@@ -10,6 +10,7 @@
                 <div class="span-2"><dt>UP</dt><dd data-dokumen-keluar-field="up"></dd></div>
                 <div class="span-2"><dt>Tanggal Pengiriman</dt><dd data-dokumen-keluar-field="tanggal_pengiriman"></dd></div>
                 <div class="span-2"><dt>Alamat Penerima</dt><dd data-dokumen-keluar-field="alamat_penerima"></dd></div>
+                <div class="span-2"><dt>Dokumen</dt><dd><a href="#" target="_blank" rel="noopener noreferrer" data-dokumen-keluar-document-link hidden>Buka dokumen ↗</a><span data-dokumen-keluar-document-empty>-</span></dd></div>
             </dl>
         </div>
         <footer class="modal-footer"><button type="button" class="btn btn-ghost" data-dokumen-keluar-detail-close>Tutup</button><?php if (! ($readOnly ?? false)): ?><button type="button" class="btn btn-primary" data-dokumen-keluar-detail-edit>✎ Ubah data</button><?php endif ?></footer>

@@ -132,6 +132,8 @@ class DokumenKeluar extends BaseController
                 'tanggal_pengiriman'       => date('d-m-Y', strtotime($dokumen['tanggal_pengiriman'])),
                 'tanggal_pengiriman_value' => $dokumen['tanggal_pengiriman'],
                 'alamat_penerima'          => $dokumen['alamat_penerima'],
+                'dokumen_link'             => $dokumen['dokumen_link'] ?: '',
+                'dokumen_link_value'       => $dokumen['dokumen_link'] ?: '',
                 'update_url'               => site_url("agendaris/surat-keluar/{$id}"),
                 'delete_url'               => site_url("agendaris/surat-keluar/{$id}/hapus"),
             ],
@@ -190,6 +192,7 @@ class DokumenKeluar extends BaseController
             'up'                  => trim((string) $this->request->getPost('up')),
             'tanggal_pengiriman'  => trim((string) $this->request->getPost('tanggal_pengiriman')),
             'alamat_penerima'     => trim((string) $this->request->getPost('alamat_penerima')),
+            'dokumen_link'        => trim((string) $this->request->getPost('dokumen_link')),
         ];
     }
 
@@ -203,13 +206,21 @@ class DokumenKeluar extends BaseController
             'up'                 => 'permit_empty|max_length[255]',
             'tanggal_pengiriman' => 'required|valid_date[Y-m-d]',
             'alamat_penerima'    => 'required|max_length[2000]',
+            'dokumen_link'       => 'permit_empty|max_length[2048]',
         ]);
 
         if (! $validation->run($data)) {
             return array_values($validation->getErrors());
         }
 
-        foreach (['pemohon', 'pelaksana', 'up'] as $optionalField) {
+        if ($data['dokumen_link'] !== '') {
+            $scheme = strtolower((string) parse_url($data['dokumen_link'], PHP_URL_SCHEME));
+            if ($scheme !== 'https' || filter_var($data['dokumen_link'], FILTER_VALIDATE_URL) === false) {
+                return ['Link dokumen harus berupa URL HTTPS yang valid.'];
+            }
+        }
+
+        foreach (['pemohon', 'pelaksana', 'up', 'dokumen_link'] as $optionalField) {
             if ($data[$optionalField] === '') {
                 $data[$optionalField] = null;
             }

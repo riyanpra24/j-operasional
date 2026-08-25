@@ -10,7 +10,7 @@ class DokumenMasukModel extends Model
     protected $primaryKey     = 'id';
     protected $returnType     = 'array';
     protected $useSoftDeletes = true;
-    protected $allowedFields  = ['pengirim', 'perihal', 'penerima', 'hari', 'tanggal', 'jenis', 'jumlah', 'ekspedisi', 'pengambilan', 'tanggal_security'];
+    protected $allowedFields  = ['pengirim', 'perihal', 'penerima', 'hari', 'tanggal', 'jenis', 'jumlah', 'ekspedisi', 'pengambilan', 'pengambilan_at', 'tanggal_security'];
 
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';

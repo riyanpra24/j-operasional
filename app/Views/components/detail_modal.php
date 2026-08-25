@@ -28,7 +28,7 @@
                 <div><dt>Tanggal Diterima</dt><dd data-detail-field="tanggal"></dd></div>
                 <div><dt>Jumlah</dt><dd data-detail-field="jumlah"></dd></div>
                 <div><dt>Ekspedisi</dt><dd data-detail-field="ekspedisi"></dd></div>
-                <div class="pickup-detail-row"><dt>Pengambilan</dt><dd data-detail-field="pengambilan"></dd><small>Data dikunci setelah diproses melalui Distribusi Dokumen.</small></div>
+                <div class="pickup-detail-row"><dt>Pengambilan</dt><dd data-detail-field="pengambilan"></dd><small class="pickup-time" data-detail-field="pengambilan_at"></small><small>Data dikunci setelah diproses melalui Distribusi Dokumen.</small></div>
             </dl>
         </div>
 

@@ -52,8 +52,13 @@
                     </div>
                     <div class="form-group">
                         <label for="modal_jenis">Jenis <span class="required">*</span></label>
-                        <input id="modal_jenis" name="jenis" list="modal-jenis-list" maxlength="100" placeholder="Surat / Dokumen / Paket" required>
-                        <datalist id="modal-jenis-list"><option value="Surat"><option value="Dokumen"><option value="Berkas"><option value="Paket"></datalist>
+                        <select id="modal_jenis" name="jenis" required>
+                            <option value="">Pilih jenis</option>
+                            <option value="Surat">Surat</option>
+                            <option value="Dokumen">Dokumen</option>
+                            <option value="Berkas">Berkas</option>
+                            <option value="Paket">Paket</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="modal_jumlah">Jumlah <span class="required">*</span></label>

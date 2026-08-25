@@ -15,6 +15,11 @@
                     <div class="form-group"><label for="keluar_up">UP</label><input id="keluar_up" name="up" maxlength="255" placeholder="Nama atau unit tujuan UP"></div>
                     <div class="form-group"><label for="keluar_tanggal_pengiriman">Tanggal Pengiriman <span class="required">*</span></label><input id="keluar_tanggal_pengiriman" type="date" name="tanggal_pengiriman" required></div>
                     <div class="form-group modal-span-2"><label for="keluar_alamat_penerima">Alamat Penerima <span class="required">*</span></label><textarea id="keluar_alamat_penerima" name="alamat_penerima" maxlength="2000" placeholder="Alamat lengkap penerima" required></textarea></div>
+                    <div class="form-group modal-span-2 agenda-link-field">
+                        <label for="keluar_dokumen_link">Link Berkas</label>
+                        <input id="keluar_dokumen_link" type="url" name="dokumen_link" maxlength="2048" placeholder="https://...">
+                        <small>Tempel tautan HTTPS dari OneDrive, SharePoint, atau penyimpanan dokumen lainnya</small>
+                    </div>
                 </div>
             </div>
             <footer class="modal-footer"><span class="modal-submit-status" data-dokumen-keluar-status></span><button type="button" class="btn btn-ghost" data-dokumen-keluar-form-close>Batal</button><button type="submit" class="btn btn-primary" data-dokumen-keluar-submit>Simpan Surat Keluar</button></footer>

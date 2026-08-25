@@ -133,6 +133,9 @@ class DokumenMasuk extends BaseController
                     'jumlah'          => number_format((int) $dokumen['jumlah'], 0, ',', '.'),
                     'ekspedisi'       => $dokumen['ekspedisi'] ?: '-',
                     'pengambilan'     => $dokumen['pengambilan'] ?: 'Belum diambil',
+                    'pengambilan_at'  => $dokumen['pengambilan_at']
+                        ? 'Diambil pada ' . date('d-m-Y H:i', strtotime($dokumen['pengambilan_at'])) . ' WIB'
+                        : 'Waktu pengambilan belum tersedia',
                     'created_at'      => date('d-m-Y H:i', strtotime($dokumen['created_at'])) . ' WIB',
                     'updated_at'      => date('d-m-Y H:i', strtotime($dokumen['updated_at'])) . ' WIB',
                     'edit_url'        => site_url("dokumen-masuk/{$id}/ubah"),
@@ -271,7 +274,7 @@ class DokumenMasuk extends BaseController
             'penerima'  => 'required|max_length[255]',
             'hari'      => 'required|in_list[Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu]',
             'tanggal'   => 'required|valid_date[Y-m-d]',
-            'jenis'     => 'required|max_length[100]',
+            'jenis'     => 'required|in_list[Surat,Dokumen,Berkas,Paket]',
             'jumlah'    => 'required|integer|greater_than_equal_to[1]',
             'ekspedisi' => 'permit_empty|max_length[150]',
         ])->run($data);

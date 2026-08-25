@@ -254,7 +254,11 @@ class DistribusiDokumen extends BaseController
 
         $db = db_connect();
         $db->transStart();
-        $model->update($id, ['pengambilan' => $pengambilan]);
+        $pengambilanAt = date('Y-m-d H:i:s');
+        $model->update($id, [
+            'pengambilan'    => $pengambilan,
+            'pengambilan_at' => $pengambilanAt,
+        ]);
 
         $agendaExists = $db->table('agendaris')->where('dokumen_masuk_id', $id)->countAllResults() > 0;
         if (! $agendaExists) {

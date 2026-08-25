@@ -1066,6 +1066,7 @@
             dokumenKeluarForm.elements.up.value = data.up_value;
             dokumenKeluarForm.elements.tanggal_pengiriman.value = data.tanggal_pengiriman_value;
             dokumenKeluarForm.elements.alamat_penerima.value = data.alamat_penerima;
+            dokumenKeluarForm.elements.dokumen_link.value = data.dokumen_link_value;
             dokumenKeluarStatus.textContent = '';
         } catch (error) {
             showDokumenKeluarErrors(error.message);
@@ -1131,6 +1132,12 @@
             Object.entries(data).forEach(([field, value]) => {
                 dokumenKeluarDetailModal.querySelectorAll(`[data-dokumen-keluar-field="${field}"]`).forEach((element) => { element.textContent = value; });
             });
+            const documentLink = dokumenKeluarDetailModal.querySelector('[data-dokumen-keluar-document-link]');
+            const documentEmpty = dokumenKeluarDetailModal.querySelector('[data-dokumen-keluar-document-empty]');
+            const hasDocumentLink = Boolean(data.dokumen_link);
+            documentLink.hidden = !hasDocumentLink;
+            documentLink.href = hasDocumentLink ? data.dokumen_link : '#';
+            documentEmpty.hidden = hasDocumentLink;
             dokumenKeluarDetailLoading.hidden = true;
             dokumenKeluarDetailContent.hidden = false;
         } catch (error) {
