@@ -2,13 +2,21 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\RedirectResponse;
+
 class Landing extends BaseController
 {
-    public function index(): string
+    public function index(): string|RedirectResponse
     {
+        if (session()->get('auth_user_id') !== null) {
+            $lastRoute = (string) session()->get('auth_last_route');
+
+            return redirect()->to(site_url($lastRoute !== '' ? $lastRoute : 'dashboard'));
+        }
+
         return view('landing/index', [
             'title'      => 'J-Operasional',
-            'isLoggedIn' => session()->get('auth_user_id') !== null,
+            'isLoggedIn' => false,
         ]);
     }
 }

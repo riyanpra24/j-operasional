@@ -7,6 +7,7 @@
     <title><?= esc($title ?? 'J-Operasional') ?> | Document Management</title>
     <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg?v=2') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>">
+    <script src="<?= base_url('assets/url-mask.js') ?>"></script>
 </head>
 <body class="landing-page">
     <a class="landing-skip-link" href="#konten-utama">Lewati ke konten utama</a>

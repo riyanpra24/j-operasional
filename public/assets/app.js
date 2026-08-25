@@ -1,4 +1,13 @@
 (() => {
+    const reloadOperationalPage = () => {
+        if (typeof window.__operationalRouteUrl === 'string' && window.__operationalRouteUrl !== '') {
+            window.location.replace(window.__operationalRouteUrl);
+            return;
+        }
+
+        window.location.reload();
+    };
+
     const sidebar = document.querySelector('#sidebar');
     const sidebarToggle = document.querySelector('[data-sidebar-toggle]');
     const desktopMedia = window.matchMedia('(min-width: 901px)');
@@ -312,7 +321,7 @@
             modalErrors.classList.add('success');
             modalErrors.hidden = false;
             modalStatus.textContent = 'Berhasil disimpan';
-            window.setTimeout(() => window.location.reload(), 650);
+            window.setTimeout(reloadOperationalPage, 650);
         } catch (error) {
             showErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
@@ -497,7 +506,7 @@
             editErrors.classList.add('success');
             editErrors.hidden = false;
             editStatus.textContent = 'Berhasil diperbarui';
-            window.setTimeout(() => window.location.reload(), 650);
+            window.setTimeout(reloadOperationalPage, 650);
         } catch (error) {
             showEditErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
@@ -569,7 +578,7 @@
             updateCsrf(result.csrf);
 
             if (!response.ok || !result.success) throw new Error(result.message || 'Dokumen gagal dihapus.');
-            window.setTimeout(() => window.location.reload(), 250);
+            window.setTimeout(reloadOperationalPage, 250);
         } catch (error) {
             deleteError.textContent = error.message;
             deleteError.hidden = false;
@@ -676,7 +685,7 @@
             distributionErrors.classList.add('success');
             distributionErrors.hidden = false;
             distributionStatus.textContent = 'Berhasil diproses';
-            window.setTimeout(() => window.location.reload(), 650);
+            window.setTimeout(reloadOperationalPage, 650);
         } catch (error) {
             showDistributionErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
@@ -796,7 +805,7 @@
                 return;
             }
             outgoingDistributionStatus.textContent = 'Berhasil disimpan';
-            window.setTimeout(() => window.location.reload(), 500);
+            window.setTimeout(reloadOperationalPage, 500);
         } catch (error) {
             showOutgoingDistributionErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
@@ -938,7 +947,7 @@
                 return;
             }
             agendaStatus.textContent = 'Berhasil disimpan';
-            window.setTimeout(() => window.location.reload(), 500);
+            window.setTimeout(reloadOperationalPage, 500);
         } catch (error) {
             showAgendaErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
@@ -1037,7 +1046,7 @@
             const result = await response.json();
             updateCsrf(result.csrf);
             if (!response.ok || !result.success) throw new Error(result.message || 'Data gagal dihapus.');
-            window.setTimeout(() => window.location.reload(), 250);
+            window.setTimeout(reloadOperationalPage, 250);
         } catch (error) {
             agendaDeleteError.textContent = error.message;
             agendaDeleteError.hidden = false;
@@ -1147,7 +1156,7 @@
                 return;
             }
             dokumenKeluarStatus.textContent = 'Berhasil disimpan';
-            window.setTimeout(() => window.location.reload(), 500);
+            window.setTimeout(reloadOperationalPage, 500);
         } catch (error) {
             showDokumenKeluarErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
@@ -1238,7 +1247,7 @@
             const result = await response.json();
             updateCsrf(result.csrf);
             if (!response.ok || !result.success) throw new Error(result.message || 'Data gagal dihapus.');
-            window.setTimeout(() => window.location.reload(), 250);
+            window.setTimeout(reloadOperationalPage, 250);
         } catch (error) {
             dokumenKeluarDeleteError.textContent = error.message;
             dokumenKeluarDeleteError.hidden = false;
@@ -1389,7 +1398,7 @@
             updateCsrf(result.csrf);
             if (!response.ok || !result.success) { showProgressErrors(result.message || 'Data belum dapat disimpan.', result.errors || []); return; }
             progressStatus.textContent = 'Berhasil disimpan';
-            window.setTimeout(() => window.location.reload(), 500);
+            window.setTimeout(reloadOperationalPage, 500);
         } catch (error) {
             showProgressErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
@@ -1417,7 +1426,7 @@
             const result = await response.json();
             updateCsrf(result.csrf);
             if (!response.ok || !result.success) throw new Error(result.message || 'Dokumen gagal dihapus.');
-            window.setTimeout(() => window.location.reload(), 250);
+            window.setTimeout(reloadOperationalPage, 250);
         } catch (error) {
             progressDeleteError.textContent = error.message;
             progressDeleteError.hidden = false;

@@ -27,6 +27,7 @@ $errors  = session()->getFlashdata('errors') ?? [];
     <title><?= esc($title ?? 'Operasional') ?> | Register Operasional</title>
     <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg?v=2') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>">
+    <script src="<?= base_url('assets/url-mask.js') ?>"></script>
     <script>
         try {
             if (window.innerWidth > 900 && localStorage.getItem('j-operasional-sidebar') === 'collapsed') {

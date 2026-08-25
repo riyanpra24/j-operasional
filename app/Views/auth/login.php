@@ -11,6 +11,7 @@ $logoutSuccess = session()->getFlashdata('logout_success');
     <title><?= esc($title ?? 'Login') ?> | J-Operasional</title>
     <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg?v=2') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>">
+    <script src="<?= base_url('assets/url-mask.js') ?>"></script>
 </head>
 <body class="login-page">
     <main class="login-shell">
