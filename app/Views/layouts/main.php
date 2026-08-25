@@ -96,13 +96,9 @@ $errors  = session()->getFlashdata('errors') ?? [];
                             <span aria-hidden="true">●</span>
                             Dokumen Keluar
                         </a>
-                        <a href="<?= site_url('agendaris/progres-dokumen-masuk') ?>" class="nav-sublink <?= $agendarisActive && $agendarisPage === 'progres-dokumen-masuk' ? 'active' : '' ?>">
+                        <a href="<?= site_url('agendaris/progres-dokumen') ?>" class="nav-sublink <?= $agendarisActive && in_array($agendarisPage, ['progres-dokumen', 'progres-dokumen-masuk', 'progres-dokumen-keluar'], true) ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
-                            Progres Dokumen Masuk
-                        </a>
-                        <a href="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="nav-sublink <?= $agendarisActive && in_array($agendarisPage, ['progres-dokumen', 'progres-dokumen-keluar'], true) ? 'active' : '' ?>">
-                            <span aria-hidden="true">●</span>
-                            Progres Dokumen Keluar
+                            Progres Dokumen
                         </a>
                     </div>
                 </div>

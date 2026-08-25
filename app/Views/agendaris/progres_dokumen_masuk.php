@@ -3,12 +3,14 @@
 
 <section class="page-heading">
     <p class="eyebrow">AGENDARIS</p>
-    <h1>Progres Dokumen Masuk</h1>
-    <p>Pantau proses penyerahan seluruh dokumen yang berasal dari Security.</p>
+    <h1>Progres Dokumen</h1>
+    <p>Pantau proses dokumen masuk dan dokumen keluar dalam satu halaman terhubung.</p>
 </section>
 
+<?= view('agendaris/progres_tabs', ['activeTab' => 'masuk']) ?>
+
 <section class="panel filter-panel">
-    <form method="get" action="<?= site_url('agendaris/progres-dokumen-masuk') ?>" class="agendaris-filter-form">
+    <form method="get" action="<?= site_url('agendaris/progres-dokumen') ?>" class="agendaris-filter-form">
         <div class="form-group search-group">
             <label for="incoming_progress_q">Cari dokumen</label>
             <div class="input-with-icon"><span>⌕</span><input id="incoming_progress_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Pengirim, perihal, penerima, jenis..."></div>
@@ -22,7 +24,7 @@
             </select>
         </div>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
-        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen-masuk') ?>" class="btn btn-ghost">Reset</a></div>
+        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen') ?>" class="btn btn-ghost">Reset</a></div>
     </form>
 </section>
 
@@ -55,7 +57,7 @@
         </table>
     </div>
     <div class="table-list-footer">
-        <form method="get" action="<?= site_url('agendaris/progres-dokumen-masuk') ?>" class="table-length-form">
+        <form method="get" action="<?= site_url('agendaris/progres-dokumen') ?>" class="table-length-form">
             <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>">
             <input type="hidden" name="progres" value="<?= esc($filters['progres']) ?>">
             <label for="incoming_progress_per_page">Tampilkan</label>

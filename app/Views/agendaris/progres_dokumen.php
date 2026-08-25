@@ -2,9 +2,11 @@
 <?= $this->section('content') ?>
 
 <section class="page-heading heading-actions">
-    <div><p class="eyebrow">AGENDARIS</p><h1>Progres Dokumen Keluar</h1><p>Seluruh data Dokumen Keluar beserta progres distribusinya.</p></div>
+    <div><p class="eyebrow">AGENDARIS</p><h1>Progres Dokumen</h1><p>Pantau proses dokumen masuk dan dokumen keluar dalam satu halaman terhubung.</p></div>
     <button type="button" class="btn btn-primary" data-progress-add>＋ Tambah Dokumen</button>
 </section>
+
+<?= view('agendaris/progres_tabs', ['activeTab' => 'keluar']) ?>
 
 <section class="panel filter-panel">
     <form method="get" action="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="agendaris-filter-form">

@@ -403,6 +403,15 @@ body { background: #e9edef; }
 @media (max-width: 650px) { .company-metrics { grid-template-columns: 1fr; gap: 8px; padding: 0; }.company-summary-card { min-height: auto; }.company-metric { min-height: 52px; }.reference-data-grid { grid-template-columns: 1fr; }.mini-analytics-card { grid-column: auto; }.reference-section-header { grid-template-columns: 1fr auto; }.reference-search { display: none; }.reference-line-chart { padding-inline: 8px; }.reference-legend { gap: 12px; }.reference-top-grid,.reference-chart-grid { gap: 10px; } }
 
 /* Agendaris - Surat Masuk */
+.progress-document-tabs { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: -7px 0 18px; padding: 6px; background: #eef3f6; border: 1px solid #e1e7ec; border-radius: 13px; }
+.progress-document-tab { position: relative; display: grid; grid-template-columns: 38px 1fr; grid-template-rows: auto auto; column-gap: 11px; align-items: center; min-height: 67px; padding: 11px 14px; color: #6d7b8d; background: transparent; border: 1px solid transparent; border-radius: 10px; transition: .18s ease; }
+.progress-document-tab > span { display: grid; grid-row: 1 / span 2; place-items: center; width: 38px; height: 38px; color: #77909d; background: #e2eaee; border-radius: 10px; font-size: 17px; font-weight: 800; }
+.progress-document-tab strong { align-self: end; color: #526075; font-size: 10px; }
+.progress-document-tab small { align-self: start; margin-top: 2px; color: #8d99a9; font-size: 7.5px; }
+.progress-document-tab:hover { color: #078f91; background: rgba(255,255,255,.65); }
+.progress-document-tab.active { background: #fff; border-color: #b9e2df; box-shadow: 0 4px 12px rgba(36,76,83,.09); }
+.progress-document-tab.active > span { color: #fff; background: linear-gradient(145deg,#11b7aa,#078fa7); }
+.progress-document-tab.active strong { color: #087f82; }
 .agendaris-filter-form { display: grid; grid-template-columns: minmax(250px,1.5fr) minmax(145px,.8fr) minmax(165px,.72fr) minmax(165px,.72fr) auto; gap: 11px; align-items: end; }
 .agendaris-heading-actions { align-items: center; }
 .agendaris-heading-actions form { margin: 0; }
@@ -446,6 +455,7 @@ body { background: #e9edef; }
 }
 
 @media (max-width: 650px) {
+    .progress-document-tabs { grid-template-columns: 1fr; }
     .agendaris-heading-actions { width: 100%; }
     .agendaris-heading-actions form,.agendaris-heading-actions .btn { flex: 1; }
     .agendaris-heading-actions form .btn { width: 100%; }

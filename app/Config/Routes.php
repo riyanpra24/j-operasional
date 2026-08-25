@@ -79,7 +79,7 @@ $routes->group('agendaris', static function (RouteCollection $routes): void {
         $routes->post('(:num)/hapus', 'DokumenKeluar::destroy/$1', ['as' => 'dokumen_keluar.destroy']);
     });
 
-    $routes->get('progres-dokumen', static fn () => redirect()->to(site_url('agendaris/progres-dokumen-keluar')));
+    $routes->get('progres-dokumen', 'ProgresDokumen::masuk', ['as' => 'progres_dokumen.index']);
 
     $routes->group('progres-dokumen-masuk', static function (RouteCollection $routes): void {
         $routes->get('/', 'ProgresDokumen::masuk', ['as' => 'progres_dokumen_masuk.index']);
@@ -87,10 +87,10 @@ $routes->group('agendaris', static function (RouteCollection $routes): void {
     });
 
     $routes->group('progres-dokumen-keluar', static function (RouteCollection $routes): void {
-        $routes->get('/', 'ProgresDokumen::index', ['as' => 'progres_dokumen.index']);
-        $routes->post('/', 'ProgresDokumen::store', ['as' => 'progres_dokumen.store']);
-        $routes->get('(:num)', 'ProgresDokumen::show/$1', ['as' => 'progres_dokumen.show']);
-        $routes->post('(:num)', 'ProgresDokumen::update/$1', ['as' => 'progres_dokumen.update']);
-        $routes->post('(:num)/hapus', 'ProgresDokumen::destroy/$1', ['as' => 'progres_dokumen.destroy']);
+        $routes->get('/', 'ProgresDokumen::index', ['as' => 'progres_dokumen_keluar.index']);
+        $routes->post('/', 'ProgresDokumen::store', ['as' => 'progres_dokumen_keluar.store']);
+        $routes->get('(:num)', 'ProgresDokumen::show/$1', ['as' => 'progres_dokumen_keluar.show']);
+        $routes->post('(:num)', 'ProgresDokumen::update/$1', ['as' => 'progres_dokumen_keluar.update']);
+        $routes->post('(:num)/hapus', 'ProgresDokumen::destroy/$1', ['as' => 'progres_dokumen_keluar.destroy']);
     });
 });

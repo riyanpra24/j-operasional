@@ -51,7 +51,7 @@ class ProgresDokumen extends BaseController
         }
 
         return view('agendaris/progres_dokumen_masuk', [
-            'title'   => 'Progres Dokumen Masuk',
+            'title'   => 'Progres Dokumen',
             'dokumen' => $this->dokumenMasukModel
                 ->orderBy('created_at', 'ASC')
                 ->orderBy('id', 'ASC')
@@ -119,7 +119,7 @@ class ProgresDokumen extends BaseController
         }
 
         return view('agendaris/progres_dokumen', [
-            'title'   => 'Progres Dokumen Keluar',
+            'title'   => 'Progres Dokumen',
             'dokumen' => $this->model->orderBy('id', 'ASC')->paginate($perPage, 'progres_dokumen'),
             'pager'   => $this->model->pager,
             'filters' => compact('keyword', 'progres', 'perPage'),
