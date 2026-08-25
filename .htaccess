@@ -1,0 +1,29 @@
+# Compatibility entry point when the hosting document root points to the
+# CodeIgniter project directory instead of directly to the public directory.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Keep hosting certificate validation reachable.
+    RewriteRule ^\.well-known(?:/|$) - [L]
+
+    # Never expose application source, runtime data, dependencies, or secrets.
+    RewriteRule ^(?:app|system|tests|writable|vendor|\.git)(?:/|$) - [F,L,NC]
+    RewriteRule ^(?:\.env(?:\..*)?|env|composer\.(?:json|lock)|phpunit(?:\.dist)?\.xml|preload\.php|spark)$ - [F,L,NC]
+
+    # Send the domain root directly to CodeIgniter's public front controller.
+    RewriteRule ^$ public/index.php [L,QSA]
+
+    # Requests already inside public are handled by public/.htaccess.
+    RewriteRule ^public(?:/|$) - [L]
+
+    # Expose public assets and route application URLs without moving files.
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+
+<FilesMatch "^(?:\.env(?:\..*)?|env|composer\.(?:json|lock)|phpunit(?:\.dist)?\.xml|preload\.php|spark)$">
+    Require all denied
+</FilesMatch>
+
+ServerSignature Off
