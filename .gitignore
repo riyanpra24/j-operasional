@@ -1,0 +1,39 @@
+# Environment files and local credentials
+.env
+.env.*
+!.env.example
+
+# Dependency directories
+/vendor/
+/node_modules/
+
+# CodeIgniter writable runtime data
+/writable/cache/*
+!/writable/cache/index.html
+/writable/debugbar/*
+!/writable/debugbar/index.html
+/writable/logs/*
+!/writable/logs/index.html
+/writable/session/*
+!/writable/session/index.html
+/writable/uploads/*
+!/writable/uploads/index.html
+
+# Test and coverage artifacts
+/.phpunit.result.cache
+/coverage/
+
+# Database dumps, archives, and local backups
+*.sql
+*.zip
+*.tar
+*.tar.gz
+*.bak
+*.tmp
+
+# IDE and operating-system files
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini

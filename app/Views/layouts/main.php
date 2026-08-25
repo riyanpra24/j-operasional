@@ -25,7 +25,7 @@ $errors  = session()->getFlashdata('errors') ?? [];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sistem register dokumen masuk operasional">
     <title><?= esc($title ?? 'Operasional') ?> | Register Operasional</title>
-    <link rel="icon" href="<?= base_url('favicon.ico') ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg?v=2') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>">
     <script>
         try {
