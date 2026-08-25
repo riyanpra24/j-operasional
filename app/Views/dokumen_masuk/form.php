@@ -19,8 +19,12 @@ $jenisOther = (string) old('jenis_lainnya', $jenisChoice === 'Lainnya' && $curre
         <div class="form-group span-2"><label for="penerima">Penerima <span class="required">*</span></label><input id="penerima" name="penerima" maxlength="255" value="<?= esc($v('penerima')) ?>" required></div>
         <div class="form-group"><label for="tanggal">Tanggal Diterima <span class="required">*</span></label><input id="tanggal" type="date" name="tanggal" value="<?= esc($v('tanggal', date('Y-m-d'))) ?>" data-date-input required></div>
         <div class="form-group"><label for="hari">Hari</label><input id="hari" value="<?= esc($v('hari')) ?>" data-day-output readonly tabindex="-1"><small>Dihitung otomatis</small></div>
+<<<<<<< HEAD
         <div class="form-group"><label for="jenis">Jenis <span class="required">*</span></label><select id="jenis" name="jenis" data-jenis-select required><option value="">Pilih jenis</option><?php foreach ([...$jenisOptions, 'Lainnya'] as $jenis): ?><option value="<?= esc($jenis, 'attr') ?>" <?= $jenisChoice === $jenis ? 'selected' : '' ?>><?= esc($jenis) ?></option><?php endforeach ?></select></div>
         <div class="form-group span-2" data-jenis-custom <?= $jenisChoice === 'Lainnya' ? '' : 'hidden' ?>><label for="jenis_lainnya">Jenis lainnya <span class="required">*</span></label><input id="jenis_lainnya" name="jenis_lainnya" data-jenis-custom-input maxlength="100" value="<?= esc($jenisOther, 'attr') ?>" placeholder="Ketik jenis dokumen" <?= $jenisChoice === 'Lainnya' ? 'required' : 'disabled' ?>></div>
+=======
+        <div class="form-group"><label for="jenis">Jenis <span class="required">*</span></label><select id="jenis" name="jenis" required><option value="">Pilih jenis</option><?php foreach (['Surat', 'Dokumen', 'Berkas', 'Paket'] as $jenisOption): ?><option value="<?= esc($jenisOption, 'attr') ?>" <?= $v('jenis') === $jenisOption ? 'selected' : '' ?>><?= esc($jenisOption) ?></option><?php endforeach ?></select></div>
+>>>>>>> 3fb4f07c1d3125ff5fb057a935357640b39148e3
         <div class="form-group"><label for="jumlah">Jumlah <span class="required">*</span></label><input id="jumlah" type="number" min="1" name="jumlah" value="<?= esc($v('jumlah', '1')) ?>" required></div>
         <?= view('components/ekspedisi_selector', ['prefix' => 'form', 'current' => $v('ekspedisi'), 'groupClass' => 'span-2']) ?>
     </div></section>

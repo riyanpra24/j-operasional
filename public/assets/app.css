@@ -477,6 +477,7 @@ body { background: #e9edef; }
 .pickup-status { display: inline-block; max-width: 160px; overflow: hidden; padding: 5px 8px; border-radius: 999px; font-size: 7.5px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
 .pickup-status.pending { color: #a26b18; background: #fff4de; border: 1px solid #f1d9aa; }.pickup-status.completed { color: #087a71; background: #e2f7f3; border: 1px solid #bfe7e1; }
 .locked-pickup-detail { padding: 14px !important; background: #f0faf8; border: 1px solid #cdeae6 !important; border-radius: 8px; }.locked-pickup-detail dt { color: #078f8b; }.locked-pickup-detail small,.pickup-detail-row small { display: block; margin-top: 5px; color: #8b989e; font-size: 7.5px; }.pickup-detail-row { margin-top: 6px; padding: 13px !important; background: #f0faf8; border: 1px solid #cdeae6 !important; border-radius: 8px; }
+.locked-pickup-detail .pickup-time,.pickup-detail-row .pickup-time { color: #078f8b; font-weight: 800; }
 
 /* Popup proses distribusi */
 .distribution-action-modal[hidden] { display: none; }

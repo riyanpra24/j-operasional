@@ -23,5 +23,6 @@ class DokumenKeluarModel extends Model
         'tanggal_security',
         'progres',
         'alamat_penerima',
+        'dokumen_link',
     ];
 }

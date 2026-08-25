@@ -28,8 +28,12 @@
                 <div><dt>Tanggal Diterima</dt><dd data-detail-field="tanggal"></dd></div>
                 <div><dt>Jumlah</dt><dd data-detail-field="jumlah"></dd></div>
                 <div><dt>Ekspedisi</dt><dd data-detail-field="ekspedisi"></dd></div>
+<<<<<<< HEAD
                 <div class="pickup-detail-row"><dt>Penyerahan</dt><dd data-detail-field="pengambilan"></dd><small>Data dikunci setelah diproses melalui Distribusi Dokumen.</small></div>
                 <div class="pickup-detail-row" data-penyerahan-time hidden><dt>Waktu Penyerahan</dt><dd data-detail-field="penyerahan_at"></dd><small>Tanggal dan waktu dicatat otomatis saat penyerahan disimpan.</small></div>
+=======
+                <div class="pickup-detail-row"><dt>Pengambilan</dt><dd data-detail-field="pengambilan"></dd><small class="pickup-time" data-detail-field="pengambilan_at"></small><small>Data dikunci setelah diproses melalui Distribusi Dokumen.</small></div>
+>>>>>>> 3fb4f07c1d3125ff5fb057a935357640b39148e3
             </dl>
         </div>
 
