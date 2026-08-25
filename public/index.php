@@ -47,9 +47,38 @@ if (getcwd() . DIRECTORY_SEPARATOR !== FCPATH) {
  */
 
 // LOAD OUR PATHS CONFIG FILE
-// This is the line that might need to be changed, depending on your folder structure.
-require FCPATH . '../app/Config/Paths.php';
-// ^^^ Change this line if you move your application folder
+//
+// Struktur lokal CodeIgniter:
+//   operasional/public/index.php
+//   operasional/app/Config/Paths.php
+//
+// Struktur yang disarankan untuk Hostinger shared hosting:
+//   public_html/index.php
+//   operasional/app/Config/Paths.php
+//
+// Kandidat pertama mempertahankan struktur standar CodeIgniter. Kandidat
+// kedua memungkinkan isi folder `public` dipindahkan ke `public_html` tanpa
+// membuka folder app, system, dan writable ke akses publik.
+$pathsConfigCandidates = [
+    FCPATH . '../app/Config/Paths.php',
+    FCPATH . '../operasional/app/Config/Paths.php',
+];
+
+$pathsConfig = null;
+
+foreach ($pathsConfigCandidates as $candidate) {
+    if (is_file($candidate)) {
+        $pathsConfig = $candidate;
+        break;
+    }
+}
+
+if ($pathsConfig === null) {
+    http_response_code(500);
+    exit('Konfigurasi CodeIgniter tidak ditemukan. Periksa lokasi folder operasional/app/Config/Paths.php.');
+}
+
+require $pathsConfig;
 
 $paths = new Paths();
 

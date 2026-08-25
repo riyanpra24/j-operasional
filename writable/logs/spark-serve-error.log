@@ -45,3 +45,52 @@
 [Tue Aug 25 11:19:42 2026] 127.0.0.1:64482 Accepted
 [Tue Aug 25 11:19:43 2026] 127.0.0.1:64482 [200]: GET /index.php?debugbar_time=1787631582.631079
 [Tue Aug 25 11:19:43 2026] 127.0.0.1:64482 Closing
+[Tue Aug 25 11:21:00 2026] 127.0.0.1:52600 Accepted
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:52600 Closing
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:52300 Accepted
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:59868 Accepted
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:52300 [200]: GET /index.php?debugbar
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:52300 Closing
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:64989 Accepted
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:59868 [200]: GET /assets/app.css
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:64989 [200]: GET /assets/app.js
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:59868 Closing
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:64989 Closing
+[Tue Aug 25 11:21:01 2026] 127.0.0.1:50762 Accepted
+[Tue Aug 25 11:21:02 2026] 127.0.0.1:50762 [200]: GET /index.php?debugbar_time=1787631661.670619
+[Tue Aug 25 11:21:02 2026] 127.0.0.1:50762 Closing
+[Tue Aug 25 15:04:20 2026] 127.0.0.1:54592 Accepted
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:54592 Closing
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:61785 Accepted
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:61785 Closed without sending a request; it was probably just an unused speculative preconnection
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:61785 Closing
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:56552 Accepted
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:56552 Closing
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:63738 Accepted
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:56621 Accepted
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:63738 [200]: GET /assets/app.css
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:56621 [200]: GET /index.php?debugbar
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:56621 Closing
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:63738 Closing
+[Tue Aug 25 15:04:25 2026] 127.0.0.1:54901 Accepted
+[Tue Aug 25 15:04:26 2026] 127.0.0.1:54901 [200]: GET /index.php?debugbar_time=1787645065.278797
+[Tue Aug 25 15:04:26 2026] 127.0.0.1:54901 Closing
+[Tue Aug 25 15:04:26 2026] 127.0.0.1:58971 Accepted
+[Tue Aug 25 15:04:26 2026] 127.0.0.1:58971 [200]: GET /favicon.ico
+[Tue Aug 25 15:04:26 2026] 127.0.0.1:58971 Closing
+[Tue Aug 25 15:22:58 2026] 127.0.0.1:59275 Accepted
+[Tue Aug 25 15:23:02 2026] 127.0.0.1:59275 Closing
+[Tue Aug 25 15:23:02 2026] 127.0.0.1:50681 Accepted
+[Tue Aug 25 15:23:02 2026] 127.0.0.1:63047 Accepted
+[Tue Aug 25 15:23:02 2026] 127.0.0.1:50681 [200]: GET /index.php?debugbar
+[Tue Aug 25 15:23:02 2026] 127.0.0.1:50681 Closing
+[Tue Aug 25 15:23:02 2026] 127.0.0.1:63047 [200]: GET /assets/app.css
+[Tue Aug 25 15:23:02 2026] 127.0.0.1:63047 Closing
+[Tue Aug 25 15:23:02 2026] 127.0.0.1:56358 Accepted
+[Tue Aug 25 15:23:03 2026] 127.0.0.1:56358 [200]: GET /index.php?debugbar_time=1787646181.753212
+[Tue Aug 25 15:23:03 2026] 127.0.0.1:56358 Closing
+[Tue Aug 25 15:23:03 2026] 127.0.0.1:62811 Accepted
+[Tue Aug 25 15:23:03 2026] 127.0.0.1:62811 [200]: GET /favicon.ico
+[Tue Aug 25 15:23:03 2026] 127.0.0.1:62811 Closing
+[Tue Aug 25 15:23:16 2026] 127.0.0.1:62820 Accepted
+[Tue Aug 25 15:23:16 2026] 127.0.0.1:62820 Closing

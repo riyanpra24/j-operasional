@@ -133,15 +133,9 @@ class DokumenMasuk extends BaseController
                     'jumlah'          => number_format((int) $dokumen['jumlah'], 0, ',', '.'),
                     'ekspedisi'       => $dokumen['ekspedisi'] ?: '-',
                     'pengambilan'     => $dokumen['pengambilan'] ?: 'Belum diambil',
-<<<<<<< HEAD
                     'penyerahan_at'   => $dokumen['penyerahan_at']
                         ? date('d-m-Y H:i', strtotime($dokumen['penyerahan_at'])) . ' WIB'
                         : '',
-=======
-                    'pengambilan_at'  => $dokumen['pengambilan_at']
-                        ? 'Diambil pada ' . date('d-m-Y H:i', strtotime($dokumen['pengambilan_at'])) . ' WIB'
-                        : 'Waktu pengambilan belum tersedia',
->>>>>>> 3fb4f07c1d3125ff5fb057a935357640b39148e3
                     'created_at'      => date('d-m-Y H:i', strtotime($dokumen['created_at'])) . ' WIB',
                     'updated_at'      => date('d-m-Y H:i', strtotime($dokumen['updated_at'])) . ' WIB',
                     'edit_url'        => site_url("dokumen-masuk/{$id}/ubah"),

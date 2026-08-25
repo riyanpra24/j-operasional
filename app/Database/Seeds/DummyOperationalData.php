@@ -53,7 +53,7 @@ class DummyOperationalData extends Seeder
                     'jumlah'            => $jumlah,
                     'ekspedisi'         => $ekspedisi,
                     'pengambilan'       => $pengambilan,
-                    'pengambilan_at'    => $pengambilan !== null ? $now : null,
+                    'penyerahan_at'     => $pengambilan !== null ? $now : null,
                     'tanggal_security'  => $pengambilan !== null ? $tanggal : null,
                     'created_at'        => $now,
                     'updated_at'        => $now,

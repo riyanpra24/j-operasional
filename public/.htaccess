@@ -1,6 +1,9 @@
 # Disable directory browsing
 Options -Indexes
 
+# Use CodeIgniter's front controller as the directory index.
+DirectoryIndex index.php
+
 # ----------------------------------------------------------------------
 # Rewrite engine
 # ----------------------------------------------------------------------
@@ -10,6 +13,11 @@ Options -Indexes
 <IfModule mod_rewrite.c>
 	Options +FollowSymlinks
 	RewriteEngine On
+
+	# Redirect old URLs such as /index.php/login to /login. The application
+	# itself generates clean URLs because Config\\App::$indexPage is empty.
+	RewriteCond %{THE_REQUEST} \s/+index\.php(?:[/\s?]|$) [NC]
+	RewriteRule ^index\.php(?:/(.*))?$ /$1 [R=301,L,NE]
 
 	# If you installed CodeIgniter in a subfolder, you will need to
 	# change the following line to match the subfolder you need.
@@ -21,10 +29,9 @@ Options -Indexes
 	RewriteCond %{REQUEST_URI} (.+)/$
 	RewriteRule ^ %1 [L,R=301]
 
-	# Rewrite "www.example.com -> example.com"
-	RewriteCond %{HTTPS} !=on
+	# Rewrite "www.example.com -> example.com" without downgrading HTTPS.
 	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-	RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
+	RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
 
 	# Checks to see if the user is attempting to access a valid file,
 	# such as an image or css document, if this isn't true it sends the
