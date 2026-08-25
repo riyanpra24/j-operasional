@@ -1311,7 +1311,7 @@
     const loadProgressDocument = async (url) => {
         const response = await fetch(url, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } });
         const result = await response.json();
-        if (!response.ok || !result.success) throw new Error(result.message || 'Progres Dokumen tidak tersedia.');
+        if (!response.ok || !result.success) throw new Error(result.message || 'Progres Dokumen Keluar tidak tersedia.');
         return result.dokumen;
     };
     const fillProgressForm = (data) => {
@@ -1333,7 +1333,7 @@
         setProgressSecurityFieldsLocked(false);
         progressForm.reset();
         progressForm.action = progressCreateUrl;
-        progressFormTitle.textContent = 'Tambah Progres Dokumen';
+        progressFormTitle.textContent = 'Tambah Progres Dokumen Keluar';
         progressSubmit.textContent = 'Simpan dokumen';
         progressErrors.hidden = true;
         progressStatus.textContent = '';
@@ -1345,7 +1345,7 @@
         setProgressSecurityFieldsLocked(true);
         progressForm.reset();
         progressErrors.hidden = true;
-        progressFormTitle.textContent = 'Edit Progres Dokumen';
+        progressFormTitle.textContent = 'Edit Progres Dokumen Keluar';
         progressSubmit.textContent = 'Simpan perubahan';
         progressStatus.textContent = 'Memuat data...';
         showProgressForm();
@@ -1435,6 +1435,42 @@
         }
     });
 
+    const incomingProgressModal = document.querySelector('#incomingProgressDetailModal');
+    const incomingProgressLoading = incomingProgressModal?.querySelector('[data-incoming-progress-loading]');
+    const incomingProgressContent = incomingProgressModal?.querySelector('[data-incoming-progress-content]');
+    const closeIncomingProgress = () => {
+        if (!incomingProgressModal) return;
+        incomingProgressModal.classList.remove('open');
+        incomingProgressModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        window.setTimeout(() => { incomingProgressModal.hidden = true; }, 180);
+    };
+    const openIncomingProgress = async (url) => {
+        if (!incomingProgressModal || !incomingProgressLoading || !incomingProgressContent || !url) return;
+        incomingProgressLoading.innerHTML = '<span></span><strong>Memuat Progres Dokumen Masuk...</strong>';
+        incomingProgressLoading.hidden = false;
+        incomingProgressContent.hidden = true;
+        incomingProgressModal.hidden = false;
+        incomingProgressModal.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => incomingProgressModal.classList.add('open'));
+        document.body.style.overflow = 'hidden';
+        try {
+            const response = await fetch(url, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.message || 'Progres Dokumen Masuk tidak tersedia.');
+            Object.entries(result.dokumen).forEach(([field, value]) => {
+                incomingProgressModal.querySelectorAll(`[data-incoming-progress-field="${field}"]`).forEach((element) => { element.textContent = value; });
+            });
+            incomingProgressLoading.hidden = true;
+            incomingProgressContent.hidden = false;
+        } catch (error) {
+            incomingProgressLoading.innerHTML = `<strong>${escapeHtml(error.message)}</strong>`;
+        }
+    };
+
+    document.querySelectorAll('[data-incoming-progress-view]').forEach((button) => button.addEventListener('click', () => openIncomingProgress(button.dataset.incomingProgressUrl)));
+    incomingProgressModal?.querySelectorAll('[data-incoming-progress-close]').forEach((button) => button.addEventListener('click', closeIncomingProgress));
+
     document.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
         if (agendaFormModal?.classList.contains('open')) closeAgendaForm();
@@ -1446,5 +1482,6 @@
         if (progressFormModal?.classList.contains('open')) closeProgressForm();
         if (progressDetailModal?.classList.contains('open')) closeProgressDetail();
         if (progressDeleteModal?.classList.contains('open')) closeProgressDelete();
+        if (incomingProgressModal?.classList.contains('open')) closeIncomingProgress();
     });
 })();

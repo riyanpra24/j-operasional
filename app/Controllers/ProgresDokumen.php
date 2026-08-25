@@ -3,16 +3,91 @@
 namespace App\Controllers;
 
 use App\Models\DokumenKeluarModel;
+use App\Models\DokumenMasukModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class ProgresDokumen extends BaseController
 {
     private DokumenKeluarModel $model;
+    private DokumenMasukModel $dokumenMasukModel;
 
     public function __construct()
     {
         $this->model = new DokumenKeluarModel();
+        $this->dokumenMasukModel = new DokumenMasukModel();
+    }
+
+    public function masuk(): string
+    {
+        $keyword = trim((string) $this->request->getGet('q'));
+        $progres = trim((string) $this->request->getGet('progres'));
+        $perPage = (int) $this->request->getGet('per_page');
+
+        if (! in_array($perPage, [10, 20, 50, 100], true)) {
+            $perPage = 10;
+        }
+
+        if ($keyword !== '') {
+            $this->dokumenMasukModel->groupStart()
+                ->like('pengirim', $keyword)
+                ->orLike('perihal', $keyword)
+                ->orLike('penerima', $keyword)
+                ->orLike('jenis', $keyword)
+                ->orLike('ekspedisi', $keyword)
+                ->orLike('pengambilan', $keyword)
+                ->groupEnd();
+        }
+
+        if ($progres === 'menunggu') {
+            $this->dokumenMasukModel->groupStart()
+                ->where('pengambilan', null)
+                ->orWhere('pengambilan', '')
+                ->groupEnd();
+        } elseif ($progres === 'diserahkan') {
+            $this->dokumenMasukModel
+                ->where('pengambilan IS NOT NULL', null, false)
+                ->where('pengambilan !=', '');
+        }
+
+        return view('agendaris/progres_dokumen_masuk', [
+            'title'   => 'Progres Dokumen Masuk',
+            'dokumen' => $this->dokumenMasukModel
+                ->orderBy('created_at', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->paginate($perPage, 'progres_dokumen_masuk'),
+            'pager'   => $this->dokumenMasukModel->pager,
+            'filters' => compact('keyword', 'progres', 'perPage'),
+        ]);
+    }
+
+    public function showMasuk(int $id): ResponseInterface
+    {
+        $dokumen = $this->dokumenMasukModel->find($id);
+        if ($dokumen === null) {
+            throw PageNotFoundException::forPageNotFound('Progres Dokumen Masuk tidak ditemukan.');
+        }
+
+        $sudahDiserahkan = trim((string) ($dokumen['pengambilan'] ?? '')) !== '';
+
+        return $this->response->setJSON([
+            'success' => true,
+            'dokumen' => [
+                'pengirim'         => $dokumen['pengirim'],
+                'perihal'          => $dokumen['perihal'] ?: '-',
+                'penerima'         => $dokumen['penerima'] ?: '-',
+                'hari'             => $dokumen['hari'],
+                'tanggal'          => $this->displayDate($dokumen['tanggal']),
+                'jenis'            => $dokumen['jenis'],
+                'jumlah'           => number_format((int) $dokumen['jumlah'], 0, ',', '.'),
+                'ekspedisi'        => $dokumen['ekspedisi'] ?: '-',
+                'penyerahan'       => $sudahDiserahkan ? $dokumen['pengambilan'] : 'Menunggu Penyerahan',
+                'waktu_penyerahan' => $dokumen['penyerahan_at']
+                    ? date('d-m-Y H:i', strtotime($dokumen['penyerahan_at'])) . ' WIB'
+                    : '-',
+                'progres'          => $sudahDiserahkan ? 'Sudah Diserahkan' : 'Menunggu Penyerahan',
+            ],
+        ]);
     }
 
     public function index(): string
@@ -44,7 +119,7 @@ class ProgresDokumen extends BaseController
         }
 
         return view('agendaris/progres_dokumen', [
-            'title'   => 'Progres Dokumen',
+            'title'   => 'Progres Dokumen Keluar',
             'dokumen' => $this->model->orderBy('id', 'ASC')->paginate($perPage, 'progres_dokumen'),
             'pager'   => $this->model->pager,
             'filters' => compact('keyword', 'progres', 'perPage'),
@@ -76,13 +151,13 @@ class ProgresDokumen extends BaseController
 
             return $this->response->setStatusCode(500)->setJSON([
                 'success' => false,
-                'message' => 'Progres Dokumen belum dapat disimpan.',
+                'message' => 'Progres Dokumen Keluar belum dapat disimpan.',
                 'errors'  => [$error->getMessage()],
                 'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
             ]);
         }
 
-        $message = 'Progres Dokumen berhasil ditambahkan.';
+        $message = 'Progres Dokumen Keluar berhasil ditambahkan.';
         session()->setFlashdata('success', $message);
 
         return $this->successResponse($message, ['id' => $id], 201);
@@ -119,8 +194,8 @@ class ProgresDokumen extends BaseController
                 'tanggal_security_value'     => $dokumen['tanggal_security'] ?: '',
                 'progres'                    => $dokumen['progres'] ?: 'Menunggu Ekspedisi',
                 'locked'                     => $dokumen['progres'] === 'Diambil Ekspedisi',
-                'update_url'                 => site_url("agendaris/progres-dokumen/{$id}"),
-                'delete_url'                 => site_url("agendaris/progres-dokumen/{$id}/hapus"),
+                'update_url'                 => site_url("agendaris/progres-dokumen-keluar/{$id}"),
+                'delete_url'                 => site_url("agendaris/progres-dokumen-keluar/{$id}/hapus"),
             ],
         ]);
     }
@@ -139,10 +214,10 @@ class ProgresDokumen extends BaseController
         }
 
         if (! $this->model->update($id, $data)) {
-            return $this->validationError($this->model->errors() ?: ['Progres Dokumen gagal diperbarui.']);
+            return $this->validationError($this->model->errors() ?: ['Progres Dokumen Keluar gagal diperbarui.']);
         }
 
-        $message = 'Progres Dokumen berhasil diperbarui.';
+        $message = 'Progres Dokumen Keluar berhasil diperbarui.';
         session()->setFlashdata('success', $message);
 
         return $this->successResponse($message);
@@ -156,7 +231,7 @@ class ProgresDokumen extends BaseController
         }
 
         if (! $this->model->delete($id, true)) {
-            return $this->validationError($this->model->errors() ?: ['Progres Dokumen gagal dihapus.']);
+            return $this->validationError($this->model->errors() ?: ['Progres Dokumen Keluar gagal dihapus.']);
         }
 
         $message = "Dokumen nomor {$dokumen['nomor_surat']} berhasil dihapus permanen dari database.";
@@ -230,7 +305,7 @@ class ProgresDokumen extends BaseController
     {
         $dokumen = $this->model->find($id);
         if ($dokumen === null) {
-            throw PageNotFoundException::forPageNotFound('Progres Dokumen tidak ditemukan.');
+            throw PageNotFoundException::forPageNotFound('Progres Dokumen Keluar tidak ditemukan.');
         }
 
         return $dokumen;
@@ -240,7 +315,7 @@ class ProgresDokumen extends BaseController
     {
         return $this->response->setStatusCode(422)->setJSON([
             'success' => false,
-            'message' => 'Periksa kembali data Progres Dokumen.',
+            'message' => 'Periksa kembali data Progres Dokumen Keluar.',
             'errors'  => array_values($errors),
             'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
         ]);
