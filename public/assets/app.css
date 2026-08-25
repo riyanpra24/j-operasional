@@ -287,6 +287,8 @@ input[readonly] { color: #788598; background: #f7f8fa; }
 .delete-modal-body p strong { color: #5b677a; }
 .delete-modal-body .modal-alert { margin: 15px 0 0; text-align: left; }
 .delete-modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 13px 20px; background: #fafbfc; border-top: 1px solid #edf0f4; }
+.delete-modal-actions.locked { grid-template-columns: 1fr; }
+[data-delete-submit][hidden] { display: none; }
 .btn-delete { color: #fff; background: linear-gradient(135deg,#df6670,#c94d58); box-shadow: 0 5px 12px rgba(201,77,88,.18); }
 .btn-delete:hover { background: linear-gradient(135deg,#d95a65,#ba414c); }
 .btn-delete:disabled { cursor: wait; opacity: .65; }

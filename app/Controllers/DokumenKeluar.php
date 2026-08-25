@@ -65,6 +65,7 @@ class DokumenKeluar extends BaseController
         return view('dokumen_keluar/index', [
             'title'        => $securityView ? 'Dokumen Keluar' : 'Surat Keluar',
             'indexUrl'     => $indexUrl,
+            'detailUrlPrefix' => $securityView ? 'dokumen-keluar' : 'agendaris/surat-keluar',
             'readOnly'     => $securityView,
             'dokumen'      => $this->model->orderBy('id', 'ASC')->paginate($perPage, 'dokumen_keluar'),
             'pager'        => $this->model->pager,
@@ -164,11 +165,18 @@ class DokumenKeluar extends BaseController
 
     public function destroy(int $id): ResponseInterface
     {
-        $dokumen = $this->findDokumen($id);
+        if (! in_array((string) session()->get('auth_role'), ['admin', 'agendaris'], true)) {
+            $message = 'Akun Security hanya dapat melihat Dokumen Keluar dan tidak dapat menghapus data.';
 
-        if ($dokumen['progres'] === 'Diambil Ekspedisi') {
-            return $this->lockedResponse();
+            return $this->response->setStatusCode(403)->setJSON([
+                'success' => false,
+                'message' => $message,
+                'errors'  => [$message],
+                'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+            ]);
         }
+
+        $dokumen = $this->findDokumen($id);
 
         if (! $this->model->delete($id, true)) {
             return $this->validationError($this->model->errors() ?: ['Surat Keluar gagal dihapus.']);

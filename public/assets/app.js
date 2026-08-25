@@ -142,6 +142,51 @@
 
     document.querySelectorAll('form').forEach((form) => setupPerihalSelector(form));
 
+    const jenisSelectors = new WeakMap();
+    const setupJenisSelector = (form) => {
+        if (form && jenisSelectors.has(form)) return jenisSelectors.get(form);
+        const select = form?.querySelector('[data-jenis-select]');
+        const customGroup = form?.querySelector('[data-jenis-custom]');
+        const customInput = form?.querySelector('[data-jenis-custom-input]');
+        if (!select || !customGroup || !customInput) return null;
+
+        const sync = () => {
+            const isOther = select.value === 'Lainnya';
+            customGroup.hidden = !isOther;
+            customInput.disabled = !isOther;
+            customInput.required = isOther;
+            if (!isOther) customInput.value = '';
+        };
+
+        select.addEventListener('change', () => {
+            sync();
+            if (select.value === 'Lainnya') customInput.focus();
+        });
+        sync();
+
+        const controller = {
+            setValue(value) {
+                const normalized = String(value || '');
+                const known = Array.from(select.options).some((option) => option.value === normalized && normalized !== 'Lainnya');
+                if (known) {
+                    select.value = normalized;
+                    customInput.value = '';
+                } else if (normalized) {
+                    select.value = 'Lainnya';
+                    customInput.value = normalized;
+                } else {
+                    select.value = '';
+                    customInput.value = '';
+                }
+                sync();
+            },
+        };
+        jenisSelectors.set(form, controller);
+        return controller;
+    };
+
+    document.querySelectorAll('form').forEach((form) => setupJenisSelector(form));
+
     const ekspedisiSelectors = new WeakMap();
     const setupEkspedisiSelector = (form) => {
         if (form && ekspedisiSelectors.has(form)) return ekspedisiSelectors.get(form);
@@ -307,6 +352,8 @@
                     element.textContent = value;
                 });
             });
+            const penyerahanTime = detailModal.querySelector('[data-penyerahan-time]');
+            if (penyerahanTime) penyerahanTime.hidden = !result.dokumen.penyerahan_at;
             detailEdit.href = result.dokumen.edit_url;
             detailEdit.dataset.detailUrl = currentDetailUrl;
             setDetailState('content');
@@ -353,6 +400,7 @@
     const editStatus = editModal?.querySelector('[data-edit-status]');
     const editSubmit = editModal?.querySelector('[data-edit-submit]');
     const editPerihalSelector = setupPerihalSelector(editForm);
+    const editJenisSelector = setupJenisSelector(editForm);
     let currentEditUrl = '';
 
     const closeEditModal = () => {
@@ -390,7 +438,7 @@
             editPerihalSelector?.setValue(data.perihal);
             editForm.elements.penerima.value = data.penerima === '-' ? '' : data.penerima;
             editForm.elements.tanggal.value = data.tanggal_value;
-            editForm.elements.jenis.value = data.jenis;
+            editJenisSelector?.setValue(data.jenis);
             editForm.elements.jumlah.value = data.jumlah.replace(/\./g, '');
             setupEkspedisiSelector(editForm)?.setValue(data.ekspedisi);
             editForm.elements.tanggal.dispatchEvent(new Event('change'));
@@ -474,7 +522,9 @@
         deleteTitle.textContent = locked ? 'Dokumen tidak dapat dihapus' : 'Hapus dokumen?';
         deleteDescription.hidden = locked;
         deleteSubmit.hidden = locked;
-        deleteError.textContent = locked ? 'Dokumen sudah diambil dan tidak dapat dihapus dari sistem.' : '';
+        deleteSubmit.disabled = locked;
+        deleteForm.classList.toggle('locked', locked);
+        deleteError.textContent = locked ? 'Dokumen sudah diserahkan dan tidak dapat dihapus dari sistem.' : '';
         deleteError.hidden = !locked;
         deleteModal.hidden = false;
         deleteModal.setAttribute('aria-hidden', 'false');
@@ -928,6 +978,8 @@
             Object.entries(data).forEach(([field, value]) => {
                 agendaDetailModal.querySelectorAll(`[data-agendaris-field="${field}"]`).forEach((element) => { element.textContent = value; });
             });
+            const penyerahanTime = agendaDetailModal.querySelector('[data-agendaris-penyerahan-time]');
+            if (penyerahanTime) penyerahanTime.hidden = !data.penyerahan_at;
             const hasLink = Boolean(data.berkas_link);
             if (agendaDetailLink) {
                 agendaDetailLink.hidden = !hasLink;

@@ -133,6 +133,9 @@ class Agendaris extends BaseController
                 'penerima_value'      => $agenda['penerima'] ?: '',
                 'pengambilan'         => $agenda['pengambilan'] ?: '-',
                 'pengambilan_value'   => $agenda['pengambilan'] ?: '',
+                'penyerahan_at'       => $agenda['penyerahan_at']
+                    ? date('d-m-Y H:i', strtotime($agenda['penyerahan_at'])) . ' WIB'
+                    : '',
                 'jenis'               => $agenda['jenis'] ?: '-',
                 'jenis_value'         => $agenda['jenis'] ?: '',
                 'tanggal_diterima'    => date('d-m-Y', strtotime($agenda['tanggal_diterima'])),
@@ -236,6 +239,8 @@ class Agendaris extends BaseController
     private function findJoined(int $id): array
     {
         $row = db_connect()->table('agendaris')
+            ->select('agendaris.*, dokumen_masuk.penyerahan_at')
+            ->join('dokumen_masuk', 'dokumen_masuk.id = agendaris.dokumen_masuk_id', 'left')
             ->where('agendaris.id', $id)
             ->get()
             ->getRowArray();

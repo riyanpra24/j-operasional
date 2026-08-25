@@ -4,22 +4,12 @@ $current = trim((string) ($current ?? ''));
 $groupClass = trim((string) ($groupClass ?? ''));
 $options = [
     'J&T Express',
-    'JNE Express',
-    'Shopee Express',
-    'SiCepat Ekspres',
-    'Ninja Xpress',
-    'AnterAja',
-    'ID Express',
+    'JNE',
     'Pos Indonesia',
     'TIKI',
-    'Lion Parcel',
     'GoSend',
     'GrabExpress',
     'Paxel',
-    'Lalamove',
-    'SAPX Express',
-    'J&T',
-    'Indah Logistik Cargo',
     'KAI Logistik',
 ];
 $choice = $current === '' ? '' : (in_array($current, $options, true) ? $current : 'Lainnya');

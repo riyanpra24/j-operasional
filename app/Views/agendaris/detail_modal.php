@@ -11,7 +11,8 @@
                 <div class="span-2"><dt>Perihal Surat</dt><dd data-agendaris-field="perihal_surat"></dd></div>
                 <div><dt>Pengirim</dt><dd data-agendaris-field="pengirim"></dd></div>
                 <div><dt>Penerima</dt><dd data-agendaris-field="penerima"></dd></div>
-                <div><dt>Pengambilan</dt><dd data-agendaris-field="pengambilan"></dd></div>
+                <div><dt>Penyerahan</dt><dd data-agendaris-field="pengambilan"></dd></div>
+                <div data-agendaris-penyerahan-time hidden><dt>Waktu Penyerahan</dt><dd data-agendaris-field="penyerahan_at"></dd></div>
                 <div><dt>Jenis</dt><dd data-agendaris-field="jenis"></dd></div>
                 <div><dt>Tanggal Diterima</dt><dd data-agendaris-field="tanggal_diterima"></dd></div>
                 <div class="span-2"><dt>Link Berkas</dt><dd><a class="agenda-file-link" href="#" target="_blank" rel="noopener noreferrer" data-agendaris-detail-link hidden>Buka berkas ↗</a><span data-agendaris-detail-no-link>Belum ada link berkas</span></dd></div>

@@ -52,8 +52,17 @@
                     </div>
                     <div class="form-group">
                         <label for="modal_jenis">Jenis <span class="required">*</span></label>
-                        <input id="modal_jenis" name="jenis" list="modal-jenis-list" maxlength="100" placeholder="Surat / Dokumen / Paket" required>
-                        <datalist id="modal-jenis-list"><option value="Surat"><option value="Dokumen"><option value="Berkas"><option value="Paket"></datalist>
+                        <select id="modal_jenis" name="jenis" data-jenis-select required>
+                            <option value="">Pilih jenis</option>
+                            <option value="Surat">Surat</option>
+                            <option value="Dokumen">Dokumen</option>
+                            <option value="Paket">Paket</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group modal-span-2" data-jenis-custom hidden>
+                        <label for="modal_jenis_lainnya">Jenis lainnya <span class="required">*</span></label>
+                        <input id="modal_jenis_lainnya" name="jenis_lainnya" data-jenis-custom-input maxlength="100" placeholder="Ketik jenis dokumen">
                     </div>
                     <div class="form-group">
                         <label for="modal_jumlah">Jumlah <span class="required">*</span></label>

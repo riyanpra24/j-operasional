@@ -1,0 +1,47 @@
+[Tue Aug 25 11:18:29 2026] PHP 8.2.12 Development Server (http://127.0.0.1:8080) started
+[Tue Aug 25 11:18:32 2026] 127.0.0.1:55672 Accepted
+[Tue Aug 25 11:18:32 2026] 127.0.0.1:55672 Closing
+[Tue Aug 25 11:19:21 2026] 127.0.0.1:63424 Accepted
+[Tue Aug 25 11:19:22 2026] 127.0.0.1:63424 Closing
+[Tue Aug 25 11:19:22 2026] 127.0.0.1:50836 Accepted
+[Tue Aug 25 11:19:22 2026] 127.0.0.1:50836 [200]: GET /index.php?debugbar
+[Tue Aug 25 11:19:22 2026] 127.0.0.1:50836 Closing
+[Tue Aug 25 11:19:22 2026] 127.0.0.1:65390 Accepted
+[Tue Aug 25 11:19:22 2026] 127.0.0.1:65390 [200]: GET /assets/app.css
+[Tue Aug 25 11:19:22 2026] 127.0.0.1:65390 Closing
+[Tue Aug 25 11:19:22 2026] 127.0.0.1:49672 Accepted
+[Tue Aug 25 11:19:24 2026] 127.0.0.1:49672 [200]: GET /index.php?debugbar_time=1787631562.017309
+[Tue Aug 25 11:19:24 2026] 127.0.0.1:49672 Closing
+[Tue Aug 25 11:19:24 2026] 127.0.0.1:55905 Accepted
+[Tue Aug 25 11:19:24 2026] 127.0.0.1:55905 [200]: GET /favicon.ico
+[Tue Aug 25 11:19:24 2026] 127.0.0.1:55905 Closing
+[Tue Aug 25 11:19:31 2026] 127.0.0.1:60194 Accepted
+[Tue Aug 25 11:19:33 2026] 127.0.0.1:60194 Closing
+[Tue Aug 25 11:19:33 2026] 127.0.0.1:61467 Accepted
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:61467 Closing
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:51203 Accepted
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:53768 Accepted
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:61974 Accepted
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:51203 [200]: GET /assets/app.css
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:53768 [200]: GET /assets/app.js
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:61974 [200]: GET /index.php?debugbar
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:61974 Closing
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:51203 Closing
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:53768 Closing
+[Tue Aug 25 11:19:34 2026] 127.0.0.1:52257 Accepted
+[Tue Aug 25 11:19:35 2026] 127.0.0.1:52257 [200]: GET /index.php?debugbar_time=1787631574.447344
+[Tue Aug 25 11:19:35 2026] 127.0.0.1:52257 Closing
+[Tue Aug 25 11:19:40 2026] 127.0.0.1:64303 Accepted
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:64303 Closing
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:58865 Accepted
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:57458 Accepted
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:58865 [200]: GET /index.php?debugbar
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:58865 Closing
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:51333 Accepted
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:57458 [200]: GET /assets/app.css
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:51333 [200]: GET /assets/app.js
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:57458 Closing
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:51333 Closing
+[Tue Aug 25 11:19:42 2026] 127.0.0.1:64482 Accepted
+[Tue Aug 25 11:19:43 2026] 127.0.0.1:64482 [200]: GET /index.php?debugbar_time=1787631582.631079
+[Tue Aug 25 11:19:43 2026] 127.0.0.1:64482 Closing

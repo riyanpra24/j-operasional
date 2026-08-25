@@ -36,6 +36,7 @@ $routes->post('distribusi-dokumen/(:num)', 'DistribusiDokumen::complete/$1', ['a
 $routes->get('distribusi-dokumen/surat-keluar/(:num)', 'DistribusiDokumen::showOutgoing/$1', ['as' => 'distribusi_dokumen.outgoing.show']);
 $routes->post('distribusi-dokumen/surat-keluar/(:num)', 'DistribusiDokumen::completeOutgoing/$1', ['as' => 'distribusi_dokumen.outgoing.complete']);
 $routes->get('dokumen-keluar', 'DokumenKeluar::index', ['as' => 'dokumen_keluar.security_index']);
+$routes->get('dokumen-keluar/(:num)', 'DokumenKeluar::show/$1', ['as' => 'dokumen_keluar.security_show']);
 
 $routes->group('dokumen-masuk', static function ($routes) {
     $routes->get('/', 'DokumenMasuk::index', ['as' => 'dokumen_masuk.index']);

@@ -19,7 +19,8 @@
                     <div class="form-group"><label for="edit_penerima">Penerima <span class="required">*</span></label><input id="edit_penerima" name="penerima" maxlength="255" required></div>
                     <div class="form-group"><label for="edit_tanggal">Tanggal Diterima <span class="required">*</span></label><input id="edit_tanggal" type="date" name="tanggal" data-date-input required></div>
                     <div class="form-group"><label for="edit_hari">Hari</label><input id="edit_hari" data-day-output readonly tabindex="-1"><small>Dihitung otomatis</small></div>
-                    <div class="form-group"><label for="edit_jenis">Jenis <span class="required">*</span></label><input id="edit_jenis" name="jenis" list="edit-jenis-list" maxlength="100" required><datalist id="edit-jenis-list"><option value="Surat"><option value="Dokumen"><option value="Berkas"><option value="Paket"></datalist></div>
+                    <div class="form-group"><label for="edit_jenis">Jenis <span class="required">*</span></label><select id="edit_jenis" name="jenis" data-jenis-select required><option value="">Pilih jenis</option><option value="Surat">Surat</option><option value="Dokumen">Dokumen</option><option value="Paket">Paket</option><option value="Lainnya">Lainnya</option></select></div>
+                    <div class="form-group modal-span-2" data-jenis-custom hidden><label for="edit_jenis_lainnya">Jenis lainnya <span class="required">*</span></label><input id="edit_jenis_lainnya" name="jenis_lainnya" data-jenis-custom-input maxlength="100" placeholder="Ketik jenis dokumen"></div>
                     <div class="form-group"><label for="edit_jumlah">Jumlah <span class="required">*</span></label><input id="edit_jumlah" type="number" min="1" name="jumlah" required></div>
                     <?= view('components/ekspedisi_selector', ['prefix' => 'edit']) ?>
                 </div>

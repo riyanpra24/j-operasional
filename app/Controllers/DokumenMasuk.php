@@ -133,6 +133,9 @@ class DokumenMasuk extends BaseController
                     'jumlah'          => number_format((int) $dokumen['jumlah'], 0, ',', '.'),
                     'ekspedisi'       => $dokumen['ekspedisi'] ?: '-',
                     'pengambilan'     => $dokumen['pengambilan'] ?: 'Belum diambil',
+                    'penyerahan_at'   => $dokumen['penyerahan_at']
+                        ? date('d-m-Y H:i', strtotime($dokumen['penyerahan_at'])) . ' WIB'
+                        : '',
                     'created_at'      => date('d-m-Y H:i', strtotime($dokumen['created_at'])) . ' WIB',
                     'updated_at'      => date('d-m-Y H:i', strtotime($dokumen['updated_at'])) . ' WIB',
                     'edit_url'        => site_url("dokumen-masuk/{$id}/ubah"),
@@ -197,7 +200,7 @@ class DokumenMasuk extends BaseController
         $dokumen = $this->findOrFail($id);
 
         if (trim((string) ($dokumen['pengambilan'] ?? '')) !== '') {
-            $message = 'Dokumen sudah diambil dan tidak dapat dihapus dari sistem.';
+            $message = 'Dokumen sudah diserahkan dan tidak dapat dihapus dari sistem.';
 
             if ($this->request->isAJAX()) {
                 return $this->response->setStatusCode(409)->setJSON([
@@ -250,6 +253,10 @@ class DokumenMasuk extends BaseController
             ''        => trim((string) $this->request->getPost('ekspedisi')),
             default   => $ekspedisiPilihan,
         };
+        $jenisPilihan = trim((string) $this->request->getPost('jenis'));
+        $jenis = $jenisPilihan === 'Lainnya'
+            ? trim((string) $this->request->getPost('jenis_lainnya'))
+            : $jenisPilihan;
 
         return [
             'pengirim'  => trim((string) $this->request->getPost('pengirim')),
@@ -257,7 +264,7 @@ class DokumenMasuk extends BaseController
             'penerima'  => trim((string) $this->request->getPost('penerima')),
             'hari'      => $this->dayName($tanggal),
             'tanggal'   => $tanggal,
-            'jenis'     => trim((string) $this->request->getPost('jenis')),
+            'jenis'     => $jenis,
             'jumlah'    => (int) $this->request->getPost('jumlah'),
             'ekspedisi' => $this->nullIfEmpty($ekspedisi),
         ];
