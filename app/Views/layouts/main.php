@@ -45,14 +45,14 @@ $errors  = session()->getFlashdata('errors') ?? [];
     <?php endif ?>
     <div class="app-shell">
         <aside class="sidebar" id="sidebar">
-            <a href="<?= site_url('/') ?>" class="brand" aria-label="Dashboard Operasional">
+            <a href="<?= site_url('dashboard') ?>" class="brand" aria-label="Dashboard Operasional">
                 <span class="brand-mark">ϟ</span>
                 <span><strong>J-Operasional</strong><small>Document Management</small></span>
             </a>
 
             <nav class="main-nav" aria-label="Navigasi utama">
                 <p class="nav-label">MENU UTAMA</p>
-                <a href="<?= site_url('/') ?>" class="nav-link <?= $segment === '' ? 'active' : '' ?>" title="Dashboard">
+                <a href="<?= site_url('dashboard') ?>" class="nav-link <?= $segment === 'dashboard' ? 'active' : '' ?>" title="Dashboard">
                     <span class="nav-icon icon-dashboard" aria-hidden="true">◆</span>
                     Dashboard
                 </a>

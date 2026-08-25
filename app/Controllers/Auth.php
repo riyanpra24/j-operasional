@@ -11,7 +11,7 @@ class Auth extends BaseController
     public function login(): string|RedirectResponse
     {
         if (session()->get('auth_user_id') !== null) {
-            return redirect()->to(site_url('/'));
+            return redirect()->to(site_url('dashboard'));
         }
 
         return view('auth/login', [
@@ -53,7 +53,7 @@ class Auth extends BaseController
             'is_logged_in'      => true,
         ]);
 
-        return redirect()->to(site_url('/'))->with('success', 'Selamat datang, ' . $user['display_name'] . '.');
+        return redirect()->to(site_url('dashboard'))->with('success', 'Selamat datang, ' . $user['display_name'] . '.');
     }
 
     public function logout(): RedirectResponse

@@ -15,8 +15,9 @@ $routes->group('', static function (RouteCollection $routes): void {
     $routes->post('logout', 'Auth::logout', ['as' => 'logout']);
 });
 
-// Dashboard
-$routes->get('/', 'Dashboard::index', ['as' => 'dashboard']);
+// Halaman publik dan dashboard internal
+$routes->get('/', 'Landing::index', ['as' => 'landing']);
+$routes->get('dashboard', 'Dashboard::index', ['as' => 'dashboard']);
 
 // Pengelolaan akun (administrator)
 $routes->group('kelola-akun', static function (RouteCollection $routes): void {

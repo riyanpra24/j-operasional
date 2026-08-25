@@ -20,7 +20,7 @@ class RoleAccessFilter implements FilterInterface
         $path = trim($request->getUri()->getPath(), '/');
         $path = preg_replace('#^index\.php/?#', '', $path) ?? $path;
 
-        if ($path === '' || $path === 'logout') {
+        if ($path === '' || $path === 'dashboard' || $path === 'logout') {
             return null;
         }
 
@@ -43,7 +43,7 @@ class RoleAccessFilter implements FilterInterface
                 ]);
         }
 
-        return redirect()->to(site_url('/'))->with('error', $message);
+        return redirect()->to(site_url('dashboard'))->with('error', $message);
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
