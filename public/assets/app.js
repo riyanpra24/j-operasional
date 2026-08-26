@@ -671,7 +671,7 @@
     distributionForm?.addEventListener('submit', async (event) => {
         event.preventDefault();
         distributionErrors.hidden = true;
-        distributionStatus.textContent = 'Menyimpan pengambilan...';
+        distributionStatus.textContent = 'Menyimpan penyerahan...';
         distributionSubmit.disabled = true;
 
         try {
@@ -685,7 +685,7 @@
             updateCsrf(result.csrf);
 
             if (!response.ok || !result.success) {
-                showDistributionErrors(result.message || 'Pengambilan belum dapat disimpan.', result.errors || []);
+                showDistributionErrors(result.message || 'Penyerahan belum dapat disimpan.', result.errors || []);
                 return;
             }
 
@@ -698,7 +698,7 @@
             showDistributionErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
             distributionSubmit.disabled = false;
-            if (distributionStatus.textContent === 'Menyimpan pengambilan...') distributionStatus.textContent = '';
+            if (distributionStatus.textContent === 'Menyimpan penyerahan...') distributionStatus.textContent = '';
         }
     });
 
@@ -971,6 +971,9 @@
             agendaForm.elements.nomor_agendaris.value = data.nomor_agendaris_value;
             agendaForm.elements.tanggal_agendaris.value = data.tanggal_agendaris_value;
             agendaForm.elements.perihal_surat.value = data.perihal_surat;
+            agendaForm.elements.disposisi_1.value = data.disposisi_1_value || '';
+            agendaForm.elements.disposisi_2.value = data.disposisi_2_value || '';
+            agendaForm.elements.disposisi_3.value = data.disposisi_3_value || '';
             agendaForm.elements.progres.value = data.progres || 'Menunggu Penyelesaian';
             setAgendaSourceLock(Boolean(data.source_locked));
             setAgendaLink(true, data.berkas_link || '');

@@ -219,6 +219,12 @@ class Agendaris extends BaseController
                 'tanggal_agendaris_value' => $agenda['tanggal_agendaris'] ?: '',
                 'perihal_surat'       => $agenda['perihal_surat'],
                 'berkas_link'         => $agenda['berkas_link'] ?: '',
+                'disposisi_1'         => $agenda['disposisi_1'] ?: 'Belum diisi',
+                'disposisi_1_value'   => $agenda['disposisi_1'] ?: '',
+                'disposisi_2'         => $agenda['disposisi_2'] ?: 'Belum diisi',
+                'disposisi_2_value'   => $agenda['disposisi_2'] ?: '',
+                'disposisi_3'         => $agenda['disposisi_3'] ?: 'Belum diisi',
+                'disposisi_3_value'   => $agenda['disposisi_3'] ?: '',
                 'progres'             => $agenda['progres'] ?: 'Menunggu Penyelesaian',
                 'created_at'          => date('d-m-Y H:i', strtotime($agenda['created_at'])) . ' WIB',
                 'updated_at'          => date('d-m-Y H:i', strtotime($agenda['updated_at'])) . ' WIB',
@@ -304,6 +310,9 @@ class Agendaris extends BaseController
             'tanggal_agendaris'=> $this->nullIfEmpty($this->request->getPost('tanggal_agendaris')),
             'perihal_surat'    => trim((string) $this->request->getPost('perihal_surat')),
             'berkas_link'      => trim((string) $this->request->getPost('berkas_link')),
+            'disposisi_1'      => $this->nullIfEmpty($this->request->getPost('disposisi_1')),
+            'disposisi_2'      => $this->nullIfEmpty($this->request->getPost('disposisi_2')),
+            'disposisi_3'      => $this->nullIfEmpty($this->request->getPost('disposisi_3')),
             'progres'          => trim((string) $this->request->getPost('progres')),
         ];
     }
@@ -322,6 +331,9 @@ class Agendaris extends BaseController
             'tanggal_agendaris'=> 'permit_empty|valid_date[Y-m-d]',
             'perihal_surat'    => 'required|max_length[255]',
             'berkas_link'      => 'permit_empty|max_length[2048]',
+            'disposisi_1'      => 'permit_empty|max_length[255]',
+            'disposisi_2'      => 'permit_empty|max_length[255]',
+            'disposisi_3'      => 'permit_empty|max_length[255]',
             'progres'          => 'required|in_list[Menunggu Penyelesaian,Selesai]',
         ]);
 

@@ -146,7 +146,7 @@ class DokumenMasuk extends BaseController
                     'satuan_jumlah'   => ($dokumen['satuan_jumlah'] ?? null) ?: '-',
                     'satuan_jumlah_value' => ($dokumen['satuan_jumlah'] ?? null) ?: '',
                     'ekspedisi'       => $dokumen['ekspedisi'] ?: '-',
-                    'pengambilan'     => $dokumen['pengambilan'] ?: 'Belum diambil',
+                    'pengambilan'     => $dokumen['pengambilan'] ?: 'Belum diserahkan',
                     'penyerahan_at'   => $dokumen['penyerahan_at']
                         ? date('d-m-Y H:i', strtotime($dokumen['penyerahan_at'])) . ' WIB'
                         : '',

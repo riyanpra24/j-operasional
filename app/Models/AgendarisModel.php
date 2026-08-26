@@ -21,6 +21,9 @@ class AgendarisModel extends Model
         'tanggal_agendaris',
         'perihal_surat',
         'berkas_link',
+        'disposisi_1',
+        'disposisi_2',
+        'disposisi_3',
         'progres',
     ];
 

@@ -442,7 +442,10 @@ body { background: #e9edef; }
 .agenda-link-field { padding: 10px 12px; background: #f7fbfb; border: 1px dashed #b9dcda; border-radius: 8px; }
 .agenda-link-field input { background: #fff; }
 .agenda-file-link { color: #078f91; font-weight: 800; text-decoration: underline; text-underline-offset: 2px; }
-.agendaris-detail-content { padding: 8px 20px 18px; }
+.agendaris-detail-modal .modal-header,.agendaris-detail-modal .modal-footer { flex: 0 0 auto; }
+.agendaris-detail-content { display: grid; flex: 1 1 auto; gap: 14px; min-height: 0; padding: 14px 20px 18px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.agendaris-detail-section { padding: 15px 17px 5px; background: #fff; border: 1px solid #e4e9ed; border-radius: 10px; box-shadow: 0 3px 10px rgba(35,51,62,.05); }
+.agendaris-detail-section-heading { margin-bottom: 0; }
 .agendaris-detail-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 22px; margin: 0; }
 .agendaris-detail-grid > div { min-width: 0; padding: 14px 0; border-bottom: 1px solid #edf0f3; }
 .agendaris-detail-grid dt { margin-bottom: 4px; color: #96a1af; font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; }
