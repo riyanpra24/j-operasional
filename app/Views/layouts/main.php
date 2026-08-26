@@ -19,6 +19,8 @@ $successToast = $syncSuccess ?: $success;
 $successToastTitle = $syncSuccess ? 'Sinkronisasi berhasil' : 'Berhasil';
 $error   = session()->getFlashdata('error');
 $errors  = session()->getFlashdata('errors') ?? [];
+$appCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
+$appJsVersion  = is_file(FCPATH . 'assets/app.js') ? (string) filemtime(FCPATH . 'assets/app.js') : '1';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -28,7 +30,7 @@ $errors  = session()->getFlashdata('errors') ?? [];
     <meta name="description" content="Sistem register dokumen masuk operasional">
     <title><?= esc($title ?? 'Operasional') ?> | Register Operasional</title>
     <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg?v=2') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>?v=<?= esc($appCssVersion, 'attr') ?>">
     <script src="<?= base_url('assets/url-mask.js') ?>"></script>
     <script>
         try {
@@ -182,6 +184,6 @@ $errors  = session()->getFlashdata('errors') ?? [];
         <?= view('components/detail_modal', ['readOnly' => $incomingArchive]) ?>
         <?php if (! $incomingArchive): ?><?= view('components/edit_modal') ?><?= view('components/delete_modal') ?><?php endif ?>
     <?php endif ?>
-    <script src="<?= base_url('assets/app.js') ?>"></script>
+    <script src="<?= base_url('assets/app.js') ?>?v=<?= esc($appJsVersion, 'attr') ?>"></script>
 </body>
 </html>
