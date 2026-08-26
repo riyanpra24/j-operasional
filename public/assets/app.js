@@ -829,12 +829,45 @@
     const agendaErrors = agendaFormModal?.querySelector('[data-agendaris-errors]');
     const agendaStatus = agendaFormModal?.querySelector('[data-agendaris-status]');
     const agendaSubmit = agendaFormModal?.querySelector('[data-agendaris-submit]');
+    const agendaStepNext = agendaFormModal?.querySelector('[data-agendaris-step-next]');
+    const agendaStepBack = agendaFormModal?.querySelector('[data-agendaris-step-back]');
+    const agendaStepPanels = agendaFormModal?.querySelectorAll('[data-agendaris-step]') || [];
+    const agendaStepIndicators = agendaFormModal?.querySelectorAll('[data-agendaris-step-indicator]') || [];
     const agendaLink = agendaFormModal?.querySelector('[data-agendaris-link]');
     const agendaLinkInput = agendaForm?.elements.berkas_link;
     const agendaGenerateButton = agendaFormModal?.querySelector('[data-agendaris-generate]');
+    const agendaDownloadSheetButton = agendaFormModal?.querySelector('[data-agendaris-download-sheet]');
     const agendaNumberInput = agendaForm?.elements.nomor_agendaris;
     const agendaCreateUrl = agendaForm?.action || '';
     const agendaSourceFieldNames = ['pengirim', 'tanggal_diterima', 'penerima', 'pengambilan', 'jenis'];
+    const agendaLastStep = agendaStepPanels.length || 1;
+    let agendaCurrentStep = 1;
+
+    const setAgendaStep = (step) => {
+        agendaCurrentStep = step;
+        agendaStepPanels.forEach((panel) => { panel.hidden = Number(panel.dataset.agendarisStep) !== step; });
+        agendaStepIndicators.forEach((indicator) => {
+            indicator.classList.toggle('active', Number(indicator.dataset.agendarisStepIndicator) === step);
+        });
+        if (agendaStepBack) agendaStepBack.hidden = step === 1;
+        if (agendaStepNext) agendaStepNext.hidden = step >= agendaLastStep;
+        if (agendaSubmit) agendaSubmit.hidden = step !== agendaLastStep;
+        if (agendaStatus) agendaStatus.textContent = '';
+    };
+
+    const validateAgendaStep = (step) => {
+        const panel = Array.from(agendaStepPanels).find((item) => Number(item.dataset.agendarisStep) === step);
+        if (!panel) return true;
+        const fields = panel.querySelectorAll('input, select, textarea');
+        for (const field of fields) {
+            if (!field.checkValidity()) {
+                field.reportValidity();
+                field.focus();
+                return false;
+            }
+        }
+        return true;
+    };
 
     const setAgendaSourceLock = (locked) => {
         agendaSourceFieldNames.forEach((name) => {
@@ -867,7 +900,10 @@
         agendaFormModal.classList.remove('open');
         agendaFormModal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
-        window.setTimeout(() => { agendaFormModal.hidden = true; }, 180);
+        window.setTimeout(() => {
+            agendaFormModal.hidden = true;
+            setAgendaStep(1);
+        }, 180);
     };
 
     const showAgendaErrors = (message, errors = []) => {
@@ -890,6 +926,7 @@
         agendaForm.action = agendaCreateUrl;
         agendaFormTitle.textContent = 'Tambah Surat Masuk';
         agendaSubmit.textContent = 'Simpan Surat Masuk';
+        setAgendaStep(1);
         setAgendaSourceLock(false);
         setAgendaLink(true);
         setAgendaNumberState(false);
@@ -912,6 +949,7 @@
     const openAgendaEdit = async (url) => {
         if (!agendaForm || !agendaFormModal || !url) return;
         agendaForm.reset();
+        setAgendaStep(1);
         setAgendaSourceLock(false);
         setAgendaLink(false);
         agendaErrors.hidden = true;
@@ -947,6 +985,26 @@
     document.querySelector('[data-agendaris-add]')?.addEventListener('click', openAgendaCreate);
     document.querySelectorAll('[data-agendaris-edit]').forEach((button) => button.addEventListener('click', () => openAgendaEdit(button.dataset.agendarisUrl)));
     agendaFormModal?.querySelectorAll('[data-agendaris-form-close]').forEach((button) => button.addEventListener('click', closeAgendaForm));
+    agendaStepNext?.addEventListener('click', () => {
+        agendaErrors.hidden = true;
+        if (!validateAgendaStep(agendaCurrentStep)) return;
+        const nextStep = Math.min(agendaCurrentStep + 1, agendaLastStep);
+        setAgendaStep(nextStep);
+        window.setTimeout(() => {
+            if (nextStep === 2 && agendaGenerateButton && !agendaGenerateButton.disabled) agendaGenerateButton.focus();
+            else if (nextStep === 2) agendaForm?.elements.tanggal_agendaris?.focus();
+            else agendaForm?.elements.progres?.focus();
+        }, 120);
+    });
+    agendaStepBack?.addEventListener('click', () => {
+        agendaErrors.hidden = true;
+        const previousStep = Math.max(agendaCurrentStep - 1, 1);
+        setAgendaStep(previousStep);
+        window.setTimeout(() => {
+            if (previousStep === 1) agendaForm?.elements.pengirim?.focus();
+            else agendaForm?.elements.nomor_surat?.focus();
+        }, 120);
+    });
 
     agendaGenerateButton?.addEventListener('click', async () => {
         const url = agendaGenerateButton.dataset.generateUrl;
@@ -972,8 +1030,59 @@
         }
     });
 
+    agendaDownloadSheetButton?.addEventListener('click', async () => {
+        const url = agendaDownloadSheetButton.dataset.downloadUrl;
+        if (!url || !agendaForm) return;
+
+        agendaErrors.hidden = true;
+        agendaStatus.textContent = 'Membuat Lembar Pengendalian...';
+        agendaDownloadSheetButton.disabled = true;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: new FormData(agendaForm),
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/pdf, application/json' },
+            });
+            const csrfName = response.headers.get('X-CSRF-Name');
+            const csrfHash = response.headers.get('X-CSRF-Hash');
+            updateCsrf({ name: csrfName, hash: csrfHash });
+
+            if (!response.ok) {
+                const result = await response.json();
+                updateCsrf(result.csrf);
+                showAgendaErrors(result.message || 'Lembar Pengendalian belum dapat dibuat.', result.errors || []);
+                return;
+            }
+
+            const blob = await response.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const disposition = response.headers.get('Content-Disposition') || '';
+            const filename = disposition.match(/filename="?([^";]+)"?/i)?.[1] || 'Lembar-Pengendalian-Surat-Masuk.pdf';
+            link.href = objectUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+            agendaStatus.textContent = 'Lembar Pengendalian berhasil diunduh';
+        } catch (error) {
+            showAgendaErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
+        } finally {
+            agendaDownloadSheetButton.disabled = false;
+            if (agendaStatus.textContent === 'Membuat Lembar Pengendalian...') agendaStatus.textContent = '';
+        }
+    });
+
     agendaForm?.addEventListener('submit', async (event) => {
         event.preventDefault();
+        if (agendaCurrentStep !== agendaLastStep) {
+            if (!validateAgendaStep(agendaCurrentStep)) return;
+            setAgendaStep(Math.min(agendaCurrentStep + 1, agendaLastStep));
+            return;
+        }
         agendaErrors.hidden = true;
         agendaStatus.textContent = 'Menyimpan data...';
         agendaSubmit.disabled = true;

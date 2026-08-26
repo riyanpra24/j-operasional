@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\IncomingControlSheetPdf;
 use App\Models\AgendarisModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -138,6 +139,52 @@ class Agendaris extends BaseController
         return $this->successResponse('Nomor Agendaris berhasil dibuat.', [
             'nomor_agendaris' => $nomor,
         ]);
+    }
+
+    public function downloadControlSheet(): ResponseInterface
+    {
+        $data = [
+            'nomor_agendaris'   => $this->nullIfEmpty($this->request->getPost('nomor_agendaris')),
+            'tanggal_agendaris' => $this->nullIfEmpty($this->request->getPost('tanggal_agendaris')),
+            'nomor_surat'       => trim((string) $this->request->getPost('nomor_surat')),
+            'tanggal_surat'     => trim((string) $this->request->getPost('tanggal_surat')),
+            'perihal_surat'     => trim((string) $this->request->getPost('perihal_surat')),
+        ];
+
+        $validation = service('validation')->setRules([
+            'nomor_agendaris'   => 'permit_empty|max_length[50]',
+            'tanggal_agendaris' => 'permit_empty|valid_date[Y-m-d]',
+            'nomor_surat'       => 'required|max_length[150]',
+            'tanggal_surat'     => 'required|valid_date[Y-m-d]',
+            'perihal_surat'     => 'required|max_length[255]',
+        ]);
+
+        if (! $validation->run($data)) {
+            return $this->validationError(array_values($validation->getErrors()));
+        }
+
+        try {
+            $pdf = (new IncomingControlSheetPdf())->render($data);
+        } catch (\Throwable $error) {
+            log_message('error', 'Gagal membuat Lembar Pengendalian Surat Masuk: {message}', ['message' => $error->getMessage()]);
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'Lembar Pengendalian belum dapat dibuat. Silakan coba kembali.',
+                'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+            ]);
+        }
+
+        $safeNumber = preg_replace('/[^A-Za-z0-9_-]+/', '-', $data['nomor_surat']) ?: 'surat-masuk';
+        $filename   = 'Lembar-Pengendalian-' . trim($safeNumber, '-') . '.pdf';
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->setHeader('Cache-Control', 'private, no-store, max-age=0')
+            ->setHeader('X-CSRF-Name', csrf_token())
+            ->setHeader('X-CSRF-Hash', csrf_hash())
+            ->setBody($pdf);
     }
 
     public function show(int $id): ResponseInterface

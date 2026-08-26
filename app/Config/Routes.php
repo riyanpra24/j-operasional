@@ -32,6 +32,7 @@ $routes->group('kelola-akun', static function (RouteCollection $routes): void {
 $routes->group('dokumen-masuk', static function (RouteCollection $routes): void {
     $routes->get('/', 'DokumenMasuk::index', ['as' => 'dokumen_masuk.index']);
     $routes->get('(:num)', 'DokumenMasuk::show/$1', ['as' => 'dokumen_masuk.show']);
+    $routes->post('(:num)/kembalikan', 'DokumenMasuk::reopen/$1', ['as' => 'dokumen_masuk.reopen']);
 });
 
 // Security - Dokumen Keluar (hanya baca)
@@ -82,6 +83,7 @@ $routes->group('agendaris', static function (RouteCollection $routes): void {
         $routes->get('/', 'ProgresDokumen::masuk', ['as' => 'progres_dokumen_masuk.index']);
         $routes->post('/', 'Agendaris::store', ['as' => 'progres_dokumen_masuk.store']);
         $routes->get('generate-nomor', 'Agendaris::generateNomor', ['as' => 'progres_dokumen_masuk.generate_nomor']);
+        $routes->post('download-lembar-pengendalian', 'Agendaris::downloadControlSheet', ['as' => 'progres_dokumen_masuk.download_control_sheet']);
         $routes->post('sinkronkan', 'Agendaris::synchronize', ['as' => 'progres_dokumen_masuk.synchronize']);
         $routes->get('(:num)', 'Agendaris::show/$1', ['as' => 'progres_dokumen_masuk.show']);
         $routes->post('(:num)', 'Agendaris::update/$1', ['as' => 'progres_dokumen_masuk.update']);

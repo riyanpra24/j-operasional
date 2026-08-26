@@ -223,6 +223,35 @@ class DokumenMasuk extends BaseController
         return redirect()->to(site_url('distribusi-dokumen'));
     }
 
+    public function reopen(int $id): ResponseInterface
+    {
+        $dokumen = $this->findOrFail($id);
+        if (trim((string) ($dokumen['pengambilan'] ?? '')) === '') {
+            return $this->response->setStatusCode(409)->setJSON([
+                'success' => false,
+                'message' => 'Dokumen sudah berada di Distribusi Dokumen.',
+                'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+            ]);
+        }
+
+        if (! $this->model->update($id, [
+            'pengambilan'   => null,
+            'penyerahan_at' => null,
+        ])) {
+            return $this->ajaxError($this->model->errors() ?: ['Dokumen belum dapat dikembalikan ke Distribusi Dokumen.']);
+        }
+
+        $message = 'Dokumen Masuk berhasil dikembalikan ke Distribusi Dokumen dan telah keluar dari arsip.';
+        session()->setFlashdata('success', $message);
+
+        return $this->response->setJSON([
+            'success'      => true,
+            'message'      => $message,
+            'redirect_url' => site_url('dokumen-masuk'),
+            'csrf'         => ['name' => csrf_token(), 'hash' => csrf_hash()],
+        ]);
+    }
+
     public function destroy(int $id): ResponseInterface
     {
         $dokumen = $this->findOrFail($id);

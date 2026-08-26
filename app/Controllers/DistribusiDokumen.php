@@ -252,21 +252,25 @@ class DistribusiDokumen extends BaseController
             'penyerahan_at' => date('Y-m-d H:i:s'),
         ]);
 
-        $agendaExists = $db->table('agendaris')->where('dokumen_masuk_id', $id)->countAllResults() > 0;
-        if (! $agendaExists) {
-            $db->table('agendaris')->insert([
+        $agendaData = [
+            'pengirim'         => $dokumen['pengirim'],
+            'penerima'         => $dokumen['penerima'],
+            'pengambilan'      => $pengambilan,
+            'jenis'            => $dokumen['jenis'],
+            'tanggal_diterima' => $dokumen['tanggal'],
+            'perihal_surat'    => trim((string) $dokumen['perihal']) ?: 'Belum diisi',
+            'updated_at'       => date('Y-m-d H:i:s'),
+        ];
+        $agenda = $db->table('agendaris')->where('dokumen_masuk_id', $id)->get()->getRowArray();
+        if ($agenda === null) {
+            $db->table('agendaris')->insert(array_merge($agendaData, [
                 'dokumen_masuk_id' => $id,
-                'pengirim'          => $dokumen['pengirim'],
-                'penerima'          => $dokumen['penerima'],
-                'pengambilan'       => $pengambilan,
-                'jenis'             => $dokumen['jenis'],
-                'tanggal_diterima'  => $dokumen['tanggal'],
                 'tanggal_surat'    => null,
                 'nomor_surat'      => null,
-                'perihal_surat'    => trim((string) $dokumen['perihal']) ?: 'Belum diisi',
-                'created_at'        => date('Y-m-d H:i:s'),
-                'updated_at'        => date('Y-m-d H:i:s'),
-            ]);
+                'created_at'       => date('Y-m-d H:i:s'),
+            ]));
+        } else {
+            $db->table('agendaris')->where('id', $agenda['id'])->update($agendaData);
         }
         $db->transComplete();
 
