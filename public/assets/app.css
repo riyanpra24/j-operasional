@@ -438,7 +438,7 @@ body { background: #e9edef; }
 .agenda-number-control .btn { min-height: 48px; padding-inline: 14px; white-space: nowrap; }
 .agenda-number-control input[readonly] { color: #344158; background: #f7f9fb; }
 .agendaris-form-grid .field-source-locked label::after { margin-left: 4px; content: "🔒"; }
-.agendaris-form-grid .field-source-locked input { color: #647188; background: #f3f6f8; border-color: #dfe5ea; cursor: not-allowed; }
+.agendaris-form-grid .field-source-locked input,.agendaris-form-grid .field-source-locked select { color: #647188; background: #f3f6f8; border-color: #dfe5ea; cursor: not-allowed; }
 .agenda-link-field { padding: 10px 12px; background: #f7fbfb; border: 1px dashed #b9dcda; border-radius: 8px; }
 .agenda-link-field input { background: #fff; }
 .agenda-file-link { color: #078f91; font-weight: 800; text-decoration: underline; text-underline-offset: 2px; }

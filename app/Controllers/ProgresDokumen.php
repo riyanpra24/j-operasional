@@ -151,8 +151,14 @@ class ProgresDokumen extends BaseController
 
     public function store(): ResponseInterface
     {
-        $data   = $this->payload();
-        $errors = $this->validatePayload($data);
+        $data = $this->payload();
+        // Field tahap Security tidak boleh ditentukan dari formulir Agendaris.
+        // Nilai awal progres dibuat sistem dan selanjutnya hanya diubah melalui
+        // endpoint Distribusi Dokumen yang dibatasi untuk role Security.
+        $data['security']         = null;
+        $data['tanggal_security'] = null;
+        $data['progres']          = 'Menunggu Ekspedisi';
+        $errors = $this->validatePayload($data, false);
         if ($errors !== []) {
             return $this->validationError($errors);
         }

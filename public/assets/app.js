@@ -1484,13 +1484,14 @@
     };
     const openProgressCreate = () => {
         if (!progressForm) return;
-        setProgressSecurityFieldsLocked(false);
+        setProgressSecurityFieldsLocked(true);
         progressForm.reset();
         progressForm.action = progressCreateUrl;
         progressFormTitle.textContent = 'Tambah Progres Dokumen Keluar';
         progressSubmit.textContent = 'Simpan dokumen';
         progressErrors.hidden = true;
         progressStatus.textContent = '';
+        setProgressSecurityFieldsLocked(true);
         showProgressForm();
         window.setTimeout(() => progressForm.elements.nomor_surat.focus(), 120);
     };

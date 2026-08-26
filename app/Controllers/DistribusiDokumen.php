@@ -190,7 +190,7 @@ class DistribusiDokumen extends BaseController
         if (trim((string) $dokumen['pengambilan']) !== '') {
             return $this->response->setStatusCode(409)->setJSON([
                 'success' => false,
-                'message' => 'Dokumen ini sudah diproses pengambilannya.',
+                'message' => 'Dokumen ini sudah diproses penyerahannya.',
             ]);
         }
 
@@ -226,7 +226,7 @@ class DistribusiDokumen extends BaseController
         if (trim((string) $dokumen['pengambilan']) !== '') {
             return $this->response->setStatusCode(409)->setJSON([
                 'success' => false,
-                'message' => 'Pengambilan sudah pernah dicatat dan tidak dapat diubah.',
+                'message' => 'Penyerahan sudah pernah dicatat dan tidak dapat diubah.',
                 'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
             ]);
         }
@@ -239,7 +239,7 @@ class DistribusiDokumen extends BaseController
         if (! $validation->run(['pengambilan' => $pengambilan])) {
             return $this->response->setStatusCode(422)->setJSON([
                 'success' => false,
-                'message' => 'Isi kolom pengambilan terlebih dahulu.',
+                'message' => 'Isi kolom penyerahan terlebih dahulu.',
                 'errors'  => array_values($validation->getErrors()),
                 'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
             ]);
@@ -277,12 +277,12 @@ class DistribusiDokumen extends BaseController
         if (! $db->transStatus()) {
             return $this->response->setStatusCode(500)->setJSON([
                 'success' => false,
-                'message' => 'Pengambilan dan Agendaris belum dapat disimpan.',
+                'message' => 'Penyerahan dan Agendaris belum dapat disimpan.',
                 'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
             ]);
         }
 
-        $message = 'Pengambilan berhasil dicatat dan dokumen masuk otomatis ke Agendaris.';
+        $message = 'Penyerahan berhasil dicatat dan dokumen masuk otomatis ke Agendaris.';
         session()->setFlashdata('success', $message);
 
         return $this->response->setJSON([

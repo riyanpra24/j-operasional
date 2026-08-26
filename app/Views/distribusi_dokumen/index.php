@@ -60,7 +60,7 @@
                     <td><?= esc($row['up'] ?: '-') ?></td>
                     <td class="cell-wrap"><?= esc($row['alamat_penerima']) ?></td>
                     <td><span class="pickup-status <?= $progressComplete ? 'completed' : 'pending' ?>"><?= esc($row['progres'] ?: 'Menunggu Ekspedisi') ?></span></td>
-                    <td><button class="distribution-action-button" type="button" data-open-outgoing-distribution data-action-url="<?= site_url('distribusi-dokumen/surat-keluar/'.$row['id']) ?>">Kelola</button></td>
+                    <td><button class="distribution-action-button" type="button" data-open-outgoing-distribution data-action-url="<?= site_url('distribusi-dokumen/surat-keluar/'.$row['id']) ?>">Proses</button></td>
                 </tr>
             <?php endforeach ?>
         <?php endif ?>
