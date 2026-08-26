@@ -10,7 +10,7 @@
         </header>
 
         <div class="detail-loading" data-detail-loading><span></span><strong>Memuat detail dokumen...</strong></div>
-        <div class="detail-error" data-detail-error hidden><strong>Detail tidak dapat dimuat.</strong><button type="button" data-detail-retry>Coba lagi</button></div>
+        <div class="detail-error" data-detail-error hidden><strong data-detail-error-message>Detail tidak dapat dimuat.</strong><button type="button" data-detail-retry>Coba lagi</button></div>
 
         <div class="detail-modal-content" data-detail-content hidden>
             <div class="detail-record-head">

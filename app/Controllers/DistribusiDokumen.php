@@ -204,7 +204,7 @@ class DistribusiDokumen extends BaseController
                 'tanggal'    => date('d-m-Y', strtotime($dokumen['tanggal'])),
                 'jenis'      => $dokumen['jenis'],
                 'jumlah'     => number_format((int) $dokumen['jumlah'], 0, ',', '.'),
-                'satuan_jumlah' => $dokumen['satuan_jumlah'] ?: '-',
+                'satuan_jumlah' => ($dokumen['satuan_jumlah'] ?? null) ?: '-',
                 'ekspedisi'  => $dokumen['ekspedisi'] ?: '-',
                 'process_url'=> site_url("distribusi-dokumen/{$id}"),
             ],

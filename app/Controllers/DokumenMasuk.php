@@ -143,8 +143,8 @@ class DokumenMasuk extends BaseController
                     'tanggal_value'   => $dokumen['tanggal'],
                     'jenis'           => $dokumen['jenis'],
                     'jumlah'          => number_format((int) $dokumen['jumlah'], 0, ',', '.'),
-                    'satuan_jumlah'   => $dokumen['satuan_jumlah'] ?: '-',
-                    'satuan_jumlah_value' => $dokumen['satuan_jumlah'] ?: '',
+                    'satuan_jumlah'   => ($dokumen['satuan_jumlah'] ?? null) ?: '-',
+                    'satuan_jumlah_value' => ($dokumen['satuan_jumlah'] ?? null) ?: '',
                     'ekspedisi'       => $dokumen['ekspedisi'] ?: '-',
                     'pengambilan'     => $dokumen['pengambilan'] ?: 'Belum diambil',
                     'penyerahan_at'   => $dokumen['penyerahan_at']

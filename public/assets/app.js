@@ -334,6 +334,7 @@
     const detailLoading = detailModal?.querySelector('[data-detail-loading]');
     const detailContent = detailModal?.querySelector('[data-detail-content]');
     const detailError = detailModal?.querySelector('[data-detail-error]');
+    const detailErrorMessage = detailModal?.querySelector('[data-detail-error-message]');
     const detailEdit = detailModal?.querySelector('[data-detail-edit]');
     let currentDetailUrl = '';
 
@@ -353,8 +354,11 @@
                 credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
             });
-            const result = await response.json();
-            if (!response.ok || !result.success) throw new Error('Detail tidak tersedia.');
+            const responseType = response.headers.get('content-type') || '';
+            const result = responseType.includes('application/json') ? await response.json() : null;
+            if (!response.ok || !result?.success) {
+                throw new Error(`Detail tidak dapat dimuat (HTTP ${response.status}).`);
+            }
 
             Object.entries(result.dokumen).forEach(([field, value]) => {
                 detailModal.querySelectorAll(`[data-detail-field="${field}"]`).forEach((element) => {
@@ -369,6 +373,7 @@
             }
             setDetailState('content');
         } catch (error) {
+            if (detailErrorMessage) detailErrorMessage.textContent = error.message || 'Detail tidak dapat dimuat.';
             setDetailState('error');
         }
     };
