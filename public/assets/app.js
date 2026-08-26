@@ -363,8 +363,10 @@
             });
             const penyerahanTime = detailModal.querySelector('[data-penyerahan-time]');
             if (penyerahanTime) penyerahanTime.hidden = !result.dokumen.penyerahan_at;
-            detailEdit.href = result.dokumen.edit_url;
-            detailEdit.dataset.detailUrl = currentDetailUrl;
+            if (detailEdit) {
+                detailEdit.href = result.dokumen.edit_url;
+                detailEdit.dataset.detailUrl = currentDetailUrl;
+            }
             setDetailState('content');
         } catch (error) {
             setDetailState('error');
@@ -449,6 +451,7 @@
             editForm.elements.tanggal.value = data.tanggal_value;
             editJenisSelector?.setValue(data.jenis);
             editForm.elements.jumlah.value = data.jumlah.replace(/\./g, '');
+            editForm.elements.satuan_jumlah.value = data.satuan_jumlah_value || '';
             setupEkspedisiSelector(editForm)?.setValue(data.ekspedisi);
             editForm.elements.tanggal.dispatchEvent(new Event('change'));
             editLoading.hidden = true;
@@ -823,6 +826,8 @@
     const agendaSubmit = agendaFormModal?.querySelector('[data-agendaris-submit]');
     const agendaLink = agendaFormModal?.querySelector('[data-agendaris-link]');
     const agendaLinkInput = agendaForm?.elements.berkas_link;
+    const agendaGenerateButton = agendaFormModal?.querySelector('[data-agendaris-generate]');
+    const agendaNumberInput = agendaForm?.elements.nomor_agendaris;
     const agendaCreateUrl = agendaForm?.action || '';
     const agendaSourceFieldNames = ['pengirim', 'tanggal_diterima', 'penerima', 'pengambilan', 'jenis'];
 
@@ -844,6 +849,12 @@
     const setAgendaLink = (visible, value = '') => {
         if (agendaLink) agendaLink.hidden = !visible;
         if (agendaLinkInput) agendaLinkInput.value = visible ? value : '';
+    };
+
+    const setAgendaNumberState = (hasNumber) => {
+        if (!agendaGenerateButton) return;
+        agendaGenerateButton.disabled = hasNumber;
+        agendaGenerateButton.textContent = hasNumber ? 'Nomor sudah dibuat' : 'Generate Nomor';
     };
 
     const closeAgendaForm = () => {
@@ -876,6 +887,7 @@
         agendaSubmit.textContent = 'Simpan Surat Masuk';
         setAgendaSourceLock(false);
         setAgendaLink(true);
+        setAgendaNumberState(false);
         agendaErrors.hidden = true;
         agendaStatus.textContent = '';
         showAgendaForm();
@@ -913,9 +925,13 @@
             agendaForm.elements.tanggal_diterima.value = data.tanggal_value;
             agendaForm.elements.tanggal_surat.value = data.tanggal_surat_value;
             agendaForm.elements.nomor_surat.value = data.nomor_surat_value;
+            agendaForm.elements.nomor_agendaris.value = data.nomor_agendaris_value;
+            agendaForm.elements.tanggal_agendaris.value = data.tanggal_agendaris_value;
             agendaForm.elements.perihal_surat.value = data.perihal_surat;
+            agendaForm.elements.progres.value = data.progres || 'Menunggu Penyelesaian';
             setAgendaSourceLock(Boolean(data.source_locked));
             setAgendaLink(true, data.berkas_link || '');
+            setAgendaNumberState(Boolean(data.nomor_agendaris_value));
             agendaStatus.textContent = '';
         } catch (error) {
             showAgendaErrors(error.message);
@@ -926,6 +942,30 @@
     document.querySelector('[data-agendaris-add]')?.addEventListener('click', openAgendaCreate);
     document.querySelectorAll('[data-agendaris-edit]').forEach((button) => button.addEventListener('click', () => openAgendaEdit(button.dataset.agendarisUrl)));
     agendaFormModal?.querySelectorAll('[data-agendaris-form-close]').forEach((button) => button.addEventListener('click', closeAgendaForm));
+
+    agendaGenerateButton?.addEventListener('click', async () => {
+        const url = agendaGenerateButton.dataset.generateUrl;
+        if (!url || !agendaNumberInput) return;
+
+        agendaGenerateButton.disabled = true;
+        agendaGenerateButton.textContent = 'Membuat...';
+        agendaErrors.hidden = true;
+
+        try {
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+            });
+            const result = await response.json();
+            updateCsrf(result.csrf);
+            if (!response.ok || !result.success) throw new Error(result.message || 'Nomor Agendaris belum dapat dibuat.');
+            agendaNumberInput.value = result.nomor_agendaris;
+            setAgendaNumberState(true);
+        } catch (error) {
+            showAgendaErrors(error.message);
+            setAgendaNumberState(false);
+        }
+    });
 
     agendaForm?.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -1435,6 +1475,53 @@
         }
     });
 
+    const reopenProgressModal = document.querySelector('#reopenProgressModal');
+    const reopenProgressForm = reopenProgressModal?.querySelector('[data-reopen-progress-form]');
+    const reopenProgressLabel = reopenProgressModal?.querySelector('[data-reopen-progress-label]');
+    const reopenProgressError = reopenProgressModal?.querySelector('[data-reopen-progress-error]');
+    const reopenProgressSubmit = reopenProgressModal?.querySelector('[data-reopen-progress-submit]');
+
+    const closeReopenProgress = () => {
+        if (!reopenProgressModal) return;
+        reopenProgressModal.classList.remove('open');
+        reopenProgressModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        window.setTimeout(() => { reopenProgressModal.hidden = true; }, 180);
+    };
+
+    document.querySelectorAll('[data-reopen-progress]').forEach((button) => button.addEventListener('click', () => {
+        if (!reopenProgressModal || !reopenProgressForm) return;
+        reopenProgressForm.action = button.dataset.reopenUrl;
+        reopenProgressLabel.textContent = button.dataset.reopenLabel || 'Dokumen ini';
+        reopenProgressError.hidden = true;
+        reopenProgressModal.hidden = false;
+        reopenProgressModal.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => reopenProgressModal.classList.add('open'));
+        document.body.style.overflow = 'hidden';
+    }));
+
+    reopenProgressModal?.querySelectorAll('[data-reopen-progress-close]').forEach((button) => button.addEventListener('click', closeReopenProgress));
+    reopenProgressForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        reopenProgressError.hidden = true;
+        reopenProgressSubmit.disabled = true;
+        try {
+            const response = await fetch(reopenProgressForm.action, {
+                method: 'POST', body: new FormData(reopenProgressForm), credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+            });
+            const result = await response.json();
+            updateCsrf(result.csrf);
+            if (!response.ok || !result.success) throw new Error(result.message || 'Dokumen belum dapat dikembalikan ke progres.');
+            window.location.href = result.redirect_url;
+        } catch (error) {
+            reopenProgressError.textContent = error.message;
+            reopenProgressError.hidden = false;
+        } finally {
+            reopenProgressSubmit.disabled = false;
+        }
+    });
+
     const incomingProgressModal = document.querySelector('#incomingProgressDetailModal');
     const incomingProgressLoading = incomingProgressModal?.querySelector('[data-incoming-progress-loading]');
     const incomingProgressContent = incomingProgressModal?.querySelector('[data-incoming-progress-content]');
@@ -1482,6 +1569,7 @@
         if (progressFormModal?.classList.contains('open')) closeProgressForm();
         if (progressDetailModal?.classList.contains('open')) closeProgressDetail();
         if (progressDeleteModal?.classList.contains('open')) closeProgressDelete();
+        if (reopenProgressModal?.classList.contains('open')) closeReopenProgress();
         if (incomingProgressModal?.classList.contains('open')) closeIncomingProgress();
     });
 })();

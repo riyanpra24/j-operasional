@@ -5,7 +5,7 @@
         <div class="detail-loading" data-dokumen-keluar-detail-loading><span></span><strong>Memuat data pengiriman...</strong></div>
         <div class="agendaris-detail-content" data-dokumen-keluar-detail-content hidden>
             <dl class="agendaris-detail-grid">
-                <div><dt>Nomor Surat</dt><dd data-dokumen-keluar-field="nomor_surat"></dd></div><div><dt>Jenis Surat</dt><dd data-dokumen-keluar-field="jenis_surat"></dd></div>
+                <div><dt>Nomor Surat</dt><dd data-dokumen-keluar-field="nomor_surat"></dd></div><div><dt>Jenis Dokumen</dt><dd data-dokumen-keluar-field="jenis_surat"></dd></div>
                 <div><dt>Pemohon</dt><dd data-dokumen-keluar-field="pemohon"></dd></div><div><dt>Pelaksana</dt><dd data-dokumen-keluar-field="pelaksana"></dd></div>
                 <div class="span-2"><dt>UP</dt><dd data-dokumen-keluar-field="up"></dd></div>
                 <div class="span-2"><dt>Tanggal Pengiriman</dt><dd data-dokumen-keluar-field="tanggal_pengiriman"></dd></div>

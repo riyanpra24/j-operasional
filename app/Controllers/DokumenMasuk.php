@@ -27,6 +27,9 @@ class DokumenMasuk extends BaseController
             $perPage = 10;
         }
 
+        $this->model->where('pengambilan IS NOT NULL', null, false)
+            ->where('pengambilan !=', '');
+
         if ($keyword !== '') {
             $this->model->groupStart()
                 ->like('pengirim', $keyword)
@@ -53,6 +56,8 @@ class DokumenMasuk extends BaseController
         $jenisOptions = db_connect()->table('dokumen_masuk')
             ->select('jenis')
             ->where('deleted_at', null)
+            ->where('pengambilan IS NOT NULL', null, false)
+            ->where('pengambilan !=', '')
             ->groupBy('jenis')
             ->orderBy('jenis', 'ASC')
             ->get()
@@ -72,8 +77,9 @@ class DokumenMasuk extends BaseController
         return view('dokumen_masuk/form', [
             'title'       => 'Tambah Dokumen Masuk',
             'dokumen'     => [],
-            'action'      => site_url('dokumen-masuk'),
+            'action'      => site_url('distribusi-dokumen/dokumen-masuk'),
             'submitLabel' => 'Simpan dokumen',
+            'returnUrl'   => site_url('distribusi-dokumen'),
         ]);
     }
 
@@ -111,12 +117,18 @@ class DokumenMasuk extends BaseController
             ]);
         }
 
-        return redirect()->to(site_url("dokumen-masuk/{$id}"));
+        return redirect()->to(site_url('distribusi-dokumen'));
     }
 
     public function show(int $id): string|ResponseInterface
     {
         $dokumen = $this->findOrFail($id);
+        $isComplete = trim((string) ($dokumen['pengambilan'] ?? '')) !== '';
+        $isDistributionRequest = service('uri')->getSegment(1) === 'distribusi-dokumen';
+
+        if (($isDistributionRequest && $isComplete) || (! $isDistributionRequest && ! $isComplete)) {
+            throw PageNotFoundException::forPageNotFound('Dokumen masuk tidak tersedia pada tahap ini.');
+        }
 
         if ($this->request->isAJAX()) {
             return $this->response->setJSON([
@@ -131,6 +143,8 @@ class DokumenMasuk extends BaseController
                     'tanggal_value'   => $dokumen['tanggal'],
                     'jenis'           => $dokumen['jenis'],
                     'jumlah'          => number_format((int) $dokumen['jumlah'], 0, ',', '.'),
+                    'satuan_jumlah'   => $dokumen['satuan_jumlah'] ?: '-',
+                    'satuan_jumlah_value' => $dokumen['satuan_jumlah'] ?: '',
                     'ekspedisi'       => $dokumen['ekspedisi'] ?: '-',
                     'pengambilan'     => $dokumen['pengambilan'] ?: 'Belum diambil',
                     'penyerahan_at'   => $dokumen['penyerahan_at']
@@ -138,8 +152,8 @@ class DokumenMasuk extends BaseController
                         : '',
                     'created_at'      => date('d-m-Y H:i', strtotime($dokumen['created_at'])) . ' WIB',
                     'updated_at'      => date('d-m-Y H:i', strtotime($dokumen['updated_at'])) . ' WIB',
-                    'edit_url'        => site_url("dokumen-masuk/{$id}/ubah"),
-                    'update_url'      => site_url("dokumen-masuk/{$id}"),
+                    'edit_url'        => site_url("distribusi-dokumen/dokumen-masuk/{$id}/ubah"),
+                    'update_url'      => site_url("distribusi-dokumen/dokumen-masuk/{$id}"),
                 ],
             ]);
         }
@@ -152,17 +166,31 @@ class DokumenMasuk extends BaseController
 
     public function edit(int $id): string
     {
+        $dokumen = $this->findOrFail($id);
+        if (trim((string) ($dokumen['pengambilan'] ?? '')) !== '') {
+            throw PageNotFoundException::forPageNotFound('Dokumen yang sudah selesai hanya dapat dilihat dari arsip Dokumen Masuk.');
+        }
+
         return view('dokumen_masuk/form', [
             'title'       => 'Ubah Dokumen Masuk',
-            'dokumen'     => $this->findOrFail($id),
-            'action'      => site_url("dokumen-masuk/{$id}"),
+            'dokumen'     => $dokumen,
+            'action'      => site_url("distribusi-dokumen/dokumen-masuk/{$id}"),
             'submitLabel' => 'Simpan perubahan',
+            'returnUrl'   => site_url('distribusi-dokumen'),
         ]);
     }
 
     public function update(int $id): ResponseInterface
     {
-        $this->findOrFail($id);
+        $dokumen = $this->findOrFail($id);
+        if (trim((string) ($dokumen['pengambilan'] ?? '')) !== '') {
+            return $this->response->setStatusCode(409)->setJSON([
+                'success' => false,
+                'message' => 'Dokumen yang sudah selesai hanya dapat dilihat dari arsip Dokumen Masuk.',
+                'errors'  => ['Data distribusi yang sudah selesai tidak dapat diubah.'],
+                'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+            ]);
+        }
         $data = $this->payload();
 
         if (! $this->validatePayload($data)) {
@@ -192,7 +220,7 @@ class DokumenMasuk extends BaseController
             ]);
         }
 
-        return redirect()->to(site_url("dokumen-masuk/{$id}"));
+        return redirect()->to(site_url('distribusi-dokumen'));
     }
 
     public function destroy(int $id): ResponseInterface
@@ -235,7 +263,7 @@ class DokumenMasuk extends BaseController
             ]);
         }
 
-        return redirect()->to(site_url('dokumen-masuk'));
+        return redirect()->to(site_url('distribusi-dokumen'));
     }
 
     private function payload(): array
@@ -266,6 +294,7 @@ class DokumenMasuk extends BaseController
             'tanggal'   => $tanggal,
             'jenis'     => $jenis,
             'jumlah'    => (int) $this->request->getPost('jumlah'),
+            'satuan_jumlah' => $this->nullIfEmpty($this->request->getPost('satuan_jumlah')),
             'ekspedisi' => $this->nullIfEmpty($ekspedisi),
         ];
     }
@@ -280,6 +309,7 @@ class DokumenMasuk extends BaseController
             'tanggal'   => 'required|valid_date[Y-m-d]',
             'jenis'     => 'required|in_list[Surat,Dokumen,Berkas,Paket]',
             'jumlah'    => 'required|integer|greater_than_equal_to[1]',
+            'satuan_jumlah' => 'permit_empty|max_length[50]',
             'ekspedisi' => 'permit_empty|max_length[150]',
         ])->run($data);
     }

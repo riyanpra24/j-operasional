@@ -20,6 +20,7 @@
                     <div class="form-group"><label>Tanggal Diterima <i>🔒</i></label><input data-distribution-field="tanggal" readonly tabindex="-1"></div>
                     <div class="form-group"><label>Jenis <i>🔒</i></label><input data-distribution-field="jenis" readonly tabindex="-1"></div>
                     <div class="form-group"><label>Jumlah <i>🔒</i></label><input data-distribution-field="jumlah" readonly tabindex="-1"></div>
+                    <div class="form-group"><label>Satuan Jumlah <i>🔒</i></label><input data-distribution-field="satuan_jumlah" readonly tabindex="-1"></div>
                     <div class="form-group modal-span-2"><label>Ekspedisi <i>🔒</i></label><input data-distribution-field="ekspedisi" readonly tabindex="-1"></div>
                 </div>
 

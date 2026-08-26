@@ -15,7 +15,7 @@
                 <div class="modal-section-heading"><span>01</span><div><strong>Informasi Surat Keluar</strong><small>Data sumber dikunci dan hanya dapat diubah dari menu Surat Keluar</small></div></div>
                 <div class="modal-form-grid locked-document-grid">
                     <div class="form-group"><label>Nomor Surat <i>🔒</i></label><input data-outgoing-distribution-field="nomor_surat" readonly tabindex="-1"></div>
-                    <div class="form-group"><label>Jenis Surat <i>🔒</i></label><input data-outgoing-distribution-field="jenis_surat" readonly tabindex="-1"></div>
+                    <div class="form-group"><label>Jenis Dokumen <i>🔒</i></label><input data-outgoing-distribution-field="jenis_surat" readonly tabindex="-1"></div>
                     <div class="form-group"><label>Pemohon <i>🔒</i></label><input data-outgoing-distribution-field="pemohon" readonly tabindex="-1"></div>
                     <div class="form-group"><label>Pelaksana <i>🔒</i></label><input data-outgoing-distribution-field="pelaksana" readonly tabindex="-1"></div>
                     <div class="form-group"><label>UP <i>🔒</i></label><input data-outgoing-distribution-field="up" readonly tabindex="-1"></div>

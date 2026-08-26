@@ -10,7 +10,7 @@ $currentJenis = (string) ($dokumen['jenis'] ?? '');
 $jenisChoice = (string) old('jenis', in_array($currentJenis, $jenisOptions, true) ? $currentJenis : ($currentJenis !== '' ? 'Lainnya' : ''));
 $jenisOther = (string) old('jenis_lainnya', $jenisChoice === 'Lainnya' && $currentJenis !== 'Lainnya' ? $currentJenis : '');
 ?>
-<section class="page-heading form-heading"><a href="<?= $dokumen ? site_url('dokumen-masuk/' . $dokumen['id']) : site_url('dokumen-masuk') ?>" class="back-link">← Kembali</a><p class="eyebrow">FORM DOKUMEN MASUK</p><h1><?= esc($title) ?></h1><p>Hari dihitung otomatis berdasarkan tanggal yang dipilih.</p></section>
+<section class="page-heading form-heading"><a href="<?= esc($returnUrl ?? site_url('distribusi-dokumen')) ?>" class="back-link">← Kembali</a><p class="eyebrow">FORM DOKUMEN MASUK</p><h1><?= esc($title) ?></h1><p>Hari dihitung otomatis berdasarkan tanggal yang dipilih.</p></section>
 <form action="<?= esc($action) ?>" method="post" class="data-form"><?= csrf_field() ?>
     <section class="panel form-section"><div class="section-heading"><span class="section-number">01</span><div><h2>Informasi dokumen</h2><p>Lengkapi data sesuai buku register dokumen masuk.</p></div></div><div class="form-grid">
         <div class="form-group span-2"><label for="pengirim">Pengirim <span class="required">*</span></label><input id="pengirim" name="pengirim" maxlength="255" value="<?= esc($v('pengirim')) ?>" required></div>
@@ -22,8 +22,9 @@ $jenisOther = (string) old('jenis_lainnya', $jenisChoice === 'Lainnya' && $curre
         <div class="form-group"><label for="jenis">Jenis <span class="required">*</span></label><select id="jenis" name="jenis" data-jenis-select required><option value="">Pilih jenis</option><?php foreach ([...$jenisOptions, 'Lainnya'] as $jenis): ?><option value="<?= esc($jenis, 'attr') ?>" <?= $jenisChoice === $jenis ? 'selected' : '' ?>><?= esc($jenis) ?></option><?php endforeach ?></select></div>
         <div class="form-group span-2" data-jenis-custom <?= $jenisChoice === 'Lainnya' ? '' : 'hidden' ?>><label for="jenis_lainnya">Jenis lainnya <span class="required">*</span></label><input id="jenis_lainnya" name="jenis_lainnya" data-jenis-custom-input maxlength="100" value="<?= esc($jenisOther, 'attr') ?>" placeholder="Ketik jenis dokumen" <?= $jenisChoice === 'Lainnya' ? 'required' : 'disabled' ?>></div>
         <div class="form-group"><label for="jumlah">Jumlah <span class="required">*</span></label><input id="jumlah" type="number" min="1" name="jumlah" value="<?= esc($v('jumlah', '1')) ?>" required></div>
+        <div class="form-group"><label for="satuan_jumlah">Satuan Jumlah</label><input id="satuan_jumlah" name="satuan_jumlah" maxlength="50" value="<?= esc($v('satuan_jumlah')) ?>" placeholder="Contoh: lembar, berkas, amplop"><small>Isi satuan jumlah yang diterima jika diperlukan.</small></div>
         <?= view('components/ekspedisi_selector', ['prefix' => 'form', 'current' => $v('ekspedisi'), 'groupClass' => 'span-2']) ?>
     </div></section>
-    <div class="form-actions-sticky"><a href="<?= $dokumen ? site_url('dokumen-masuk/' . $dokumen['id']) : site_url('dokumen-masuk') ?>" class="btn btn-ghost">Batal</a><button type="submit" class="btn btn-primary"><?= esc($submitLabel) ?></button></div>
+    <div class="form-actions-sticky"><a href="<?= esc($returnUrl ?? site_url('distribusi-dokumen')) ?>" class="btn btn-ghost">Batal</a><button type="submit" class="btn btn-primary"><?= esc($submitLabel) ?></button></div>
 </form>
 <?= $this->endSection() ?>

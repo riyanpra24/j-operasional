@@ -22,6 +22,7 @@
                     <div class="form-group"><label for="edit_jenis">Jenis <span class="required">*</span></label><select id="edit_jenis" name="jenis" data-jenis-select required><option value="">Pilih jenis</option><option value="Surat">Surat</option><option value="Dokumen">Dokumen</option><option value="Paket">Paket</option><option value="Lainnya">Lainnya</option></select></div>
                     <div class="form-group modal-span-2" data-jenis-custom hidden><label for="edit_jenis_lainnya">Jenis lainnya <span class="required">*</span></label><input id="edit_jenis_lainnya" name="jenis_lainnya" data-jenis-custom-input maxlength="100" placeholder="Ketik jenis dokumen"></div>
                     <div class="form-group"><label for="edit_jumlah">Jumlah <span class="required">*</span></label><input id="edit_jumlah" type="number" min="1" name="jumlah" required></div>
+                    <div class="form-group"><label for="edit_satuan_jumlah">Satuan Jumlah</label><input id="edit_satuan_jumlah" name="satuan_jumlah" maxlength="50" placeholder="Contoh: lembar, berkas, amplop"><small>Isi satuan jumlah yang diterima jika diperlukan.</small></div>
                     <?= view('components/ekspedisi_selector', ['prefix' => 'edit']) ?>
                 </div>
             </div>

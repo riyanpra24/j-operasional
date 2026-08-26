@@ -4,6 +4,7 @@ $logoutSuccess = session()->getFlashdata('logout_success');
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +14,7 @@ $logoutSuccess = session()->getFlashdata('logout_success');
     <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>">
     <script src="<?= base_url('assets/url-mask.js') ?>"></script>
 </head>
+
 <body class="login-page">
     <main class="login-shell">
         <section class="login-brand-panel" aria-label="Informasi aplikasi">
@@ -20,13 +22,13 @@ $logoutSuccess = session()->getFlashdata('logout_success');
                 <span class="login-brand-mark">ϟ</span>
                 <div>
                     <strong>J-Operasional</strong>
-                    <small>Document Management</small>
+                    <small>Operasional Management</small>
                 </div>
             </div>
             <div class="login-brand-copy">
-                <span>REGISTER DIGITAL</span>
-                <h1>Kelola dokumen operasional dalam satu sistem.</h1>
-                <p>Akses dashboard, pencatatan, distribusi, dan agenda dokumen sesuai kewenangan akun Anda.</p>
+                <span>PORTAL DIGITAL</span>
+                <h1>Kelola aktivitas operasional dalam satu sistem.</h1>
+                <p>Akses dashboard, pengelolaan, monitoring, dan kegiatan operasional sesuai kewenangan akun Anda.</p>
             </div>
             <small class="login-copyright">Register Operasional · <?= date('Y') ?></small>
         </section>
@@ -35,7 +37,7 @@ $logoutSuccess = session()->getFlashdata('logout_success');
             <div class="login-form-wrap">
                 <span class="login-eyebrow">AKSES SISTEM</span>
                 <h2>Selamat datang</h2>
-                <p>Masukkan akun yang telah diberikan administrator.</p>
+                <p>Masukkan akun yang telah diberikan</p>
 
                 <?php if ($loginError): ?>
                     <div class="login-alert danger" role="alert"><?= esc($loginError) ?></div>
@@ -57,8 +59,7 @@ $logoutSuccess = session()->getFlashdata('logout_success');
                             placeholder="Masukkan username"
                             autocomplete="username"
                             required
-                            autofocus
-                        >
+                            autofocus>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
@@ -69,14 +70,13 @@ $logoutSuccess = session()->getFlashdata('logout_success');
                                 type="password"
                                 placeholder="Masukkan password"
                                 autocomplete="current-password"
-                                required
-                            >
+                                required>
                             <button type="button" data-password-toggle aria-label="Tampilkan password">Lihat</button>
                         </div>
                     </div>
                     <button class="btn btn-primary login-submit" type="submit">Masuk ke sistem</button>
                 </form>
-                <p class="login-help">Hubungi administrator apabila mengalami kendala akses.</p>
+                <p class="login-help">Hubungi IT Kanwil apabila mengalami kendala akses.</p>
             </div>
         </section>
     </main>
@@ -91,4 +91,5 @@ $logoutSuccess = session()->getFlashdata('logout_success');
         });
     </script>
 </body>
+
 </html>

@@ -9,6 +9,8 @@ $currentRole = (string) session()->get('auth_role');
 $displayName = (string) session()->get('auth_display_name');
 $canAccessSecurity = in_array($currentRole, ['admin', 'security'], true);
 $canAccessAgendaris = in_array($currentRole, ['admin', 'agendaris'], true);
+$incomingArchive = $segment === 'dokumen-masuk';
+$incomingWorkspace = in_array($segment, ['dashboard', 'dokumen-masuk', 'distribusi-dokumen'], true);
 $roleLabel = \Config\UserRoles::label($currentRole);
 $initial = strtoupper(substr($displayName !== '' ? $displayName : 'U', 0, 1));
 $success = session()->getFlashdata('success');
@@ -175,11 +177,10 @@ $errors  = session()->getFlashdata('errors') ?? [];
             </footer>
         </div>
     </div>
-    <?php if ($canAccessSecurity): ?>
-        <?= view('components/input_modal') ?>
-        <?= view('components/detail_modal') ?>
-        <?= view('components/edit_modal') ?>
-        <?= view('components/delete_modal') ?>
+    <?php if ($canAccessSecurity && $incomingWorkspace): ?>
+        <?php if (! $incomingArchive): ?><?= view('components/input_modal') ?><?php endif ?>
+        <?= view('components/detail_modal', ['readOnly' => $incomingArchive]) ?>
+        <?php if (! $incomingArchive): ?><?= view('components/edit_modal') ?><?= view('components/delete_modal') ?><?php endif ?>
     <?php endif ?>
     <script src="<?= base_url('assets/app.js') ?>"></script>
 </body>

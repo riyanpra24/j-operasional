@@ -434,6 +434,9 @@ body { background: #e9edef; }
 [data-progress-detail-edit][hidden] { display: none; }
 .agendaris-modal-body { padding: 14px 18px 16px; overflow: visible; }
 .agendaris-form-grid { gap: 11px 14px; }
+.agenda-number-control { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; align-items: center; }
+.agenda-number-control .btn { min-height: 48px; padding-inline: 14px; white-space: nowrap; }
+.agenda-number-control input[readonly] { color: #344158; background: #f7f9fb; }
 .agendaris-form-grid .field-source-locked label::after { margin-left: 4px; content: "🔒"; }
 .agendaris-form-grid .field-source-locked input { color: #647188; background: #f3f6f8; border-color: #dfe5ea; cursor: not-allowed; }
 .agenda-link-field { padding: 10px 12px; background: #f7fbfb; border: 1px dashed #b9dcda; border-radius: 8px; }
@@ -467,6 +470,7 @@ body { background: #e9edef; }
     .agendaris-modal-dialog,.agendaris-delete-modal .modal-dialog { width: 100%; max-height: 92vh; border-radius: 15px 15px 0 0; }
     .agendaris-modal-body { overflow-y: auto; }
     .agendaris-form-grid,.agendaris-detail-grid { grid-template-columns: 1fr; }
+    .agenda-number-control { grid-template-columns: 1fr; }
     .agendaris-form-grid .modal-span-2,.agendaris-detail-grid .span-2 { grid-column: auto; }
 }
 

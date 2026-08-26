@@ -17,8 +17,11 @@ class AgendarisModel extends Model
         'tanggal_diterima',
         'tanggal_surat',
         'nomor_surat',
+        'nomor_agendaris',
+        'tanggal_agendaris',
         'perihal_surat',
         'berkas_link',
+        'progres',
     ];
 
     protected $useTimestamps = true;

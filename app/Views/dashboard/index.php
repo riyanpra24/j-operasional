@@ -51,7 +51,7 @@ $registerUrl = $canAccessSecurity ? site_url('dokumen-masuk') : site_url('agenda
 
 <section class="reference-chart-grid">
     <article class="reference-panel main-graph-card">
-        <header><div><h2>Grafik Dokumen Masuk</h2><p>Pergerakan data enam bulan terakhir</p></div><a href="<?= $canAccessSecurity ? site_url('dokumen-masuk/tambah') : $registerUrl ?>" <?= $canAccessSecurity ? 'data-open-input-modal' : '' ?>>＋ <?= $canAccessSecurity ? 'Dokumen Baru' : 'Buka Agenda' ?></a></header>
+        <header><div><h2>Grafik Dokumen Masuk</h2><p>Pergerakan data enam bulan terakhir</p></div><a href="<?= $canAccessSecurity ? site_url('distribusi-dokumen') : $registerUrl ?>" <?= $canAccessSecurity ? 'data-open-input-modal' : '' ?>>＋ <?= $canAccessSecurity ? 'Dokumen Baru' : 'Buka Agenda' ?></a></header>
         <div class="reference-line-chart">
             <div class="reference-y-axis"><span><?= $maxChart ?></span><span><?= (int) ceil($maxChart * .75) ?></span><span><?= (int) ceil($maxChart * .5) ?></span><span><?= (int) ceil($maxChart * .25) ?></span><span>0</span></div>
             <div class="reference-svg-wrap">

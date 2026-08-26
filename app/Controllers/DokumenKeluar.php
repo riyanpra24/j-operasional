@@ -29,9 +29,7 @@ class DokumenKeluar extends BaseController
             $perPage = 10;
         }
 
-        if ($securityView) {
-            $this->model->where('progres', 'Diambil Ekspedisi');
-        }
+        $this->model->where('progres', 'Diambil Ekspedisi');
 
         if ($keyword !== '') {
             $this->model->groupStart()
@@ -56,17 +54,17 @@ class DokumenKeluar extends BaseController
             $this->model->where('tanggal_pengiriman <=', $to);
         }
 
-        $jenisBuilder = db_connect()->table('dokumen_keluar')->select('jenis_surat');
-        if ($securityView) {
-            $jenisBuilder->where('progres', 'Diambil Ekspedisi');
-        }
+        $jenisBuilder = db_connect()->table('dokumen_keluar')
+            ->select('jenis_surat')
+            ->where('progres', 'Diambil Ekspedisi');
         $jenisOptions = $jenisBuilder->groupBy('jenis_surat')->orderBy('jenis_surat', 'ASC')->get()->getResultArray();
 
         return view('dokumen_keluar/index', [
-            'title'        => $securityView ? 'Dokumen Keluar' : 'Surat Keluar',
+            'title'        => 'Dokumen Keluar',
+            'securityView' => $securityView,
             'indexUrl'     => $indexUrl,
             'detailUrlPrefix' => $securityView ? 'dokumen-keluar' : 'agendaris/surat-keluar',
-            'readOnly'     => $securityView,
+            'readOnly'     => true,
             'dokumen'      => $this->model->orderBy('id', 'ASC')->paginate($perPage, 'dokumen_keluar'),
             'pager'        => $this->model->pager,
             'filters'      => compact('keyword', 'jenis', 'from', 'to', 'perPage'),
@@ -117,6 +115,9 @@ class DokumenKeluar extends BaseController
     public function show(int $id): ResponseInterface
     {
         $dokumen = $this->findDokumen($id);
+        if ($dokumen['progres'] !== 'Diambil Ekspedisi') {
+            throw PageNotFoundException::forPageNotFound('Dokumen Keluar belum selesai diproses dan belum tersedia di arsip.');
+        }
 
         return $this->response->setJSON([
             'success' => true,
@@ -163,6 +164,29 @@ class DokumenKeluar extends BaseController
         session()->setFlashdata('success', $message);
 
         return $this->successResponse($message);
+    }
+
+    public function reopen(int $id): ResponseInterface
+    {
+        $dokumen = $this->findDokumen($id);
+        if ($dokumen['progres'] !== 'Diambil Ekspedisi') {
+            return $this->response->setStatusCode(409)->setJSON([
+                'success' => false,
+                'message' => 'Dokumen sudah berada di Progres Dokumen.',
+                'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+            ]);
+        }
+
+        if (! $this->model->update($id, ['progres' => 'Menunggu Ekspedisi'])) {
+            return $this->validationError($this->model->errors() ?: ['Dokumen belum dapat dikembalikan ke progres.']);
+        }
+
+        $message = 'Dokumen Keluar berhasil dikembalikan ke Progres Dokumen dan telah keluar dari arsip.';
+        session()->setFlashdata('success', $message);
+
+        return $this->successResponse($message, [
+            'redirect_url' => site_url('agendaris/surat-keluar'),
+        ]);
     }
 
     public function destroy(int $id): ResponseInterface

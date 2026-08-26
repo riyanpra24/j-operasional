@@ -11,14 +11,14 @@
 <section class="panel filter-panel">
     <form method="get" action="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="agendaris-filter-form">
         <div class="form-group search-group"><label for="progress_q">Cari dokumen</label><div class="input-with-icon"><span>⌕</span><input id="progress_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor surat, jenis, pelaksana, Security..."></div></div>
-        <div class="form-group"><label for="progress_filter">Progres</label><select id="progress_filter" name="progres"><option value="">Semua progres</option><option value="Menunggu Ekspedisi" <?= $filters['progres'] === 'Menunggu Ekspedisi' ? 'selected' : '' ?>>Menunggu Ekspedisi</option><option value="Diambil Ekspedisi" <?= $filters['progres'] === 'Diambil Ekspedisi' ? 'selected' : '' ?>>Diambil Ekspedisi</option></select></div>
+        <div class="form-group"><label for="progress_filter">Progres</label><select id="progress_filter" name="progres"><option value="">Semua progres aktif</option><option value="Menunggu Ekspedisi" <?= $filters['progres'] === 'Menunggu Ekspedisi' ? 'selected' : '' ?>>Menunggu Ekspedisi</option></select></div>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
         <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="btn btn-ghost">Reset</a></div>
     </form>
 </section>
 
 <section class="panel register-panel progress-document-panel">
-    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nomor Surat</th><th>Jenis Surat</th><th>Pemohon</th><th>Pelaksana</th><th>UP</th><th>Tanggal Pengiriman</th><th>Nomor Resi</th><th>Tanggal Diterima</th><th>Penerima</th><th>Alamat Penerima</th><th>Security</th><th>Tanggal Diterima Security</th><th>Progres</th><th>Aksi</th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nomor Surat</th><th>Jenis Dokumen</th><th>Pemohon</th><th>Pelaksana</th><th>UP</th><th>Tanggal Pengiriman</th><th>Nomor Resi</th><th>Tanggal Diterima</th><th>Penerima</th><th>Alamat Penerima</th><th>Security</th><th>Tanggal Diterima Security</th><th>Progres</th><th>Aksi</th></tr></thead><tbody>
         <?php if ($dokumen === []): ?><tr><td colspan="15"><div class="empty-state"><span>⇢</span><strong>Belum ada Progres Dokumen Keluar</strong><p>Tambahkan Dokumen Keluar atau ubah filter pencarian.</p></div></td></tr>
         <?php else: ?>
             <?php $rowNumber = (($pager->getCurrentPage('progres_dokumen') - 1) * $filters['perPage']) + 1; ?>

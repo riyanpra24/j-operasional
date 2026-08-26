@@ -9,7 +9,7 @@
             <button type="button" class="modal-close" data-modal-close aria-label="Tutup popup">×</button>
         </header>
 
-        <form action="<?= site_url('dokumen-masuk') ?>" method="post" id="modalDokumenForm">
+        <form action="<?= site_url('distribusi-dokumen/dokumen-masuk') ?>" method="post" id="modalDokumenForm">
             <?= csrf_field() ?>
             <div class="modal-alert" data-modal-errors hidden role="alert"></div>
             <div class="modal-body input-modal-body">
@@ -67,6 +67,11 @@
                     <div class="form-group">
                         <label for="modal_jumlah">Jumlah <span class="required">*</span></label>
                         <input id="modal_jumlah" type="number" min="1" name="jumlah" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_satuan_jumlah">Satuan Jumlah</label>
+                        <input id="modal_satuan_jumlah" name="satuan_jumlah" maxlength="50" placeholder="Contoh: lembar, berkas, amplop">
+                        <small>Isi satuan jumlah yang diterima jika diperlukan.</small>
                     </div>
                     <?= view('components/ekspedisi_selector', ['prefix' => 'modal']) ?>
                 </div>

@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\AgendarisModel;
 use App\Models\DokumenKeluarModel;
 use App\Models\DokumenMasukModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
@@ -11,53 +12,73 @@ class ProgresDokumen extends BaseController
 {
     private DokumenKeluarModel $model;
     private DokumenMasukModel $dokumenMasukModel;
+    private AgendarisModel $agendarisModel;
 
     public function __construct()
     {
         $this->model = new DokumenKeluarModel();
         $this->dokumenMasukModel = new DokumenMasukModel();
+        $this->agendarisModel = new AgendarisModel();
     }
 
     public function masuk(): string
     {
         $keyword = trim((string) $this->request->getGet('q'));
-        $progres = trim((string) $this->request->getGet('progres'));
+        $jenis   = trim((string) $this->request->getGet('jenis'));
+        $from    = trim((string) $this->request->getGet('dari'));
+        $to      = trim((string) $this->request->getGet('sampai'));
         $perPage = (int) $this->request->getGet('per_page');
 
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
         }
 
+        $this->agendarisModel->select('agendaris.*')
+            ->where('agendaris.progres', 'Menunggu Penyelesaian');
+
         if ($keyword !== '') {
-            $this->dokumenMasukModel->groupStart()
-                ->like('pengirim', $keyword)
-                ->orLike('perihal', $keyword)
-                ->orLike('penerima', $keyword)
-                ->orLike('jenis', $keyword)
-                ->orLike('ekspedisi', $keyword)
-                ->orLike('pengambilan', $keyword)
+            $this->agendarisModel->groupStart()
+                ->like('agendaris.nomor_surat', $keyword)
+                ->orLike('agendaris.nomor_agendaris', $keyword)
+                ->orLike('agendaris.perihal_surat', $keyword)
+                ->orLike('agendaris.pengirim', $keyword)
+                ->orLike('agendaris.penerima', $keyword)
+                ->orLike('agendaris.pengambilan', $keyword)
+                ->orLike('agendaris.jenis', $keyword)
                 ->groupEnd();
         }
 
-        if ($progres === 'menunggu') {
-            $this->dokumenMasukModel->groupStart()
-                ->where('pengambilan', null)
-                ->orWhere('pengambilan', '')
-                ->groupEnd();
-        } elseif ($progres === 'diserahkan') {
-            $this->dokumenMasukModel
-                ->where('pengambilan IS NOT NULL', null, false)
-                ->where('pengambilan !=', '');
+        if ($jenis !== '') {
+            $this->agendarisModel->where('agendaris.jenis', $jenis);
         }
+
+        if ($this->isDate($from)) {
+            $this->agendarisModel->where('agendaris.tanggal_diterima >=', $from);
+        }
+
+        if ($this->isDate($to)) {
+            $this->agendarisModel->where('agendaris.tanggal_diterima <=', $to);
+        }
+
+        $jenisOptions = db_connect()->table('agendaris')
+            ->select('jenis')
+            ->where('progres', 'Menunggu Penyelesaian')
+            ->where('jenis IS NOT NULL', null, false)
+            ->where('jenis !=', '')
+            ->groupBy('jenis')
+            ->orderBy('jenis', 'ASC')
+            ->get()
+            ->getResultArray();
 
         return view('agendaris/progres_dokumen_masuk', [
-            'title'   => 'Progres Dokumen',
-            'dokumen' => $this->dokumenMasukModel
-                ->orderBy('created_at', 'ASC')
-                ->orderBy('id', 'ASC')
+            'title'  => 'Progres Dokumen',
+            'agenda' => $this->agendarisModel
+                ->orderBy('agendaris.created_at', 'ASC')
+                ->orderBy('agendaris.id', 'ASC')
                 ->paginate($perPage, 'progres_dokumen_masuk'),
-            'pager'   => $this->dokumenMasukModel->pager,
-            'filters' => compact('keyword', 'progres', 'perPage'),
+            'pager'        => $this->agendarisModel->pager,
+            'filters'      => compact('keyword', 'jenis', 'from', 'to', 'perPage'),
+            'jenisOptions' => array_column($jenisOptions, 'jenis'),
         ]);
     }
 
@@ -100,6 +121,8 @@ class ProgresDokumen extends BaseController
             $perPage = 10;
         }
 
+        $this->model->where('progres !=', 'Diambil Ekspedisi');
+
         if ($keyword !== '') {
             $this->model->groupStart()
                 ->like('nomor_surat', $keyword)
@@ -114,7 +137,7 @@ class ProgresDokumen extends BaseController
                 ->groupEnd();
         }
 
-        if (in_array($progres, ['Menunggu Ekspedisi', 'Diambil Ekspedisi'], true)) {
+        if ($progres === 'Menunggu Ekspedisi') {
             $this->model->where('progres', $progres);
         }
 
@@ -345,6 +368,13 @@ class ProgresDokumen extends BaseController
     private function displayDate(?string $date): string
     {
         return $date ? date('d-m-Y', strtotime($date)) : '-';
+    }
+
+    private function isDate(string $value): bool
+    {
+        $date = \DateTime::createFromFormat('Y-m-d', $value);
+
+        return $date !== false && $date->format('Y-m-d') === $value;
     }
 
     private function nullIfEmpty(mixed $value): ?string

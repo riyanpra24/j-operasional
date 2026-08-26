@@ -9,6 +9,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class Agendaris extends BaseController
 {
+    private const NOMOR_AGENDARIS_PREFIX = 'AGD/KW/VI/';
+
     private AgendarisModel $model;
 
     public function __construct()
@@ -34,10 +36,12 @@ class Agendaris extends BaseController
         }
 
         $this->model->select('agendaris.*');
+        $this->model->where('agendaris.progres', 'Selesai');
 
         if ($keyword !== '') {
             $this->model->groupStart()
                 ->like('agendaris.nomor_surat', $keyword)
+                ->orLike('agendaris.nomor_agendaris', $keyword)
                 ->orLike('agendaris.perihal_surat', $keyword)
                 ->orLike('agendaris.pengirim', $keyword)
                 ->orLike('agendaris.penerima', $keyword)
@@ -60,6 +64,7 @@ class Agendaris extends BaseController
 
         $jenisOptions = db_connect()->table('agendaris')
             ->select('jenis')
+            ->where('progres', 'Selesai')
             ->where('jenis IS NOT NULL', null, false)
             ->where('jenis !=', '')
             ->groupBy('jenis')
@@ -68,7 +73,7 @@ class Agendaris extends BaseController
             ->getResultArray();
 
         return view('agendaris/index', [
-            'title'   => 'Surat Masuk',
+            'title'   => 'Dokumen Masuk',
             'agenda'  => $this->model->orderBy('agendaris.created_at', 'ASC')->orderBy('agendaris.id', 'ASC')->paginate($perPage, 'agendaris'),
             'pager'   => $this->model->pager,
             'filters' => compact('keyword', 'jenis', 'from', 'to', 'perPage'),
@@ -96,6 +101,7 @@ class Agendaris extends BaseController
     public function synchronize(): RedirectResponse
     {
         $db = db_connect();
+        $returnUrl = site_url('agendaris/progres-dokumen');
 
         try {
             $db->query(
@@ -106,7 +112,7 @@ class Agendaris extends BaseController
                 . "WHERE d.deleted_at IS NULL AND TRIM(COALESCE(d.pengambilan, '')) <> '' AND a.id IS NULL"
             );
         } catch (\Throwable $error) {
-            return redirect()->to(site_url('agendaris/surat-masuk'))
+            return redirect()->to($returnUrl)
                 ->with('error', 'Sinkronisasi belum berhasil. Silakan coba kembali.');
         }
 
@@ -115,7 +121,23 @@ class Agendaris extends BaseController
             ? "Sinkronisasi selesai. {$total} Surat Masuk yang hilang berhasil dibuat ulang dari Dokumen Masuk."
             : 'Semua Surat Masuk sudah tersinkronisasi dengan Dokumen Masuk.';
 
-        return redirect()->to(site_url('agendaris/surat-masuk'))->with('sync_success', $message);
+        return redirect()->to($returnUrl)->with('sync_success', $message);
+    }
+
+    public function generateNomor(): ResponseInterface
+    {
+        $row = db_connect()->table('agendaris')
+            ->select('MAX(CAST(SUBSTRING(nomor_agendaris, 11) AS UNSIGNED)) AS nomor_terakhir', false)
+            ->where("nomor_agendaris REGEXP '^AGD/KW/VI/[0-9]+$'", null, false)
+            ->get()
+            ->getRowArray();
+
+        $next = ((int) ($row['nomor_terakhir'] ?? 0)) + 1;
+        $nomor = self::NOMOR_AGENDARIS_PREFIX . str_pad((string) $next, 3, '0', STR_PAD_LEFT);
+
+        return $this->successResponse('Nomor Agendaris berhasil dibuat.', [
+            'nomor_agendaris' => $nomor,
+        ]);
     }
 
     public function show(int $id): ResponseInterface
@@ -144,12 +166,17 @@ class Agendaris extends BaseController
                 'tanggal_surat_value' => $agenda['tanggal_surat'] ?: '',
                 'nomor_surat'         => $agenda['nomor_surat'] ?: 'Belum diisi',
                 'nomor_surat_value'   => $agenda['nomor_surat'] ?: '',
+                'nomor_agendaris'     => $agenda['nomor_agendaris'] ?: 'Belum dibuat',
+                'nomor_agendaris_value' => $agenda['nomor_agendaris'] ?: '',
+                'tanggal_agendaris'   => $agenda['tanggal_agendaris'] ? date('d-m-Y', strtotime($agenda['tanggal_agendaris'])) : 'Belum diisi',
+                'tanggal_agendaris_value' => $agenda['tanggal_agendaris'] ?: '',
                 'perihal_surat'       => $agenda['perihal_surat'],
                 'berkas_link'         => $agenda['berkas_link'] ?: '',
+                'progres'             => $agenda['progres'] ?: 'Menunggu Penyelesaian',
                 'created_at'          => date('d-m-Y H:i', strtotime($agenda['created_at'])) . ' WIB',
                 'updated_at'          => date('d-m-Y H:i', strtotime($agenda['updated_at'])) . ' WIB',
-                'update_url'          => site_url("agendaris/surat-masuk/{$id}"),
-                'delete_url'          => site_url("agendaris/surat-masuk/{$id}/hapus"),
+                'update_url'          => site_url("agendaris/progres-dokumen-masuk/{$id}"),
+                'delete_url'          => site_url("agendaris/progres-dokumen-masuk/{$id}/hapus"),
             ],
         ]);
     }
@@ -165,7 +192,7 @@ class Agendaris extends BaseController
             }
         }
 
-        $errors = $this->validateAgenda($data);
+        $errors = $this->validateAgenda($data, $id);
 
         if ($errors !== []) {
             return $this->validationError($errors);
@@ -176,6 +203,29 @@ class Agendaris extends BaseController
         }
 
         return $this->successResponse('Surat masuk Agendaris berhasil diperbarui.');
+    }
+
+    public function reopen(int $id): ResponseInterface
+    {
+        $agenda = $this->findJoined($id);
+        if (($agenda['progres'] ?? '') !== 'Selesai') {
+            return $this->response->setStatusCode(409)->setJSON([
+                'success' => false,
+                'message' => 'Dokumen sudah berada di Progres Dokumen.',
+                'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+            ]);
+        }
+
+        if (! $this->model->update($id, ['progres' => 'Menunggu Penyelesaian'])) {
+            return $this->validationError($this->model->errors() ?: ['Dokumen belum dapat dikembalikan ke progres.']);
+        }
+
+        $message = 'Dokumen Masuk berhasil dikembalikan ke Progres Dokumen dan telah keluar dari arsip.';
+        session()->setFlashdata('success', $message);
+
+        return $this->successResponse($message, [
+            'redirect_url' => site_url('agendaris/surat-masuk'),
+        ]);
     }
 
     public function destroy(int $id): ResponseInterface
@@ -203,12 +253,15 @@ class Agendaris extends BaseController
             'tanggal_diterima' => trim((string) $this->request->getPost('tanggal_diterima')),
             'tanggal_surat'    => trim((string) $this->request->getPost('tanggal_surat')),
             'nomor_surat'      => trim((string) $this->request->getPost('nomor_surat')),
+            'nomor_agendaris'  => $this->nullIfEmpty($this->request->getPost('nomor_agendaris')),
+            'tanggal_agendaris'=> $this->nullIfEmpty($this->request->getPost('tanggal_agendaris')),
             'perihal_surat'    => trim((string) $this->request->getPost('perihal_surat')),
             'berkas_link'      => trim((string) $this->request->getPost('berkas_link')),
+            'progres'          => trim((string) $this->request->getPost('progres')),
         ];
     }
 
-    private function validateAgenda(array $data): array
+    private function validateAgenda(array $data, ?int $ignoreId = null): array
     {
         $validation = service('validation')->setRules([
             'pengirim'         => 'required|max_length[255]',
@@ -218,12 +271,30 @@ class Agendaris extends BaseController
             'tanggal_diterima' => 'required|valid_date[Y-m-d]',
             'tanggal_surat'    => 'required|valid_date[Y-m-d]',
             'nomor_surat'      => 'required|max_length[150]',
+            'nomor_agendaris'  => 'permit_empty|max_length[50]',
+            'tanggal_agendaris'=> 'permit_empty|valid_date[Y-m-d]',
             'perihal_surat'    => 'required|max_length[255]',
             'berkas_link'      => 'permit_empty|max_length[2048]',
+            'progres'          => 'required|in_list[Menunggu Penyelesaian,Selesai]',
         ]);
 
         if (! $validation->run($data)) {
             return array_values($validation->getErrors());
+        }
+
+        if ($data['nomor_agendaris'] !== null) {
+            if (preg_match('/^AGD\/KW\/VI\/[0-9]{3,}$/', $data['nomor_agendaris']) !== 1) {
+                return ['Nomor Agendaris harus menggunakan format AGD/KW/VI/001.'];
+            }
+
+            $duplicate = db_connect()->table('agendaris')
+                ->where('nomor_agendaris', $data['nomor_agendaris']);
+            if ($ignoreId !== null) {
+                $duplicate->where('id !=', $ignoreId);
+            }
+            if ($duplicate->countAllResults() > 0) {
+                return ['Nomor Agendaris sudah digunakan. Silakan generate nomor baru.'];
+            }
         }
 
         if ($data['berkas_link'] !== '') {
@@ -234,6 +305,13 @@ class Agendaris extends BaseController
         }
 
         return [];
+    }
+
+    private function nullIfEmpty(mixed $value): ?string
+    {
+        $value = trim((string) $value);
+
+        return $value === '' ? null : $value;
     }
 
     private function findJoined(int $id): array

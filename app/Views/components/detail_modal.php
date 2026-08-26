@@ -27,6 +27,7 @@
                 <div><dt>Hari</dt><dd data-detail-field="hari"></dd></div>
                 <div><dt>Tanggal Diterima</dt><dd data-detail-field="tanggal"></dd></div>
                 <div><dt>Jumlah</dt><dd data-detail-field="jumlah"></dd></div>
+                <div><dt>Satuan Jumlah</dt><dd data-detail-field="satuan_jumlah"></dd></div>
                 <div><dt>Ekspedisi</dt><dd data-detail-field="ekspedisi"></dd></div>
                 <div class="pickup-detail-row"><dt>Penyerahan</dt><dd data-detail-field="pengambilan"></dd><small>Data dikunci setelah diproses melalui Distribusi Dokumen.</small></div>
                 <div class="pickup-detail-row" data-penyerahan-time hidden><dt>Waktu Penyerahan</dt><dd data-detail-field="penyerahan_at"></dd><small>Tanggal dan waktu dicatat otomatis saat penyerahan disimpan.</small></div>
@@ -35,7 +36,7 @@
 
         <footer class="modal-footer detail-modal-footer">
             <button type="button" class="btn btn-ghost" data-detail-close>Tutup</button>
-            <a href="#" class="btn btn-primary" data-detail-edit data-open-edit-modal>✎ Ubah data</a>
+            <?php if (! ($readOnly ?? false)): ?><a href="#" class="btn btn-primary" data-detail-edit data-open-edit-modal>✎ Ubah data</a><?php endif ?>
         </footer>
     </section>
 </div>

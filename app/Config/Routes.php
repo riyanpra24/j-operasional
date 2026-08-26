@@ -31,12 +31,7 @@ $routes->group('kelola-akun', static function (RouteCollection $routes): void {
 // Security - Dokumen Masuk
 $routes->group('dokumen-masuk', static function (RouteCollection $routes): void {
     $routes->get('/', 'DokumenMasuk::index', ['as' => 'dokumen_masuk.index']);
-    $routes->get('tambah', 'DokumenMasuk::create', ['as' => 'dokumen_masuk.create']);
-    $routes->post('/', 'DokumenMasuk::store', ['as' => 'dokumen_masuk.store']);
     $routes->get('(:num)', 'DokumenMasuk::show/$1', ['as' => 'dokumen_masuk.show']);
-    $routes->get('(:num)/ubah', 'DokumenMasuk::edit/$1', ['as' => 'dokumen_masuk.edit']);
-    $routes->post('(:num)', 'DokumenMasuk::update/$1', ['as' => 'dokumen_masuk.update']);
-    $routes->post('(:num)/hapus', 'DokumenMasuk::destroy/$1', ['as' => 'dokumen_masuk.destroy']);
 });
 
 // Security - Dokumen Keluar (hanya baca)
@@ -48,6 +43,13 @@ $routes->group('dokumen-keluar', static function (RouteCollection $routes): void
 // Security - Distribusi Dokumen
 $routes->group('distribusi-dokumen', static function (RouteCollection $routes): void {
     $routes->get('/', 'DistribusiDokumen::index', ['as' => 'distribusi_dokumen.index']);
+
+    // CRUD Dokumen Masuk dikelola dari antrean Distribusi Dokumen.
+    $routes->post('dokumen-masuk', 'DokumenMasuk::store', ['as' => 'distribusi_dokumen.incoming.store']);
+    $routes->get('dokumen-masuk/(:num)', 'DokumenMasuk::show/$1', ['as' => 'distribusi_dokumen.incoming.show']);
+    $routes->get('dokumen-masuk/(:num)/ubah', 'DokumenMasuk::edit/$1', ['as' => 'distribusi_dokumen.incoming.edit']);
+    $routes->post('dokumen-masuk/(:num)', 'DokumenMasuk::update/$1', ['as' => 'distribusi_dokumen.incoming.update']);
+    $routes->post('dokumen-masuk/(:num)/hapus', 'DokumenMasuk::destroy/$1', ['as' => 'distribusi_dokumen.incoming.destroy']);
 
     // Route Surat Keluar diletakkan sebelum parameter numerik agar struktur
     // modul mudah dibaca dan tidak ambigu.
@@ -64,26 +66,26 @@ $routes->group('agendaris', static function (RouteCollection $routes): void {
 
     $routes->group('surat-masuk', static function (RouteCollection $routes): void {
         $routes->get('/', 'Agendaris::suratMasuk', ['as' => 'agendaris.surat_masuk']);
-        $routes->post('/', 'Agendaris::store', ['as' => 'agendaris.store']);
-        $routes->post('sinkronkan', 'Agendaris::synchronize', ['as' => 'agendaris.synchronize']);
         $routes->get('(:num)', 'Agendaris::show/$1', ['as' => 'agendaris.show']);
-        $routes->post('(:num)', 'Agendaris::update/$1', ['as' => 'agendaris.update']);
-        $routes->post('(:num)/hapus', 'Agendaris::destroy/$1', ['as' => 'agendaris.destroy']);
+        $routes->post('(:num)/kembalikan', 'Agendaris::reopen/$1', ['as' => 'agendaris.reopen']);
     });
 
     $routes->group('surat-keluar', static function (RouteCollection $routes): void {
         $routes->get('/', 'DokumenKeluar::index', ['as' => 'dokumen_keluar.index']);
-        $routes->post('/', 'DokumenKeluar::store', ['as' => 'dokumen_keluar.store']);
         $routes->get('(:num)', 'DokumenKeluar::show/$1', ['as' => 'dokumen_keluar.show']);
-        $routes->post('(:num)', 'DokumenKeluar::update/$1', ['as' => 'dokumen_keluar.update']);
-        $routes->post('(:num)/hapus', 'DokumenKeluar::destroy/$1', ['as' => 'dokumen_keluar.destroy']);
+        $routes->post('(:num)/kembalikan', 'DokumenKeluar::reopen/$1', ['as' => 'dokumen_keluar.reopen']);
     });
 
     $routes->get('progres-dokumen', 'ProgresDokumen::masuk', ['as' => 'progres_dokumen.index']);
 
     $routes->group('progres-dokumen-masuk', static function (RouteCollection $routes): void {
         $routes->get('/', 'ProgresDokumen::masuk', ['as' => 'progres_dokumen_masuk.index']);
-        $routes->get('(:num)', 'ProgresDokumen::showMasuk/$1', ['as' => 'progres_dokumen_masuk.show']);
+        $routes->post('/', 'Agendaris::store', ['as' => 'progres_dokumen_masuk.store']);
+        $routes->get('generate-nomor', 'Agendaris::generateNomor', ['as' => 'progres_dokumen_masuk.generate_nomor']);
+        $routes->post('sinkronkan', 'Agendaris::synchronize', ['as' => 'progres_dokumen_masuk.synchronize']);
+        $routes->get('(:num)', 'Agendaris::show/$1', ['as' => 'progres_dokumen_masuk.show']);
+        $routes->post('(:num)', 'Agendaris::update/$1', ['as' => 'progres_dokumen_masuk.update']);
+        $routes->post('(:num)/hapus', 'Agendaris::destroy/$1', ['as' => 'progres_dokumen_masuk.destroy']);
     });
 
     $routes->group('progres-dokumen-keluar', static function (RouteCollection $routes): void {

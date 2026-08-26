@@ -13,12 +13,17 @@ class DistribusiDokumen extends BaseController
         $model   = new DokumenMasukModel();
         $outgoing = new DokumenKeluarModel();
         $keyword = trim((string) $this->request->getGet('q'));
+        $tab     = trim((string) $this->request->getGet('tab'));
         $from    = trim((string) $this->request->getGet('dari'));
         $to      = trim((string) $this->request->getGet('sampai'));
         $perPage = (int) $this->request->getGet('per_page');
 
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
+        }
+
+        if (! in_array($tab, ['masuk', 'keluar'], true)) {
+            $tab = 'masuk';
         }
 
         $model->groupStart()
@@ -68,26 +73,13 @@ class DistribusiDokumen extends BaseController
             $outgoing->where('dokumen_keluar.tanggal_pengiriman <=', $to);
         }
 
-        $db = db_connect();
-
         return view('distribusi_dokumen/index', [
             'title'          => 'Distribusi Dokumen',
             'dokumen'        => $model->orderBy('created_at', 'ASC')->orderBy('id', 'ASC')->paginate($perPage, 'distribusi_dokumen'),
             'pager'          => $model->pager,
             'dokumenKeluar'  => $outgoing->orderBy('distribusi_dokumen.id', 'ASC')->paginate($perPage, 'distribusi_keluar'),
             'pagerKeluar'    => $outgoing->pager,
-            'filters'        => compact('keyword', 'from', 'to', 'perPage'),
-            'totalData' => $db->table('dokumen_masuk')
-                ->where('deleted_at', null)
-                ->groupStart()
-                ->where('pengambilan', null)
-                ->orWhere('pengambilan', '')
-                ->groupEnd()
-                ->countAllResults(),
-            'totalKeluar' => $db->table('distribusi_dokumen')
-                ->join('dokumen_keluar', 'dokumen_keluar.id = distribusi_dokumen.dokumen_keluar_id', 'inner')
-                ->where('dokumen_keluar.progres !=', 'Diambil Ekspedisi')
-                ->countAllResults(),
+            'filters'        => compact('keyword', 'tab', 'from', 'to', 'perPage'),
         ]);
     }
 
@@ -212,6 +204,7 @@ class DistribusiDokumen extends BaseController
                 'tanggal'    => date('d-m-Y', strtotime($dokumen['tanggal'])),
                 'jenis'      => $dokumen['jenis'],
                 'jumlah'     => number_format((int) $dokumen['jumlah'], 0, ',', '.'),
+                'satuan_jumlah' => $dokumen['satuan_jumlah'] ?: '-',
                 'ekspedisi'  => $dokumen['ekspedisi'] ?: '-',
                 'process_url'=> site_url("distribusi-dokumen/{$id}"),
             ],
