@@ -8,10 +8,23 @@ use Config\UserRoles;
 
 class Auth extends BaseController
 {
+    private const LOGIN_LIFETIME_SECONDS = 600;
+
     public function login(): string|RedirectResponse
     {
         if (session()->get('auth_user_id') !== null) {
-            return redirect()->to(site_url('dashboard'));
+            $expiresAt = (int) session()->get('auth_expires_at');
+
+            if ($expiresAt > time()) {
+                return redirect()->to(site_url('dashboard'));
+            }
+
+            $this->clearAuthentication();
+
+            return view('auth/login', [
+                'title'              => 'Login',
+                'loginErrorOverride' => 'Sesi login telah berakhir setelah 10 menit. Silakan login kembali.',
+            ]);
         }
 
         return view('auth/login', [
@@ -50,6 +63,7 @@ class Auth extends BaseController
             'auth_username'     => $user['username'],
             'auth_display_name' => $user['display_name'],
             'auth_role'         => $role,
+            'auth_expires_at'   => time() + self::LOGIN_LIFETIME_SECONDS,
             'is_logged_in'      => true,
         ]);
 
@@ -58,15 +72,22 @@ class Auth extends BaseController
 
     public function logout(): RedirectResponse
     {
+        $this->clearAuthentication();
+
+        return redirect()->to(site_url('login'))->with('logout_success', 'Anda berhasil keluar dari sistem.');
+    }
+
+    private function clearAuthentication(): void
+    {
         session()->remove([
             'auth_user_id',
             'auth_username',
             'auth_display_name',
             'auth_role',
+            'auth_expires_at',
+            'auth_last_route',
             'is_logged_in',
         ]);
         session()->regenerate(true);
-
-        return redirect()->to(site_url('login'))->with('logout_success', 'Anda berhasil keluar dari sistem.');
     }
 }

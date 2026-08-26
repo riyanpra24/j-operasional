@@ -1,4 +1,18 @@
 (() => {
+    const authExpiresAt = Number(document.body.dataset.authExpiresAt || 0);
+    const loginUrl = document.body.dataset.loginUrl || '';
+    if (authExpiresAt > 0 && loginUrl !== '') {
+        const redirectToLogin = () => window.location.replace(loginUrl);
+        const remainingMilliseconds = (authExpiresAt * 1000) - Date.now();
+
+        if (remainingMilliseconds <= 0) {
+            redirectToLogin();
+            return;
+        }
+
+        window.setTimeout(redirectToLogin, remainingMilliseconds);
+    }
+
     const reloadOperationalPage = () => {
         if (typeof window.__operationalRouteUrl === 'string' && window.__operationalRouteUrl !== '') {
             window.location.replace(window.__operationalRouteUrl);

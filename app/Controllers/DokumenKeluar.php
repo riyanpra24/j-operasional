@@ -133,6 +133,13 @@ class DokumenKeluar extends BaseController
                 'up_value'                 => $dokumen['up'] ?: '',
                 'tanggal_pengiriman'       => date('d-m-Y', strtotime($dokumen['tanggal_pengiriman'])),
                 'tanggal_pengiriman_value' => $dokumen['tanggal_pengiriman'],
+                'nomor_resi'               => $dokumen['nomor_resi'] ?: '-',
+                'tanggal_diterima'         => $dokumen['tanggal_diterima'] ? date('d-m-Y', strtotime($dokumen['tanggal_diterima'])) : '-',
+                'penerima'                 => $dokumen['penerima'] ?: '-',
+                'security'                 => $dokumen['security'] ?: '-',
+                'tanggal_security'         => $this->displayDateTime($dokumen['diterima_security_at'] ?? null, $dokumen['tanggal_security'] ?? null),
+                'progres'                  => $dokumen['progres'],
+                'waktu_pengambilan_ekspedisi' => $this->displayDateTime($dokumen['diambil_ekspedisi_at'] ?? null),
                 'alamat_penerima'          => $dokumen['alamat_penerima'],
                 'dokumen_link'             => $dokumen['dokumen_link'] ?: '',
                 'dokumen_link_value'       => $dokumen['dokumen_link'] ?: '',
@@ -177,7 +184,10 @@ class DokumenKeluar extends BaseController
             ]);
         }
 
-        if (! $this->model->update($id, ['progres' => 'Menunggu Ekspedisi'])) {
+        if (! $this->model->update($id, [
+            'progres'                => 'Menunggu Ekspedisi',
+            'diambil_ekspedisi_at'   => null,
+        ])) {
             return $this->validationError($this->model->errors() ?: ['Dokumen belum dapat dikembalikan ke progres.']);
         }
 
@@ -307,5 +317,14 @@ class DokumenKeluar extends BaseController
         $date = \DateTimeImmutable::createFromFormat('Y-m-d', $value);
 
         return $date !== false && $date->format('Y-m-d') === $value;
+    }
+
+    private function displayDateTime(?string $timestamp, ?string $dateFallback = null): string
+    {
+        if ($timestamp) {
+            return date('d-m-Y H:i', strtotime($timestamp)) . ' WIB';
+        }
+
+        return $dateFallback ? date('d-m-Y', strtotime($dateFallback)) : '-';
     }
 }

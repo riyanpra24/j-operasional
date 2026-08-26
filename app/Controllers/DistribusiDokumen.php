@@ -157,6 +157,15 @@ class DistribusiDokumen extends BaseController
             }
         }
 
+        $securityTime = ! empty($dokumen['diterima_security_at'])
+            ? date('H:i:s', strtotime($dokumen['diterima_security_at']))
+            : date('H:i:s');
+        $data['diterima_security_at'] = $data['tanggal_security'] . ' ' . $securityTime;
+
+        if ($data['progres'] === 'Diambil Ekspedisi' && empty($dokumen['diambil_ekspedisi_at'])) {
+            $data['diambil_ekspedisi_at'] = date('Y-m-d H:i:s');
+        }
+
         if (! db_connect()->table('dokumen_keluar')->where('id', $id)->update($data)) {
             return $this->response->setStatusCode(500)->setJSON([
                 'success' => false,

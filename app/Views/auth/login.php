@@ -1,5 +1,5 @@
 <?php
-$loginError    = session()->getFlashdata('login_error');
+$loginError    = $loginErrorOverride ?? session()->getFlashdata('login_error');
 $logoutSuccess = session()->getFlashdata('logout_success');
 ?>
 <!DOCTYPE html>

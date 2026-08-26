@@ -21,6 +21,7 @@ $error   = session()->getFlashdata('error');
 $errors  = session()->getFlashdata('errors') ?? [];
 $appCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
 $appJsVersion  = is_file(FCPATH . 'assets/app.js') ? (string) filemtime(FCPATH . 'assets/app.js') : '1';
+$authExpiresAt = (int) session()->get('auth_expires_at');
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -40,7 +41,7 @@ $appJsVersion  = is_file(FCPATH . 'assets/app.js') ? (string) filemtime(FCPATH .
         } catch (error) {}
     </script>
 </head>
-<body>
+<body data-auth-expires-at="<?= $authExpiresAt ?>" data-login-url="<?= esc(site_url('login'), 'attr') ?>">
     <?php if ($successToast): ?>
         <div class="success-toast" role="status" aria-live="polite" data-success-toast>
             <span class="success-toast-icon" aria-hidden="true">✓</span>

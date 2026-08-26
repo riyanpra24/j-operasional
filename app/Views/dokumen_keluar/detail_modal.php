@@ -9,6 +9,10 @@
                 <div><dt>Pemohon</dt><dd data-dokumen-keluar-field="pemohon"></dd></div><div><dt>Pelaksana</dt><dd data-dokumen-keluar-field="pelaksana"></dd></div>
                 <div class="span-2"><dt>UP</dt><dd data-dokumen-keluar-field="up"></dd></div>
                 <div class="span-2"><dt>Tanggal Pengiriman</dt><dd data-dokumen-keluar-field="tanggal_pengiriman"></dd></div>
+                <div><dt>Nomor Resi</dt><dd data-dokumen-keluar-field="nomor_resi"></dd></div><div><dt>Tanggal Diterima</dt><dd data-dokumen-keluar-field="tanggal_diterima"></dd></div>
+                <div><dt>Penerima</dt><dd data-dokumen-keluar-field="penerima"></dd></div><div><dt>Security</dt><dd data-dokumen-keluar-field="security"></dd></div>
+                <div><dt>Tanggal Diterima Security</dt><dd data-dokumen-keluar-field="tanggal_security"></dd></div><div><dt>Progres</dt><dd data-dokumen-keluar-field="progres"></dd></div>
+                <div class="span-2"><dt>Waktu Pengambilan Ekspedisi</dt><dd data-dokumen-keluar-field="waktu_pengambilan_ekspedisi"></dd></div>
                 <div class="span-2"><dt>Alamat Penerima</dt><dd data-dokumen-keluar-field="alamat_penerima"></dd></div>
                 <div class="span-2"><dt>Dokumen</dt><dd><a href="#" target="_blank" rel="noopener noreferrer" data-dokumen-keluar-document-link hidden>Buka dokumen ↗</a><span data-dokumen-keluar-document-empty>-</span></dd></div>
             </dl>

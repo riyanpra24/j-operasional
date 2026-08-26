@@ -219,9 +219,10 @@ class ProgresDokumen extends BaseController
                 'alamat_penerima'            => $dokumen['alamat_penerima'],
                 'security'                   => $dokumen['security'] ?: '-',
                 'security_value'             => $dokumen['security'] ?: '',
-                'tanggal_security'           => $this->displayDate($dokumen['tanggal_security']),
+                'tanggal_security'           => $this->displayDateTime($dokumen['diterima_security_at'] ?? null, $dokumen['tanggal_security'] ?? null),
                 'tanggal_security_value'     => $dokumen['tanggal_security'] ?: '',
                 'progres'                    => $dokumen['progres'] ?: 'Menunggu Ekspedisi',
+                'waktu_pengambilan_ekspedisi'=> $this->displayDateTime($dokumen['diambil_ekspedisi_at'] ?? null),
                 'locked'                     => $dokumen['progres'] === 'Diambil Ekspedisi',
                 'update_url'                 => site_url("agendaris/progres-dokumen-keluar/{$id}"),
                 'delete_url'                 => site_url("agendaris/progres-dokumen-keluar/{$id}/hapus"),
@@ -374,6 +375,15 @@ class ProgresDokumen extends BaseController
     private function displayDate(?string $date): string
     {
         return $date ? date('d-m-Y', strtotime($date)) : '-';
+    }
+
+    private function displayDateTime(?string $timestamp, ?string $dateFallback = null): string
+    {
+        if ($timestamp) {
+            return date('d-m-Y H:i', strtotime($timestamp)) . ' WIB';
+        }
+
+        return $dateFallback ? $this->displayDate($dateFallback) : '-';
     }
 
     private function isDate(string $value): bool
