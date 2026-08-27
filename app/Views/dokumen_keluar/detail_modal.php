@@ -36,7 +36,7 @@
             </section>
             <?php else: ?>
             <dl class="agendaris-detail-grid">
-                <div><dt>Nomor Surat</dt><dd data-dokumen-keluar-field="nomor_surat"></dd></div><div><dt>Jenis Dokumen</dt><dd data-dokumen-keluar-field="jenis_surat"></dd></div>
+                <div><dt>Jenis Dokumen</dt><dd data-dokumen-keluar-field="jenis_surat"></dd></div>
                 <div><dt>Pemohon</dt><dd data-dokumen-keluar-field="pemohon"></dd></div><div><dt>Pelaksana</dt><dd data-dokumen-keluar-field="pelaksana"></dd></div>
                 <div class="span-2"><dt>UP</dt><dd data-dokumen-keluar-field="up"></dd></div>
                 <div class="span-2"><dt>Tanggal Pengiriman</dt><dd data-dokumen-keluar-field="tanggal_pengiriman"></dd></div>
@@ -46,7 +46,6 @@
                 <div><dt>Status Penyelesaian Agendaris</dt><dd data-dokumen-keluar-field="status_agendaris"></dd></div><div><dt>Waktu Selesai Agendaris</dt><dd data-dokumen-keluar-field="waktu_selesai_agendaris"></dd></div>
                 <div class="span-2"><dt>Waktu Pengambilan Ekspedisi</dt><dd data-dokumen-keluar-field="waktu_pengambilan_ekspedisi"></dd></div>
                 <div class="span-2"><dt>Alamat Penerima</dt><dd data-dokumen-keluar-field="alamat_penerima"></dd></div>
-                <div class="span-2"><dt>Dokumen</dt><dd><a href="#" target="_blank" rel="noopener noreferrer" data-dokumen-keluar-document-link hidden>Buka dokumen ↗</a><span data-dokumen-keluar-document-empty>-</span></dd></div>
             </dl>
             <section class="security-handover-history" data-dokumen-keluar-handover-history hidden>
                 <div class="modal-section-heading"><span>⇄</span><div><strong>Riwayat Serah Terima Security</strong><small>Perpindahan penanggung jawab Dokumen Keluar antar-shift</small></div></div>
