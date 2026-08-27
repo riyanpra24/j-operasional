@@ -121,7 +121,10 @@ class ProgresDokumen extends BaseController
             $perPage = 10;
         }
 
-        $this->model->where('progres !=', 'Diambil Ekspedisi');
+        // Progres Security dan penyelesaian Agendaris merupakan dua tahap terpisah.
+        // Dokumen tetap berada di halaman ini setelah diambil ekspedisi sampai
+        // Agendaris sendiri menandainya selesai.
+        $this->model->where('status_agendaris !=', 'Selesai');
 
         if ($keyword !== '') {
             $this->model->groupStart()
@@ -137,7 +140,7 @@ class ProgresDokumen extends BaseController
                 ->groupEnd();
         }
 
-        if ($progres === 'Menunggu Ekspedisi') {
+        if (in_array($progres, ['Menunggu Ekspedisi', 'Diambil Ekspedisi'], true)) {
             $this->model->where('progres', $progres);
         }
 
@@ -158,6 +161,8 @@ class ProgresDokumen extends BaseController
         $data['security']         = null;
         $data['tanggal_security'] = null;
         $data['progres']          = 'Menunggu Ekspedisi';
+        $data['status_agendaris'] = 'Menunggu Penyelesaian';
+        $data['selesai_agendaris_at'] = null;
         $errors = $this->validatePayload($data, false);
         if ($errors !== []) {
             return $this->validationError($errors);
@@ -222,6 +227,9 @@ class ProgresDokumen extends BaseController
                 'tanggal_security'           => $this->displayDateTime($dokumen['diterima_security_at'] ?? null, $dokumen['tanggal_security'] ?? null),
                 'tanggal_security_value'     => $dokumen['tanggal_security'] ?: '',
                 'progres'                    => $dokumen['progres'] ?: 'Menunggu Ekspedisi',
+                'status_agendaris'           => $dokumen['status_agendaris'] ?: 'Menunggu Penyelesaian',
+                'status_agendaris_value'     => $dokumen['status_agendaris'] ?: 'Menunggu Penyelesaian',
+                'waktu_selesai_agendaris'    => $this->displayDateTime($dokumen['selesai_agendaris_at'] ?? null),
                 'waktu_pengambilan_ekspedisi'=> $this->displayDateTime($dokumen['diambil_ekspedisi_at'] ?? null),
                 'locked'                     => $dokumen['progres'] === 'Diambil Ekspedisi',
                 'update_url'                 => site_url("agendaris/progres-dokumen-keluar/{$id}"),
@@ -238,9 +246,15 @@ class ProgresDokumen extends BaseController
         foreach (['security', 'tanggal_security', 'progres'] as $securityField) {
             $data[$securityField] = $dokumen[$securityField];
         }
+        $data['selesai_agendaris_at'] = $data['status_agendaris'] === 'Selesai'
+            ? ($dokumen['selesai_agendaris_at'] ?: date('Y-m-d H:i:s'))
+            : null;
         $errors = $this->validatePayload($data, false);
         if ($errors !== []) {
             return $this->validationError($errors);
+        }
+        if ($data['status_agendaris'] === 'Selesai' && $data['progres'] !== 'Diambil Ekspedisi') {
+            return $this->validationError(['Dokumen baru dapat diselesaikan oleh Agendaris setelah progres Security menjadi Diambil Ekspedisi.']);
         }
 
         if (! $this->model->update($id, $data)) {
@@ -256,7 +270,7 @@ class ProgresDokumen extends BaseController
     public function destroy(int $id): ResponseInterface
     {
         $dokumen = $this->findOrFail($id);
-        if ($dokumen['progres'] === 'Diambil Ekspedisi') {
+        if ($dokumen['progres'] === 'Diambil Ekspedisi' && (string) session()->get('auth_role') !== 'admin') {
             return $this->lockedResponse();
         }
 
@@ -286,6 +300,7 @@ class ProgresDokumen extends BaseController
             'security'           => trim((string) $this->request->getPost('security')),
             'tanggal_security'   => trim((string) $this->request->getPost('tanggal_security')),
             'progres'            => trim((string) $this->request->getPost('progres')),
+            'status_agendaris'   => trim((string) $this->request->getPost('status_agendaris')),
         ];
     }
 
@@ -310,10 +325,12 @@ class ProgresDokumen extends BaseController
             'security'           => $securityRule,
             'tanggal_security'   => $securityDateRule,
             'progres'            => 'required|in_list[Menunggu Ekspedisi,Diambil Ekspedisi]',
+            'status_agendaris'   => 'required|in_list[Menunggu Penyelesaian,Selesai]',
         ], [
             'security' => ['required' => 'Security wajib dipilih.', 'in_list' => 'Pilih Security dari daftar yang tersedia.'],
             'tanggal_security' => ['required' => 'Tanggal Diterima Security wajib diisi.', 'valid_date' => 'Tanggal Diterima Security tidak valid.'],
             'progres' => ['required' => 'Progres wajib dipilih.', 'in_list' => 'Pilih Progres dari daftar yang tersedia.'],
+            'status_agendaris' => ['required' => 'Status Penyelesaian Agendaris wajib dipilih.', 'in_list' => 'Pilih Status Penyelesaian Agendaris dari daftar yang tersedia.'],
         ]);
 
         if (! $validation->run($data)) {

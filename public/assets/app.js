@@ -294,6 +294,17 @@
         '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;',
     }[char]));
 
+    const securityHandoverItemsHtml = (items) => items.map((item) => `
+        <article class="security-handover-history-item">
+            <div class="security-handover-route">
+                <span><small>Security Lama</small><strong>${escapeHtml(item.security_dari)}</strong></span>
+                <b aria-hidden="true">→</b>
+                <span><small>Security Baru</small><strong>${escapeHtml(item.security_ke)}</strong></span>
+            </div>
+            <small>${escapeHtml(item.waktu)} · Dicatat oleh ${escapeHtml(item.dicatat_oleh)}</small>
+        </article>
+    `).join('');
+
     const showErrors = (message, errors = []) => {
         if (!modalErrors) return;
         const list = errors.length ? `<ul>${errors.map((error) => `<li>${escapeHtml(error)}</li>`).join('')}</ul>` : '';
@@ -350,6 +361,8 @@
     const detailError = detailModal?.querySelector('[data-detail-error]');
     const detailErrorMessage = detailModal?.querySelector('[data-detail-error-message]');
     const detailEdit = detailModal?.querySelector('[data-detail-edit]');
+    const securityHandoverHistory = detailModal?.querySelector('[data-security-handover-history]');
+    const securityHandoverHistoryList = detailModal?.querySelector('[data-security-handover-history-list]');
     let currentDetailUrl = '';
 
     const setDetailState = (state) => {
@@ -381,6 +394,20 @@
             });
             const penyerahanTime = detailModal.querySelector('[data-penyerahan-time]');
             if (penyerahanTime) penyerahanTime.hidden = !result.dokumen.penyerahan_at;
+            const handoverItems = Array.isArray(result.dokumen.serah_terima_history) ? result.dokumen.serah_terima_history : [];
+            if (securityHandoverHistory && securityHandoverHistoryList) {
+                securityHandoverHistory.hidden = handoverItems.length === 0;
+                securityHandoverHistoryList.innerHTML = handoverItems.map((item) => `
+                    <article class="security-handover-history-item">
+                        <div class="security-handover-route">
+                            <span><small>Security Lama</small><strong>${escapeHtml(item.security_dari)}</strong></span>
+                            <b aria-hidden="true">→</b>
+                            <span><small>Security Baru</small><strong>${escapeHtml(item.security_ke)}</strong></span>
+                        </div>
+                        <small>${escapeHtml(item.waktu)} · Dicatat oleh ${escapeHtml(item.dicatat_oleh)}</small>
+                    </article>
+                `).join('');
+            }
             if (detailEdit) {
                 detailEdit.href = result.dokumen.edit_url;
                 detailEdit.dataset.detailUrl = currentDetailUrl;
@@ -428,10 +455,26 @@
     const editLoading = editModal?.querySelector('[data-edit-loading]');
     const editErrors = editModal?.querySelector('[data-edit-errors]');
     const editStatus = editModal?.querySelector('[data-edit-status]');
-    const editSubmit = editModal?.querySelector('[data-edit-submit]');
+    const editSubmitButtons = editModal?.querySelectorAll('[data-edit-submit]') || [];
+    const editHandoverInfo = editModal?.querySelector('[data-edit-handover-info]');
+    const editHandoverValue = editModal?.querySelector('[data-edit-handover-value]');
+    const editHandoverPanel = editModal?.querySelector('[data-edit-handover-panel]');
+    const editHandoverSelect = editModal?.querySelector('[data-edit-handover-select]');
     const editPerihalSelector = setupPerihalSelector(editForm);
     const editJenisSelector = setupJenisSelector(editForm);
     let currentEditUrl = '';
+
+    const setEditHandoverPanel = (open) => {
+        if (!editHandoverPanel || !editHandoverSelect) return;
+        editHandoverPanel.hidden = !open;
+        editHandoverSelect.disabled = !open;
+        editHandoverSelect.required = open;
+        if (!open) editHandoverSelect.value = '';
+        if (open) {
+            editHandoverPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            window.setTimeout(() => editHandoverSelect.focus(), 180);
+        }
+    };
 
     const closeEditModal = () => {
         if (!editModal) return;
@@ -472,6 +515,11 @@
             editForm.elements.jumlah.value = data.jumlah.replace(/\./g, '');
             editForm.elements.satuan_jumlah.value = data.satuan_jumlah_value || '';
             setupEkspedisiSelector(editForm)?.setValue(data.ekspedisi);
+            if (editHandoverInfo && editHandoverValue) {
+                editHandoverInfo.hidden = false;
+                editHandoverValue.textContent = data.security_penanggung_jawab || 'Belum ditentukan';
+            }
+            setEditHandoverPanel(false);
             editForm.elements.tanggal.dispatchEvent(new Event('change'));
             editLoading.hidden = true;
             editForm.hidden = false;
@@ -499,20 +547,25 @@
     });
 
     editModal?.querySelectorAll('[data-edit-close]').forEach((trigger) => trigger.addEventListener('click', closeEditModal));
+    editModal?.querySelector('[data-edit-handover-open]')?.addEventListener('click', () => setEditHandoverPanel(true));
+    editModal?.querySelector('[data-edit-handover-cancel]')?.addEventListener('click', () => setEditHandoverPanel(false));
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && editModal?.classList.contains('open')) closeEditModal();
     });
 
     editForm?.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const editAction = event.submitter?.dataset.editAction || 'save';
         editErrors.hidden = true;
-        editStatus.textContent = 'Menyimpan perubahan...';
-        editSubmit.disabled = true;
+        editStatus.textContent = editAction === 'handover' ? 'Mencatat serah terima...' : 'Menyimpan perubahan...';
+        editSubmitButtons.forEach((button) => { button.disabled = true; });
 
         try {
+            const formData = new FormData(editForm);
+            formData.set('submit_action', editAction);
             const response = await fetch(editForm.action, {
                 method: 'POST',
-                body: new FormData(editForm),
+                body: formData,
                 credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
             });
@@ -532,8 +585,8 @@
         } catch (error) {
             showEditErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
-            editSubmit.disabled = false;
-            if (editStatus.textContent === 'Menyimpan perubahan...') editStatus.textContent = '';
+            editSubmitButtons.forEach((button) => { button.disabled = false; });
+            if (['Menyimpan perubahan...', 'Mencatat serah terima...'].includes(editStatus.textContent)) editStatus.textContent = '';
         }
     });
 
@@ -722,11 +775,34 @@
     const outgoingDistributionErrors = outgoingDistributionModal?.querySelector('[data-outgoing-distribution-errors]');
     const outgoingDistributionStatus = outgoingDistributionModal?.querySelector('[data-outgoing-distribution-status]');
     const outgoingDistributionSubmit = outgoingDistributionModal?.querySelector('[data-outgoing-distribution-submit]');
+    const outgoingHandoverSubmit = outgoingDistributionModal?.querySelector('[data-outgoing-handover-submit]');
+    const outgoingHandoverOpen = outgoingDistributionModal?.querySelector('[data-outgoing-handover-open]');
+    const outgoingHandoverPanel = outgoingDistributionModal?.querySelector('[data-outgoing-handover-panel]');
+    const outgoingHandoverSelect = outgoingDistributionModal?.querySelector('[data-outgoing-handover-select]');
+    const outgoingHandoverInfo = outgoingDistributionModal?.querySelector('[data-outgoing-handover-info]');
+    const outgoingHandoverCurrent = outgoingDistributionModal?.querySelector('[data-outgoing-handover-current]');
+    const outgoingHandoverHistory = outgoingDistributionModal?.querySelector('[data-outgoing-handover-history]');
+    const outgoingHandoverHistoryList = outgoingDistributionModal?.querySelector('[data-outgoing-handover-history-list]');
+    const outgoingSecurityField = outgoingDistributionModal?.querySelector('[data-outgoing-security-field]');
+    const outgoingSecurityLockNote = outgoingDistributionModal?.querySelector('[data-outgoing-security-lock-note]');
     const outgoingDistributionNext = outgoingDistributionModal?.querySelector('[data-outgoing-step-next]');
     const outgoingDistributionBack = outgoingDistributionModal?.querySelector('[data-outgoing-step-back]');
     const outgoingDistributionSteps = outgoingDistributionModal?.querySelectorAll('[data-outgoing-step]') || [];
     const outgoingDistributionIndicators = outgoingDistributionModal?.querySelectorAll('[data-outgoing-step-indicator]') || [];
     let outgoingDistributionCurrentStep = 1;
+    let outgoingCanHandover = false;
+
+    const setOutgoingHandoverPanel = (open) => {
+        if (!outgoingHandoverPanel || !outgoingHandoverSelect) return;
+        outgoingHandoverPanel.hidden = !open;
+        outgoingHandoverSelect.disabled = !open;
+        outgoingHandoverSelect.required = open;
+        if (!open) outgoingHandoverSelect.value = '';
+        if (open) {
+            outgoingHandoverPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            window.setTimeout(() => outgoingHandoverSelect.focus(), 180);
+        }
+    };
 
     const setOutgoingDistributionStep = (step) => {
         outgoingDistributionCurrentStep = step;
@@ -737,6 +813,8 @@
         outgoingDistributionBack.hidden = step === 1;
         outgoingDistributionNext.hidden = step !== 1;
         outgoingDistributionSubmit.hidden = step !== 2;
+        if (outgoingHandoverOpen) outgoingHandoverOpen.hidden = step !== 2 || !outgoingCanHandover;
+        if (step !== 2) setOutgoingHandoverPanel(false);
         outgoingDistributionStatus.textContent = '';
     };
 
@@ -763,6 +841,8 @@
         outgoingDistributionLoading.hidden = false;
         outgoingDistributionForm.hidden = true;
         outgoingDistributionErrors.hidden = true;
+        outgoingCanHandover = false;
+        setOutgoingHandoverPanel(false);
         setOutgoingDistributionStep(1);
         outgoingDistributionModal.hidden = false;
         outgoingDistributionModal.setAttribute('aria-hidden', 'false');
@@ -783,6 +863,19 @@
             outgoingDistributionForm.elements.tanggal_security.value = result.dokumen.tanggal_security_value;
             outgoingDistributionForm.elements.security.value = result.dokumen.security_value;
             outgoingDistributionForm.elements.progres.value = result.dokumen.progres_value;
+            outgoingCanHandover = Boolean(result.dokumen.security_value);
+            outgoingSecurityField?.classList.toggle('outgoing-security-locked', outgoingCanHandover);
+            if (outgoingSecurityLockNote) outgoingSecurityLockNote.hidden = !outgoingCanHandover;
+            outgoingDistributionForm.elements.security.tabIndex = outgoingCanHandover ? -1 : 0;
+            if (outgoingHandoverInfo && outgoingHandoverCurrent) {
+                outgoingHandoverInfo.hidden = !outgoingCanHandover;
+                outgoingHandoverCurrent.textContent = result.dokumen.security_value || '';
+            }
+            const handoverItems = Array.isArray(result.dokumen.serah_terima_history) ? result.dokumen.serah_terima_history : [];
+            if (outgoingHandoverHistory && outgoingHandoverHistoryList) {
+                outgoingHandoverHistory.hidden = handoverItems.length === 0;
+                outgoingHandoverHistoryList.innerHTML = securityHandoverItemsHtml(handoverItems);
+            }
             outgoingDistributionLoading.hidden = true;
             outgoingDistributionForm.hidden = false;
         } catch (error) {
@@ -801,23 +894,29 @@
         outgoingDistributionErrors.hidden = true;
         setOutgoingDistributionStep(1);
     });
+    outgoingHandoverOpen?.addEventListener('click', () => setOutgoingHandoverPanel(true));
+    outgoingDistributionModal?.querySelector('[data-outgoing-handover-cancel]')?.addEventListener('click', () => setOutgoingHandoverPanel(false));
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && outgoingDistributionModal?.classList.contains('open')) closeOutgoingDistribution();
     });
 
     outgoingDistributionForm?.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const outgoingAction = event.submitter?.dataset.outgoingAction || 'save';
         if (outgoingDistributionCurrentStep !== 2) {
             setOutgoingDistributionStep(2);
             window.setTimeout(() => outgoingDistributionForm.elements.security.focus(), 120);
             return;
         }
         outgoingDistributionErrors.hidden = true;
-        outgoingDistributionStatus.textContent = 'Menyimpan distribusi...';
+        outgoingDistributionStatus.textContent = outgoingAction === 'handover' ? 'Mencatat serah terima...' : 'Menyimpan distribusi...';
         outgoingDistributionSubmit.disabled = true;
+        if (outgoingHandoverSubmit) outgoingHandoverSubmit.disabled = true;
         try {
+            const outgoingFormData = new FormData(outgoingDistributionForm);
+            outgoingFormData.set('submit_action', outgoingAction);
             const response = await fetch(outgoingDistributionForm.action, {
-                method: 'POST', body: new FormData(outgoingDistributionForm), credentials: 'same-origin',
+                method: 'POST', body: outgoingFormData, credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
             });
             const result = await response.json();
@@ -832,7 +931,8 @@
             showOutgoingDistributionErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
             outgoingDistributionSubmit.disabled = false;
-            if (outgoingDistributionStatus.textContent === 'Menyimpan distribusi...') outgoingDistributionStatus.textContent = '';
+            if (outgoingHandoverSubmit) outgoingHandoverSubmit.disabled = false;
+            if (['Menyimpan distribusi...', 'Mencatat serah terima...'].includes(outgoingDistributionStatus.textContent)) outgoingDistributionStatus.textContent = '';
         }
     });
 
@@ -853,7 +953,9 @@
     const agendaDownloadSheetButton = agendaFormModal?.querySelector('[data-agendaris-download-sheet]');
     const agendaNumberInput = agendaForm?.elements.nomor_agendaris;
     const agendaCreateUrl = agendaForm?.action || '';
-    const agendaSourceFieldNames = ['pengirim', 'tanggal_diterima', 'penerima', 'pengambilan', 'jenis'];
+    // Hanya Pengirim yang boleh diperbarui oleh Agendaris. Field sumber
+    // Security lainnya tetap dikunci.
+    const agendaSourceFieldNames = ['tanggal_diterima', 'penerima', 'pengambilan', 'jenis'];
     const agendaDispositionStages = agendaFormModal?.querySelectorAll('[data-disposition-form-stage]') || [];
     const agendaLastStep = agendaStepPanels.length || 1;
     let agendaCurrentStep = 1;
@@ -1408,6 +1510,8 @@
     const dokumenKeluarDetailLoading = dokumenKeluarDetailModal?.querySelector('[data-dokumen-keluar-detail-loading]');
     const dokumenKeluarDetailContent = dokumenKeluarDetailModal?.querySelector('[data-dokumen-keluar-detail-content]');
     const dokumenKeluarDetailEdit = dokumenKeluarDetailModal?.querySelector('[data-dokumen-keluar-detail-edit]');
+    const dokumenKeluarHandoverHistory = dokumenKeluarDetailModal?.querySelector('[data-dokumen-keluar-handover-history]');
+    const dokumenKeluarHandoverHistoryList = dokumenKeluarDetailModal?.querySelector('[data-dokumen-keluar-handover-history-list]');
     let currentDokumenKeluarUrl = '';
 
     const closeDokumenKeluarDetail = () => {
@@ -1438,6 +1542,11 @@
             documentLink.hidden = !hasDocumentLink;
             documentLink.href = hasDocumentLink ? data.dokumen_link : '#';
             documentEmpty.hidden = hasDocumentLink;
+            const handoverItems = Array.isArray(data.serah_terima_history) ? data.serah_terima_history : [];
+            if (dokumenKeluarHandoverHistory && dokumenKeluarHandoverHistoryList) {
+                dokumenKeluarHandoverHistory.hidden = handoverItems.length === 0;
+                dokumenKeluarHandoverHistoryList.innerHTML = securityHandoverItemsHtml(handoverItems);
+            }
             dokumenKeluarDetailLoading.hidden = true;
             dokumenKeluarDetailContent.hidden = false;
         } catch (error) {
@@ -1554,10 +1663,12 @@
         return result.dokumen;
     };
     const fillProgressForm = (data) => {
-        ['nomor_surat','jenis_surat','pemohon','pelaksana','up','tanggal_pengiriman','nomor_resi','tanggal_diterima','penerima','alamat_penerima','security','tanggal_security','progres'].forEach((name) => {
+        ['nomor_surat','jenis_surat','pemohon','pelaksana','up','tanggal_pengiriman','nomor_resi','tanggal_diterima','penerima','alamat_penerima','security','tanggal_security','progres','status_agendaris'].forEach((name) => {
             const valueKey = `${name}_value`;
             progressForm.elements[name].value = Object.prototype.hasOwnProperty.call(data, valueKey) ? data[valueKey] : (data[name] === '-' ? '' : data[name]);
         });
+        const completionOption = progressForm.elements.status_agendaris?.querySelector('option[value="Selesai"]');
+        if (completionOption) completionOption.disabled = data.progres !== 'Diambil Ekspedisi';
     };
     const setProgressSecurityFieldsLocked = (locked) => {
         ['security','tanggal_security','progres'].forEach((name) => {
@@ -1571,6 +1682,8 @@
         if (!progressForm) return;
         setProgressSecurityFieldsLocked(true);
         progressForm.reset();
+        const completionOption = progressForm.elements.status_agendaris?.querySelector('option[value="Selesai"]');
+        if (completionOption) completionOption.disabled = true;
         progressForm.action = progressCreateUrl;
         progressFormTitle.textContent = 'Tambah Progres Dokumen Keluar';
         progressSubmit.textContent = 'Simpan dokumen';

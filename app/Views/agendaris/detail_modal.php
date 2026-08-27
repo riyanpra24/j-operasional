@@ -8,9 +8,6 @@
                 <div class="modal-section-heading agendaris-detail-section-heading"><span>01</span><div><strong id="agendarisDetailSuratHeading">Informasi Surat Masuk</strong><small>Informasi penerimaan dan identitas dokumen</small></div></div>
                 <dl class="agendaris-detail-grid">
                     <div class="span-2"><dt>Sumber Data</dt><dd data-agendaris-field="sumber_data"></dd></div>
-                    <div><dt>Tanggal Surat</dt><dd data-agendaris-field="tanggal_surat"></dd></div>
-                    <div><dt>Nomor Surat</dt><dd data-agendaris-field="nomor_surat"></dd></div>
-                    <div class="span-2"><dt>Perihal Surat</dt><dd data-agendaris-field="perihal_surat"></dd></div>
                     <div><dt>Pengirim</dt><dd data-agendaris-field="pengirim"></dd></div>
                     <div><dt>Penerima</dt><dd data-agendaris-field="penerima"></dd></div>
                     <div><dt>Penyerahan</dt><dd data-agendaris-field="pengambilan"></dd></div>
@@ -20,8 +17,11 @@
                 </dl>
             </section>
             <section class="agendaris-detail-section" aria-labelledby="agendarisDetailAgendaHeading">
-                <div class="modal-section-heading agendaris-detail-section-heading"><span>02</span><div><strong id="agendarisDetailAgendaHeading">Data Agendaris</strong><small>Nomor agenda dan tautan dokumen</small></div></div>
+                <div class="modal-section-heading agendaris-detail-section-heading"><span>02</span><div><strong id="agendarisDetailAgendaHeading">Data Agendaris</strong><small>Nomor surat, data agenda, dan tautan dokumen</small></div></div>
                 <dl class="agendaris-detail-grid">
+                    <div class="span-2"><dt>Perihal Surat</dt><dd data-agendaris-field="perihal_surat"></dd></div>
+                    <div><dt>Nomor Surat</dt><dd data-agendaris-field="nomor_surat"></dd></div>
+                    <div><dt>Tanggal Surat</dt><dd data-agendaris-field="tanggal_surat"></dd></div>
                     <div><dt>Nomor Agendaris</dt><dd data-agendaris-field="nomor_agendaris"></dd></div>
                     <div><dt>Tanggal Agendaris</dt><dd data-agendaris-field="tanggal_agendaris"></dd></div>
                     <div class="span-2"><dt>Link Berkas</dt><dd><a class="agenda-file-link" href="#" target="_blank" rel="noopener noreferrer" data-agendaris-detail-link hidden>Buka berkas ↗</a><span data-agendaris-detail-no-link>Belum ada link berkas</span></dd></div>

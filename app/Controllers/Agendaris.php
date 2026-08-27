@@ -250,7 +250,9 @@ class Agendaris extends BaseController
         $data   = $this->payload();
 
         if ($agenda['dokumen_masuk_id'] !== null) {
-            foreach (['pengirim', 'penerima', 'pengambilan', 'jenis', 'tanggal_diterima'] as $lockedField) {
+            // Hanya Pengirim yang boleh diperbarui oleh Agendaris. Field
+            // sumber Security lainnya tetap menggunakan nilai asal.
+            foreach (['penerima', 'pengambilan', 'jenis', 'tanggal_diterima'] as $lockedField) {
                 $data[$lockedField] = $agenda[$lockedField];
             }
         }

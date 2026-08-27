@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\DokumenMasukModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\ResponseInterface;
+use Config\SecurityPersonnel;
 
 class DokumenMasuk extends BaseController
 {
@@ -131,6 +132,13 @@ class DokumenMasuk extends BaseController
         }
 
         if ($this->request->isAJAX()) {
+            $handoverHistory = db_connect()->table('security_handover_history')
+                ->where('dokumen_masuk_id', $id)
+                ->orderBy('diserahkan_at', 'DESC')
+                ->orderBy('id', 'DESC')
+                ->get()
+                ->getResultArray();
+
             return $this->response->setJSON([
                 'success' => true,
                 'dokumen' => [
@@ -150,6 +158,17 @@ class DokumenMasuk extends BaseController
                     'penyerahan_at'   => $dokumen['penyerahan_at']
                         ? date('d-m-Y H:i', strtotime($dokumen['penyerahan_at'])) . ' WIB'
                         : '',
+                    'serah_terima_shift_at' => $dokumen['serah_terima_shift_at']
+                        ? date('d-m-Y H:i', strtotime($dokumen['serah_terima_shift_at'])) . ' WIB'
+                        : '',
+                    'serah_terima_shift_oleh' => $dokumen['serah_terima_shift_oleh'] ?: '',
+                    'security_penanggung_jawab' => $dokumen['penerima'] ?: 'Belum ditentukan',
+                    'serah_terima_history' => array_map(static fn (array $item): array => [
+                        'security_dari' => $item['security_dari'] ?: 'Belum ditentukan',
+                        'security_ke'   => $item['security_ke'],
+                        'dicatat_oleh'  => $item['dicatat_oleh'],
+                        'waktu'         => date('d-m-Y H:i', strtotime($item['diserahkan_at'])) . ' WIB',
+                    ], $handoverHistory),
                     'created_at'      => date('d-m-Y H:i', strtotime($dokumen['created_at'])) . ' WIB',
                     'updated_at'      => date('d-m-Y H:i', strtotime($dokumen['updated_at'])) . ' WIB',
                     'edit_url'        => site_url("distribusi-dokumen/dokumen-masuk/{$id}/ubah"),
@@ -192,6 +211,11 @@ class DokumenMasuk extends BaseController
             ]);
         }
         $data = $this->payload();
+        // Admin tetap dapat memperbaiki penerima dari form edit. Untuk role
+        // lainnya, pergantian penerima hanya melalui alur Serah Terima.
+        if ((string) session()->get('auth_role') !== 'admin') {
+            $data['penerima'] = (string) ($dokumen['penerima'] ?? '');
+        }
 
         if (! $this->validatePayload($data)) {
             if ($this->request->isAJAX()) {
@@ -201,7 +225,51 @@ class DokumenMasuk extends BaseController
             return redirect()->back()->withInput()->with('errors', service('validation')->getErrors());
         }
 
-        if (! $this->model->update($id, $data)) {
+        $isShiftHandover = $this->request->getPost('submit_action') === 'handover';
+        $handoverHistory = null;
+        if ($isShiftHandover) {
+            $actor = trim((string) session()->get('auth_display_name'));
+            if ($actor === '') {
+                $actor = trim((string) session()->get('auth_username')) ?: 'Petugas Security';
+            }
+
+            $securityTujuan = trim((string) $this->request->getPost('security_tujuan'));
+            if (! in_array($securityTujuan, SecurityPersonnel::NAMES, true)) {
+                return $this->ajaxError(['Pilih Security penerima serah terima dari daftar yang tersedia.']);
+            }
+
+            $securityDari = trim((string) ($dokumen['penerima'] ?? ''));
+            if ($securityDari === '') {
+                return $this->ajaxError(['Penerima lama belum tersedia dan harus diisi sebelum serah terima.']);
+            }
+
+            if ($securityDari === $securityTujuan) {
+                return $this->ajaxError(['Security tujuan harus berbeda dari penanggung jawab saat ini.']);
+            }
+
+            $handoverAt = date('Y-m-d H:i:s');
+            $data['serah_terima_shift_at']   = $handoverAt;
+            $data['serah_terima_shift_oleh'] = $actor;
+            $data['security_penanggung_jawab'] = $securityTujuan;
+            $data['penerima'] = $securityTujuan;
+            $handoverHistory = [
+                'dokumen_masuk_id' => $id,
+                'security_dari'    => $securityDari,
+                'security_ke'      => $securityTujuan,
+                'dicatat_oleh'     => $actor,
+                'diserahkan_at'    => $handoverAt,
+            ];
+        }
+
+        $db = db_connect();
+        $db->transStart();
+        $updated = $this->model->update($id, $data);
+        if ($updated && $handoverHistory !== null) {
+            $db->table('security_handover_history')->insert($handoverHistory);
+        }
+        $db->transComplete();
+
+        if (! $updated || ! $db->transStatus()) {
             if ($this->request->isAJAX()) {
                 return $this->ajaxError($this->model->errors());
             }
@@ -209,7 +277,9 @@ class DokumenMasuk extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->model->errors());
         }
 
-        $message = 'Dokumen masuk berhasil diperbarui.';
+        $message = $isShiftHandover
+            ? 'Serah terima shift berhasil dicatat. Dokumen tetap berada di antrean distribusi.'
+            : 'Dokumen masuk berhasil diperbarui.';
         session()->setFlashdata('success', $message);
 
         if ($this->request->isAJAX()) {

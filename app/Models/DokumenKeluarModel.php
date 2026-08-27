@@ -24,6 +24,8 @@ class DokumenKeluarModel extends Model
         'diterima_security_at',
         'progres',
         'diambil_ekspedisi_at',
+        'status_agendaris',
+        'selesai_agendaris_at',
         'alamat_penerima',
         'dokumen_link',
     ];

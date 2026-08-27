@@ -29,7 +29,11 @@ class DokumenKeluar extends BaseController
             $perPage = 10;
         }
 
-        $this->model->where('progres', 'Diambil Ekspedisi');
+        if ($securityView) {
+            $this->model->where('progres', 'Diambil Ekspedisi');
+        } else {
+            $this->model->where('status_agendaris', 'Selesai');
+        }
 
         if ($keyword !== '') {
             $this->model->groupStart()
@@ -54,9 +58,12 @@ class DokumenKeluar extends BaseController
             $this->model->where('tanggal_pengiriman <=', $to);
         }
 
-        $jenisBuilder = db_connect()->table('dokumen_keluar')
-            ->select('jenis_surat')
-            ->where('progres', 'Diambil Ekspedisi');
+        $jenisBuilder = db_connect()->table('dokumen_keluar')->select('jenis_surat');
+        if ($securityView) {
+            $jenisBuilder->where('progres', 'Diambil Ekspedisi');
+        } else {
+            $jenisBuilder->where('status_agendaris', 'Selesai');
+        }
         $jenisOptions = $jenisBuilder->groupBy('jenis_surat')->orderBy('jenis_surat', 'ASC')->get()->getResultArray();
 
         return view('dokumen_keluar/index', [
@@ -115,9 +122,20 @@ class DokumenKeluar extends BaseController
     public function show(int $id): ResponseInterface
     {
         $dokumen = $this->findDokumen($id);
-        if ($dokumen['progres'] !== 'Diambil Ekspedisi') {
+        $securityView = service('uri')->getSegment(1) === 'dokumen-keluar';
+        $availableInArchive = $securityView
+            ? $dokumen['progres'] === 'Diambil Ekspedisi'
+            : $dokumen['status_agendaris'] === 'Selesai';
+        if (! $availableInArchive) {
             throw PageNotFoundException::forPageNotFound('Dokumen Keluar belum selesai diproses dan belum tersedia di arsip.');
         }
+
+        $handoverHistory = db_connect()->table('outgoing_security_handover_history')
+            ->where('dokumen_keluar_id', $id)
+            ->orderBy('diserahkan_at', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->getResultArray();
 
         return $this->response->setJSON([
             'success' => true,
@@ -137,8 +155,16 @@ class DokumenKeluar extends BaseController
                 'tanggal_diterima'         => $dokumen['tanggal_diterima'] ? date('d-m-Y', strtotime($dokumen['tanggal_diterima'])) : '-',
                 'penerima'                 => $dokumen['penerima'] ?: '-',
                 'security'                 => $dokumen['security'] ?: '-',
+                'serah_terima_history'     => array_map(static fn (array $item): array => [
+                    'security_dari' => $item['security_dari'],
+                    'security_ke'   => $item['security_ke'],
+                    'dicatat_oleh'  => $item['dicatat_oleh'],
+                    'waktu'         => date('d-m-Y H:i', strtotime($item['diserahkan_at'])) . ' WIB',
+                ], $handoverHistory),
                 'tanggal_security'         => $this->displayDateTime($dokumen['diterima_security_at'] ?? null, $dokumen['tanggal_security'] ?? null),
                 'progres'                  => $dokumen['progres'],
+                'status_agendaris'         => $dokumen['status_agendaris'] ?: 'Menunggu Penyelesaian',
+                'waktu_selesai_agendaris'  => $this->displayDateTime($dokumen['selesai_agendaris_at'] ?? null),
                 'waktu_pengambilan_ekspedisi' => $this->displayDateTime($dokumen['diambil_ekspedisi_at'] ?? null),
                 'alamat_penerima'          => $dokumen['alamat_penerima'],
                 'dokumen_link'             => $dokumen['dokumen_link'] ?: '',
@@ -176,7 +202,7 @@ class DokumenKeluar extends BaseController
     public function reopen(int $id): ResponseInterface
     {
         $dokumen = $this->findDokumen($id);
-        if ($dokumen['progres'] !== 'Diambil Ekspedisi') {
+        if (($dokumen['status_agendaris'] ?? 'Menunggu Penyelesaian') !== 'Selesai') {
             return $this->response->setStatusCode(409)->setJSON([
                 'success' => false,
                 'message' => 'Dokumen sudah berada di Progres Dokumen.',
@@ -185,8 +211,8 @@ class DokumenKeluar extends BaseController
         }
 
         if (! $this->model->update($id, [
-            'progres'                => 'Menunggu Ekspedisi',
-            'diambil_ekspedisi_at'   => null,
+            'status_agendaris'      => 'Menunggu Penyelesaian',
+            'selesai_agendaris_at'  => null,
         ])) {
             return $this->validationError($this->model->errors() ?: ['Dokumen belum dapat dikembalikan ke progres.']);
         }

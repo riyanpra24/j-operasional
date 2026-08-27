@@ -29,9 +29,14 @@
                 <div><dt>Jumlah</dt><dd data-detail-field="jumlah"></dd></div>
                 <div><dt>Satuan Jumlah</dt><dd data-detail-field="satuan_jumlah"></dd></div>
                 <div><dt>Ekspedisi</dt><dd data-detail-field="ekspedisi"></dd></div>
+                <div><dt>Penanggung Jawab Security</dt><dd data-detail-field="security_penanggung_jawab"></dd></div>
                 <div class="pickup-detail-row"><dt>Penyerahan</dt><dd data-detail-field="pengambilan"></dd><small>Data dikunci setelah diproses melalui Distribusi Dokumen.</small></div>
                 <div class="pickup-detail-row" data-penyerahan-time hidden><dt>Waktu Penyerahan</dt><dd data-detail-field="penyerahan_at"></dd><small>Tanggal dan waktu dicatat otomatis saat penyerahan disimpan.</small></div>
             </dl>
+            <section class="security-handover-history" data-security-handover-history hidden>
+                <div class="modal-section-heading"><span>⇄</span><div><strong>Riwayat Serah Terima Security</strong><small>Perpindahan penanggung jawab dokumen antar-shift</small></div></div>
+                <div class="security-handover-history-list" data-security-handover-history-list></div>
+            </section>
         </div>
 
         <footer class="modal-footer detail-modal-footer">

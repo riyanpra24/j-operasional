@@ -51,7 +51,7 @@
 </section>
 
 <?php if (! $readOnly): ?><?= view('dokumen_keluar/form_modal') ?><?php endif ?>
-<?= view('dokumen_keluar/detail_modal', ['readOnly' => $readOnly]) ?>
+<?= view('dokumen_keluar/detail_modal', ['readOnly' => $readOnly, 'securityView' => $securityView ?? false]) ?>
 <?php if (! $readOnly): ?><?= view('dokumen_keluar/delete_modal') ?><?php endif ?>
 <?php if (! ($securityView ?? false)): ?><?= view('components/reopen_progress_modal') ?><?php endif ?>
 <?= $this->endSection() ?>

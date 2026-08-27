@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\DokumenMasukModel;
 use App\Models\DokumenKeluarModel;
 use CodeIgniter\HTTP\ResponseInterface;
+use Config\SecurityPersonnel;
 
 class DistribusiDokumen extends BaseController
 {
@@ -86,6 +87,7 @@ class DistribusiDokumen extends BaseController
     public function showOutgoing(int $id): ResponseInterface
     {
         $dokumen = $this->findOutgoing($id);
+        $handoverHistory = $this->outgoingHandoverHistory($id);
 
         return $this->response->setJSON([
             'success' => true,
@@ -100,6 +102,7 @@ class DistribusiDokumen extends BaseController
                 'tanggal_security_value'   => $dokumen['tanggal_security'] ?: '',
                 'security_value'           => $dokumen['security'] ?: '',
                 'progres_value'            => $dokumen['progres'] ?: 'Menunggu Ekspedisi',
+                'serah_terima_history'      => $handoverHistory,
                 'process_url'              => site_url("distribusi-dokumen/surat-keluar/{$id}"),
             ],
         ]);
@@ -113,10 +116,15 @@ class DistribusiDokumen extends BaseController
             'security'         => trim((string) $this->request->getPost('security')),
             'progres'          => trim((string) $this->request->getPost('progres')),
         ];
+        $isShiftHandover = $this->request->getPost('submit_action') === 'handover';
+        $handoverHistory = null;
+        if (! $isShiftHandover && trim((string) ($dokumen['security'] ?? '')) !== '') {
+            $data['security'] = $dokumen['security'];
+        }
 
         $validation = service('validation')->setRules([
             'tanggal_security' => 'required|valid_date[Y-m-d]',
-            'security'         => 'required|in_list[Yanto Pujoyuwono,M. Aziz Dwi Pratomo,Ach. Fathur Rozi,Yayak Andriyani]',
+            'security'         => 'required|in_list[' . implode(',', SecurityPersonnel::NAMES) . ']',
             'progres'          => 'required|in_list[Diambil Ekspedisi,Menunggu Ekspedisi]',
         ], [
             'security' => [
@@ -157,6 +165,49 @@ class DistribusiDokumen extends BaseController
             }
         }
 
+        if ($isShiftHandover) {
+            $securityLama = trim((string) ($dokumen['security'] ?? ''));
+            $securityBaru = trim((string) $this->request->getPost('security_tujuan'));
+            if ($securityLama === '') {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'success' => false,
+                    'message' => 'Security lama belum tersedia.',
+                    'errors'  => ['Simpan field Security terlebih dahulu sebelum melakukan serah terima.'],
+                    'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+                ]);
+            }
+            if (! in_array($securityBaru, SecurityPersonnel::NAMES, true)) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'success' => false,
+                    'message' => 'Pilih Security tujuan dari daftar yang tersedia.',
+                    'errors'  => ['Field Security Baru wajib dipilih.'],
+                    'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+                ]);
+            }
+            if ($securityLama === $securityBaru) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'success' => false,
+                    'message' => 'Security tujuan harus berbeda dari Security lama.',
+                    'errors'  => ['Pilih petugas Security yang berbeda.'],
+                    'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+                ]);
+            }
+
+            $actor = trim((string) session()->get('auth_display_name'));
+            if ($actor === '') {
+                $actor = trim((string) session()->get('auth_username')) ?: 'Petugas Security';
+            }
+            $handoverAt = date('Y-m-d H:i:s');
+            $data['security'] = $securityBaru;
+            $handoverHistory = [
+                'dokumen_keluar_id' => $id,
+                'security_dari'     => $securityLama,
+                'security_ke'       => $securityBaru,
+                'dicatat_oleh'      => $actor,
+                'diserahkan_at'     => $handoverAt,
+            ];
+        }
+
         $securityTime = ! empty($dokumen['diterima_security_at'])
             ? date('H:i:s', strtotime($dokumen['diterima_security_at']))
             : date('H:i:s');
@@ -166,7 +217,15 @@ class DistribusiDokumen extends BaseController
             $data['diambil_ekspedisi_at'] = date('Y-m-d H:i:s');
         }
 
-        if (! db_connect()->table('dokumen_keluar')->where('id', $id)->update($data)) {
+        $db = db_connect();
+        $db->transStart();
+        $updated = $db->table('dokumen_keluar')->where('id', $id)->update($data);
+        if ($updated && $handoverHistory !== null) {
+            $db->table('outgoing_security_handover_history')->insert($handoverHistory);
+        }
+        $db->transComplete();
+
+        if (! $updated || ! $db->transStatus()) {
             return $this->response->setStatusCode(500)->setJSON([
                 'success' => false,
                 'message' => 'Data distribusi Surat Keluar belum dapat disimpan.',
@@ -174,7 +233,9 @@ class DistribusiDokumen extends BaseController
             ]);
         }
 
-        $message = 'Distribusi Surat Keluar berhasil diperbarui.';
+        $message = $isShiftHandover
+            ? 'Serah terima Security Dokumen Keluar berhasil dicatat.'
+            : 'Distribusi Surat Keluar berhasil diperbarui.';
         session()->setFlashdata('success', $message);
 
         return $this->response->setJSON([
@@ -323,5 +384,23 @@ class DistribusiDokumen extends BaseController
         }
 
         return $dokumen;
+    }
+
+    /** @return array<int, array<string, string>> */
+    private function outgoingHandoverHistory(int $id): array
+    {
+        $rows = db_connect()->table('outgoing_security_handover_history')
+            ->where('dokumen_keluar_id', $id)
+            ->orderBy('diserahkan_at', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        return array_map(static fn (array $row): array => [
+            'security_dari' => $row['security_dari'],
+            'security_ke'   => $row['security_ke'],
+            'dicatat_oleh'  => $row['dicatat_oleh'],
+            'waktu'         => date('d-m-Y H:i', strtotime($row['diserahkan_at'])) . ' WIB',
+        ], $rows);
     }
 }

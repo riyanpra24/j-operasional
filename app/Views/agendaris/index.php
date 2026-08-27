@@ -17,16 +17,15 @@
 </section>
 
 <section class="panel register-panel agendaris-table-panel">
-    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Sumber</th><th>Nomor Agendaris</th><th>Tanggal Agendaris</th><th>Tanggal Surat</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tracking Disposisi</th><th>Tanggal Diterima</th><th>Aksi</th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Sumber</th><th>Nomor Agendaris</th><th>Tanggal Surat</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tracking Disposisi</th><th>Tanggal Diterima</th><th>Aksi</th></tr></thead><tbody>
         <?php if ($agenda === []): ?>
-            <tr><td colspan="11"><div class="empty-state"><span>▦</span><strong>Belum ada Dokumen Masuk selesai</strong><p>Selesaikan dokumen melalui menu Progres Dokumen agar tampil di halaman ini.</p></div></td></tr>
+            <tr><td colspan="10"><div class="empty-state"><span>▦</span><strong>Belum ada Dokumen Masuk selesai</strong><p>Selesaikan dokumen melalui menu Progres Dokumen agar tampil di halaman ini.</p></div></td></tr>
         <?php else: ?>
             <?php $rowNumber = (($pager->getCurrentPage('agendaris') - 1) * $filters['perPage']) + 1; ?>
             <?php foreach ($agenda as $row): ?><tr>
                 <td><strong><?= $rowNumber++ ?></strong></td>
                 <td><span class="agenda-source <?= $row['dokumen_masuk_id'] !== null ? 'security' : 'manual' ?>"><?= $row['dokumen_masuk_id'] !== null ? 'Security' : 'Input Manual' ?></span></td>
                 <td><strong><?= $row['nomor_agendaris'] ? esc($row['nomor_agendaris']) : '<span class="agenda-incomplete">Belum dibuat</span>' ?></strong></td>
-                <td><?= $row['tanggal_agendaris'] ? date('d-m-Y', strtotime($row['tanggal_agendaris'])) : '<span class="agenda-incomplete">Belum diisi</span>' ?></td>
                 <td><?= $row['tanggal_surat'] ? date('d-m-Y', strtotime($row['tanggal_surat'])) : '<span class="agenda-incomplete">Belum diisi</span>' ?></td>
                 <td><strong><?= $row['nomor_surat'] ? esc($row['nomor_surat']) : '<span class="agenda-incomplete">Belum diisi</span>' ?></strong></td>
                 <td class="cell-wrap"><?= esc($row['perihal_surat']) ?></td>
