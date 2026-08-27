@@ -4,11 +4,13 @@ $segment = $uri->getSegment(1);
 $securityActive = in_array($segment, ['dokumen-masuk', 'dokumen-keluar', 'distribusi-dokumen'], true);
 $agendarisActive = $segment === 'agendaris';
 $accountManagementActive = $segment === 'kelola-akun';
+$generalSectionActive = $segment === 'bagian-umum-1';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
 $currentRole = (string) session()->get('auth_role');
 $displayName = (string) session()->get('auth_display_name');
 $canAccessSecurity = in_array($currentRole, ['admin', 'security'], true);
 $canAccessAgendaris = in_array($currentRole, ['admin', 'agendaris'], true);
+$canAccessGeneralSection = in_array($currentRole, ['admin', 'umum_1'], true);
 $incomingArchive = $segment === 'dokumen-masuk';
 $incomingWorkspace = in_array($segment, ['dashboard', 'dokumen-masuk', 'distribusi-dokumen'], true);
 $roleLabel = \Config\UserRoles::label($currentRole);
@@ -104,6 +106,21 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                         <a href="<?= site_url('agendaris/progres-dokumen') ?>" class="nav-sublink <?= $agendarisActive && in_array($agendarisPage, ['progres-dokumen', 'progres-dokumen-masuk', 'progres-dokumen-keluar'], true) ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Progres Dokumen
+                        </a>
+                    </div>
+                </div>
+                <?php endif ?>
+                <?php if ($canAccessGeneralSection): ?>
+                <div class="nav-group <?= $generalSectionActive ? 'open' : '' ?>" data-nav-group>
+                    <button type="button" class="nav-link nav-parent <?= $generalSectionActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $generalSectionActive ? 'true' : 'false' ?>" aria-controls="generalSectionSubmenu" title="Bagian Umum 1">
+                        <span class="nav-icon" aria-hidden="true">▤</span>
+                        <span>Bagian Umum 1</span>
+                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                    </button>
+                    <div class="nav-submenu" id="generalSectionSubmenu" data-nav-submenu <?= $generalSectionActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="nav-sublink <?= $generalSectionActive ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            PKS Barang dan Jasa
                         </a>
                     </div>
                 </div>

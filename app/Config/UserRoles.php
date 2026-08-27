@@ -10,7 +10,8 @@ class UserRoles extends BaseConfig
         'admin'     => 'Administrator',
         'security'  => 'Security',
         'agendaris' => 'Agendaris',
-        'umum'      => 'Umum',
+        'umum_1'    => 'Umum 1',
+        'umum_2'    => 'Umum 2',
         'akutansi'  => 'Akutansi',
         'sdm'       => 'SDM',
     ];
@@ -18,7 +19,8 @@ class UserRoles extends BaseConfig
     public const MODULE_PREFIXES = [
         'security'  => ['dokumen-masuk', 'dokumen-keluar', 'distribusi-dokumen'],
         'agendaris' => ['agendaris'],
-        'umum'      => [],
+        'umum_1'    => ['bagian-umum-1'],
+        'umum_2'    => [],
         'akutansi'  => [],
         'sdm'       => [],
     ];

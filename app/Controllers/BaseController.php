@@ -55,6 +55,7 @@ abstract class BaseController extends Controller
                 'distribusi-dokumen',
                 'agendaris',
                 'kelola-akun',
+                'bagian-umum-1',
             ];
 
             if ($segments !== [] && in_array($segments[0], $allowedRoots, true)) {

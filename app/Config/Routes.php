@@ -19,6 +19,23 @@ $routes->group('', static function (RouteCollection $routes): void {
 $routes->get('/', 'Landing::index', ['as' => 'landing']);
 $routes->get('dashboard', 'Dashboard::index', ['as' => 'dashboard']);
 
+// Bagian Umum 1 - Pengelolaan PKS Barang dan Jasa
+$routes->group('bagian-umum-1/pks-barang-jasa', static function (RouteCollection $routes): void {
+    $routes->get('/', 'PksBarangJasa::index', ['as' => 'pks.index']);
+    $routes->get('tambah', 'PksBarangJasa::create', ['as' => 'pks.create']);
+    $routes->post('/', 'PksBarangJasa::store', ['as' => 'pks.store']);
+    $routes->get('(:num)', 'PksBarangJasa::show/$1', ['as' => 'pks.show']);
+    $routes->get('(:num)/ubah', 'PksBarangJasa::edit/$1', ['as' => 'pks.edit']);
+    $routes->post('(:num)', 'PksBarangJasa::update/$1', ['as' => 'pks.update']);
+    $routes->post('(:num)/hapus', 'PksBarangJasa::destroy/$1', ['as' => 'pks.destroy']);
+    $routes->post('(:num)/dokumen', 'PksBarangJasa::storeDocument/$1', ['as' => 'pks.document.store']);
+    $routes->post('(:num)/dokumen/(:num)', 'PksBarangJasa::updateDocument/$1/$2', ['as' => 'pks.document.update']);
+    $routes->post('(:num)/dokumen/(:num)/hapus', 'PksBarangJasa::destroyDocument/$1/$2', ['as' => 'pks.document.destroy']);
+    $routes->post('(:num)/item', 'PksBarangJasa::storeItem/$1', ['as' => 'pks.item.store']);
+    $routes->post('(:num)/item/(:num)', 'PksBarangJasa::updateItem/$1/$2', ['as' => 'pks.item.update']);
+    $routes->post('(:num)/item/(:num)/hapus', 'PksBarangJasa::destroyItem/$1/$2', ['as' => 'pks.item.destroy']);
+});
+
 // Pengelolaan akun (administrator)
 $routes->group('kelola-akun', static function (RouteCollection $routes): void {
     $routes->get('/', 'KelolaAkun::index', ['as' => 'kelola_akun.index']);
