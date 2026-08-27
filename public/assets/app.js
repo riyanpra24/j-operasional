@@ -1539,9 +1539,11 @@
             const documentLink = dokumenKeluarDetailModal.querySelector('[data-dokumen-keluar-document-link]');
             const documentEmpty = dokumenKeluarDetailModal.querySelector('[data-dokumen-keluar-document-empty]');
             const hasDocumentLink = Boolean(data.dokumen_link);
-            documentLink.hidden = !hasDocumentLink;
-            documentLink.href = hasDocumentLink ? data.dokumen_link : '#';
-            documentEmpty.hidden = hasDocumentLink;
+            if (documentLink) {
+                documentLink.hidden = !hasDocumentLink;
+                documentLink.href = hasDocumentLink ? data.dokumen_link : '#';
+            }
+            if (documentEmpty) documentEmpty.hidden = hasDocumentLink;
             const handoverItems = Array.isArray(data.serah_terima_history) ? data.serah_terima_history : [];
             if (dokumenKeluarHandoverHistory && dokumenKeluarHandoverHistoryList) {
                 dokumenKeluarHandoverHistory.hidden = handoverItems.length === 0;
