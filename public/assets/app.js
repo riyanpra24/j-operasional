@@ -1,6 +1,58 @@
 (() => {
     const authExpiresAt = Number(document.body.dataset.authExpiresAt || 0);
     const loginUrl = document.body.dataset.loginUrl || '';
+    const activeTabStorageKey = 'j-operasional-active-tab';
+    const currentTabStorageKey = 'j-operasional-current-tab';
+    const tabWindowPrefix = 'j-operasional-tab:';
+
+    const randomTabId = () => {
+        if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+        return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    };
+
+    const showDuplicateTabBlocker = () => {
+        document.body.className = 'duplicate-tab-page';
+        document.body.innerHTML = `
+            <main class="duplicate-tab-card" role="alert" aria-live="assertive">
+                <span class="duplicate-tab-icon" aria-hidden="true">!</span>
+                <p>AKSES DIBATASI</p>
+                <h1>Akun sedang digunakan di tab lain</h1>
+                <span>Akses pada tab ini diblokir. Silakan lanjutkan pekerjaan pada tab pertama; sesi di tab pertama tetap aktif.</span>
+                <button type="button" class="btn btn-primary" data-duplicate-tab-retry>Periksa kembali</button>
+            </main>`;
+        document.querySelector('[data-duplicate-tab-retry]')?.addEventListener('click', () => window.location.reload());
+    };
+
+    let duplicateTabDetected = false;
+    if (loginUrl !== '') {
+        try {
+            const storedTabId = sessionStorage.getItem(currentTabStorageKey);
+            const windowTabId = window.name.startsWith(tabWindowPrefix)
+                ? window.name.slice(tabWindowPrefix.length)
+                : '';
+            const currentTabId = storedTabId !== '' && storedTabId === windowTabId
+                ? storedTabId
+                : randomTabId();
+
+            sessionStorage.setItem(currentTabStorageKey, currentTabId);
+            window.name = `${tabWindowPrefix}${currentTabId}`;
+
+            const activeTabId = localStorage.getItem(activeTabStorageKey);
+            if (activeTabId && activeTabId !== currentTabId) {
+                duplicateTabDetected = true;
+            } else {
+                localStorage.setItem(activeTabStorageKey, currentTabId);
+            }
+        } catch (error) {
+            // Browser tanpa Web Storage tetap memakai validasi sesi server.
+        }
+    }
+
+    if (duplicateTabDetected) {
+        showDuplicateTabBlocker();
+        return;
+    }
+
     if (authExpiresAt > 0 && loginUrl !== '') {
         const redirectToLogin = () => window.location.replace(loginUrl);
         const remainingMilliseconds = (authExpiresAt * 1000) - Date.now();

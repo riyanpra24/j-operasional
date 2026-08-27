@@ -81,6 +81,12 @@ $logoutSuccess = session()->getFlashdata('logout_success');
         </section>
     </main>
     <script>
+        try {
+            localStorage.removeItem('j-operasional-active-tab');
+            sessionStorage.removeItem('j-operasional-current-tab');
+            if (window.name.startsWith('j-operasional-tab:')) window.name = '';
+        } catch (error) {}
+
         const toggle = document.querySelector('[data-password-toggle]');
         const password = document.getElementById('password');
         toggle?.addEventListener('click', () => {
