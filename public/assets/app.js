@@ -1615,6 +1615,8 @@
     const progressDetailLoading = progressDetailModal?.querySelector('[data-progress-detail-loading]');
     const progressDetailContent = progressDetailModal?.querySelector('[data-progress-detail-content]');
     const progressDetailEdit = progressDetailModal?.querySelector('[data-progress-detail-edit]');
+    const progressDocumentLink = progressDetailModal?.querySelector('[data-progress-document-link]');
+    const progressDocumentEmpty = progressDetailModal?.querySelector('[data-progress-document-empty]');
     const progressDeleteModal = document.querySelector('#progressDocumentDeleteModal');
     const progressDeleteForm = progressDeleteModal?.querySelector('[data-progress-delete-form]');
     const progressDeleteLabel = progressDeleteModal?.querySelector('[data-progress-delete-label]');
@@ -1663,7 +1665,7 @@
         return result.dokumen;
     };
     const fillProgressForm = (data) => {
-        ['nomor_surat','jenis_surat','pemohon','pelaksana','up','tanggal_pengiriman','nomor_resi','tanggal_diterima','penerima','alamat_penerima','security','tanggal_security','progres','status_agendaris'].forEach((name) => {
+        ['nomor_surat','jenis_surat','pemohon','pelaksana','up','tanggal_pengiriman','nomor_resi','tanggal_diterima','penerima','alamat_penerima','dokumen_link','security','tanggal_security','progres','status_agendaris'].forEach((name) => {
             const valueKey = `${name}_value`;
             progressForm.elements[name].value = Object.prototype.hasOwnProperty.call(data, valueKey) ? data[valueKey] : (data[name] === '-' ? '' : data[name]);
         });
@@ -1725,6 +1727,12 @@
         try {
             const data = await loadProgressDocument(url);
             Object.entries(data).forEach(([field, value]) => progressDetailModal.querySelectorAll(`[data-progress-field="${field}"]`).forEach((element) => { element.textContent = value; }));
+            const hasDocumentLink = Boolean(data.dokumen_link);
+            if (progressDocumentLink) {
+                progressDocumentLink.href = hasDocumentLink ? data.dokumen_link : '#';
+                progressDocumentLink.hidden = !hasDocumentLink;
+            }
+            if (progressDocumentEmpty) progressDocumentEmpty.hidden = hasDocumentLink;
             progressDetailEdit.hidden = false;
             progressDetailLoading.hidden = true;
             progressDetailContent.hidden = false;

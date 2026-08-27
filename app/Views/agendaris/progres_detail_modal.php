@@ -36,6 +36,7 @@
                 <dl class="agendaris-detail-grid">
                     <div><dt>Status Penyelesaian</dt><dd data-progress-field="status_agendaris"></dd></div>
                     <div><dt>Waktu Selesai</dt><dd data-progress-field="waktu_selesai_agendaris"></dd></div>
+                    <div class="span-2"><dt>Link Berkas</dt><dd><a href="#" target="_blank" rel="noopener noreferrer" data-progress-document-link hidden>Buka berkas ↗</a><span data-progress-document-empty>Belum ada link berkas</span></dd></div>
                 </dl>
             </section>
         </div>

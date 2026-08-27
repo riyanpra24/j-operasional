@@ -222,6 +222,8 @@ class ProgresDokumen extends BaseController
                 'penerima'                   => $dokumen['penerima'] ?: '-',
                 'penerima_value'             => $dokumen['penerima'] ?: '',
                 'alamat_penerima'            => $dokumen['alamat_penerima'],
+                'dokumen_link'                => $dokumen['dokumen_link'] ?: '',
+                'dokumen_link_value'          => $dokumen['dokumen_link'] ?: '',
                 'security'                   => $dokumen['security'] ?: '-',
                 'security_value'             => $dokumen['security'] ?: '',
                 'tanggal_security'           => $this->displayDateTime($dokumen['diterima_security_at'] ?? null, $dokumen['tanggal_security'] ?? null),
@@ -297,6 +299,7 @@ class ProgresDokumen extends BaseController
             'tanggal_diterima'   => $this->nullIfEmpty($this->request->getPost('tanggal_diterima')),
             'penerima'           => $this->nullIfEmpty($this->request->getPost('penerima')),
             'alamat_penerima'    => trim((string) $this->request->getPost('alamat_penerima')),
+            'dokumen_link'       => $this->nullIfEmpty($this->request->getPost('dokumen_link')),
             'security'           => trim((string) $this->request->getPost('security')),
             'tanggal_security'   => trim((string) $this->request->getPost('tanggal_security')),
             'progres'            => trim((string) $this->request->getPost('progres')),
@@ -322,6 +325,7 @@ class ProgresDokumen extends BaseController
             'tanggal_diterima'   => 'permit_empty|valid_date[Y-m-d]',
             'penerima'           => 'permit_empty|max_length[255]',
             'alamat_penerima'    => 'required|max_length[2000]',
+            'dokumen_link'       => 'permit_empty|max_length[2048]',
             'security'           => $securityRule,
             'tanggal_security'   => $securityDateRule,
             'progres'            => 'required|in_list[Menunggu Ekspedisi,Diambil Ekspedisi]',
@@ -335,6 +339,13 @@ class ProgresDokumen extends BaseController
 
         if (! $validation->run($data)) {
             return array_values($validation->getErrors());
+        }
+
+        if ($data['dokumen_link'] !== null && $data['dokumen_link'] !== '') {
+            $scheme = strtolower((string) parse_url($data['dokumen_link'], PHP_URL_SCHEME));
+            if ($scheme !== 'https' || filter_var($data['dokumen_link'], FILTER_VALIDATE_URL) === false) {
+                return ['Link berkas harus berupa URL HTTPS yang valid.'];
+            }
         }
 
         if ($data['tanggal_security'] !== null && $data['tanggal_security'] !== '' && $data['tanggal_security'] < $data['tanggal_pengiriman']) {
