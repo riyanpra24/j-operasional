@@ -8,7 +8,7 @@ use Config\UserRoles;
 
 class Auth extends BaseController
 {
-    private const LOGIN_LIFETIME_SECONDS = 600;
+    private const LOGIN_LIFETIME_SECONDS = 7200;
 
     public function login(): string|RedirectResponse
     {
@@ -23,7 +23,7 @@ class Auth extends BaseController
 
             return view('auth/login', [
                 'title'              => 'Login',
-                'loginErrorOverride' => 'Sesi login telah berakhir setelah 10 menit. Silakan login kembali.',
+                'loginErrorOverride' => 'Sesi login telah berakhir setelah 2 jam. Silakan login kembali.',
             ]);
         }
 

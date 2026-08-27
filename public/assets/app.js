@@ -854,8 +854,40 @@
     const agendaNumberInput = agendaForm?.elements.nomor_agendaris;
     const agendaCreateUrl = agendaForm?.action || '';
     const agendaSourceFieldNames = ['pengirim', 'tanggal_diterima', 'penerima', 'pengambilan', 'jenis'];
+    const agendaDispositionStages = agendaFormModal?.querySelectorAll('[data-disposition-form-stage]') || [];
     const agendaLastStep = agendaStepPanels.length || 1;
     let agendaCurrentStep = 1;
+
+    const currentDateLocal = () => {
+        const now = new Date();
+        const local = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+        return local.toISOString().slice(0, 10);
+    };
+
+    const updateDispositionFormState = (stage) => {
+        const step = stage.dataset.dispositionFormStage;
+        const recipient = stage.querySelector(`[data-disposition-recipient="${step}"]`);
+        const status = stage.querySelector(`[data-disposition-status="${step}"]`);
+        const time = stage.querySelector(`[data-disposition-time="${step}"]`);
+        const note = stage.querySelector(`[name="disposisi_${step}_catatan"]`);
+        const state = stage.querySelector(`[data-disposition-state="${step}"]`);
+        const filled = Boolean(recipient?.value.trim());
+
+        if (filled && time && !time.value) time.value = currentDateLocal();
+        [status, time, note].forEach((field) => { if (field) field.disabled = !filled; });
+        if (state) {
+            state.textContent = filled ? (status?.value || 'Menunggu') : 'Belum ditentukan';
+            state.classList.toggle('filled', filled);
+        }
+    };
+
+    const refreshDispositionForm = () => agendaDispositionStages.forEach(updateDispositionFormState);
+
+    agendaDispositionStages.forEach((stage) => {
+        const step = stage.dataset.dispositionFormStage;
+        stage.querySelector(`[data-disposition-recipient="${step}"]`)?.addEventListener('input', () => updateDispositionFormState(stage));
+        stage.querySelector(`[data-disposition-status="${step}"]`)?.addEventListener('change', () => updateDispositionFormState(stage));
+    });
 
     const setAgendaStep = (step) => {
         agendaCurrentStep = step;
@@ -944,6 +976,7 @@
         setAgendaSourceLock(false);
         setAgendaLink(true);
         setAgendaNumberState(false);
+        refreshDispositionForm();
         agendaErrors.hidden = true;
         agendaStatus.textContent = '';
         showAgendaForm();
@@ -988,10 +1021,16 @@
             agendaForm.elements.disposisi_1.value = data.disposisi_1_value || '';
             agendaForm.elements.disposisi_2.value = data.disposisi_2_value || '';
             agendaForm.elements.disposisi_3.value = data.disposisi_3_value || '';
+            for (let step = 1; step <= 3; step += 1) {
+                agendaForm.elements[`disposisi_${step}_status`].value = data[`disposisi_${step}_status_value`] || 'Menunggu';
+                agendaForm.elements[`disposisi_${step}_waktu`].value = data[`disposisi_${step}_waktu_value`] || '';
+                agendaForm.elements[`disposisi_${step}_catatan`].value = data[`disposisi_${step}_catatan_value`] || '';
+            }
             agendaForm.elements.progres.value = data.progres || 'Menunggu Penyelesaian';
             setAgendaSourceLock(Boolean(data.source_locked));
             setAgendaLink(true, data.berkas_link || '');
             setAgendaNumberState(Boolean(data.nomor_agendaris_value));
+            refreshDispositionForm();
             agendaStatus.textContent = '';
         } catch (error) {
             showAgendaErrors(error.message);
@@ -1010,6 +1049,7 @@
         window.setTimeout(() => {
             if (nextStep === 2 && agendaGenerateButton && !agendaGenerateButton.disabled) agendaGenerateButton.focus();
             else if (nextStep === 2) agendaForm?.elements.tanggal_agendaris?.focus();
+            else if (nextStep === 3) agendaForm?.elements.disposisi_1?.focus();
             else agendaForm?.elements.progres?.focus();
         }, 120);
     });
@@ -1019,7 +1059,8 @@
         setAgendaStep(previousStep);
         window.setTimeout(() => {
             if (previousStep === 1) agendaForm?.elements.pengirim?.focus();
-            else agendaForm?.elements.nomor_surat?.focus();
+            else if (previousStep === 2) agendaForm?.elements.nomor_surat?.focus();
+            else agendaForm?.elements.disposisi_1?.focus();
         }, 120);
     });
 
@@ -1133,7 +1174,33 @@
     const agendaDetailEdit = agendaDetailModal?.querySelector('[data-agendaris-detail-edit]');
     const agendaDetailLink = agendaDetailModal?.querySelector('[data-agendaris-detail-link]');
     const agendaDetailNoLink = agendaDetailModal?.querySelector('[data-agendaris-detail-no-link]');
+    const agendaDispositionTimeline = agendaDetailModal?.querySelector('[data-agendaris-disposition-timeline]');
     let currentAgendaUrl = '';
+
+    const dispositionStatusClass = (status) => ({
+        'Belum ditentukan': 'empty',
+        Menunggu: 'pending',
+        Diterima: 'received',
+        Diproses: 'active',
+        Diteruskan: 'forwarded',
+        Selesai: 'completed',
+    }[status] || 'empty');
+
+    const renderDispositionTimeline = (timeline = []) => {
+        if (!agendaDispositionTimeline) return;
+        agendaDispositionTimeline.innerHTML = timeline.map((item) => `
+            <article class="disposition-detail-item${item.terisi ? ' filled' : ''}">
+                <span class="disposition-detail-dot">${String(item.urutan).padStart(2, '0')}</span>
+                <div class="disposition-detail-card">
+                    <header>
+                        <div><h3>${escapeHtml(item.penerima)}</h3><time>${escapeHtml(item.waktu)}</time></div>
+                        <span class="disposition-status-badge ${dispositionStatusClass(item.status)}">${escapeHtml(item.status)}</span>
+                    </header>
+                    <p>${escapeHtml(item.catatan)}</p>
+                </div>
+            </article>
+        `).join('');
+    };
 
     const closeAgendaDetail = () => {
         if (!agendaDetailModal) return;
@@ -1166,6 +1233,7 @@
                 agendaDetailLink.href = hasLink ? data.berkas_link : '#';
             }
             if (agendaDetailNoLink) agendaDetailNoLink.hidden = hasLink;
+            renderDispositionTimeline(data.disposisi_timeline || []);
             agendaDetailLoading.hidden = true;
             agendaDetailContent.hidden = false;
         } catch (error) {

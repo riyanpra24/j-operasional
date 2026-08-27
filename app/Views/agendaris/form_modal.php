@@ -13,7 +13,9 @@
                 <i></i>
                 <span data-agendaris-step-indicator="2"><b>02</b> Data Agendaris</span>
                 <i></i>
-                <span data-agendaris-step-indicator="3"><b>03</b> Status Dokumen</span>
+                <span data-agendaris-step-indicator="3"><b>03</b> Disposisi</span>
+                <i></i>
+                <span data-agendaris-step-indicator="4"><b>04</b> Status Dokumen</span>
             </div>
             <div class="modal-body agendaris-modal-body outgoing-distribution-step" data-agendaris-step="1">
                 <div class="modal-section-heading"><span>01</span><div><strong>Data surat</strong><small data-agendaris-form-note>Lengkapi seluruh informasi Surat Masuk</small></div></div>
@@ -35,7 +37,7 @@
                         <label for="agenda_nomor_agendaris">Nomor Agendaris <small>(Opsional)</small></label>
                         <div class="agenda-number-control">
                             <input id="agenda_nomor_agendaris" name="nomor_agendaris" maxlength="50" placeholder="Belum dibuat" readonly aria-readonly="true">
-                            <button type="button" class="btn btn-secondary" data-agendaris-generate data-generate-url="<?= site_url('agendaris/progres-dokumen-masuk/generate-nomor') ?>">Generate Nomor</button>
+                            <button type="button" class="btn btn-agenda-generate" data-agendaris-generate data-generate-url="<?= site_url('agendaris/progres-dokumen-masuk/generate-nomor') ?>">Generate Nomor</button>
                         </div>
                         <small>Nomor dibuat berurutan dengan format AGD/KW/VI/001.</small>
                     </div>
@@ -48,11 +50,29 @@
                 </div>
             </div>
             <div class="modal-body agendaris-modal-body outgoing-distribution-step" data-agendaris-step="3" hidden>
-                <div class="modal-section-heading"><span>03</span><div><strong>Status Dokumen</strong><small>Tentukan progres penyelesaian Dokumen Masuk</small></div></div>
+                <div class="modal-section-heading"><span>03</span><div><strong>Tracking Disposisi</strong><small>Catat posisi, status, waktu, dan instruksi penerusan dokumen</small></div></div>
                 <div class="modal-form-grid agendaris-form-grid">
-                    <div class="form-group"><label for="agenda_disposisi_1">Disposisi 1</label><input id="agenda_disposisi_1" name="disposisi_1" maxlength="255" placeholder="Isi disposisi pertama"></div>
-                    <div class="form-group"><label for="agenda_disposisi_2">Disposisi 2</label><input id="agenda_disposisi_2" name="disposisi_2" maxlength="255" placeholder="Isi disposisi kedua"></div>
-                    <div class="form-group modal-span-2"><label for="agenda_disposisi_3">Disposisi 3</label><input id="agenda_disposisi_3" name="disposisi_3" maxlength="255" placeholder="Isi disposisi ketiga"></div>
+                    <div class="modal-span-2 disposition-form-timeline" aria-label="Tracking disposisi dokumen">
+                        <?php for ($step = 1; $step <= 3; $step++): ?>
+                            <article class="disposition-form-stage" data-disposition-form-stage="<?= $step ?>">
+                                <div class="disposition-stage-marker"><span><?= str_pad((string) $step, 2, '0', STR_PAD_LEFT) ?></span><i></i></div>
+                                <div class="disposition-stage-panel">
+                                    <header><div><strong>Disposisi <?= $step ?></strong><small>Tahap penerusan dan pemantauan dokumen</small></div><span class="disposition-stage-state" data-disposition-state="<?= $step ?>">Belum ditentukan</span></header>
+                                    <div class="disposition-stage-fields">
+                                        <div class="form-group disposition-recipient-field"><label for="agenda_disposisi_<?= $step ?>">Tujuan / Penerima</label><input id="agenda_disposisi_<?= $step ?>" name="disposisi_<?= $step ?>" maxlength="255" placeholder="Nama petugas atau unit tujuan" data-disposition-recipient="<?= $step ?>"></div>
+                                        <div class="form-group"><label for="agenda_disposisi_<?= $step ?>_status">Status</label><select id="agenda_disposisi_<?= $step ?>_status" name="disposisi_<?= $step ?>_status" data-disposition-status="<?= $step ?>"><option value="Menunggu">Menunggu</option><option value="Diterima">Diterima</option><option value="Diproses">Diproses</option><option value="Diteruskan">Diteruskan</option><option value="Selesai">Selesai</option></select></div>
+                                        <div class="form-group"><label for="agenda_disposisi_<?= $step ?>_waktu">Tanggal</label><input id="agenda_disposisi_<?= $step ?>_waktu" type="date" name="disposisi_<?= $step ?>_waktu" data-disposition-time="<?= $step ?>"></div>
+                                        <div class="form-group disposition-note-field"><label for="agenda_disposisi_<?= $step ?>_catatan">Catatan / Instruksi</label><textarea id="agenda_disposisi_<?= $step ?>_catatan" name="disposisi_<?= $step ?>_catatan" maxlength="1000" rows="2" placeholder="Instruksi atau hasil tindak lanjut"></textarea></div>
+                                    </div>
+                                </div>
+                            </article>
+                        <?php endfor ?>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body agendaris-modal-body outgoing-distribution-step" data-agendaris-step="4" hidden>
+                <div class="modal-section-heading"><span>04</span><div><strong>Status Dokumen</strong><small>Tentukan progres akhir dan unduh lembar pengendalian</small></div></div>
+                <div class="modal-form-grid agendaris-form-grid">
                     <div class="form-group modal-span-2"><label for="agenda_progres">Progres <span class="required">*</span></label><select id="agenda_progres" name="progres" required><option value="Menunggu Penyelesaian">Menunggu Penyelesaian</option><option value="Selesai">Selesai</option></select><small>Dokumen berstatus Selesai akan tampil di menu Dokumen Masuk.</small></div>
                     <div class="form-group modal-span-2 agenda-control-sheet-action">
                         <button type="button" class="btn btn-secondary" data-agendaris-download-sheet data-download-url="<?= site_url('agendaris/progres-dokumen-masuk/download-lembar-pengendalian') ?>">↓ Download Lembar Pengendalian</button>

@@ -221,10 +221,20 @@ class Agendaris extends BaseController
                 'berkas_link'         => $agenda['berkas_link'] ?: '',
                 'disposisi_1'         => $agenda['disposisi_1'] ?: 'Belum diisi',
                 'disposisi_1_value'   => $agenda['disposisi_1'] ?: '',
+                'disposisi_1_status_value' => $agenda['disposisi_1_status'] ?: 'Menunggu',
+                'disposisi_1_waktu_value'  => $this->dateTimeLocalValue($agenda['disposisi_1_waktu'] ?? null),
+                'disposisi_1_catatan_value'=> $agenda['disposisi_1_catatan'] ?: '',
                 'disposisi_2'         => $agenda['disposisi_2'] ?: 'Belum diisi',
                 'disposisi_2_value'   => $agenda['disposisi_2'] ?: '',
+                'disposisi_2_status_value' => $agenda['disposisi_2_status'] ?: 'Menunggu',
+                'disposisi_2_waktu_value'  => $this->dateTimeLocalValue($agenda['disposisi_2_waktu'] ?? null),
+                'disposisi_2_catatan_value'=> $agenda['disposisi_2_catatan'] ?: '',
                 'disposisi_3'         => $agenda['disposisi_3'] ?: 'Belum diisi',
                 'disposisi_3_value'   => $agenda['disposisi_3'] ?: '',
+                'disposisi_3_status_value' => $agenda['disposisi_3_status'] ?: 'Menunggu',
+                'disposisi_3_waktu_value'  => $this->dateTimeLocalValue($agenda['disposisi_3_waktu'] ?? null),
+                'disposisi_3_catatan_value'=> $agenda['disposisi_3_catatan'] ?: '',
+                'disposisi_timeline'  => $this->dispositionTimeline($agenda),
                 'progres'             => $agenda['progres'] ?: 'Menunggu Penyelesaian',
                 'created_at'          => date('d-m-Y H:i', strtotime($agenda['created_at'])) . ' WIB',
                 'updated_at'          => date('d-m-Y H:i', strtotime($agenda['updated_at'])) . ' WIB',
@@ -298,7 +308,7 @@ class Agendaris extends BaseController
 
     private function payload(): array
     {
-        return [
+        $data = [
             'pengirim'         => trim((string) $this->request->getPost('pengirim')),
             'penerima'         => trim((string) $this->request->getPost('penerima')),
             'pengambilan'      => trim((string) $this->request->getPost('pengambilan')),
@@ -310,11 +320,26 @@ class Agendaris extends BaseController
             'tanggal_agendaris'=> $this->nullIfEmpty($this->request->getPost('tanggal_agendaris')),
             'perihal_surat'    => trim((string) $this->request->getPost('perihal_surat')),
             'berkas_link'      => trim((string) $this->request->getPost('berkas_link')),
-            'disposisi_1'      => $this->nullIfEmpty($this->request->getPost('disposisi_1')),
-            'disposisi_2'      => $this->nullIfEmpty($this->request->getPost('disposisi_2')),
-            'disposisi_3'      => $this->nullIfEmpty($this->request->getPost('disposisi_3')),
             'progres'          => trim((string) $this->request->getPost('progres')),
         ];
+
+        for ($step = 1; $step <= 3; $step++) {
+            $recipient = $this->nullIfEmpty($this->request->getPost("disposisi_{$step}"));
+            $data["disposisi_{$step}"] = $recipient;
+
+            if ($recipient === null) {
+                $data["disposisi_{$step}_status"] = null;
+                $data["disposisi_{$step}_waktu"] = null;
+                $data["disposisi_{$step}_catatan"] = null;
+                continue;
+            }
+
+            $data["disposisi_{$step}_status"] = $this->nullIfEmpty($this->request->getPost("disposisi_{$step}_status")) ?? 'Menunggu';
+            $data["disposisi_{$step}_waktu"] = $this->normalizeDateTime($this->request->getPost("disposisi_{$step}_waktu")) ?? date('Y-m-d H:i:s');
+            $data["disposisi_{$step}_catatan"] = $this->nullIfEmpty($this->request->getPost("disposisi_{$step}_catatan"));
+        }
+
+        return $data;
     }
 
     private function validateAgenda(array $data, ?int $ignoreId = null): array
@@ -332,13 +357,30 @@ class Agendaris extends BaseController
             'perihal_surat'    => 'required|max_length[255]',
             'berkas_link'      => 'permit_empty|max_length[2048]',
             'disposisi_1'      => 'permit_empty|max_length[255]',
+            'disposisi_1_status' => 'permit_empty|in_list[Menunggu,Diterima,Diproses,Diteruskan,Selesai]',
+            'disposisi_1_waktu'  => 'permit_empty|valid_date[Y-m-d H:i:s]',
+            'disposisi_1_catatan'=> 'permit_empty|max_length[1000]',
             'disposisi_2'      => 'permit_empty|max_length[255]',
+            'disposisi_2_status' => 'permit_empty|in_list[Menunggu,Diterima,Diproses,Diteruskan,Selesai]',
+            'disposisi_2_waktu'  => 'permit_empty|valid_date[Y-m-d H:i:s]',
+            'disposisi_2_catatan'=> 'permit_empty|max_length[1000]',
             'disposisi_3'      => 'permit_empty|max_length[255]',
+            'disposisi_3_status' => 'permit_empty|in_list[Menunggu,Diterima,Diproses,Diteruskan,Selesai]',
+            'disposisi_3_waktu'  => 'permit_empty|valid_date[Y-m-d H:i:s]',
+            'disposisi_3_catatan'=> 'permit_empty|max_length[1000]',
             'progres'          => 'required|in_list[Menunggu Penyelesaian,Selesai]',
         ]);
 
         if (! $validation->run($data)) {
             return array_values($validation->getErrors());
+        }
+
+        if ($data['disposisi_2'] !== null && $data['disposisi_1'] === null) {
+            return ['Disposisi 1 harus diisi sebelum Disposisi 2.'];
+        }
+
+        if ($data['disposisi_3'] !== null && $data['disposisi_2'] === null) {
+            return ['Disposisi 2 harus diisi sebelum Disposisi 3.'];
         }
 
         if ($data['nomor_agendaris'] !== null) {
@@ -371,6 +413,57 @@ class Agendaris extends BaseController
         $value = trim((string) $value);
 
         return $value === '' ? null : $value;
+    }
+
+    private function normalizeDateTime(mixed $value): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        $dateOnly = \DateTime::createFromFormat('!Y-m-d', $value);
+        if ($dateOnly !== false && $dateOnly->format('Y-m-d') === $value) {
+            return $dateOnly->format('Y-m-d H:i:s');
+        }
+
+        foreach (['Y-m-d\\TH:i', 'Y-m-d H:i:s'] as $format) {
+            $date = \DateTime::createFromFormat($format, $value);
+            if ($date !== false && $date->format($format) === $value) {
+                return $date->format('Y-m-d H:i:s');
+            }
+        }
+
+        return $value;
+    }
+
+    private function dateTimeLocalValue(?string $value): string
+    {
+        return $value ? date('Y-m-d', strtotime($value)) : '';
+    }
+
+    /**
+     * @return array<int, array<string, int|string|bool>>
+     */
+    private function dispositionTimeline(array $agenda): array
+    {
+        $timeline = [];
+
+        for ($step = 1; $step <= 3; $step++) {
+            $recipient = trim((string) ($agenda["disposisi_{$step}"] ?? ''));
+            $time = $agenda["disposisi_{$step}_waktu"] ?? null;
+
+            $timeline[] = [
+                'urutan'       => $step,
+                'terisi'       => $recipient !== '',
+                'penerima'     => $recipient !== '' ? $recipient : 'Belum ditentukan',
+                'status'       => $recipient !== '' ? ($agenda["disposisi_{$step}_status"] ?: 'Menunggu') : 'Belum ditentukan',
+                'waktu'        => $time ? date('d-m-Y', strtotime($time)) : 'Tanggal belum dicatat',
+                'catatan'      => ($agenda["disposisi_{$step}_catatan"] ?? null) ?: 'Belum ada catatan',
+            ];
+        }
+
+        return $timeline;
     }
 
     private function findJoined(int $id): array

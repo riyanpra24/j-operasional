@@ -30,9 +30,9 @@
 </section>
 
 <section class="panel register-panel agendaris-table-panel progress-document-panel">
-    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Sumber</th><th>Nomor Agendaris</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Progres</th><th>Aksi</th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Sumber</th><th>Nomor Agendaris</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tracking Disposisi</th><th>Progres</th><th>Aksi</th></tr></thead><tbody>
         <?php if ($agenda === []): ?>
-            <tr><td colspan="8"><div class="empty-state"><span>▦</span><strong>Belum ada Dokumen Masuk</strong><p>Tambahkan Dokumen Masuk baru atau sinkronkan dari data Security.</p></div></td></tr>
+            <tr><td colspan="9"><div class="empty-state"><span>▦</span><strong>Belum ada Dokumen Masuk</strong><p>Tambahkan Dokumen Masuk baru atau sinkronkan dari data Security.</p></div></td></tr>
         <?php else: ?>
             <?php $rowNumber = (($pager->getCurrentPage('progres_dokumen_masuk') - 1) * $filters['perPage']) + 1; ?>
             <?php foreach ($agenda as $row): ?><tr>
@@ -42,6 +42,15 @@
                 <td><strong><?= $row['nomor_surat'] ? esc($row['nomor_surat']) : '<span class="agenda-incomplete">Belum diisi</span>' ?></strong></td>
                 <td class="cell-wrap"><?= esc($row['perihal_surat']) ?></td>
                 <td><?= esc($row['pengirim']) ?></td>
+                <?php
+                    $activeDisposition = 0;
+                    for ($step = 1; $step <= 3; $step++) {
+                        if (trim((string) ($row["disposisi_{$step}"] ?? '')) !== '') $activeDisposition = $step;
+                    }
+                    $trackingStatus = $activeDisposition > 0 ? ($row["disposisi_{$activeDisposition}_status"] ?? 'Menunggu') : 'Belum ditentukan';
+                    $trackingClass = ['Menunggu' => 'pending', 'Diterima' => 'received', 'Diproses' => 'active', 'Diteruskan' => 'forwarded', 'Selesai' => 'completed'][$trackingStatus] ?? 'empty';
+                ?>
+                <td><div class="disposition-table-tracking"><strong><?= $activeDisposition > 0 ? esc($row["disposisi_{$activeDisposition}"]) : 'Belum ada disposisi' ?></strong><span><?= $activeDisposition > 0 ? "Tahap {$activeDisposition} dari 3" : 'Tracking belum dimulai' ?></span><em class="disposition-status-badge <?= $trackingClass ?>"><?= esc($trackingStatus) ?></em></div></td>
                 <?php $completed = ($row['progres'] ?? '') === 'Selesai'; ?>
                 <td><span class="pickup-status <?= $completed ? 'completed' : 'pending' ?>"><?= esc($row['progres'] ?? 'Menunggu Penyelesaian') ?></span></td>
                 <td><div class="table-actions">

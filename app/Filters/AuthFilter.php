@@ -8,7 +8,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class AuthFilter implements FilterInterface
 {
-    private const LOGIN_LIFETIME_SECONDS = 600;
+    private const LOGIN_LIFETIME_SECONDS = 7200;
 
     public function before(RequestInterface $request, $arguments = null)
     {
@@ -18,7 +18,7 @@ class AuthFilter implements FilterInterface
         if ($userId !== null) {
             $expiresAt = (int) $session->get('auth_expires_at');
 
-            // Beri batas 10 menit pada sesi lama yang dibuat sebelum fitur ini tersedia.
+            // Beri batas 2 jam pada sesi lama yang dibuat sebelum fitur ini tersedia.
             if ($expiresAt === 0) {
                 $expiresAt = time() + self::LOGIN_LIFETIME_SECONDS;
                 $session->set('auth_expires_at', $expiresAt);
@@ -56,7 +56,7 @@ class AuthFilter implements FilterInterface
 
     private function expiredResponse(RequestInterface $request): ResponseInterface
     {
-        $message = 'Sesi login telah berakhir setelah 10 menit. Silakan login kembali.';
+        $message = 'Sesi login telah berakhir setelah 2 jam. Silakan login kembali.';
 
         if ($request->isAJAX()) {
             return service('response')

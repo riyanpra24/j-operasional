@@ -429,14 +429,48 @@ body { background: #e9edef; }
 .agendaris-form-modal.open .modal-dialog,.agendaris-detail-modal.open .modal-dialog,.agendaris-delete-modal.open .modal-dialog { transform: translateY(0) scale(1); }
 .agendaris-modal-dialog { width: min(680px,100%); max-height: calc(100vh - 44px); }
 [data-agendaris-form] { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.agendaris-form-modal .outgoing-distribution-steps { justify-content: flex-start; gap: 7px; padding-inline: 16px; overflow-x: auto; scrollbar-width: thin; }
+.agendaris-form-modal .outgoing-distribution-steps span { flex: 0 0 auto; }.agendaris-form-modal .outgoing-distribution-steps i { flex: 1 0 24px; max-width: 38px; }
 [data-progress-form] { display: flex; flex: 1; flex-direction: column; min-height: 0; }
 #progressDocumentFormModal .agendaris-modal-body { overflow-y: auto; }
 [data-progress-detail-edit][hidden] { display: none; }
 .agendaris-modal-body { padding: 14px 18px 16px; overflow: visible; }
+.agendaris-modal-body[data-agendaris-step="3"] { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scrollbar-color: #72c9c2 #edf5f5; scrollbar-width: thin; }
+.agendaris-modal-body[data-agendaris-step="3"]::-webkit-scrollbar { width: 7px; }
+.agendaris-modal-body[data-agendaris-step="3"]::-webkit-scrollbar-track { background: #edf5f5; border-radius: 999px; }
+.agendaris-modal-body[data-agendaris-step="3"]::-webkit-scrollbar-thumb { background: linear-gradient(#20b9ad,#078f9d); border-radius: 999px; }
 .agendaris-form-grid { gap: 11px 14px; }
 .agenda-number-control { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; align-items: center; }
 .agenda-number-control .btn { min-height: 48px; padding-inline: 14px; white-space: nowrap; }
+.btn-agenda-generate { color: #fff; background: linear-gradient(135deg,#16c7b7,#078ea0); border-color: #078ea0; box-shadow: 0 6px 14px rgba(7,151,151,.24); }
+.btn-agenda-generate:hover { background: linear-gradient(135deg,#0fb6a8,#077f92); border-color: #077f92; box-shadow: 0 8px 17px rgba(7,127,146,.28); }
+.btn-agenda-generate:focus-visible { outline: 3px solid rgba(16,181,167,.25); outline-offset: 2px; }
+.btn-agenda-generate:disabled { color: #749597; background: #e1f1f0; border-color: #c9e5e2; box-shadow: none; cursor: not-allowed; }
 .agenda-number-control input[readonly] { color: #344158; background: #f7f9fb; }
+.disposition-form-timeline { display: grid; gap: 11px; }
+.disposition-form-stage { display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 10px; }
+.disposition-stage-marker { position: relative; display: flex; justify-content: center; }
+.disposition-stage-marker span { position: relative; z-index: 1; display: grid; place-items: center; width: 30px; height: 30px; color: #fff; background: linear-gradient(145deg,#13b8aa,#078e9f); border: 3px solid #e7f8f6; border-radius: 50%; font-size: 7px; font-weight: 850; box-sizing: border-box; }
+.disposition-stage-marker i { position: absolute; top: 29px; bottom: -14px; width: 2px; background: linear-gradient(#8bd6cf,#dcebea); }
+.disposition-form-stage:last-child .disposition-stage-marker i { display: none; }
+.disposition-stage-panel { overflow: hidden; background: #fbfdfd; border: 1px solid #dce9e8; border-radius: 10px; box-shadow: 0 3px 9px rgba(37,73,75,.05); }
+.disposition-stage-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: linear-gradient(105deg,#edf9f7,#f7faff); border-bottom: 1px solid #e3ecec; }
+.disposition-stage-panel > header strong,.disposition-stage-panel > header small { display: block; }.disposition-stage-panel > header strong { color: #35445a; font-size: 9px; }.disposition-stage-panel > header small { margin-top: 2px; color: #91a0ae; font-size: 7px; }
+.disposition-stage-state { padding: 4px 7px; color: #7b8795; background: #eef2f4; border: 1px solid #dce3e7; border-radius: 999px; font-size: 7px; font-weight: 800; white-space: nowrap; }
+.disposition-stage-state.filled { color: #087e79; background: #e3f7f4; border-color: #bde5df; }
+.disposition-stage-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 12px; padding: 11px 12px 12px; }
+.disposition-stage-fields .form-group { min-width: 0; }.disposition-recipient-field,.disposition-note-field { grid-column: 1/-1; }.disposition-stage-fields textarea { min-height: 58px; resize: vertical; }
+.disposition-detail-section { padding-bottom: 15px; }
+.disposition-detail-timeline { display: grid; gap: 0; padding: 14px 2px 4px; }
+.disposition-detail-item { position: relative; display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 10px; min-height: 84px; }
+.disposition-detail-item::before { position: absolute; top: 30px; bottom: 0; left: 15px; width: 2px; background: #dce8e7; content: ""; }.disposition-detail-item:last-child::before { display: none; }
+.disposition-detail-dot { position: relative; z-index: 1; display: grid; place-items: center; width: 30px; height: 30px; color: #fff; background: #aeb9c3; border: 4px solid #eef2f4; border-radius: 50%; font-size: 7px; font-weight: 850; box-sizing: border-box; }
+.disposition-detail-item.filled .disposition-detail-dot { background: linear-gradient(145deg,#13b8aa,#078e9f); border-color: #e5f7f5; }
+.disposition-detail-card { margin-bottom: 10px; padding: 11px 13px; background: #fafcfc; border: 1px solid #e0e9e9; border-radius: 9px; }
+.disposition-detail-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }.disposition-detail-card h3 { margin: 0; color: #344158; font-size: 10px; }.disposition-detail-card time { display: block; margin-top: 3px; color: #8795a5; font-size: 7.5px; }
+.disposition-detail-card p { margin: 8px 0 0; padding-top: 8px; color: #657286; border-top: 1px dashed #dde6e7; font-size: 8px; line-height: 1.5; }
+.disposition-status-badge { display: inline-flex; padding: 4px 7px; border: 1px solid; border-radius: 999px; font-size: 7px; font-weight: 850; white-space: nowrap; }.disposition-status-badge.empty { color: #7d8996; background: #f0f3f5; border-color: #dde3e7; }.disposition-status-badge.pending { color: #a36b16; background: #fff4df; border-color: #efd5a0; }.disposition-status-badge.received { color: #3269a8; background: #edf5ff; border-color: #c9dcf3; }.disposition-status-badge.active { color: #087e79; background: #e3f7f4; border-color: #bde5df; }.disposition-status-badge.forwarded { color: #7155a3; background: #f3effc; border-color: #d9cff0; }.disposition-status-badge.completed { color: #31794f; background: #eaf7ef; border-color: #c5e6d1; }
+.disposition-table-tracking { display: grid; min-width: 130px; gap: 3px; }.disposition-table-tracking strong { max-width: 180px; overflow: hidden; color: #344158; font-size: 8.5px; text-overflow: ellipsis; white-space: nowrap; }.disposition-table-tracking > span { color: #8d99a7; font-size: 7px; }.disposition-table-tracking .disposition-status-badge { justify-self: start; margin-top: 2px; font-style: normal; }
 .agendaris-form-grid .field-source-locked label::after { margin-left: 4px; content: "🔒"; }
 .agendaris-form-grid .field-source-locked input,.agendaris-form-grid .field-source-locked select { color: #647188; background: #f3f6f8; border-color: #dfe5ea; cursor: not-allowed; }
 .agenda-link-field { padding: 10px 12px; background: #f7fbfb; border: 1px dashed #b9dcda; border-radius: 8px; }
@@ -474,6 +508,7 @@ body { background: #e9edef; }
     .agendaris-modal-body { overflow-y: auto; }
     .agendaris-form-grid,.agendaris-detail-grid { grid-template-columns: 1fr; }
     .agenda-number-control { grid-template-columns: 1fr; }
+    .disposition-stage-fields { grid-template-columns: 1fr; }.disposition-recipient-field,.disposition-note-field { grid-column: auto; }
     .agendaris-form-grid .modal-span-2,.agendaris-detail-grid .span-2 { grid-column: auto; }
 }
 

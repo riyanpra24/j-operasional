@@ -22,8 +22,17 @@ class AgendarisModel extends Model
         'perihal_surat',
         'berkas_link',
         'disposisi_1',
+        'disposisi_1_status',
+        'disposisi_1_waktu',
+        'disposisi_1_catatan',
         'disposisi_2',
+        'disposisi_2_status',
+        'disposisi_2_waktu',
+        'disposisi_2_catatan',
         'disposisi_3',
+        'disposisi_3_status',
+        'disposisi_3_waktu',
+        'disposisi_3_catatan',
         'progres',
     ];
 

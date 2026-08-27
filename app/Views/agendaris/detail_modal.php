@@ -20,16 +20,20 @@
                 </dl>
             </section>
             <section class="agendaris-detail-section" aria-labelledby="agendarisDetailAgendaHeading">
-                <div class="modal-section-heading agendaris-detail-section-heading"><span>02</span><div><strong id="agendarisDetailAgendaHeading">Data Agendaris</strong><small>Nomor agenda, disposisi, progres, dan tautan dokumen</small></div></div>
+                <div class="modal-section-heading agendaris-detail-section-heading"><span>02</span><div><strong id="agendarisDetailAgendaHeading">Data Agendaris</strong><small>Nomor agenda dan tautan dokumen</small></div></div>
                 <dl class="agendaris-detail-grid">
                     <div><dt>Nomor Agendaris</dt><dd data-agendaris-field="nomor_agendaris"></dd></div>
                     <div><dt>Tanggal Agendaris</dt><dd data-agendaris-field="tanggal_agendaris"></dd></div>
-                    <div><dt>Disposisi 1</dt><dd data-agendaris-field="disposisi_1"></dd></div>
-                    <div><dt>Disposisi 2</dt><dd data-agendaris-field="disposisi_2"></dd></div>
-                    <div class="span-2"><dt>Disposisi 3</dt><dd data-agendaris-field="disposisi_3"></dd></div>
-                    <div class="span-2"><dt>Progres</dt><dd data-agendaris-field="progres"></dd></div>
                     <div class="span-2"><dt>Link Berkas</dt><dd><a class="agenda-file-link" href="#" target="_blank" rel="noopener noreferrer" data-agendaris-detail-link hidden>Buka berkas ↗</a><span data-agendaris-detail-no-link>Belum ada link berkas</span></dd></div>
                 </dl>
+            </section>
+            <section class="agendaris-detail-section disposition-detail-section" aria-labelledby="agendarisDetailDispositionHeading">
+                <div class="modal-section-heading agendaris-detail-section-heading"><span>03</span><div><strong id="agendarisDetailDispositionHeading">Tracking Disposisi</strong><small>Posisi, status, waktu, dan catatan setiap tahap</small></div></div>
+                <div class="disposition-detail-timeline" data-agendaris-disposition-timeline></div>
+            </section>
+            <section class="agendaris-detail-section" aria-labelledby="agendarisDetailStatusHeading">
+                <div class="modal-section-heading agendaris-detail-section-heading"><span>04</span><div><strong id="agendarisDetailStatusHeading">Status Dokumen</strong><small>Status akhir penyelesaian Dokumen Masuk</small></div></div>
+                <dl class="agendaris-detail-grid"><div class="span-2"><dt>Progres</dt><dd data-agendaris-field="progres"></dd></div></dl>
             </section>
         </div>
         <footer class="modal-footer"><button type="button" class="btn btn-ghost" data-agendaris-detail-close>Tutup</button><?php if (! ($readOnly ?? false)): ?><button type="button" class="btn btn-primary" data-agendaris-detail-edit>✎ Ubah data</button><?php endif ?></footer>
