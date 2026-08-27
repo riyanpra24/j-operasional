@@ -1089,10 +1089,12 @@
         if (agendaLinkInput) agendaLinkInput.value = visible ? value : '';
     };
 
-    const setAgendaNumberState = (hasNumber) => {
+    const setAgendaNumberState = (hasNumber, canCancel = false) => {
         if (!agendaGenerateButton) return;
-        agendaGenerateButton.disabled = hasNumber;
+        agendaGenerateButton.disabled = hasNumber && !canCancel;
         agendaGenerateButton.textContent = hasNumber ? 'Nomor sudah dibuat' : 'Generate Nomor';
+        agendaGenerateButton.dataset.canCancel = canCancel ? 'true' : 'false';
+        agendaGenerateButton.title = canCancel ? 'Klik lagi untuk membatalkan Nomor Agendaris' : '';
     };
 
     const closeAgendaForm = () => {
@@ -1222,6 +1224,13 @@
         const url = agendaGenerateButton.dataset.generateUrl;
         if (!url || !agendaNumberInput) return;
 
+        if (agendaGenerateButton.dataset.canCancel === 'true' && agendaNumberInput.value) {
+            agendaNumberInput.value = '';
+            setAgendaNumberState(false);
+            if (agendaStatus) agendaStatus.textContent = 'Nomor Agendaris dibatalkan dan belum disimpan.';
+            return;
+        }
+
         agendaGenerateButton.disabled = true;
         agendaGenerateButton.textContent = 'Membuat...';
         agendaErrors.hidden = true;
@@ -1235,7 +1244,7 @@
             updateCsrf(result.csrf);
             if (!response.ok || !result.success) throw new Error(result.message || 'Nomor Agendaris belum dapat dibuat.');
             agendaNumberInput.value = result.nomor_agendaris;
-            setAgendaNumberState(true);
+            setAgendaNumberState(true, true);
         } catch (error) {
             showAgendaErrors(error.message);
             setAgendaNumberState(false);

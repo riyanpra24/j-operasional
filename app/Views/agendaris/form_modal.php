@@ -39,7 +39,7 @@
                             <input id="agenda_nomor_agendaris" name="nomor_agendaris" maxlength="50" placeholder="Belum dibuat" readonly aria-readonly="true">
                             <button type="button" class="btn btn-agenda-generate" data-agendaris-generate data-generate-url="<?= site_url('agendaris/progres-dokumen-masuk/generate-nomor') ?>">Generate Nomor</button>
                         </div>
-                        <small>Nomor dibuat berurutan dengan format AGD/KW/VI/001.</small>
+                        <small>Nomor baru disimpan bersama formulir. Klik tombol yang sama sekali lagi untuk membatalkannya.</small>
                     </div>
                     <div class="form-group"><label for="agenda_tanggal_agendaris">Tanggal Agendaris <small>(Opsional)</small></label><input id="agenda_tanggal_agendaris" type="date" name="tanggal_agendaris"></div>
                     <div class="form-group modal-span-2 agenda-link-field" data-agendaris-link>

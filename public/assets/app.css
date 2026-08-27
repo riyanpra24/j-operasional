@@ -467,6 +467,8 @@ body { background: #e9edef; }
 .btn-agenda-generate:hover { background: linear-gradient(135deg,#0fb6a8,#077f92); border-color: #077f92; box-shadow: 0 8px 17px rgba(7,127,146,.28); }
 .btn-agenda-generate:focus-visible { outline: 3px solid rgba(16,181,167,.25); outline-offset: 2px; }
 .btn-agenda-generate:disabled { color: #749597; background: #e1f1f0; border-color: #c9e5e2; box-shadow: none; cursor: not-allowed; }
+.btn-agenda-generate[data-can-cancel="true"] { color:#668e91;background:#e1f1f0;border-color:#c9e5e2;box-shadow:none;cursor:pointer; }
+.btn-agenda-generate[data-can-cancel="true"]:hover { color:#497f82;background:#d6ece9;border-color:#b9ddd9; }
 .agenda-number-control input[readonly] { color: #344158; background: #f7f9fb; }
 .disposition-form-timeline { display: grid; gap: 11px; }
 .disposition-form-stage { display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 10px; }
