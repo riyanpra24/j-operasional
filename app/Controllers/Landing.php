@@ -15,7 +15,7 @@ class Landing extends BaseController
         }
 
         return view('landing/index', [
-            'title'      => 'J-Operasional',
+            'title'      => 'Jamkrindo Kanwil Surabaya',
             'isLoggedIn' => false,
         ]);
     }
