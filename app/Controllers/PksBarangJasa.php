@@ -66,85 +66,96 @@ class PksBarangJasa extends BaseController
         ]);
     }
 
-    public function create(): string
+    public function create(): RedirectResponse
     {
-        return view('pks/form', [
-            'title' => 'Tambah PKS Barang dan Jasa',
-            'record' => null,
-            'action' => site_url('bagian-umum-1/pks-barang-jasa'),
-        ]);
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))
+            ->with('pks_modal', 'create')
+            ->with('pks_form_data', []);
     }
 
     public function store(): RedirectResponse
     {
         $data = $this->mainPayload();
-        $errors = $this->validateMain($data);
+        $documentData = $this->initialDocumentPayload(0);
+        $formData = array_merge($data, $this->documentFormData($documentData));
+        $errors = array_merge($this->validateMain($data), $this->validateDocument($documentData));
         if ($errors !== []) {
-            return $this->mainFormError('create', $data, $errors);
+            return $this->mainFormError('create', $formData, $errors);
         }
 
         $db = db_connect();
         $db->transStart();
         $mitraId = $this->mitra->insert($this->mitraData($data), true);
         $kerjasamaId = $this->kerjasama->insert($this->kerjasamaData($data, (int) $mitraId), true);
+        $documentData['kerjasama_id'] = (int) $kerjasamaId;
+        $documentId = $this->dokumen->insert($documentData, true);
         $db->transComplete();
 
-        if (! $db->transStatus() || ! $kerjasamaId) {
-            return $this->mainFormError('create', $data, ['pks' => 'Data PKS gagal disimpan. Silakan coba kembali.']);
+        if (! $db->transStatus() || ! $kerjasamaId || ! $documentId) {
+            return $this->mainFormError('create', $formData, ['pks' => 'Data PKS dan dokumen induk gagal disimpan. Silakan coba kembali.']);
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $kerjasamaId))
-            ->with('success', 'Data utama PKS berhasil dibuat. Silakan tambahkan dokumen PKS/addendum dan item pekerjaan.');
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $kerjasamaId . '/ubah'))
+            ->with('success', 'PKS beserta dokumen induknya berhasil dibuat. Anda dapat menambahkan addendum dan item pekerjaan pada halaman ini.');
     }
 
     public function show(int $id): string
     {
-        $record = $this->findRecord($id);
-        $documents = $this->dokumen->where('kerjasama_id', $id)->orderBy('urutan', 'ASC')->findAll();
-        $items = $this->item->where('kerjasama_id', $id)->orderBy('id', 'ASC')->findAll();
-        $latest = $documents === [] ? null : $documents[array_key_last($documents)];
-        $status = $this->statusFromDates($latest['periode_mulai'] ?? null, $latest['periode_selesai'] ?? null);
+        $data = $this->detailPageData($id, false);
+        $data['isPopup'] = $this->request->getGet('popup') === '1';
 
-        return view('pks/show', [
-            'title' => 'Detail PKS Barang dan Jasa',
-            'record' => $record,
-            'documents' => $documents,
-            'items' => $items,
-            'latest' => $latest,
-            'status' => $status,
-            'nextSequence' => $documents === [] ? 1 : ((int) max(array_column($documents, 'urutan')) + 1),
-        ]);
+        return view('pks/show', $data);
     }
 
-    public function edit(int $id): string
+    public function edit(int $id): string|RedirectResponse
     {
-        return view('pks/form', [
-            'title' => 'Ubah PKS Barang dan Jasa',
-            'record' => $this->findRecord($id),
-            'action' => site_url('bagian-umum-1/pks-barang-jasa/' . $id),
-        ]);
+        if ($this->request->getGet('data_utama') !== '1') {
+            return view('pks/show', $this->detailPageData($id, true));
+        }
+
+        $record = $this->findRecord($id);
+        $initialDocument = $this->dokumen->where('kerjasama_id', $id)->where('jenis_dokumen', 'PKS')->first();
+        if ($initialDocument !== null) {
+            $record = array_merge($record, $this->documentFormData($initialDocument));
+        }
+
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))
+            ->with('pks_modal', 'edit')
+            ->with('pks_form_data', $record)
+            ->with('pks_edit_id', $id);
     }
 
     public function update(int $id): RedirectResponse
     {
         $record = $this->findRecord($id);
+        $initialDocument = $this->dokumen->where('kerjasama_id', $id)->where('jenis_dokumen', 'PKS')->first();
         $data = $this->mainPayload();
-        $errors = $this->validateMain($data, $id);
+        $documentData = $this->initialDocumentPayload($id);
+        $formData = array_merge($data, $this->documentFormData($documentData));
+        $errors = array_merge(
+            $this->validateMain($data, $id),
+            $this->validateDocument($documentData, isset($initialDocument['id']) ? (int) $initialDocument['id'] : null)
+        );
         if ($errors !== []) {
-            return $this->mainFormError('edit', $data, $errors, $id);
+            return $this->mainFormError('edit', $formData, $errors, $id);
         }
 
         $db = db_connect();
         $db->transStart();
         $this->mitra->update((int) $record['mitra_id'], $this->mitraData($data));
         $this->kerjasama->update($id, $this->kerjasamaData($data, (int) $record['mitra_id']));
+        if ($initialDocument !== null) {
+            $this->dokumen->update((int) $initialDocument['id'], $documentData);
+        } else {
+            $this->dokumen->insert($documentData);
+        }
         $db->transComplete();
 
         if (! $db->transStatus()) {
-            return $this->mainFormError('edit', $data, ['pks' => 'Perubahan data PKS gagal disimpan.'], $id);
+            return $this->mainFormError('edit', $formData, ['pks' => 'Perubahan data PKS dan dokumen induk gagal disimpan.'], $id);
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id))->with('success', 'Data utama PKS berhasil diperbarui.');
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah'))->with('success', 'Data utama dan dokumen induk PKS berhasil diperbarui.');
     }
 
     public function destroy(int $id): RedirectResponse
@@ -170,6 +181,7 @@ class PksBarangJasa extends BaseController
     {
         $this->findRecord($id);
         $data = $this->documentPayload($id);
+        $data['jenis_dokumen'] = 'Addendum';
         $errors = $this->validateDocument($data);
         if ($errors !== []) {
             return $this->detailError($id, $errors, 'dokumen');
@@ -179,13 +191,17 @@ class PksBarangJasa extends BaseController
             return $this->detailError($id, $this->dokumen->errors() ?: ['dokumen' => 'Dokumen gagal disimpan.'], 'dokumen');
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id) . '#riwayat-dokumen')->with('success', 'Riwayat dokumen berhasil ditambahkan.');
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('success', 'Riwayat dokumen berhasil ditambahkan.');
     }
 
     public function updateDocument(int $id, int $documentId): RedirectResponse
     {
-        $this->findOwnedDocument($id, $documentId);
+        $document = $this->findOwnedDocument($id, $documentId);
         $data = $this->documentPayload($id);
+        $data['jenis_dokumen'] = $document['jenis_dokumen'];
+        if ($document['jenis_dokumen'] === 'PKS') {
+            $data['urutan'] = 0;
+        }
         $errors = $this->validateDocument($data, $documentId);
         if ($errors !== []) {
             return $this->detailError($id, $errors, 'dokumen');
@@ -195,15 +211,19 @@ class PksBarangJasa extends BaseController
             return $this->detailError($id, $this->dokumen->errors() ?: ['dokumen' => 'Dokumen gagal diperbarui.'], 'dokumen');
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id) . '#riwayat-dokumen')->with('success', 'Riwayat dokumen berhasil diperbarui.');
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('success', 'Riwayat dokumen berhasil diperbarui.');
     }
 
     public function destroyDocument(int $id, int $documentId): RedirectResponse
     {
         $document = $this->findOwnedDocument($id, $documentId);
+        if ($document['jenis_dokumen'] === 'PKS') {
+            return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')
+                ->with('error', 'Dokumen PKS induk tidak dapat dihapus. Hapus data PKS secara keseluruhan jika memang diperlukan.');
+        }
         $this->dokumen->delete($documentId);
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id) . '#riwayat-dokumen')->with('success', $document['jenis_dokumen'] . ' nomor ' . $document['nomor_dokumen'] . ' berhasil dihapus.');
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('success', $document['jenis_dokumen'] . ' nomor ' . $document['nomor_dokumen'] . ' berhasil dihapus.');
     }
 
     public function storeItem(int $id): RedirectResponse
@@ -216,7 +236,7 @@ class PksBarangJasa extends BaseController
         }
 
         $this->item->insert($data);
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id) . '#item-pekerjaan')->with('success', 'Item pekerjaan berhasil ditambahkan.');
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', 'Item pekerjaan berhasil ditambahkan.');
     }
 
     public function updateItem(int $id, int $itemId): RedirectResponse
@@ -229,26 +249,58 @@ class PksBarangJasa extends BaseController
         }
 
         $this->item->update($itemId, $data);
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id) . '#item-pekerjaan')->with('success', 'Item pekerjaan berhasil diperbarui.');
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', 'Item pekerjaan berhasil diperbarui.');
     }
 
     public function destroyItem(int $id, int $itemId): RedirectResponse
     {
         $item = $this->findOwnedItem($id, $itemId);
         $this->item->delete($itemId);
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id) . '#item-pekerjaan')->with('success', 'Item ' . $item['nama_item'] . ' berhasil dihapus.');
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', 'Item ' . $item['nama_item'] . ' berhasil dihapus.');
     }
 
     private function baseListQuery(): PksKerjasamaModel
     {
         return $this->kerjasama
             ->select("pks_kerjasama.*, pks_mitra.nama_mitra, pks_mitra.alamat, pks_mitra.nama_kontak, pks_mitra.jabatan_kontak, pks_mitra.telepon, pks_mitra.email,
+                (SELECT d.id FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS dokumen_induk_id,
+                (SELECT d.nomor_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS nomor_dokumen,
+                (SELECT d.tanggal_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS tanggal_dokumen,
+                (SELECT d.jangka_waktu_bulan FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS jangka_waktu_bulan,
+                (SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS periode_mulai,
+                (SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS periode_selesai,
+                (SELECT d.nilai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS nilai,
+                (SELECT d.link_berkas FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS link_berkas,
                 (SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1) AS periode_mulai_terakhir,
                 (SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1) AS periode_selesai_terakhir,
                 (SELECT d.nomor_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1) AS nomor_dokumen_terakhir,
                 (SELECT d.nilai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1) AS nilai_terakhir,
                 (SELECT COUNT(*) FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id) AS jumlah_dokumen", false)
             ->join('pks_mitra', 'pks_mitra.id = pks_kerjasama.mitra_id');
+    }
+
+    private function detailPageData(int $id, bool $isEditMode): array
+    {
+        $record = $this->findRecord($id);
+        $documents = $this->dokumen->where('kerjasama_id', $id)->orderBy('urutan', 'ASC')->findAll();
+        $items = $this->item->where('kerjasama_id', $id)->orderBy('id', 'ASC')->findAll();
+        $latest = $documents === [] ? null : $documents[array_key_last($documents)];
+        $status = $this->statusFromDates($latest['periode_mulai'] ?? null, $latest['periode_selesai'] ?? null);
+        $addendumSequences = array_map(
+            static fn (array $document): int => (int) $document['urutan'],
+            array_values(array_filter($documents, static fn (array $document): bool => $document['jenis_dokumen'] === 'Addendum'))
+        );
+
+        return [
+            'title' => $isEditMode ? 'Kelola PKS Barang dan Jasa' : 'Detail PKS Barang dan Jasa',
+            'record' => $record,
+            'documents' => $documents,
+            'items' => $items,
+            'latest' => $latest,
+            'status' => $status,
+            'nextSequence' => $addendumSequences === [] ? 1 : (max($addendumSequences) + 1),
+            'isEditMode' => $isEditMode,
+        ];
     }
 
     private function decorateRows(array $rows): array
@@ -355,18 +407,44 @@ class PksBarangJasa extends BaseController
 
     private function documentPayload(int $id): array
     {
+        $documentDate = trim((string) $this->request->getPost('tanggal_dokumen'));
+        $durationMonths = (int) $this->request->getPost('jangka_waktu_bulan');
+        $cooperationValue = trim((string) $this->request->getPost('nilai'));
+
         return [
             'kerjasama_id' => $id,
             'jenis_dokumen' => trim((string) $this->request->getPost('jenis_dokumen')),
             'urutan' => (int) $this->request->getPost('urutan'),
             'nomor_dokumen' => trim((string) $this->request->getPost('nomor_dokumen')),
-            'tanggal_dokumen' => trim((string) $this->request->getPost('tanggal_dokumen')),
-            'periode_mulai' => trim((string) $this->request->getPost('periode_mulai')),
-            'periode_selesai' => trim((string) $this->request->getPost('periode_selesai')),
-            'nilai' => (float) $this->request->getPost('nilai'),
+            'tanggal_dokumen' => $documentDate,
+            'periode_mulai' => $documentDate,
+            'jangka_waktu_bulan' => $durationMonths,
+            'periode_selesai' => $this->periodEndFromMonths($documentDate, $durationMonths),
+            'nilai' => $cooperationValue,
             'link_berkas' => trim((string) $this->request->getPost('link_berkas')) ?: null,
-            'keterangan' => trim((string) $this->request->getPost('keterangan')) ?: null,
         ];
+    }
+
+    private function initialDocumentPayload(int $id): array
+    {
+        $data = $this->documentPayload($id);
+        $data['jenis_dokumen'] = 'PKS';
+        $data['urutan'] = 0;
+
+        return $data;
+    }
+
+    private function documentFormData(array $data): array
+    {
+        return array_intersect_key($data, array_flip([
+            'nomor_dokumen',
+            'tanggal_dokumen',
+            'jangka_waktu_bulan',
+            'periode_mulai',
+            'periode_selesai',
+            'nilai',
+            'link_berkas',
+        ]));
     }
 
     private function validateDocument(array $data, ?int $documentId = null): array
@@ -374,16 +452,27 @@ class PksBarangJasa extends BaseController
         $validation = service('validation');
         $validation->setRules([
             'jenis_dokumen' => 'required|in_list[PKS,Addendum]',
-            'urutan' => 'required|greater_than_equal_to[1]',
+            'urutan' => 'required|integer|greater_than_equal_to[0]',
             'nomor_dokumen' => 'required|max_length[200]',
             'tanggal_dokumen' => 'required|valid_date[Y-m-d]',
             'periode_mulai' => 'required|valid_date[Y-m-d]',
+            'jangka_waktu_bulan' => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[1200]',
             'periode_selesai' => 'required|valid_date[Y-m-d]',
             'nilai' => 'required|greater_than_equal_to[0]',
             'link_berkas' => 'permit_empty|max_length[2048]',
         ]);
         $validation->run($data);
         $errors = $validation->getErrors();
+        if ($data['jenis_dokumen'] === 'PKS' && (int) $data['urutan'] !== 0) {
+            $errors['urutan'] = 'Dokumen PKS harus menggunakan tahap Induk.';
+        }
+        if ($data['jenis_dokumen'] === 'Addendum' && (int) $data['urutan'] < 1) {
+            $errors['urutan'] = 'Tahap Addendum harus dimulai dari 1.';
+        }
+        if ($data['jenis_dokumen'] === 'Addendum'
+            && $this->dokumen->where('kerjasama_id', $data['kerjasama_id'])->where('jenis_dokumen', 'PKS')->first() === null) {
+            $errors['jenis_dokumen'] = 'Dokumen PKS induk harus tersedia sebelum menambahkan Addendum.';
+        }
         if ($data['periode_mulai'] !== '' && $data['periode_selesai'] !== '' && $data['periode_selesai'] < $data['periode_mulai']) {
             $errors['periode_selesai'] = 'Periode selesai tidak boleh lebih awal dari periode mulai.';
         }
@@ -397,7 +486,36 @@ class PksBarangJasa extends BaseController
         if ($duplicate->first() !== null) {
             $errors['urutan'] = 'Urutan dokumen sudah digunakan. Gunakan nomor tahap yang berbeda.';
         }
+        if ($data['jenis_dokumen'] === 'PKS') {
+            $existingParent = $this->dokumen->where('kerjasama_id', $data['kerjasama_id'])->where('jenis_dokumen', 'PKS');
+            if ($documentId !== null) {
+                $existingParent->where('id !=', $documentId);
+            }
+            if ($existingParent->first() !== null) {
+                $errors['jenis_dokumen'] = 'Setiap kerja sama hanya boleh memiliki satu dokumen PKS induk.';
+            }
+        }
         return $errors;
+    }
+
+    private function periodEndFromMonths(string $start, int $months): string
+    {
+        if ($months < 1 || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
+            return '';
+        }
+
+        $parts = array_map('intval', explode('-', $start));
+        if (count($parts) !== 3 || ! checkdate($parts[1], $parts[2], $parts[0])) {
+            return '';
+        }
+
+        [$year, $month, $day] = $parts;
+        $targetMonthIndex = ($year * 12) + ($month - 1) + $months;
+        $targetYear = intdiv($targetMonthIndex, 12);
+        $targetMonth = ($targetMonthIndex % 12) + 1;
+        $lastDay = (int) (new \DateTimeImmutable(sprintf('%04d-%02d-01', $targetYear, $targetMonth)))->format('t');
+
+        return sprintf('%04d-%02d-%02d', $targetYear, $targetMonth, min($day, $lastDay));
     }
 
     private function itemPayload(int $id): array
@@ -426,7 +544,7 @@ class PksBarangJasa extends BaseController
 
     private function detailError(int $id, array $errors, string $section): RedirectResponse
     {
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id) . '#' . ($section === 'item' ? 'item-pekerjaan' : 'riwayat-dokumen'))
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#' . ($section === 'item' ? 'item-pekerjaan' : 'riwayat-dokumen'))
             ->withInput()->with('errors', $errors)->with('pks_error_section', $section);
     }
 

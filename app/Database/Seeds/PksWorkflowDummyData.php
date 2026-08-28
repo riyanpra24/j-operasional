@@ -55,7 +55,7 @@ class PksWorkflowDummyData extends Seeder
                 ],
                 'documents' => [
                     [
-                        'jenis_dokumen' => 'PKS', 'urutan' => 1, 'nomor_dokumen' => '012/PKS/JKS-AT/VIII/2026',
+                        'jenis_dokumen' => 'PKS', 'urutan' => 0, 'nomor_dokumen' => '012/PKS/JKS-AT/VIII/2026',
                         'tanggal_dokumen' => $this->date($today, '+30 days'), 'periode_mulai' => $this->date($today, '+45 days'),
                         'periode_selesai' => $this->date($today, '+410 days'), 'nilai' => 185000000,
                         'link_berkas' => 'https://example.com/pks/pks-dummy-002', 'keterangan' => 'Dokumen telah ditandatangani; pelaksanaan dimulai sesuai periode kontrak.',
@@ -85,7 +85,7 @@ class PksWorkflowDummyData extends Seeder
                 ],
                 'documents' => [
                     [
-                        'jenis_dokumen' => 'PKS', 'urutan' => 1, 'nomor_dokumen' => '021/PKS/JKS-SBN/II/2026',
+                        'jenis_dokumen' => 'PKS', 'urutan' => 0, 'nomor_dokumen' => '021/PKS/JKS-SBN/II/2026',
                         'tanggal_dokumen' => $this->date($today, '-190 days'), 'periode_mulai' => $this->date($today, '-180 days'),
                         'periode_selesai' => $this->date($today, '+185 days'), 'nilai' => 468000000,
                         'link_berkas' => 'https://example.com/pks/pks-dummy-003', 'keterangan' => 'PKS induk jasa kebersihan gedung kantor.',
@@ -116,7 +116,7 @@ class PksWorkflowDummyData extends Seeder
                 ],
                 'documents' => [
                     [
-                        'jenis_dokumen' => 'PKS', 'urutan' => 1, 'nomor_dokumen' => '033/PKS/JKS-GPS/IX/2025',
+                        'jenis_dokumen' => 'PKS', 'urutan' => 0, 'nomor_dokumen' => '033/PKS/JKS-GPS/IX/2025',
                         'tanggal_dokumen' => $this->date($today, '-345 days'), 'periode_mulai' => $this->date($today, '-340 days'),
                         'periode_selesai' => $this->date($today, '+18 days'), 'nilai' => 720000000,
                         'link_berkas' => 'https://example.com/pks/pks-dummy-004', 'keterangan' => 'Perlu evaluasi dan keputusan perpanjangan sebelum masa berlaku selesai.',
@@ -146,7 +146,7 @@ class PksWorkflowDummyData extends Seeder
                 ],
                 'documents' => [
                     [
-                        'jenis_dokumen' => 'PKS', 'urutan' => 1, 'nomor_dokumen' => '047/PKS/JKS-TSA/VII/2025',
+                        'jenis_dokumen' => 'PKS', 'urutan' => 0, 'nomor_dokumen' => '047/PKS/JKS-TSA/VII/2025',
                         'tanggal_dokumen' => $this->date($today, '-420 days'), 'periode_mulai' => $this->date($today, '-410 days'),
                         'periode_selesai' => $this->date($today, '-45 days'), 'nilai' => 96000000,
                         'link_berkas' => 'https://example.com/pks/pks-dummy-005', 'keterangan' => 'Kontrak telah berakhir dan menunggu proses penutupan administrasi.',
@@ -176,13 +176,13 @@ class PksWorkflowDummyData extends Seeder
                 ],
                 'documents' => [
                     [
-                        'jenis_dokumen' => 'PKS', 'urutan' => 1, 'nomor_dokumen' => '058/PKS/JKS-LKD/I/2025',
+                        'jenis_dokumen' => 'PKS', 'urutan' => 0, 'nomor_dokumen' => '058/PKS/JKS-LKD/I/2025',
                         'tanggal_dokumen' => $this->date($today, '-590 days'), 'periode_mulai' => $this->date($today, '-570 days'),
                         'periode_selesai' => $this->date($today, '-205 days'), 'nilai' => 240000000,
                         'link_berkas' => 'https://example.com/pks/pks-dummy-006-induk', 'keterangan' => 'PKS induk layanan internet kantor.',
                     ],
                     [
-                        'jenis_dokumen' => 'Addendum', 'urutan' => 2, 'nomor_dokumen' => '058/ADD-01/JKS-LKD/I/2026',
+                        'jenis_dokumen' => 'Addendum', 'urutan' => 1, 'nomor_dokumen' => '058/ADD-01/JKS-LKD/I/2026',
                         'tanggal_dokumen' => $this->date($today, '-220 days'), 'periode_mulai' => $this->date($today, '-204 days'),
                         'periode_selesai' => $this->date($today, '+160 days'), 'nilai' => 264000000,
                         'link_berkas' => 'https://example.com/pks/pks-dummy-006-addendum', 'keterangan' => 'Perpanjangan masa berlaku dan penyesuaian nilai layanan.',
@@ -212,13 +212,13 @@ class PksWorkflowDummyData extends Seeder
                 ],
                 'documents' => [
                     [
-                        'jenis_dokumen' => 'PKS', 'urutan' => 1, 'nomor_dokumen' => '064/PKS/JKS-MKI/IX/2025',
+                        'jenis_dokumen' => 'PKS', 'urutan' => 0, 'nomor_dokumen' => '064/PKS/JKS-MKI/IX/2025',
                         'tanggal_dokumen' => $this->date($today, '-360 days'), 'periode_mulai' => $this->date($today, '-350 days'),
                         'periode_selesai' => $this->date($today, '-20 days'), 'nilai' => 540000000,
                         'link_berkas' => 'https://example.com/pks/pks-dummy-007-induk', 'keterangan' => 'PKS induk sewa kendaraan operasional.',
                     ],
                     [
-                        'jenis_dokumen' => 'Addendum', 'urutan' => 2, 'nomor_dokumen' => '064/ADD-01/JKS-MKI/VIII/2026',
+                        'jenis_dokumen' => 'Addendum', 'urutan' => 1, 'nomor_dokumen' => '064/ADD-01/JKS-MKI/VIII/2026',
                         'tanggal_dokumen' => $this->date($today, '-30 days'), 'periode_mulai' => $this->date($today, '-19 days'),
                         'periode_selesai' => $this->date($today, '+14 days'), 'nilai' => 585000000,
                         'link_berkas' => 'https://example.com/pks/pks-dummy-007-addendum', 'keterangan' => 'Perpanjangan sementara sambil menunggu proses pengadaan berikutnya.',
@@ -257,6 +257,10 @@ class PksWorkflowDummyData extends Seeder
             }
 
             foreach ($record['documents'] as $document) {
+                $document['jangka_waktu_bulan'] = $this->monthsBetween(
+                    $document['periode_mulai'],
+                    $document['periode_selesai']
+                );
                 $existingDocument = $this->db->table('pks_dokumen_kerjasama')
                     ->where('kerjasama_id', $cooperationId)
                     ->where('urutan', $document['urutan'])
@@ -303,5 +307,11 @@ class PksWorkflowDummyData extends Seeder
     private function date(DateTimeImmutable $today, string $modifier): string
     {
         return $today->modify($modifier)->format('Y-m-d');
+    }
+
+    private function monthsBetween(string $start, string $end): int
+    {
+        $interval = (new DateTimeImmutable($start))->diff(new DateTimeImmutable($end));
+        return max(1, ($interval->y * 12) + $interval->m);
     }
 }

@@ -12,7 +12,6 @@ $summaryCards = [
     'aktif' => ['label' => 'Aktif', 'icon' => '✓', 'class' => 'active', 'count' => $summary['aktif']],
     'segera' => ['label' => 'Segera Berakhir', 'icon' => '!', 'class' => 'warning', 'count' => $summary['segera']],
     'berakhir' => ['label' => 'Berakhir', 'icon' => '×', 'class' => 'expired', 'count' => $summary['berakhir']],
-    'belum' => ['label' => 'Belum Lengkap', 'icon' => '…', 'class' => 'neutral', 'count' => $summary['belum']],
 ];
 ?>
 
@@ -73,9 +72,8 @@ $summaryCards = [
                         <td><strong><?= $formatMoney($record['nilai_terakhir']) ?></strong></td>
                         <td><span class="pks-status <?= esc($record['status_class']) ?>"><?= esc($record['status_label']) ?></span></td>
                         <td><div class="action-buttons">
-                            <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']) ?>" title="Lihat detail" aria-label="Lihat detail">⌕</a>
-                            <?php $editData = array_intersect_key($record, array_flip(['id','kode_internal','nama_kerjasama','unit_pengelola','pic_internal','nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email'])); ?>
-                            <button type="button" class="icon-btn" data-pks-edit='<?= esc(json_encode($editData), 'attr') ?>' title="Ubah" aria-label="Ubah PKS">✎</button>
+                            <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']) ?>" data-pks-view data-pks-popup-url="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id'] . '?popup=1') ?>" title="Lihat detail" aria-label="Lihat detail">⌕</a>
+                            <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id'] . '/ubah') ?>" title="Edit dan kelola" aria-label="Edit dan kelola PKS">✎</a>
                         </div></td>
                     </tr>
                 <?php endforeach ?>
@@ -111,7 +109,9 @@ $summaryCards = [
                     <i aria-hidden="true"></i>
                     <button type="button" data-pks-step-indicator="2"><span>02</span><div><strong>Data Mitra</strong><small>Penyedia barang/jasa</small></div></button>
                     <i aria-hidden="true"></i>
-                    <button type="button" data-pks-step-indicator="3"><span>03</span><div><strong>Konfirmasi</strong><small>Periksa sebelum simpan</small></div></button>
+                    <button type="button" data-pks-step-indicator="3"><span>03</span><div><strong>Dokumen PKS</strong><small>Dokumen induk kerja sama</small></div></button>
+                    <i aria-hidden="true"></i>
+                    <button type="button" data-pks-step-indicator="4"><span>04</span><div><strong>Konfirmasi</strong><small>Periksa sebelum simpan</small></div></button>
                 </div>
 
                 <section class="pks-wizard-panel" data-pks-step-panel="1">
@@ -137,7 +137,22 @@ $summaryCards = [
                 </section>
 
                 <section class="pks-wizard-panel" data-pks-step-panel="3" hidden>
-                    <div class="modal-section-heading"><span>03</span><div><strong>Konfirmasi Data</strong><small>Pastikan data berikut sudah sesuai sebelum disimpan</small></div></div>
+                    <div class="modal-section-heading"><span>03</span><div><strong>Dokumen PKS Induk</strong><small>Dokumen pertama yang menjadi dasar nilai dan masa berlaku PKS</small></div></div>
+                    <div class="modal-form-grid pks-popup-grid">
+                        <div class="form-group"><label>Jenis Dokumen</label><input value="PKS" readonly aria-readonly="true"><small>Dikunci sebagai dokumen PKS.</small></div>
+                        <div class="form-group"><label>Urutan / Tahap</label><input value="Induk" readonly aria-readonly="true"><small>Dokumen PKS selalu menjadi induk.</small></div>
+                        <div class="form-group modal-span-2"><label for="popupNomorDokumen">Nomor Dokumen PKS <span class="required">*</span></label><input id="popupNomorDokumen" name="nomor_dokumen" maxlength="200" placeholder="Contoh: 05/PKS/SBY/V.6/IV/2026" required><small>Disimpan sebagai dokumen PKS induk.</small></div>
+                        <div class="form-group"><label for="popupTanggalDokumen">Tanggal Dokumen <span class="required">*</span></label><input id="popupTanggalDokumen" name="tanggal_dokumen" type="date" required></div>
+                        <div class="form-group"><label for="popupNilaiKerjasama">Nilai Kerja Sama <span class="required">*</span></label><input id="popupNilaiKerjasama" name="nilai" type="number" min="0" step="0.01" placeholder="0" required></div>
+                        <div class="form-group"><label for="popupPeriodeMulai">Periode Mulai</label><input id="popupPeriodeMulai" name="periode_mulai" type="date" readonly aria-readonly="true"><small>Mengikuti Tanggal Dokumen secara otomatis.</small></div>
+                        <div class="form-group"><label for="popupJangkaWaktu">Jangka Waktu <span class="required">*</span></label><div class="input-with-suffix"><input id="popupJangkaWaktu" name="jangka_waktu_bulan" type="number" min="1" max="1200" step="1" placeholder="12" required><span>bulan</span></div></div>
+                        <div class="form-group"><label for="popupPeriodeSelesai">Periode Selesai</label><input id="popupPeriodeSelesai" name="periode_selesai" type="date" readonly aria-readonly="true"><small>Dihitung otomatis dari periode mulai dan jangka waktu.</small></div>
+                        <div class="form-group modal-span-2"><label for="popupLinkBerkas">Link Berkas</label><input id="popupLinkBerkas" name="link_berkas" type="url" maxlength="2048" placeholder="https://drive.google.com/... atau tautan dokumen lainnya"><small>Opsional. Gunakan link http/https yang dapat diakses sesuai kewenangan.</small></div>
+                    </div>
+                </section>
+
+                <section class="pks-wizard-panel" data-pks-step-panel="4" hidden>
+                    <div class="modal-section-heading"><span>04</span><div><strong>Konfirmasi Data</strong><small>Pastikan data berikut sudah sesuai sebelum disimpan</small></div></div>
                     <div class="pks-review-card">
                         <div><small>Nomor PKS</small><strong data-pks-review="kode_internal">-</strong></div>
                         <div><small>Unit Pengelola</small><strong data-pks-review="unit_pengelola">-</strong></div>
@@ -146,12 +161,34 @@ $summaryCards = [
                         <div><small>Nama Mitra</small><strong data-pks-review="nama_mitra">-</strong></div>
                         <div><small>Kontak Mitra</small><strong data-pks-review="kontak_mitra">-</strong></div>
                         <div><small>Telepon / Email</small><strong data-pks-review="komunikasi_mitra">-</strong></div>
+                        <div><small>Jenis Dokumen</small><strong>PKS</strong></div>
+                        <div><small>Urutan / Tahap</small><strong>Induk</strong></div>
+                        <div class="wide"><small>Nomor Dokumen Induk</small><strong data-pks-review="nomor_dokumen">-</strong></div>
+                        <div><small>Tanggal Dokumen</small><strong data-pks-review="tanggal_dokumen">-</strong></div>
+                        <div><small>Jangka Waktu</small><strong data-pks-review="jangka_waktu_bulan">-</strong></div>
+                        <div><small>Periode PKS</small><strong data-pks-review="periode_pks">-</strong></div>
+                        <div><small>Nilai Kerja Sama</small><strong data-pks-review="nilai">-</strong></div>
+                        <div class="wide"><small>Link Berkas</small><strong data-pks-review="link_berkas">-</strong></div>
                     </div>
-                    <div class="pks-review-note"><span>i</span><p>Setelah data utama disimpan, Anda akan diarahkan ke halaman detail untuk menambahkan dokumen PKS, addendum, link berkas, serta item barang dan jasa.</p></div>
+                    <div class="pks-review-note"><span>i</span><p>Dokumen pada tahap 03 akan disimpan sebagai dokumen induk. Tanggal, nilai, masa berlaku, dan status awal PKS dihitung dari dokumen ini.</p></div>
                 </section>
             </div>
             <footer class="modal-footer"><button type="button" class="btn btn-ghost" data-pks-modal-close>Batal</button><button type="button" class="btn btn-secondary" data-pks-step-back hidden>← Kembali</button><button type="button" class="btn btn-primary" data-pks-step-next>Selanjutnya →</button><button type="submit" class="btn btn-primary" data-pks-modal-submit hidden>Simpan & Lanjutkan</button></footer>
         </form>
+    </section>
+</div>
+
+<div class="pks-main-modal pks-detail-popup" id="pksDetailPopup" hidden aria-hidden="true">
+    <button type="button" class="modal-backdrop" data-pks-detail-close aria-label="Tutup detail PKS"></button>
+    <section class="modal-dialog pks-detail-popup-dialog" role="dialog" aria-modal="true" aria-labelledby="pksDetailPopupTitle">
+        <header class="modal-header">
+            <div class="modal-title-group"><span class="modal-title-icon pks-modal-icon">▤</span><div><p>BAGIAN UMUM 1</p><h2 id="pksDetailPopupTitle">Detail PKS Barang dan Jasa</h2></div></div>
+            <button type="button" class="modal-close" data-pks-detail-close aria-label="Tutup">×</button>
+        </header>
+        <div class="modal-body pks-detail-popup-body" data-pks-detail-content>
+            <div class="pks-popup-loading"><span></span><p>Memuat detail PKS...</p></div>
+        </div>
+        <footer class="modal-footer"><button type="button" class="btn btn-ghost" data-pks-detail-close>Tutup</button><button type="button" class="btn btn-secondary" data-pks-detail-back hidden>← Kembali</button><button type="button" class="btn btn-primary" data-pks-detail-next hidden>Selanjutnya →</button></footer>
     </section>
 </div>
 
@@ -165,11 +202,37 @@ $summaryCards = [
     const nextButton = modal.querySelector('[data-pks-step-next]');
     const submitButton = modal.querySelector('[data-pks-modal-submit]');
     const baseUrl = <?= json_encode(site_url('bagian-umum-1/pks-barang-jasa')) ?>;
-    const fieldNames = ['kode_internal','nama_kerjasama','unit_pengelola','pic_internal','nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email'];
+    const fieldNames = ['kode_internal','nama_kerjasama','unit_pengelola','pic_internal','nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email','nomor_dokumen','tanggal_dokumen','jangka_waktu_bulan','periode_mulai','periode_selesai','nilai','link_berkas'];
     const unitField = form.elements.unit_pengelola;
     const picField = form.elements.pic_internal;
+    const documentDateField = form.elements.tanggal_dokumen;
+    const durationField = form.elements.jangka_waktu_bulan;
+    const periodStartField = form.elements.periode_mulai;
+    const periodEndField = form.elements.periode_selesai;
     const picByUnit = { 'Bagian Umum 1': 'Angger Wicaksono', 'Bagian Umum 2': 'Agil Halis Kesawa' };
     const syncPicInternal = () => { picField.value = picByUnit[unitField.value] ?? ''; };
+    const addMonthsClamped = (dateValue, monthsValue) => {
+        const match = String(dateValue || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        const months = Number.parseInt(monthsValue, 10);
+        if (!match || !Number.isInteger(months) || months < 1) return '';
+        const sourceYear = Number(match[1]);
+        const sourceMonth = Number(match[2]);
+        const sourceDay = Number(match[3]);
+        const targetIndex = (sourceYear * 12) + sourceMonth - 1 + months;
+        const targetYear = Math.floor(targetIndex / 12);
+        const targetMonth = (targetIndex % 12) + 1;
+        const lastDay = new Date(Date.UTC(targetYear, targetMonth, 0)).getUTCDate();
+        return `${String(targetYear).padStart(4, '0')}-${String(targetMonth).padStart(2, '0')}-${String(Math.min(sourceDay, lastDay)).padStart(2, '0')}`;
+    };
+    const syncDocumentPeriod = () => {
+        periodStartField.value = documentDateField.value;
+        periodEndField.value = addMonthsClamped(documentDateField.value, durationField.value);
+    };
+    const readableDate = value => {
+        const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        return match ? `${match[3]}-${match[2]}-${match[1]}` : '';
+    };
+    const rupiah = value => value === '' ? '' : `Rp ${Number(value).toLocaleString('id-ID', { maximumFractionDigits: 2 })}`;
     let currentStep = 1;
     const updateReview = () => {
         const value = name => String(form.elements[name]?.value ?? '').trim();
@@ -178,17 +241,21 @@ $summaryCards = [
             pic_internal: value('pic_internal'), nama_mitra: value('nama_mitra'),
             kontak_mitra: [value('nama_kontak'), value('jabatan_kontak')].filter(Boolean).join(' · '),
             komunikasi_mitra: [value('telepon'), value('email')].filter(Boolean).join(' · '),
+            nomor_dokumen: value('nomor_dokumen'), tanggal_dokumen: readableDate(value('tanggal_dokumen')),
+            jangka_waktu_bulan: value('jangka_waktu_bulan') ? `${value('jangka_waktu_bulan')} bulan` : '',
+            periode_pks: [readableDate(value('periode_mulai')), readableDate(value('periode_selesai'))].filter(Boolean).join(' s.d. '),
+            nilai: rupiah(value('nilai')), link_berkas: value('link_berkas'),
         };
         Object.entries(review).forEach(([name, content]) => { const target = modal.querySelector(`[data-pks-review="${name}"]`); if (target) target.textContent = content || '-'; });
     };
     const goToStep = step => {
-        currentStep = Math.max(1, Math.min(3, step));
+        currentStep = Math.max(1, Math.min(4, step));
         panels.forEach(panel => { panel.hidden = Number(panel.dataset.pksStepPanel) !== currentStep; });
         indicators.forEach(indicator => { const number = Number(indicator.dataset.pksStepIndicator); indicator.classList.toggle('active', number === currentStep); indicator.classList.toggle('complete', number < currentStep); });
         backButton.hidden = currentStep === 1;
-        nextButton.hidden = currentStep === 3;
-        submitButton.hidden = currentStep !== 3;
-        if (currentStep === 3) updateReview();
+        nextButton.hidden = currentStep === 4;
+        submitButton.hidden = currentStep !== 4;
+        if (currentStep === 4) updateReview();
         modal.querySelector('.modal-body').scrollTop = 0;
     };
     const validateCurrentStep = () => {
@@ -204,6 +271,7 @@ $summaryCards = [
         form.action = id ? `${baseUrl}/${id}` : baseUrl;
         fieldNames.forEach(name => { form.elements[name].value = data[name] ?? ''; });
         syncPicInternal();
+        syncDocumentPeriod();
         modal.querySelector('[data-pks-modal-title]').textContent = id ? 'Ubah PKS Barang dan Jasa' : 'Tambah PKS Barang dan Jasa';
         modal.querySelector('[data-pks-modal-icon]').textContent = id ? '✎' : '＋';
         submitButton.textContent = id ? 'Simpan Perubahan' : 'Simpan & Lanjutkan';
@@ -213,6 +281,9 @@ $summaryCards = [
     document.querySelectorAll('[data-pks-create]').forEach(button => button.addEventListener('click', () => prepare()));
     document.querySelectorAll('[data-pks-edit]').forEach(button => button.addEventListener('click', () => { const data = JSON.parse(button.dataset.pksEdit); prepare(data, data.id); }));
     unitField.addEventListener('change', syncPicInternal);
+    documentDateField.addEventListener('change', syncDocumentPeriod);
+    documentDateField.addEventListener('input', syncDocumentPeriod);
+    durationField.addEventListener('input', syncDocumentPeriod);
     document.querySelectorAll('[data-pks-modal-close]').forEach(button => button.addEventListener('click', close));
     nextButton.addEventListener('click', () => { if (validateCurrentStep()) goToStep(currentStep + 1); });
     backButton.addEventListener('click', () => goToStep(currentStep - 1));
@@ -221,9 +292,88 @@ $summaryCards = [
     const failedMode = <?= json_encode($popupMode) ?>;
     const failedData = <?= json_encode($popupData, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     const failedEditId = <?= json_encode($popupEditId) ?>;
-    const failedStep = <?= json_encode(array_intersect(array_keys($popupErrors), ['nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email']) !== [] ? 2 : 1) ?>;
+    const failedStep = <?= json_encode(
+        array_intersect(array_keys($popupErrors), ['nomor_dokumen','tanggal_dokumen','jangka_waktu_bulan','periode_mulai','periode_selesai','nilai','link_berkas','jenis_dokumen','urutan']) !== []
+            ? 3
+            : (array_intersect(array_keys($popupErrors), ['nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email']) !== [] ? 2 : 1)
+    ) ?>;
     if (failedMode === 'create') { prepare(failedData); goToStep(failedStep); }
     if (failedMode === 'edit' && failedEditId) { prepare(failedData, failedEditId); goToStep(failedStep); }
+})();
+</script>
+<script>
+(() => {
+    const modal = document.getElementById('pksDetailPopup');
+    const content = modal.querySelector('[data-pks-detail-content]');
+    const backButton = modal.querySelector('[data-pks-detail-back]');
+    const nextButton = modal.querySelector('[data-pks-detail-next]');
+    let requestController = null;
+    let currentStep = 1;
+    const loading = '<div class="pks-popup-loading"><span></span><p>Memuat detail PKS...</p></div>';
+    const open = () => {
+        modal.hidden = false;
+        modal.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => modal.classList.add('open'));
+        document.body.classList.add('modal-open');
+    };
+    const close = () => {
+        requestController?.abort();
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+            modal.hidden = true;
+            content.innerHTML = loading;
+            backButton.hidden = true;
+            nextButton.hidden = true;
+            document.body.classList.remove('modal-open');
+        }, 180);
+    };
+    const initializeSteps = () => {
+        const panels = [...content.querySelectorAll('[data-pks-detail-step-panel]')];
+        const indicators = [...content.querySelectorAll('[data-pks-detail-step-indicator]')];
+        if (!panels.length) return;
+        const render = step => {
+            currentStep = Math.max(1, Math.min(panels.length, step));
+            panels.forEach(panel => { panel.hidden = Number(panel.dataset.pksDetailStepPanel) !== currentStep; });
+            indicators.forEach(indicator => {
+                const number = Number(indicator.dataset.pksDetailStepIndicator);
+                indicator.classList.toggle('active', number === currentStep);
+                indicator.classList.toggle('complete', number < currentStep);
+            });
+            backButton.hidden = currentStep === 1;
+            nextButton.hidden = currentStep === panels.length;
+            content.scrollTop = 0;
+        };
+        indicators.forEach(indicator => indicator.addEventListener('click', () => render(Number(indicator.dataset.pksDetailStepIndicator))));
+        backButton.onclick = () => render(currentStep - 1);
+        nextButton.onclick = () => render(currentStep + 1);
+        render(1);
+    };
+    document.querySelectorAll('[data-pks-view]').forEach(link => link.addEventListener('click', async event => {
+        event.preventDefault();
+        requestController?.abort();
+        requestController = new AbortController();
+        content.innerHTML = loading;
+        backButton.hidden = true;
+        nextButton.hidden = true;
+        open();
+        try {
+            const response = await fetch(link.dataset.pksPopupUrl, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                signal: requestController.signal,
+            });
+            if (!response.ok) throw new Error('Detail tidak dapat dimuat.');
+            content.innerHTML = await response.text();
+            initializeSteps();
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            backButton.hidden = true;
+            nextButton.hidden = true;
+            content.innerHTML = `<div class="empty-state"><span>!</span><strong>Detail tidak dapat dimuat</strong><p>Silakan coba kembali atau buka halaman detail.</p><a class="btn btn-secondary" href="${link.href}">Buka halaman detail</a></div>`;
+        }
+    }));
+    modal.querySelectorAll('[data-pks-detail-close]').forEach(button => button.addEventListener('click', close));
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !modal.hidden) close(); });
 })();
 </script>
 <?= $this->endSection() ?>
