@@ -2,6 +2,8 @@
 $prefix = $prefix ?? 'dokumen';
 $current = trim((string) ($current ?? ''));
 $groupClass = trim((string) ($groupClass ?? ''));
+$label = trim((string) ($label ?? 'Ekspedisi'));
+$required = (bool) ($required ?? false);
 $options = [
     'J&T Express',
     'JNE',
@@ -15,8 +17,8 @@ $options = [
 $choice = $current === '' ? '' : (in_array($current, $options, true) ? $current : 'Lainnya');
 ?>
 <div class="form-group <?= esc($groupClass, 'attr') ?>">
-    <label for="<?= esc($prefix, 'attr') ?>_ekspedisi_pilihan">Ekspedisi</label>
-    <select id="<?= esc($prefix, 'attr') ?>_ekspedisi_pilihan" name="ekspedisi_pilihan" data-ekspedisi-select>
+    <label for="<?= esc($prefix, 'attr') ?>_ekspedisi_pilihan"><?= esc($label) ?><?= $required ? ' <span class="required">*</span>' : '' ?></label>
+    <select id="<?= esc($prefix, 'attr') ?>_ekspedisi_pilihan" name="ekspedisi_pilihan" data-ekspedisi-select <?= $required ? 'required' : '' ?>>
         <option value="">Pilih ekspedisi</option>
         <?php foreach ($options as $option): ?>
             <option value="<?= esc($option, 'attr') ?>" <?= $choice === $option ? 'selected' : '' ?>><?= esc($option) ?></option>

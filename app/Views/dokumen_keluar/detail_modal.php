@@ -9,6 +9,7 @@
                 <div class="modal-section-heading agendaris-detail-section-heading"><span>01</span><div><strong id="outgoingDetailInformationHeading">Informasi Surat Keluar</strong><small>Identitas dan tujuan dokumen</small></div></div>
                 <dl class="agendaris-detail-grid">
                     <div><dt>Nomor Surat</dt><dd data-dokumen-keluar-field="nomor_surat"></dd></div><div><dt>Jenis Dokumen</dt><dd data-dokumen-keluar-field="jenis_surat"></dd></div>
+                    <div><dt>Jumlah Dokumen</dt><dd data-dokumen-keluar-field="jumlah_dokumen"></dd></div><div><dt>Nama Ekspedisi</dt><dd data-dokumen-keluar-field="nama_ekspedisi"></dd></div>
                     <div><dt>Pemohon</dt><dd data-dokumen-keluar-field="pemohon"></dd></div><div><dt>Pelaksana</dt><dd data-dokumen-keluar-field="pelaksana"></dd></div>
                     <div class="span-2"><dt>UP</dt><dd data-dokumen-keluar-field="up"></dd></div>
                     <div class="span-2"><dt>Alamat Penerima</dt><dd data-dokumen-keluar-field="alamat_penerima"></dd></div>
@@ -37,6 +38,7 @@
             <?php else: ?>
             <dl class="agendaris-detail-grid">
                 <div><dt>Jenis Dokumen</dt><dd data-dokumen-keluar-field="jenis_surat"></dd></div>
+                <div><dt>Jumlah Dokumen</dt><dd data-dokumen-keluar-field="jumlah_dokumen"></dd></div><div><dt>Nama Ekspedisi</dt><dd data-dokumen-keluar-field="nama_ekspedisi"></dd></div>
                 <div><dt>Pemohon</dt><dd data-dokumen-keluar-field="pemohon"></dd></div><div><dt>Pelaksana</dt><dd data-dokumen-keluar-field="pelaksana"></dd></div>
                 <div class="span-2"><dt>UP</dt><dd data-dokumen-keluar-field="up"></dd></div>
                 <div class="span-2"><dt>Tanggal Pengiriman</dt><dd data-dokumen-keluar-field="tanggal_pengiriman"></dd></div>

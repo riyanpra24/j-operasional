@@ -133,6 +133,7 @@ class ProgresDokumen extends BaseController
                 ->orLike('pemohon', $keyword)
                 ->orLike('pelaksana', $keyword)
                 ->orLike('up', $keyword)
+                ->orLike('nama_ekspedisi', $keyword)
                 ->orLike('nomor_resi', $keyword)
                 ->orLike('penerima', $keyword)
                 ->orLike('security', $keyword)
@@ -207,6 +208,10 @@ class ProgresDokumen extends BaseController
                 'id'                         => (int) $dokumen['id'],
                 'nomor_surat'                => $dokumen['nomor_surat'],
                 'jenis_surat'                => $dokumen['jenis_surat'],
+                'jumlah_dokumen'             => ($dokumen['jumlah_dokumen'] ?? null) ?: '-',
+                'jumlah_dokumen_value'       => ($dokumen['jumlah_dokumen'] ?? null) ?: '',
+                'nama_ekspedisi'             => ($dokumen['nama_ekspedisi'] ?? null) ?: '-',
+                'nama_ekspedisi_value'       => ($dokumen['nama_ekspedisi'] ?? null) ?: '',
                 'pemohon'                    => $dokumen['pemohon'] ?: '-',
                 'pemohon_value'              => $dokumen['pemohon'] ?: '',
                 'pelaksana'                  => $dokumen['pelaksana'] ?: '-',
@@ -288,9 +293,17 @@ class ProgresDokumen extends BaseController
 
     private function payload(): array
     {
+        $ekspedisiPilihan = trim((string) $this->request->getPost('ekspedisi_pilihan'));
+        $namaEkspedisi = match ($ekspedisiPilihan) {
+            'Lainnya' => trim((string) $this->request->getPost('ekspedisi_lainnya')),
+            default => $ekspedisiPilihan,
+        };
+
         return [
             'nomor_surat'        => trim((string) $this->request->getPost('nomor_surat')),
             'jenis_surat'        => trim((string) $this->request->getPost('jenis_surat')),
+            'jumlah_dokumen'     => trim((string) $this->request->getPost('jumlah_dokumen')),
+            'nama_ekspedisi'     => $namaEkspedisi,
             'pemohon'            => $this->nullIfEmpty($this->request->getPost('pemohon')),
             'pelaksana'          => $this->nullIfEmpty($this->request->getPost('pelaksana')),
             'up'                 => $this->nullIfEmpty($this->request->getPost('up')),
@@ -317,6 +330,8 @@ class ProgresDokumen extends BaseController
         $validation = service('validation')->setRules([
             'nomor_surat'        => 'required|max_length[150]',
             'jenis_surat'        => 'required|max_length[100]',
+            'jumlah_dokumen'     => 'required|max_length[100]',
+            'nama_ekspedisi'     => 'required|max_length[150]',
             'pemohon'            => 'permit_empty|max_length[255]',
             'pelaksana'          => 'permit_empty|max_length[255]',
             'up'                 => 'permit_empty|max_length[255]',

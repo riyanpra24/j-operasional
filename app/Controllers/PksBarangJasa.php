@@ -11,6 +11,8 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class PksBarangJasa extends BaseController
 {
+    private const EXPIRY_WARNING_DAYS = 20;
+
     private PksKerjasamaModel $kerjasama;
     private PksMitraModel $mitra;
     private PksDokumenModel $dokumen;
@@ -27,7 +29,12 @@ class PksBarangJasa extends BaseController
     public function index(): string
     {
         $keyword = trim((string) $this->request->getGet('q'));
+        $status = trim((string) $this->request->getGet('status'));
         $perPage = (int) $this->request->getGet('per_page');
+
+        if (! in_array($status, ['aktif', 'segera', 'berakhir', 'belum'], true)) {
+            $status = '';
+        }
 
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
@@ -48,12 +55,13 @@ class PksBarangJasa extends BaseController
                 ->orLike('pks_kerjasama.unit_pengelola', $keyword)
                 ->groupEnd();
         }
+        $this->applyStatusFilter($query, $status);
 
         return view('pks/index', [
             'title' => 'PKS Barang dan Jasa',
             'records' => $this->decorateRows($query->orderBy('pks_kerjasama.updated_at', 'DESC')->paginate($perPage, 'pks')),
             'pager' => $this->kerjasama->pager,
-            'filters' => compact('keyword', 'perPage'),
+            'filters' => compact('keyword', 'status', 'perPage'),
             'summary' => $summary,
         ]);
     }
@@ -253,6 +261,26 @@ class PksBarangJasa extends BaseController
         return $rows;
     }
 
+    private function applyStatusFilter(PksKerjasamaModel $query, string $status): void
+    {
+        if ($status === '') {
+            return;
+        }
+
+        $latestStart = '(SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1)';
+        $latestEnd = '(SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1)';
+        $warningDays = self::EXPIRY_WARNING_DAYS;
+
+        $conditions = [
+            'aktif' => "$latestStart <= CURRENT_DATE() AND $latestEnd >= CURRENT_DATE() AND DATEDIFF($latestEnd, CURRENT_DATE()) > $warningDays",
+            'segera' => "$latestStart <= CURRENT_DATE() AND $latestEnd >= CURRENT_DATE() AND DATEDIFF($latestEnd, CURRENT_DATE()) <= $warningDays",
+            'berakhir' => "$latestEnd < CURRENT_DATE()",
+            'belum' => "($latestStart IS NULL OR $latestEnd IS NULL OR $latestStart > CURRENT_DATE())",
+        ];
+
+        $query->where($conditions[$status], null, false);
+    }
+
     private function statusFromDates(?string $start, ?string $end): array
     {
         if (! $start || ! $end) {
@@ -268,7 +296,7 @@ class PksBarangJasa extends BaseController
         if ($today > $endDate) {
             return ['status_key' => 'berakhir', 'status_label' => 'Berakhir', 'status_class' => 'expired'];
         }
-        if ((int) $today->diff($endDate)->format('%a') <= 30) {
+        if ((int) $today->diff($endDate)->format('%a') <= self::EXPIRY_WARNING_DAYS) {
             return ['status_key' => 'segera', 'status_label' => 'Segera berakhir', 'status_class' => 'warning'];
         }
         return ['status_key' => 'aktif', 'status_label' => 'Aktif', 'status_class' => 'active'];
@@ -276,11 +304,16 @@ class PksBarangJasa extends BaseController
 
     private function mainPayload(): array
     {
-        $fields = ['kode_internal', 'nama_kerjasama', 'unit_pengelola', 'pic_internal', 'ruang_lingkup', 'keterangan', 'nama_mitra', 'alamat', 'nama_kontak', 'jabatan_kontak', 'telepon', 'email'];
+        $fields = ['kode_internal', 'nama_kerjasama', 'unit_pengelola', 'pic_internal', 'nama_mitra', 'alamat', 'nama_kontak', 'jabatan_kontak', 'telepon', 'email'];
         $data = [];
         foreach ($fields as $field) {
             $data[$field] = trim((string) $this->request->getPost($field));
         }
+        $data['pic_internal'] = match ($data['unit_pengelola']) {
+            'Bagian Umum 1' => 'Angger Wicaksono',
+            'Bagian Umum 2' => 'Agil Halis Kesawa',
+            default => '',
+        };
         return $data;
     }
 
@@ -290,8 +323,8 @@ class PksBarangJasa extends BaseController
         $validation->setRules([
             'kode_internal' => 'required|max_length[80]',
             'nama_kerjasama' => 'required|max_length[250]',
-            'unit_pengelola' => 'permit_empty|max_length[150]',
-            'pic_internal' => 'permit_empty|max_length[150]',
+            'unit_pengelola' => 'permit_empty|in_list[Bagian Umum 1,Bagian Umum 2]',
+            'pic_internal' => 'permit_empty|in_list[Angger Wicaksono,Agil Halis Kesawa]',
             'nama_mitra' => 'required|max_length[200]',
             'nama_kontak' => 'permit_empty|max_length[150]',
             'jabatan_kontak' => 'permit_empty|max_length[150]',
@@ -305,7 +338,7 @@ class PksBarangJasa extends BaseController
             $duplicate->where('id !=', $id);
         }
         if ($data['kode_internal'] !== '' && $duplicate->first() !== null) {
-            $errors['kode_internal'] = 'Kode internal sudah digunakan pada PKS lain.';
+            $errors['kode_internal'] = 'Nomor PKS sudah digunakan pada PKS lain.';
         }
         return $errors;
     }
@@ -317,7 +350,7 @@ class PksBarangJasa extends BaseController
 
     private function kerjasamaData(array $data, int $mitraId): array
     {
-        return ['mitra_id' => $mitraId] + array_intersect_key($data, array_flip(['kode_internal', 'nama_kerjasama', 'unit_pengelola', 'pic_internal', 'ruang_lingkup', 'keterangan']));
+        return ['mitra_id' => $mitraId] + array_intersect_key($data, array_flip(['kode_internal', 'nama_kerjasama', 'unit_pengelola', 'pic_internal']));
     }
 
     private function documentPayload(int $id): array

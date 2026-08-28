@@ -58,6 +58,7 @@ class DistribusiDokumen extends BaseController
             $outgoing->groupStart()
                 ->like('dokumen_keluar.nomor_surat', $keyword)
                 ->orLike('dokumen_keluar.jenis_surat', $keyword)
+                ->orLike('dokumen_keluar.nama_ekspedisi', $keyword)
                 ->orLike('dokumen_keluar.pemohon', $keyword)
                 ->orLike('dokumen_keluar.pelaksana', $keyword)
                 ->orLike('dokumen_keluar.up', $keyword)
@@ -94,6 +95,8 @@ class DistribusiDokumen extends BaseController
             'dokumen' => [
                 'nomor_surat'              => $dokumen['nomor_surat'],
                 'jenis_surat'              => $dokumen['jenis_surat'],
+                'jumlah_dokumen'           => ($dokumen['jumlah_dokumen'] ?? null) ?: '-',
+                'nama_ekspedisi'           => ($dokumen['nama_ekspedisi'] ?? null) ?: '-',
                 'pemohon'                  => $dokumen['pemohon'] ?: '-',
                 'pelaksana'                => $dokumen['pelaksana'] ?: '-',
                 'up'                       => $dokumen['up'] ?: '-',

@@ -6,6 +6,11 @@ $value = static function (string $field, ?array $record): string {
     return $oldValue !== null ? (string) $oldValue : (string) ($record[$field] ?? '');
 };
 $isEdit = $record !== null;
+$picForUnit = static fn (string $unit): string => match ($unit) {
+    'Bagian Umum 1' => 'Angger Wicaksono',
+    'Bagian Umum 2' => 'Agil Halis Kesawa',
+    default => '',
+};
 ?>
 
 <section class="page-heading pks-form-heading">
@@ -20,12 +25,10 @@ $isEdit = $record !== null;
     <section class="panel form-section">
         <div class="section-heading"><span class="section-number">01</span><div><h2>Identitas Kerja Sama</h2><p>Informasi ringkas untuk mengenali dan mencari PKS.</p></div></div>
         <div class="form-grid">
-            <div class="form-group"><label for="kodeInternal">Kode Internal <span class="required">*</span></label><input id="kodeInternal" name="kode_internal" maxlength="80" value="<?= esc($value('kode_internal', $record)) ?>" placeholder="Contoh: PKS/BJ/2026/001" required><small>Kode unik internal, bukan nomor dokumen PKS.</small></div>
-            <div class="form-group"><label for="unitPengelola">Unit Pengelola</label><input id="unitPengelola" name="unit_pengelola" maxlength="150" value="<?= esc($value('unit_pengelola', $record)) ?>" placeholder="Contoh: Bagian Umum"></div>
+            <div class="form-group"><label for="kodeInternal">Nomor PKS <span class="required">*</span></label><input id="kodeInternal" name="kode_internal" maxlength="80" value="<?= esc($value('kode_internal', $record)) ?>" placeholder="Contoh: PKS/BJ/2026/001" required><small>Nomor unik untuk mengidentifikasi PKS.</small></div>
+            <div class="form-group"><label for="unitPengelola">Unit Pengelola</label><select id="unitPengelola" name="unit_pengelola"><option value="">Pilih unit pengelola</option><?php foreach (['Bagian Umum 1', 'Bagian Umum 2'] as $unit): ?><option value="<?= esc($unit) ?>" <?= $value('unit_pengelola', $record) === $unit ? 'selected' : '' ?>><?= esc($unit) ?></option><?php endforeach ?></select></div>
             <div class="form-group span-2"><label for="namaKerjasama">Nama Kerja Sama <span class="required">*</span></label><input id="namaKerjasama" name="nama_kerjasama" maxlength="250" value="<?= esc($value('nama_kerjasama', $record)) ?>" placeholder="Contoh: Pengadaan Jasa Kebersihan Kantor" required></div>
-            <div class="form-group"><label for="picInternal">PIC Internal</label><input id="picInternal" name="pic_internal" maxlength="150" value="<?= esc($value('pic_internal', $record)) ?>" placeholder="Nama penanggung jawab internal"></div>
-            <div class="form-group"><label for="ruangLingkup">Ruang Lingkup</label><textarea id="ruangLingkup" name="ruang_lingkup" placeholder="Ringkasan pekerjaan/barang atau jasa yang disepakati"><?= esc($value('ruang_lingkup', $record)) ?></textarea></div>
-            <div class="form-group span-2"><label for="pksKeterangan">Keterangan</label><textarea id="pksKeterangan" name="keterangan" placeholder="Catatan tambahan bila diperlukan"><?= esc($value('keterangan', $record)) ?></textarea></div>
+            <div class="form-group"><label for="picInternal">PIC Internal</label><input id="picInternal" name="pic_internal" value="<?= esc($picForUnit($value('unit_pengelola', $record))) ?>" readonly aria-readonly="true" placeholder="Terisi otomatis sesuai unit"><small>Ditentukan otomatis berdasarkan Unit Pengelola.</small></div>
         </div>
     </section>
 
@@ -43,4 +46,14 @@ $isEdit = $record !== null;
 
     <div class="form-actions-sticky"><a href="<?= $isEdit ? site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']) : site_url('bagian-umum-1/pks-barang-jasa') ?>" class="btn btn-ghost">Batal</a><button type="submit" class="btn btn-primary"><?= $isEdit ? 'Simpan Perubahan' : 'Simpan & Lanjutkan' ?></button></div>
 </form>
+<script>
+(() => {
+    const unitField = document.getElementById('unitPengelola');
+    const picField = document.getElementById('picInternal');
+    const picByUnit = { 'Bagian Umum 1': 'Angger Wicaksono', 'Bagian Umum 2': 'Agil Halis Kesawa' };
+    const syncPicInternal = () => { picField.value = picByUnit[unitField.value] ?? ''; };
+    unitField.addEventListener('change', syncPicInternal);
+    syncPicInternal();
+})();
+</script>
 <?= $this->endSection() ?>

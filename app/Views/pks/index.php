@@ -7,6 +7,13 @@ $popupMode = session()->getFlashdata('pks_modal');
 $popupData = session()->getFlashdata('pks_form_data') ?? [];
 $popupEditId = session()->getFlashdata('pks_edit_id');
 $popupErrors = session()->getFlashdata('errors') ?? [];
+$summaryCards = [
+    '' => ['label' => 'Total PKS', 'icon' => '▤', 'class' => 'total', 'count' => $summary['total']],
+    'aktif' => ['label' => 'Aktif', 'icon' => '✓', 'class' => 'active', 'count' => $summary['aktif']],
+    'segera' => ['label' => 'Segera Berakhir', 'icon' => '!', 'class' => 'warning', 'count' => $summary['segera']],
+    'berakhir' => ['label' => 'Berakhir', 'icon' => '×', 'class' => 'expired', 'count' => $summary['berakhir']],
+    'belum' => ['label' => 'Belum Lengkap', 'icon' => '…', 'class' => 'neutral', 'count' => $summary['belum']],
+];
 ?>
 
 <section class="page-heading heading-actions pks-page-heading">
@@ -19,18 +26,29 @@ $popupErrors = session()->getFlashdata('errors') ?? [];
 </section>
 
 <section class="pks-summary-grid" aria-label="Ringkasan PKS">
-    <article><span class="pks-summary-icon total">▤</span><div><small>Total PKS</small><strong><?= number_format($summary['total'], 0, ',', '.') ?></strong></div></article>
-    <article><span class="pks-summary-icon active">✓</span><div><small>Aktif</small><strong><?= number_format($summary['aktif'], 0, ',', '.') ?></strong></div></article>
-    <article><span class="pks-summary-icon warning">!</span><div><small>Segera Berakhir</small><strong><?= number_format($summary['segera'], 0, ',', '.') ?></strong></div></article>
-    <article><span class="pks-summary-icon expired">×</span><div><small>Berakhir</small><strong><?= number_format($summary['berakhir'], 0, ',', '.') ?></strong></div></article>
-    <article><span class="pks-summary-icon neutral">…</span><div><small>Belum Lengkap</small><strong><?= number_format($summary['belum'], 0, ',', '.') ?></strong></div></article>
+    <?php foreach ($summaryCards as $statusKey => $card): ?>
+        <?php
+        $cardQuery = array_filter([
+            'q' => $filters['keyword'],
+            'status' => $statusKey,
+            'per_page' => $filters['perPage'],
+        ], static fn ($value): bool => $value !== '');
+        $cardUrl = site_url('bagian-umum-1/pks-barang-jasa') . ($cardQuery === [] ? '' : '?' . http_build_query($cardQuery));
+        $isActiveCard = $filters['status'] === $statusKey;
+        ?>
+        <a class="pks-summary-card <?= $isActiveCard ? 'is-active' : '' ?>" href="<?= esc($cardUrl) ?>" <?= $isActiveCard ? 'aria-current="page"' : '' ?>>
+            <span class="pks-summary-icon <?= esc($card['class']) ?>"><?= esc($card['icon']) ?></span>
+            <div><small><?= esc($card['label']) ?></small><strong><?= number_format($card['count'], 0, ',', '.') ?></strong></div>
+        </a>
+    <?php endforeach ?>
 </section>
 
 <section class="panel filter-panel">
     <form action="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" method="get" class="pks-filter-form">
+        <?php if ($filters['status'] !== ''): ?><input type="hidden" name="status" value="<?= esc($filters['status']) ?>"><?php endif ?>
         <div class="form-group">
             <label for="pksSearch">Cari PKS</label>
-            <div class="input-with-icon"><span>⌕</span><input id="pksSearch" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Kode, nama kerja sama, mitra, atau unit"></div>
+            <div class="input-with-icon"><span>⌕</span><input id="pksSearch" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor PKS, nama kerja sama, mitra, atau unit"></div>
         </div>
         <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="btn btn-ghost">Reset</a></div>
     </form>
@@ -39,7 +57,7 @@ $popupErrors = session()->getFlashdata('errors') ?? [];
 <section class="panel register-panel pks-table-panel">
     <div class="table-wrap">
         <table>
-            <thead><tr><th>No.</th><th>Kode Internal</th><th>Nama Kerja Sama</th><th>Mitra</th><th>Dokumen Terakhir</th><th>Masa Berlaku</th><th>Nilai Terakhir</th><th>Status</th><th>Aksi</th></tr></thead>
+            <thead><tr><th>No.</th><th>Nomor PKS</th><th>Nama Kerja Sama</th><th>Mitra</th><th>Dokumen Terakhir</th><th>Masa Berlaku</th><th>Nilai Terakhir</th><th>Status</th><th>Aksi</th></tr></thead>
             <tbody>
             <?php if ($records === []): ?>
                 <tr><td colspan="9"><div class="empty-state"><span>▤</span><strong>Belum ada data PKS</strong><p>Tambahkan PKS pertama atau ubah kata kunci pencarian.</p><button class="btn btn-primary btn-sm" type="button" data-pks-create>Tambah PKS</button></div></td></tr>
@@ -56,7 +74,7 @@ $popupErrors = session()->getFlashdata('errors') ?? [];
                         <td><span class="pks-status <?= esc($record['status_class']) ?>"><?= esc($record['status_label']) ?></span></td>
                         <td><div class="action-buttons">
                             <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']) ?>" title="Lihat detail" aria-label="Lihat detail">⌕</a>
-                            <?php $editData = array_intersect_key($record, array_flip(['id','kode_internal','nama_kerjasama','unit_pengelola','pic_internal','ruang_lingkup','keterangan','nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email'])); ?>
+                            <?php $editData = array_intersect_key($record, array_flip(['id','kode_internal','nama_kerjasama','unit_pengelola','pic_internal','nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email'])); ?>
                             <button type="button" class="icon-btn" data-pks-edit='<?= esc(json_encode($editData), 'attr') ?>' title="Ubah" aria-label="Ubah PKS">✎</button>
                         </div></td>
                     </tr>
@@ -68,6 +86,7 @@ $popupErrors = session()->getFlashdata('errors') ?? [];
     <div class="table-list-footer">
         <form method="get" action="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="table-length-form">
             <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>">
+            <?php if ($filters['status'] !== ''): ?><input type="hidden" name="status" value="<?= esc($filters['status']) ?>"><?php endif ?>
             <label for="pksPerPage">Tampilkan</label><select id="pksPerPage" name="per_page" onchange="this.form.submit()">
                 <?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?>
             </select><span>data</span>
@@ -98,12 +117,10 @@ $popupErrors = session()->getFlashdata('errors') ?? [];
                 <section class="pks-wizard-panel" data-pks-step-panel="1">
                     <div class="modal-section-heading"><span>01</span><div><strong>Identitas Kerja Sama</strong><small>Informasi utama untuk mengenali dan mencari PKS</small></div></div>
                     <div class="modal-form-grid pks-popup-grid">
-                        <div class="form-group"><label for="popupKodeInternal">Kode Internal <span class="required">*</span></label><input id="popupKodeInternal" name="kode_internal" maxlength="80" placeholder="Contoh: PKS/BJ/2026/001" required><small>Kode unik internal, bukan nomor dokumen.</small></div>
-                        <div class="form-group"><label for="popupUnitPengelola">Unit Pengelola</label><input id="popupUnitPengelola" name="unit_pengelola" maxlength="150" placeholder="Contoh: Bagian Umum"></div>
+                        <div class="form-group"><label for="popupKodeInternal">Nomor PKS <span class="required">*</span></label><input id="popupKodeInternal" name="kode_internal" maxlength="80" placeholder="Contoh: PKS/BJ/2026/001" required><small>Nomor unik untuk mengidentifikasi PKS.</small></div>
+                        <div class="form-group"><label for="popupUnitPengelola">Unit Pengelola</label><select id="popupUnitPengelola" name="unit_pengelola"><option value="">Pilih unit pengelola</option><option value="Bagian Umum 1">Bagian Umum 1</option><option value="Bagian Umum 2">Bagian Umum 2</option></select></div>
                         <div class="form-group modal-span-2"><label for="popupNamaKerjasama">Nama Kerja Sama <span class="required">*</span></label><input id="popupNamaKerjasama" name="nama_kerjasama" maxlength="250" placeholder="Contoh: Pengadaan Jasa Kebersihan Kantor" required></div>
-                        <div class="form-group"><label for="popupPicInternal">PIC Internal</label><input id="popupPicInternal" name="pic_internal" maxlength="150" placeholder="Nama penanggung jawab internal"></div>
-                        <div class="form-group"><label for="popupRuangLingkup">Ruang Lingkup</label><textarea id="popupRuangLingkup" name="ruang_lingkup" placeholder="Ringkasan barang/jasa yang disepakati"></textarea></div>
-                        <div class="form-group modal-span-2"><label for="popupKeterangan">Keterangan</label><textarea id="popupKeterangan" name="keterangan" placeholder="Catatan tambahan bila diperlukan"></textarea></div>
+                        <div class="form-group"><label for="popupPicInternal">PIC Internal</label><input id="popupPicInternal" name="pic_internal" readonly aria-readonly="true" placeholder="Terisi otomatis sesuai unit"><small>Ditentukan otomatis berdasarkan Unit Pengelola.</small></div>
                     </div>
                 </section>
 
@@ -122,14 +139,13 @@ $popupErrors = session()->getFlashdata('errors') ?? [];
                 <section class="pks-wizard-panel" data-pks-step-panel="3" hidden>
                     <div class="modal-section-heading"><span>03</span><div><strong>Konfirmasi Data</strong><small>Pastikan data berikut sudah sesuai sebelum disimpan</small></div></div>
                     <div class="pks-review-card">
-                        <div><small>Kode Internal</small><strong data-pks-review="kode_internal">-</strong></div>
+                        <div><small>Nomor PKS</small><strong data-pks-review="kode_internal">-</strong></div>
                         <div><small>Unit Pengelola</small><strong data-pks-review="unit_pengelola">-</strong></div>
                         <div class="wide"><small>Nama Kerja Sama</small><strong data-pks-review="nama_kerjasama">-</strong></div>
                         <div><small>PIC Internal</small><strong data-pks-review="pic_internal">-</strong></div>
                         <div><small>Nama Mitra</small><strong data-pks-review="nama_mitra">-</strong></div>
                         <div><small>Kontak Mitra</small><strong data-pks-review="kontak_mitra">-</strong></div>
                         <div><small>Telepon / Email</small><strong data-pks-review="komunikasi_mitra">-</strong></div>
-                        <div class="wide"><small>Ruang Lingkup</small><strong data-pks-review="ruang_lingkup">-</strong></div>
                     </div>
                     <div class="pks-review-note"><span>i</span><p>Setelah data utama disimpan, Anda akan diarahkan ke halaman detail untuk menambahkan dokumen PKS, addendum, link berkas, serta item barang dan jasa.</p></div>
                 </section>
@@ -149,13 +165,17 @@ $popupErrors = session()->getFlashdata('errors') ?? [];
     const nextButton = modal.querySelector('[data-pks-step-next]');
     const submitButton = modal.querySelector('[data-pks-modal-submit]');
     const baseUrl = <?= json_encode(site_url('bagian-umum-1/pks-barang-jasa')) ?>;
-    const fieldNames = ['kode_internal','nama_kerjasama','unit_pengelola','pic_internal','ruang_lingkup','keterangan','nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email'];
+    const fieldNames = ['kode_internal','nama_kerjasama','unit_pengelola','pic_internal','nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email'];
+    const unitField = form.elements.unit_pengelola;
+    const picField = form.elements.pic_internal;
+    const picByUnit = { 'Bagian Umum 1': 'Angger Wicaksono', 'Bagian Umum 2': 'Agil Halis Kesawa' };
+    const syncPicInternal = () => { picField.value = picByUnit[unitField.value] ?? ''; };
     let currentStep = 1;
     const updateReview = () => {
         const value = name => String(form.elements[name]?.value ?? '').trim();
         const review = {
             kode_internal: value('kode_internal'), unit_pengelola: value('unit_pengelola'), nama_kerjasama: value('nama_kerjasama'),
-            pic_internal: value('pic_internal'), nama_mitra: value('nama_mitra'), ruang_lingkup: value('ruang_lingkup'),
+            pic_internal: value('pic_internal'), nama_mitra: value('nama_mitra'),
             kontak_mitra: [value('nama_kontak'), value('jabatan_kontak')].filter(Boolean).join(' · '),
             komunikasi_mitra: [value('telepon'), value('email')].filter(Boolean).join(' · '),
         };
@@ -183,6 +203,7 @@ $popupErrors = session()->getFlashdata('errors') ?? [];
         form.reset();
         form.action = id ? `${baseUrl}/${id}` : baseUrl;
         fieldNames.forEach(name => { form.elements[name].value = data[name] ?? ''; });
+        syncPicInternal();
         modal.querySelector('[data-pks-modal-title]').textContent = id ? 'Ubah PKS Barang dan Jasa' : 'Tambah PKS Barang dan Jasa';
         modal.querySelector('[data-pks-modal-icon]').textContent = id ? '✎' : '＋';
         submitButton.textContent = id ? 'Simpan Perubahan' : 'Simpan & Lanjutkan';
@@ -191,6 +212,7 @@ $popupErrors = session()->getFlashdata('errors') ?? [];
     };
     document.querySelectorAll('[data-pks-create]').forEach(button => button.addEventListener('click', () => prepare()));
     document.querySelectorAll('[data-pks-edit]').forEach(button => button.addEventListener('click', () => { const data = JSON.parse(button.dataset.pksEdit); prepare(data, data.id); }));
+    unitField.addEventListener('change', syncPicInternal);
     document.querySelectorAll('[data-pks-modal-close]').forEach(button => button.addEventListener('click', close));
     nextButton.addEventListener('click', () => { if (validateCurrentStep()) goToStep(currentStep + 1); });
     backButton.addEventListener('click', () => goToStep(currentStep - 1));

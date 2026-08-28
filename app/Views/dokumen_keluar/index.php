@@ -18,15 +18,17 @@
 </section>
 
 <section class="panel register-panel agendaris-table-panel">
-    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nomor Surat</th><th>Jenis Dokumen</th><th>Pemohon</th><th>Pelaksana</th><th>UP</th><th>Tanggal Pengiriman</th><th>Alamat Penerima</th><th>Aksi</th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nomor Surat</th><th>Jenis Dokumen</th><th>Jumlah Dokumen</th><th>Nama Ekspedisi</th><th>Pemohon</th><th>Pelaksana</th><th>UP</th><th>Tanggal Pengiriman</th><th>Alamat Penerima</th><th>Aksi</th></tr></thead><tbody>
         <?php if ($dokumen === []): ?>
-            <tr><td colspan="9"><div class="empty-state"><span>⇢</span><strong>Belum ada Dokumen Keluar selesai</strong><p>Selesaikan dokumen melalui menu Progres Dokumen agar tampil di halaman ini.</p></div></td></tr>
+            <tr><td colspan="11"><div class="empty-state"><span>⇢</span><strong>Belum ada Dokumen Keluar selesai</strong><p>Selesaikan dokumen melalui menu Progres Dokumen agar tampil di halaman ini.</p></div></td></tr>
         <?php else: ?>
             <?php $rowNumber = (($pager->getCurrentPage('dokumen_keluar') - 1) * $filters['perPage']) + 1; ?>
             <?php foreach ($dokumen as $row): ?><tr>
                 <td><strong><?= $rowNumber++ ?></strong></td>
                 <td><strong><?= esc($row['nomor_surat']) ?></strong></td>
                 <td><?= esc($row['jenis_surat']) ?></td>
+                <td><?= esc(($row['jumlah_dokumen'] ?? null) ?: '-') ?></td>
+                <td><?= esc(($row['nama_ekspedisi'] ?? null) ?: '-') ?></td>
                 <td><?= esc($row['pemohon'] ?: '-') ?></td>
                 <td><?= esc($row['pelaksana'] ?: '-') ?></td>
                 <td><?= esc($row['up'] ?: '-') ?></td>

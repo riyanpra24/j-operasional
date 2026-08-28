@@ -105,6 +105,8 @@ class DummyOperationalData extends Seeder
                 $outgoingBuilder->insert([
                     'nomor_surat'        => $nomor,
                     'jenis_surat'        => $jenis,
+                    'jumlah_dokumen'     => (($index % 3) + 1) . ' berkas',
+                    'nama_ekspedisi'     => ['JNE', 'TIKI', 'Pos Indonesia', 'J&T Express'][$index % 4],
                     'pemohon'            => $pemohon,
                     'pelaksana'          => $pelaksana,
                     'up'                 => $up,
@@ -121,6 +123,10 @@ class DummyOperationalData extends Seeder
                 $outgoingId = (int) $this->db->insertID();
             } else {
                 $outgoingId = (int) $existing['id'];
+                $outgoingBuilder->where('id', $outgoingId)->update([
+                    'jumlah_dokumen' => (($index % 3) + 1) . ' berkas',
+                    'nama_ekspedisi' => ['JNE', 'TIKI', 'Pos Indonesia', 'J&T Express'][$index % 4],
+                ]);
             }
 
             $distributionBuilder = $this->db->table('distribusi_dokumen');

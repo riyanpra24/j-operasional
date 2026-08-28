@@ -10,6 +10,8 @@
                 <div class="modal-form-grid agendaris-form-grid">
                     <div class="form-group"><label for="keluar_nomor_surat">Nomor Surat <span class="required">*</span></label><input id="keluar_nomor_surat" name="nomor_surat" maxlength="150" placeholder="Nomor surat" required></div>
                     <div class="form-group"><label for="keluar_jenis_surat">Jenis Dokumen <span class="required">*</span></label><input id="keluar_jenis_surat" name="jenis_surat" maxlength="100" placeholder="Jenis dokumen" required></div>
+                    <div class="form-group"><label for="keluar_jumlah_dokumen">Jumlah Dokumen <span class="required">*</span></label><input id="keluar_jumlah_dokumen" name="jumlah_dokumen" maxlength="100" value="1" placeholder="Contoh: 2 berkas atau 1 amplop" required></div>
+                    <?= view('components/ekspedisi_selector', ['prefix' => 'keluar', 'label' => 'Nama Ekspedisi', 'required' => true]) ?>
                     <div class="form-group"><label for="keluar_pemohon">Pemohon</label><input id="keluar_pemohon" name="pemohon" maxlength="255" placeholder="Nama pemohon atau unit"></div>
                     <div class="form-group"><label for="keluar_pelaksana">Pelaksana</label><input id="keluar_pelaksana" name="pelaksana" maxlength="255" placeholder="Nama pelaksana"></div>
                     <div class="form-group"><label for="keluar_up">UP</label><input id="keluar_up" name="up" maxlength="255" placeholder="Nama atau unit tujuan UP"></div>

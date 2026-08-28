@@ -31,11 +31,9 @@ $baseUrl = site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']);
     <article class="panel pks-overview-panel">
         <div class="panel-header"><div><h2>01 · Informasi Kerja Sama</h2><p>Data utama dan penanggung jawab internal</p></div></div>
         <dl class="pks-detail-list">
-            <div><dt>Kode Internal</dt><dd><?= esc($record['kode_internal']) ?></dd></div>
+            <div><dt>Nomor PKS</dt><dd><?= esc($record['kode_internal']) ?></dd></div>
             <div><dt>Unit Pengelola</dt><dd><?= esc($record['unit_pengelola'] ?: '-') ?></dd></div>
             <div><dt>PIC Internal</dt><dd><?= esc($record['pic_internal'] ?: '-') ?></dd></div>
-            <div class="wide"><dt>Ruang Lingkup</dt><dd><?= nl2br(esc($record['ruang_lingkup'] ?: '-')) ?></dd></div>
-            <div class="wide"><dt>Keterangan</dt><dd><?= nl2br(esc($record['keterangan'] ?: '-')) ?></dd></div>
         </dl>
     </article>
     <article class="panel pks-overview-panel">

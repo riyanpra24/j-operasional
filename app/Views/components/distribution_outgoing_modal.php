@@ -16,6 +16,8 @@
                 <div class="modal-form-grid locked-document-grid">
                     <div class="form-group"><label>Nomor Surat <i>🔒</i></label><input data-outgoing-distribution-field="nomor_surat" readonly tabindex="-1"></div>
                     <div class="form-group"><label>Jenis Dokumen <i>🔒</i></label><input data-outgoing-distribution-field="jenis_surat" readonly tabindex="-1"></div>
+                    <div class="form-group"><label>Jumlah Dokumen <i>🔒</i></label><input data-outgoing-distribution-field="jumlah_dokumen" readonly tabindex="-1"></div>
+                    <div class="form-group"><label>Nama Ekspedisi <i>🔒</i></label><input data-outgoing-distribution-field="nama_ekspedisi" readonly tabindex="-1"></div>
                     <div class="form-group"><label>Pemohon <i>🔒</i></label><input data-outgoing-distribution-field="pemohon" readonly tabindex="-1"></div>
                     <div class="form-group"><label>Pelaksana <i>🔒</i></label><input data-outgoing-distribution-field="pelaksana" readonly tabindex="-1"></div>
                     <div class="form-group"><label>UP <i>🔒</i></label><input data-outgoing-distribution-field="up" readonly tabindex="-1"></div>

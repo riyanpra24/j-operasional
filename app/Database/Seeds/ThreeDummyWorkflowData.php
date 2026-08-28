@@ -58,6 +58,8 @@ class ThreeDummyWorkflowData extends Seeder
             $this->db->table('dokumen_keluar')->insert([
                 'nomor_surat'        => $nomorKeluar,
                 'jenis_surat'        => 'Surat Balasan',
+                'jumlah_dokumen'     => '2 berkas',
+                'nama_ekspedisi'     => 'JNE',
                 'pemohon'            => 'Divisi Umum',
                 'pelaksana'           => 'Rina Pratama',
                 'up'                  => 'Kepala Bagian Operasional',
@@ -74,6 +76,10 @@ class ThreeDummyWorkflowData extends Seeder
             $outgoingId = (int) $this->db->insertID();
         } else {
             $outgoingId = (int) $outgoing['id'];
+            $this->db->table('dokumen_keluar')->where('id', $outgoingId)->update([
+                'jumlah_dokumen' => '2 berkas',
+                'nama_ekspedisi' => 'JNE',
+            ]);
         }
 
         if ($this->db->table('distribusi_dokumen')->where('dokumen_keluar_id', $outgoingId)->countAllResults() === 0) {

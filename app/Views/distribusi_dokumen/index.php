@@ -47,8 +47,8 @@
 </section>
 <?php else: ?>
 <section class="panel register-panel distribution-table-panel distribution-outgoing-panel">
-    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Jenis</th><th>Pelaksana</th><th>UP</th><th>Alamat Penerima</th><th>Progres</th><th>Action</th></tr></thead><tbody>
-        <?php if ($dokumenKeluar === []): ?><tr><td colspan="7"><div class="empty-state"><span>⇢</span><strong>Belum ada Dokumen Keluar untuk diproses</strong><p>Dokumen dari Progres Dokumen Agendaris akan muncul otomatis di bagian ini.</p></div></td></tr>
+    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Jenis</th><th>Jumlah Dokumen</th><th>Nama Ekspedisi</th><th>Pelaksana</th><th>UP</th><th>Alamat Penerima</th><th>Progres</th><th>Action</th></tr></thead><tbody>
+        <?php if ($dokumenKeluar === []): ?><tr><td colspan="9"><div class="empty-state"><span>⇢</span><strong>Belum ada Dokumen Keluar untuk diproses</strong><p>Dokumen dari Progres Dokumen Agendaris akan muncul otomatis di bagian ini.</p></div></td></tr>
         <?php else: ?>
             <?php $outgoingNumber = (($pagerKeluar->getCurrentPage('distribusi_keluar') - 1) * $filters['perPage']) + 1; ?>
             <?php foreach ($dokumenKeluar as $row): ?>
@@ -56,6 +56,8 @@
                 <tr>
                     <td><strong><?= $outgoingNumber++ ?></strong></td>
                     <td><?= esc($row['jenis_surat']) ?></td>
+                    <td><?= esc(($row['jumlah_dokumen'] ?? null) ?: '-') ?></td>
+                    <td><?= esc(($row['nama_ekspedisi'] ?? null) ?: '-') ?></td>
                     <td><?= esc($row['pelaksana'] ?: '-') ?></td>
                     <td><?= esc($row['up'] ?: '-') ?></td>
                     <td class="cell-wrap"><?= esc($row['alamat_penerima']) ?></td>

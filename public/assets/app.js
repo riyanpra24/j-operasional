@@ -1501,6 +1501,7 @@
     const openDokumenKeluarCreate = () => {
         if (!dokumenKeluarForm) return;
         dokumenKeluarForm.reset();
+        setupEkspedisiSelector(dokumenKeluarForm)?.setValue('');
         dokumenKeluarForm.action = dokumenKeluarCreateUrl;
         dokumenKeluarFormTitle.textContent = 'Tambah Surat Keluar';
         dokumenKeluarSubmit.textContent = 'Simpan Surat Keluar';
@@ -1524,6 +1525,8 @@
             dokumenKeluarForm.action = data.update_url;
             dokumenKeluarForm.elements.nomor_surat.value = data.nomor_surat;
             dokumenKeluarForm.elements.jenis_surat.value = data.jenis_surat;
+            dokumenKeluarForm.elements.jumlah_dokumen.value = data.jumlah_dokumen_value;
+            setupEkspedisiSelector(dokumenKeluarForm)?.setValue(data.nama_ekspedisi_value);
             dokumenKeluarForm.elements.pemohon.value = data.pemohon_value;
             dokumenKeluarForm.elements.pelaksana.value = data.pelaksana_value;
             dokumenKeluarForm.elements.up.value = data.up_value;
@@ -1728,10 +1731,11 @@
         return result.dokumen;
     };
     const fillProgressForm = (data) => {
-        ['nomor_surat','jenis_surat','pemohon','pelaksana','up','tanggal_pengiriman','nomor_resi','tanggal_diterima','penerima','alamat_penerima','dokumen_link','security','tanggal_security','progres','status_agendaris'].forEach((name) => {
+        ['nomor_surat','jenis_surat','jumlah_dokumen','pemohon','pelaksana','up','tanggal_pengiriman','nomor_resi','tanggal_diterima','penerima','alamat_penerima','dokumen_link','security','tanggal_security','progres','status_agendaris'].forEach((name) => {
             const valueKey = `${name}_value`;
             progressForm.elements[name].value = Object.prototype.hasOwnProperty.call(data, valueKey) ? data[valueKey] : (data[name] === '-' ? '' : data[name]);
         });
+        setupEkspedisiSelector(progressForm)?.setValue(data.nama_ekspedisi_value);
         const completionOption = progressForm.elements.status_agendaris?.querySelector('option[value="Selesai"]');
         if (completionOption) completionOption.disabled = data.progres !== 'Diambil Ekspedisi';
     };
@@ -1747,6 +1751,7 @@
         if (!progressForm) return;
         setProgressSecurityFieldsLocked(true);
         progressForm.reset();
+        setupEkspedisiSelector(progressForm)?.setValue('');
         const completionOption = progressForm.elements.status_agendaris?.querySelector('option[value="Selesai"]');
         if (completionOption) completionOption.disabled = true;
         progressForm.action = progressCreateUrl;

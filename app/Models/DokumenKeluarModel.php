@@ -12,6 +12,8 @@ class DokumenKeluarModel extends Model
     protected $allowedFields = [
         'nomor_surat',
         'jenis_surat',
+        'jumlah_dokumen',
+        'nama_ekspedisi',
         'pemohon',
         'pelaksana',
         'up',

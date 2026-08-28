@@ -12,6 +12,8 @@
                 <dl class="agendaris-detail-grid">
                     <div><dt>Nomor Surat</dt><dd data-progress-field="nomor_surat"></dd></div>
                     <div><dt>Jenis Dokumen</dt><dd data-progress-field="jenis_surat"></dd></div>
+                    <div><dt>Jumlah Dokumen</dt><dd data-progress-field="jumlah_dokumen"></dd></div>
+                    <div><dt>Nama Ekspedisi</dt><dd data-progress-field="nama_ekspedisi"></dd></div>
                     <div><dt>Pemohon</dt><dd data-progress-field="pemohon"></dd></div>
                     <div><dt>Pelaksana</dt><dd data-progress-field="pelaksana"></dd></div>
                     <div class="span-2"><dt>UP</dt><dd data-progress-field="up"></dd></div>
