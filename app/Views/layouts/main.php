@@ -44,7 +44,13 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
         } catch (error) {}
     </script>
 </head>
-<body data-auth-expires-at="<?= $authExpiresAt ?>" data-login-url="<?= esc(site_url('login'), 'attr') ?>" data-landing-url="<?= esc(site_url('/') . '?view=landing', 'attr') ?>">
+<body
+    data-auth-expires-at="<?= $authExpiresAt ?>"
+    data-login-url="<?= esc(site_url('login'), 'attr') ?>"
+    data-landing-url="<?= esc(site_url('/') . '?login=1', 'attr') ?>"
+    data-logout-url="<?= esc(site_url('logout'), 'attr') ?>"
+    data-csrf-name="<?= esc(csrf_token(), 'attr') ?>"
+    data-csrf-hash="<?= esc(csrf_hash(), 'attr') ?>">
     <?php if ($successToast): ?>
         <div class="success-toast" role="status" aria-live="polite" data-success-toast>
             <span class="success-toast-icon" aria-hidden="true">✓</span>

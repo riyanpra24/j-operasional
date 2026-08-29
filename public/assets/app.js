@@ -2,9 +2,13 @@
     const authExpiresAt = Number(document.body.dataset.authExpiresAt || 0);
     const loginUrl = document.body.dataset.loginUrl || '';
     const landingUrl = document.body.dataset.landingUrl || '/';
+    const logoutUrl = document.body.dataset.logoutUrl || '';
+    const csrfName = document.body.dataset.csrfName || '';
+    const csrfHash = document.body.dataset.csrfHash || '';
     const activeTabStorageKey = 'j-operasional-active-tab';
     const currentTabStorageKey = 'j-operasional-current-tab';
     const tabWindowPrefix = 'j-operasional-tab:';
+    const logoutSignalStorageKey = 'j-operasional-force-logout';
 
     const randomTabId = () => {
         if (window.crypto?.randomUUID) return window.crypto.randomUUID();
@@ -18,16 +22,59 @@
                 <span class="duplicate-tab-icon" aria-hidden="true">!</span>
                 <p>AKSES DIBATASI</p>
                 <h1>Akun sedang digunakan di tab lain</h1>
-                <span>Akses pada tab ini diblokir. Silakan lanjutkan pekerjaan pada tab pertama; sesi di tab pertama tetap aktif.</span>
+                <span data-duplicate-tab-message>Akses pada tab ini diblokir. Silakan lanjutkan pekerjaan pada tab pertama; sesi di tab pertama tetap aktif.</span>
                 <div class="duplicate-tab-actions">
-                    <a class="btn btn-secondary duplicate-tab-home" href="/" data-duplicate-tab-home>← Kembali ke Landing Page</a>
+                    <button type="button" class="btn btn-secondary duplicate-tab-home" data-duplicate-tab-home>← Kembali ke Landing Page</button>
                     <button type="button" class="btn btn-primary" data-duplicate-tab-retry>Periksa kembali</button>
                 </div>
             </main>`;
-        const homeLink = document.querySelector('[data-duplicate-tab-home]');
-        if (homeLink) homeLink.href = landingUrl;
+        const homeButton = document.querySelector('[data-duplicate-tab-home]');
+        const retryButton = document.querySelector('[data-duplicate-tab-retry]');
+        const blockerMessage = document.querySelector('[data-duplicate-tab-message]');
+
+        homeButton?.addEventListener('click', async () => {
+            if (logoutUrl === '' || csrfName === '' || csrfHash === '') return;
+            homeButton.disabled = true;
+            if (retryButton) retryButton.disabled = true;
+            homeButton.textContent = 'Mengakhiri sesi...';
+
+            try {
+                const formData = new FormData();
+                formData.append(csrfName, csrfHash);
+                const response = await fetch(logoutUrl, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                if (!response.ok) throw new Error('Sesi belum dapat diakhiri.');
+
+                try {
+                    localStorage.removeItem(activeTabStorageKey);
+                    localStorage.setItem(logoutSignalStorageKey, String(Date.now()));
+                    sessionStorage.removeItem(currentTabStorageKey);
+                    window.name = '';
+                } catch (error) {}
+
+                window.location.replace(landingUrl);
+            } catch (error) {
+                if (blockerMessage) blockerMessage.textContent = error.message || 'Sesi belum dapat diakhiri. Silakan coba kembali.';
+                homeButton.disabled = false;
+                if (retryButton) retryButton.disabled = false;
+                homeButton.textContent = '← Kembali ke Landing Page';
+            }
+        });
         document.querySelector('[data-duplicate-tab-retry]')?.addEventListener('click', () => window.location.reload());
     };
+
+    window.addEventListener('storage', (event) => {
+        if (event.key !== logoutSignalStorageKey || !event.newValue) return;
+        try {
+            sessionStorage.removeItem(currentTabStorageKey);
+            window.name = '';
+        } catch (error) {}
+        window.location.replace(landingUrl);
+    });
 
     let duplicateTabDetected = false;
     if (loginUrl !== '') {

@@ -842,6 +842,7 @@ body { background: #e9edef; }
 .duplicate-tab-card .btn { margin-top:24px; }
 .duplicate-tab-actions { display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:24px; }
 .duplicate-tab-actions .btn { margin-top:0; }
+.duplicate-tab-actions .btn:disabled { cursor:wait;opacity:.62; }
 .duplicate-tab-home { color:#005a9f;background:#fff;border-color:#bdd5e3; }
 .duplicate-tab-home:hover { color:#00457f;background:#edf7fa;border-color:#83beca; }
 @media (max-width:520px) { .duplicate-tab-actions { align-items:stretch;flex-direction:column; }.duplicate-tab-actions .btn { width:100%; } }
