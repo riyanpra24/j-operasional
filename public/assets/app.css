@@ -2871,3 +2871,340 @@ input:focus,select:focus,textarea:focus { border-color:#00aaa6;box-shadow:0 0 0 
 @media (max-width:900px) {
     .topbar { border-radius:0; }
 }
+
+/* ========================================================================== */
+/* Responsive application layer                                               */
+/* Menyatukan perilaku mobile tanpa mengubah komposisi tampilan desktop.       */
+/* ========================================================================== */
+@media (max-width:900px) {
+    :root { --mobile-gutter:14px; }
+
+    html,body { max-width:100%;overflow-x:hidden; }
+    body { min-width:0; }
+    .app-shell,.content-shell,.main-content { min-width:0; }
+    .content-shell { width:100%;margin-left:0; }
+
+    .sidebar {
+        width:min(286px,86vw);
+        max-width:100%;
+        padding:16px 14px;
+        overflow-x:hidden;
+        overflow-y:auto;
+        overscroll-behavior:contain;
+        transform:translate3d(-102%,0,0);
+        transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s ease;
+        will-change:transform;
+    }
+    .sidebar.open {
+        transform:translate3d(0,0,0);
+        box-shadow:18px 0 45px rgba(0,48,91,.2);
+    }
+    .sidebar.open + .sidebar-backdrop {
+        position:fixed;
+        inset:0;
+        z-index:35;
+        display:block;
+        background:rgba(12,35,56,.46);
+        border:0;
+        backdrop-filter:blur(2px);
+        animation:mobile-backdrop-in .2s ease both;
+    }
+    .brand.brand-jaksa { flex-shrink:0; }
+    .main-nav { min-height:max-content; }
+    .nav-link { min-height:44px; }
+    .nav-sublink { min-height:36px; }
+
+    .topbar {
+        min-height:60px;
+        padding:7px var(--mobile-gutter);
+        gap:9px;
+    }
+    .menu-toggle {
+        display:grid;
+        flex:0 0 38px;
+        width:38px;
+        height:38px;
+        margin-right:0;
+        place-items:center;
+        border-radius:10px;
+    }
+    .topbar-title { flex:1;min-width:0; }
+    .topbar-title span,.topbar-title strong {
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+    }
+    .topbar-meta { flex:0 0 auto;gap:7px;margin-left:0; }
+    .topbar-icon { flex:0 0 38px;width:38px;height:38px;border-radius:10px; }
+    .date-pill { min-height:38px;padding:7px 9px;gap:7px; }
+    .date-pill-time { padding-left:7px; }
+    .topbar-profile-trigger { min-height:38px; }
+
+    .topbar-notification-dropdown,
+    .topbar-profile-dropdown {
+        position:fixed;
+        top:68px;
+        right:12px;
+        left:auto;
+        width:min(360px,calc(100vw - 24px));
+        max-height:calc(100dvh - 80px);
+    }
+    .topbar-notification-list { max-height:min(320px,calc(100dvh - 260px)); }
+
+    .main-content { padding:20px var(--mobile-gutter) 34px; }
+    .footer { padding:14px var(--mobile-gutter); }
+
+    .page-heading,.dashboard-intro,.heading-actions,.pks-page-heading,.pks-detail-heading {
+        min-width:0;
+        gap:12px;
+    }
+    .page-heading h1,.dashboard-intro h1 { font-size:clamp(19px,4.5vw,23px);line-height:1.25; }
+    .page-heading p,.dashboard-intro p:not(.eyebrow) { max-width:70ch;line-height:1.6; }
+    .heading-button-group,.intro-actions { flex-wrap:wrap; }
+
+    .reference-top-grid,.reference-chart-grid,.analytics-layout,.pks-detail-layout { grid-template-columns:1fr; }
+    .reference-data-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .mini-analytics-card { grid-column:span 2; }
+
+    .panel,.reference-panel,.filter-panel,.register-panel,.form-section,.single-detail { min-width:0; }
+    .panel-header { flex-wrap:wrap;padding:14px 15px; }
+    .filter-panel { padding:14px; }
+    .form-section { padding:17px; }
+
+    .table-wrap {
+        position:relative;
+        max-width:100%;
+        overflow-x:auto;
+        overflow-y:hidden;
+        overscroll-behavior-inline:contain;
+        scrollbar-width:thin;
+        -webkit-overflow-scrolling:touch;
+    }
+    .table-wrap table { min-width:760px; }
+    .pks-table-panel .table-wrap table { min-width:1080px; }
+    .session-table-panel .table-wrap table { min-width:1120px; }
+    .distribution-table-panel .table-wrap table,
+    .distribution-outgoing-panel .table-wrap table,
+    .progress-document-panel .table-wrap table,
+    .agendaris-table-panel .table-wrap table { min-width:920px; }
+    th,td { padding:11px; }
+
+    .modal-dialog,.pks-detail-popup-dialog { max-width:calc(100vw - 28px); }
+}
+
+@media (max-width:700px) {
+    :root { --mobile-gutter:12px; }
+
+    .topbar { min-height:58px;padding-block:6px; }
+    .menu-toggle,.topbar-icon { flex-basis:36px;width:36px;height:36px; }
+    .date-pill { display:none; }
+    .topbar-profile-trigger { min-height:36px;padding:3px 6px; }
+    .topbar-profile-avatar { flex-basis:30px;width:30px;height:30px;border-radius:9px; }
+    .topbar-profile-copy { display:none; }
+    .topbar-profile-chevron { margin-left:0; }
+    .topbar-notification-dropdown,.topbar-profile-dropdown { top:64px;right:10px;width:calc(100vw - 20px); }
+
+    .main-content { padding:16px var(--mobile-gutter) 28px; }
+    .footer { align-items:flex-start;flex-direction:column;gap:5px;padding-inline:var(--mobile-gutter); }
+
+    .geo-landing-page { height:auto;min-height:100dvh;overflow-x:hidden;overflow-y:auto; }
+    .geo-landing-header { height:70px;padding-inline:18px; }
+    .geo-landing-main {
+        height:auto;
+        min-height:calc(100dvh - 70px);
+        padding:42px 18px 34px;
+    }
+    .geo-landing-copy { width:100%;max-width:560px; }
+    .geo-landing-copy h1.geo-landing-wordmark { width:min(100%,520px); }
+    .geo-landing-description { max-width:95%; }
+    .geo-primary-action { min-height:44px; }
+    .landing-login-dialog { max-height:94dvh; }
+    .login-shell { width:min(100% - 24px,680px);margin:12px auto; }
+
+    .page-heading,.dashboard-intro,.heading-actions,.pks-page-heading,.pks-detail-heading {
+        align-items:flex-start;
+        flex-direction:column;
+        margin-bottom:16px;
+    }
+    .page-heading > div:first-child,.dashboard-intro > div:first-child { min-width:0;width:100%; }
+    .heading-actions > div:first-child { min-width:0; }
+    .heading-button-group,.intro-actions,.agendaris-heading-actions { width:100%; }
+    .heading-button-group .btn,.intro-actions .btn,.agendaris-heading-actions > .btn,.agendaris-heading-actions > form { flex:1; }
+    .agendaris-heading-actions > form .btn { width:100%; }
+
+    .metric-strip,.pks-summary-grid,.pks-detail-summary,.account-stat-grid,.company-metrics {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:9px;
+    }
+    .metric-card,.pks-summary-card,.company-metric { min-width:0; }
+    .analytics-side,.reference-data-grid { grid-template-columns:1fr; }
+    .mini-analytics-card { grid-column:auto; }
+    .analytics-kpis { grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding-inline:14px; }
+
+    .filter-form,.distribution-filter-form,.agendaris-filter-form,.account-filter-form,.session-filter-form,.pks-filter-form {
+        grid-template-columns:1fr;
+    }
+    .search-group,
+    .distribution-filter-form .search-group,
+    .agendaris-filter-form .search-group,
+    .account-filter-form .filter-actions,
+    .session-filter-form .filter-actions { grid-column:auto; }
+    .filter-actions { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:7px; }
+    .filter-actions .btn { width:100%; }
+
+    .form-grid,.modal-form-grid,.agendaris-form-grid,.pks-child-grid,.pks-item-grid,.pks-popup-grid,
+    .detail-list.grid-two,.modal-detail-grid,.agendaris-detail-grid,.pks-detail-list {
+        grid-template-columns:1fr;
+    }
+    .span-2,.modal-span-2,.detail-list .full-detail,.pks-detail-list .wide { grid-column:auto; }
+    .section-heading { align-items:flex-start; }
+    .form-actions-sticky { bottom:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:10px; }
+    .form-actions-sticky .btn { width:100%; }
+
+    .progress-document-tabs {
+        display:flex;
+        gap:7px;
+        padding:5px;
+        overflow-x:auto;
+        scroll-snap-type:x proximity;
+        scrollbar-width:none;
+        -webkit-overflow-scrolling:touch;
+    }
+    .progress-document-tabs::-webkit-scrollbar { display:none; }
+    .progress-document-tab { flex:0 0 min(250px,78vw);scroll-snap-align:start; }
+
+    .outgoing-distribution-steps {
+        justify-content:flex-start;
+        gap:7px;
+        overflow-x:auto;
+        overflow-y:hidden;
+        scroll-padding-inline:14px;
+        overscroll-behavior-inline:contain;
+        scrollbar-width:none;
+    }
+    .outgoing-distribution-steps::-webkit-scrollbar { display:none; }
+    .outgoing-distribution-steps span { flex:0 0 auto;white-space:nowrap; }
+    .outgoing-distribution-steps i { flex:0 0 24px;width:24px; }
+
+    .input-modal,.detail-modal,.edit-modal,.delete-modal,.account-modal,
+    .agendaris-form-modal,.agendaris-detail-modal,.agendaris-delete-modal,
+    .distribution-action-modal,.pks-main-modal,.pks-delete-modal {
+        align-items:end;
+        padding:0;
+    }
+    .modal-dialog,.detail-modal-dialog,.edit-modal-dialog,.account-modal-dialog,
+    .agendaris-modal-dialog,.distribution-action-dialog,.pks-main-modal-dialog,
+    .pks-detail-popup-dialog,.delete-modal-dialog {
+        width:100%;
+        max-width:none;
+        max-height:94dvh;
+        border-radius:16px 16px 0 0;
+    }
+    .modal-header { flex:0 0 auto;padding:13px 15px; }
+    .modal-title-group { min-width:0; }
+    .modal-title-group > div { min-width:0; }
+    .modal-title-group h2 { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .modal-body,.modal-body.input-modal-body,.edit-modal-body,.pks-detail-popup-body { padding:15px; }
+    .modal-footer { flex:0 0 auto;flex-wrap:wrap;padding:10px 15px; }
+    .modal-footer .btn { flex:1; }
+    .modal-submit-status { flex:1 0 100%;margin:0 0 3px;text-align:center; }
+    .delete-modal-body { padding:24px 18px 18px; }
+    .delete-modal-actions { padding:11px 15px; }
+    .outgoing-distribution-step { margin:12px 14px 16px;padding:14px; }
+
+    .table-list-footer { align-items:flex-start;flex-direction:column;gap:8px;padding:11px 13px; }
+    .table-list-footer .pagination-wrap,.pagination-wrap {
+        justify-content:flex-start;
+        width:100%;
+        margin-left:0;
+        padding:7px 0;
+        overflow-x:auto;
+    }
+    .pagination { min-width:max-content; }
+    .table-length-form { width:100%; }
+
+    .session-table-header,.distribution-section-title { align-items:flex-start;flex-direction:column; }
+    .pks-table-realtime { justify-content:flex-start; }
+    .pks-inline-form { margin:12px;padding:14px; }
+    .pks-inline-actions { display:grid;grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .pks-inline-actions .btn { width:100%; }
+    .pks-timeline { padding-right:0; }
+
+    .success-toast { top:10px;right:10px;left:10px;width:auto; }
+    .alert { grid-template-columns:auto minmax(0,1fr) auto;padding:10px 11px; }
+}
+
+@media (max-width:460px) {
+    :root { --mobile-gutter:10px; }
+
+    .topbar { gap:7px; }
+    .topbar-title span { display:none; }
+    .topbar-title strong { font-size:10.5px; }
+    .topbar-profile-chevron { display:none; }
+    .topbar-notification-dropdown,.topbar-profile-dropdown { right:8px;width:calc(100vw - 16px); }
+    .topbar-notification-summary { grid-template-columns:1fr; }
+    .topbar-notification-list { max-height:calc(100dvh - 290px); }
+
+    .main-content { padding-top:13px; }
+    .page-heading h1,.dashboard-intro h1 { font-size:19px; }
+    .heading-button-group,.intro-actions,.agendaris-heading-actions { display:grid;grid-template-columns:1fr; }
+    .heading-button-group .btn,.intro-actions .btn,.agendaris-heading-actions > .btn,.agendaris-heading-actions > form { width:100%; }
+
+    .metric-strip,.pks-summary-grid,.pks-detail-summary,.account-stat-grid,.company-metrics,.analytics-kpis {
+        grid-template-columns:1fr;
+    }
+    .metric-card { min-height:70px; }
+    .pks-summary-card { min-height:68px;padding:11px 13px; }
+
+    .panel-header { align-items:flex-start;flex-direction:column;gap:7px; }
+    .panel-header > * { max-width:100%; }
+    .filter-actions,.form-actions-sticky,.pks-inline-actions,.delete-modal-actions { grid-template-columns:1fr; }
+
+    .modal-header { gap:8px; }
+    .modal-title-icon { flex:0 0 33px;width:33px;height:33px; }
+    .modal-footer { display:grid;grid-template-columns:1fr;width:100%; }
+    .modal-footer .btn { width:100%; }
+    .detail-record-times { align-items:flex-start;flex-direction:column;gap:5px; }
+    .detail-record-times p + p { padding-left:0;border-left:0; }
+
+    .pks-wizard-steps { grid-template-columns:1fr 10px 1fr 10px 1fr 10px 1fr;padding-inline:7px; }
+    .pks-wizard-steps > button > span { flex-basis:27px;height:27px; }
+    .pks-wizard-steps > i { min-width:0; }
+    .pks-timeline { padding-left:48px; }
+    .pks-timeline::before { left:24px; }
+    .pks-timeline-number { left:-38px;width:31px;height:31px; }
+
+    .duplicate-tab-page { padding:12px; }
+    .duplicate-tab-card { padding:32px 20px;border-radius:15px; }
+    .duplicate-tab-card h1 { font-size:20px; }
+    .duplicate-tab-card > span:not(.duplicate-tab-icon) { font-size:10px; }
+
+    .geo-landing-header { padding-inline:14px; }
+    .geo-brand-logo { width:142px;height:56px; }
+    .geo-brand-logo img { top:-20px;left:-24px;width:190px; }
+    .geo-landing-main { padding:34px 15px 28px; }
+    .geo-landing-kicker { gap:8px;letter-spacing:1.5px; }
+    .geo-landing-kicker::before { width:22px; }
+    .geo-landing-copy h1.geo-landing-wordmark { width:100%; }
+    .geo-landing-copy h2.geo-landing-acronym { gap:3px 6px;font-size:11px;line-height:1.55; }
+    .geo-landing-description { max-width:100%;font-size:9px; }
+    .geo-primary-action { width:100%; }
+
+    .login-shell { width:100%;min-height:100dvh;margin:0;border-radius:0; }
+    .login-brand-panel { min-height:170px;padding:24px 22px; }
+    .login-brand-copy { margin:24px 0 10px; }
+    .login-form-panel { padding:28px 20px; }
+}
+
+@media (max-height:540px) and (max-width:900px) {
+    .sidebar { padding-block:10px; }
+    .brand.brand-jaksa { min-height:48px;padding-bottom:8px; }
+    .brand-jaksa-wordmark { width:92px; }
+    .brand-jaksa-expansion { display:none; }
+}
+
+@media (prefers-reduced-motion:reduce) and (max-width:900px) {
+    .sidebar,.sidebar-backdrop { animation:none!important;transition:none!important; }
+}
+
+@keyframes mobile-backdrop-in { from { opacity:0; } to { opacity:1; } }
