@@ -10,5 +10,5 @@ class PksItemModel extends Model
     protected $primaryKey = 'id';
     protected $returnType = 'array';
     protected $useTimestamps = true;
-    protected $allowedFields = ['kerjasama_id', 'nama_item', 'jumlah', 'satuan', 'keterangan'];
+    protected $allowedFields = ['kerjasama_id', 'keterangan'];
 }

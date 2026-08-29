@@ -32,8 +32,8 @@ class PksWorkflowDummyData extends Seeder
                 ],
                 'documents' => [],
                 'items' => [
-                    ['nama_item' => 'Kertas A4 80 gsm', 'jumlah' => 500, 'satuan' => 'Rim', 'keterangan' => 'Pengiriman dilakukan bertahap sesuai permintaan.'],
-                    ['nama_item' => 'Tinta printer', 'jumlah' => 120, 'satuan' => 'Unit', 'keterangan' => 'Menyesuaikan tipe printer kantor.'],
+                    ['keterangan' => 'Kertas A4 80 gsm — Pengiriman dilakukan bertahap sesuai permintaan.'],
+                    ['keterangan' => 'Tinta printer — Menyesuaikan tipe printer kantor.'],
                 ],
             ],
             [
@@ -62,8 +62,8 @@ class PksWorkflowDummyData extends Seeder
                     ],
                 ],
                 'items' => [
-                    ['nama_item' => 'Preventive maintenance jaringan', 'jumlah' => 12, 'satuan' => 'Bulan', 'keterangan' => 'Pemeriksaan rutin setiap bulan.'],
-                    ['nama_item' => 'Layanan dukungan teknis', 'jumlah' => 24, 'satuan' => 'Tiket', 'keterangan' => 'Kuota dukungan selama masa kontrak.'],
+                    ['keterangan' => 'Preventive maintenance jaringan — Pemeriksaan rutin setiap bulan.'],
+                    ['keterangan' => 'Layanan dukungan teknis — Kuota dukungan selama masa kontrak.'],
                 ],
             ],
             [
@@ -92,9 +92,9 @@ class PksWorkflowDummyData extends Seeder
                     ],
                 ],
                 'items' => [
-                    ['nama_item' => 'Tenaga kebersihan', 'jumlah' => 8, 'satuan' => 'Orang', 'keterangan' => 'Penempatan pada hari kerja dan jadwal piket.'],
-                    ['nama_item' => 'General cleaning', 'jumlah' => 12, 'satuan' => 'Kegiatan', 'keterangan' => 'Dilaksanakan satu kali setiap bulan.'],
-                    ['nama_item' => 'Bahan kebersihan', 'jumlah' => 12, 'satuan' => 'Paket', 'keterangan' => 'Disediakan setiap awal bulan.'],
+                    ['keterangan' => 'Tenaga kebersihan — Penempatan pada hari kerja dan jadwal piket.'],
+                    ['keterangan' => 'General cleaning — Dilaksanakan satu kali setiap bulan.'],
+                    ['keterangan' => 'Bahan kebersihan — Disediakan setiap awal bulan.'],
                 ],
             ],
             [
@@ -123,8 +123,8 @@ class PksWorkflowDummyData extends Seeder
                     ],
                 ],
                 'items' => [
-                    ['nama_item' => 'Petugas pengamanan', 'jumlah' => 6, 'satuan' => 'Orang', 'keterangan' => 'Dibagi dalam tiga shift.'],
-                    ['nama_item' => 'Koordinator lapangan', 'jumlah' => 1, 'satuan' => 'Orang', 'keterangan' => 'Koordinasi dan pelaporan harian.'],
+                    ['keterangan' => 'Petugas pengamanan — Dibagi dalam tiga shift.'],
+                    ['keterangan' => 'Koordinator lapangan — Koordinasi dan pelaporan harian.'],
                 ],
             ],
             [
@@ -153,8 +153,8 @@ class PksWorkflowDummyData extends Seeder
                     ],
                 ],
                 'items' => [
-                    ['nama_item' => 'Servis berkala unit AC', 'jumlah' => 48, 'satuan' => 'Unit', 'keterangan' => 'Pemeriksaan dan pembersihan rutin.'],
-                    ['nama_item' => 'Penggantian komponen ringan', 'jumlah' => 1, 'satuan' => 'Paket', 'keterangan' => 'Sesuai kebutuhan dan persetujuan PIC.'],
+                    ['keterangan' => 'Servis berkala unit AC — Pemeriksaan dan pembersihan rutin.'],
+                    ['keterangan' => 'Penggantian komponen ringan — Sesuai kebutuhan dan persetujuan PIC.'],
                 ],
             ],
             [
@@ -189,8 +189,8 @@ class PksWorkflowDummyData extends Seeder
                     ],
                 ],
                 'items' => [
-                    ['nama_item' => 'Internet dedicated utama', 'jumlah' => 200, 'satuan' => 'Mbps', 'keterangan' => 'Layanan utama dengan SLA 99,5%.'],
-                    ['nama_item' => 'Koneksi internet cadangan', 'jumlah' => 100, 'satuan' => 'Mbps', 'keterangan' => 'Aktif otomatis saat koneksi utama bermasalah.'],
+                    ['keterangan' => 'Internet dedicated utama — Layanan utama dengan SLA 99,5%.'],
+                    ['keterangan' => 'Koneksi internet cadangan — Aktif otomatis saat koneksi utama bermasalah.'],
                 ],
             ],
             [
@@ -225,8 +225,8 @@ class PksWorkflowDummyData extends Seeder
                     ],
                 ],
                 'items' => [
-                    ['nama_item' => 'Kendaraan MPV operasional', 'jumlah' => 3, 'satuan' => 'Unit', 'keterangan' => 'Termasuk servis berkala dan kendaraan pengganti.'],
-                    ['nama_item' => 'Kendaraan niaga ringan', 'jumlah' => 1, 'satuan' => 'Unit', 'keterangan' => 'Digunakan untuk kebutuhan distribusi barang.'],
+                    ['keterangan' => 'Kendaraan MPV operasional — Termasuk servis berkala dan kendaraan pengganti.'],
+                    ['keterangan' => 'Kendaraan niaga ringan — Digunakan untuk kebutuhan distribusi barang.'],
                 ],
             ],
         ];
@@ -279,20 +279,22 @@ class PksWorkflowDummyData extends Seeder
             }
 
             foreach ($record['items'] as $item) {
+                $itemDescription = trim((string) $item['keterangan']);
+                $itemData = ['keterangan' => $itemDescription];
                 $existingItem = $this->db->table('pks_item_kerjasama')
                     ->where('kerjasama_id', $cooperationId)
-                    ->where('nama_item', $item['nama_item'])
+                    ->where('keterangan', $itemDescription)
                     ->get()
                     ->getRowArray();
 
                 if ($existingItem === null) {
-                    $this->db->table('pks_item_kerjasama')->insert($item + [
+                    $this->db->table('pks_item_kerjasama')->insert($itemData + [
                         'kerjasama_id' => $cooperationId,
                         'created_at' => $now,
                         'updated_at' => $now,
                     ]);
                 } else {
-                    $this->db->table('pks_item_kerjasama')->where('id', $existingItem['id'])->update($item + ['updated_at' => $now]);
+                    $this->db->table('pks_item_kerjasama')->where('id', $existingItem['id'])->update($itemData + ['updated_at' => $now]);
                 }
             }
         }

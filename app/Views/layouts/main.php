@@ -8,6 +8,7 @@ $generalSectionActive = $segment === 'bagian-umum-1';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
 $currentRole = (string) session()->get('auth_role');
 $displayName = (string) session()->get('auth_display_name');
+$authUsername = (string) session()->get('auth_username');
 $canAccessSecurity = in_array($currentRole, ['admin', 'security'], true);
 $canAccessAgendaris = in_array($currentRole, ['admin', 'agendaris'], true);
 $canAccessGeneralSection = in_array($currentRole, ['admin', 'umum_1'], true);
@@ -61,13 +62,13 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
             <nav class="main-nav" aria-label="Navigasi utama">
                 <p class="nav-label">MENU UTAMA</p>
                 <a href="<?= site_url('dashboard') ?>" class="nav-link <?= $segment === 'dashboard' ? 'active' : '' ?>" title="Dashboard">
-                    <span class="nav-icon icon-dashboard" aria-hidden="true">◆</span>
+                    <span class="nav-icon icon-dashboard" aria-hidden="true"><i>◆</i></span>
                     Dashboard
                 </a>
                 <?php if ($canAccessSecurity): ?>
                 <div class="nav-group <?= $securityActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $securityActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $securityActive ? 'true' : 'false' ?>" aria-controls="securitySubmenu" title="Security">
-                        <span class="nav-icon" aria-hidden="true">◈</span>
+                        <span class="nav-icon security-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/security-policeman.png') ?>" alt=""></span>
                         <span>Security</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
@@ -90,7 +91,7 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <?php if ($canAccessAgendaris): ?>
                 <div class="nav-group <?= $agendarisActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $agendarisActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $agendarisActive ? 'true' : 'false' ?>" aria-controls="agendarisSubmenu" title="Agendaris">
-                        <span class="nav-icon" aria-hidden="true">▦</span>
+                        <span class="nav-icon" aria-hidden="true"><i>▦</i></span>
                         <span>Agendaris</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
@@ -113,7 +114,7 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <?php if ($canAccessGeneralSection): ?>
                 <div class="nav-group <?= $generalSectionActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $generalSectionActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $generalSectionActive ? 'true' : 'false' ?>" aria-controls="generalSectionSubmenu" title="Bagian Umum 1">
-                        <span class="nav-icon" aria-hidden="true">▤</span>
+                        <span class="nav-icon" aria-hidden="true"><i>▤</i></span>
                         <span>Bagian Umum 1</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
@@ -127,29 +128,18 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <?php endif ?>
                 <?php if ($currentRole === 'admin'): ?>
                 <a href="<?= site_url('kelola-akun') ?>" class="nav-link <?= $accountManagementActive ? 'active' : '' ?>" title="Kelola Akun">
-                    <span class="nav-icon" aria-hidden="true">♙</span>
+                    <span class="nav-icon" aria-hidden="true"><i>♙</i></span>
                     Kelola Akun
                 </a>
                 <?php endif ?>
                 <p class="nav-label nav-label-spaced">KONFIGURASI</p>
                 <span class="nav-link nav-link-muted" title="Database Aktif">
-                    <span class="nav-icon" aria-hidden="true">◉</span>
+                    <span class="nav-icon" aria-hidden="true"><i>◉</i></span>
                     Database Aktif
                     <span class="nav-status-dot"></span>
                 </span>
             </nav>
 
-            <div class="sidebar-account">
-                <span class="sidebar-account-avatar"><?= esc($initial) ?></span>
-                <div>
-                    <strong><?= esc($displayName) ?></strong>
-                    <small><?= esc($roleLabel) ?></small>
-                </div>
-                <form action="<?= site_url('logout') ?>" method="post">
-                    <?= csrf_field() ?>
-                    <button type="submit" title="Keluar" aria-label="Keluar dari sistem">↪</button>
-                </form>
-            </div>
             <div class="sidebar-pattern" aria-hidden="true">OPERASIONAL</div>
         </aside>
 
@@ -165,6 +155,37 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <div class="topbar-meta">
                     <button class="topbar-icon" type="button" aria-label="Notifikasi">♢<i></i></button>
                     <span class="date-pill"><?= date('d M Y') ?></span>
+                    <div class="topbar-profile" data-profile-menu>
+                        <button class="topbar-profile-trigger" type="button" data-profile-toggle aria-expanded="false" aria-controls="topbarProfileMenu">
+                            <span class="topbar-profile-avatar" aria-hidden="true"><?= esc($initial) ?></span>
+                            <span class="topbar-profile-copy">
+                                <strong><?= esc($displayName) ?></strong>
+                                <small><?= esc($roleLabel) ?></small>
+                            </span>
+                            <span class="topbar-profile-chevron" aria-hidden="true">⌄</span>
+                        </button>
+                        <div class="topbar-profile-dropdown" id="topbarProfileMenu" data-profile-dropdown hidden>
+                            <header>
+                                <span class="topbar-profile-avatar topbar-profile-avatar-large" aria-hidden="true"><?= esc($initial) ?></span>
+                                <div>
+                                    <small>PROFIL PENGGUNA</small>
+                                    <strong><?= esc($displayName) ?></strong>
+                                    <span><?= esc($roleLabel) ?></span>
+                                </div>
+                            </header>
+                            <dl class="topbar-profile-details">
+                                <div><dt>Username</dt><dd><?= esc($authUsername) ?></dd></div>
+                                <div><dt>Hak akses</dt><dd><?= esc($roleLabel) ?></dd></div>
+                            </dl>
+                            <form action="<?= site_url('logout') ?>" method="post">
+                                <?= csrf_field() ?>
+                                <button class="topbar-logout" type="submit">
+                                    <span aria-hidden="true">↪</span>
+                                    Keluar dari Sistem
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </header>
 

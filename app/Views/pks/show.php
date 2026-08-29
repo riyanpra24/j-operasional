@@ -155,26 +155,23 @@ $isEditMode = $isEditMode ?? false;
     <?php if ($isEditMode): ?><div class="pks-inline-form" id="new-item" hidden>
         <form action="<?= $baseUrl . '/item' ?>" method="post">
             <?= csrf_field() ?>
-            <div class="pks-inline-heading"><div><strong>Tambah Item Pekerjaan</strong><small>Jumlah dan satuan boleh dikosongkan jika item bersifat umum.</small></div><button type="button" class="pks-inline-close" data-pks-toggle="new-item">×</button></div>
+            <div class="pks-inline-heading"><div><strong>Tambah Item Pekerjaan</strong><small>Tuliskan rincian barang, jasa, atau pekerjaan yang tercakup dalam PKS.</small></div><button type="button" class="pks-inline-close" data-pks-toggle="new-item">×</button></div>
             <div class="form-grid pks-item-grid">
-                <div class="form-group span-2"><label>Nama Barang / Jasa <span class="required">*</span></label><input name="nama_item" maxlength="250" placeholder="Contoh: Jasa kebersihan gedung" required></div>
-                <div class="form-group"><label>Jumlah</label><input name="jumlah" type="number" min="0" step="0.01"></div>
-                <div class="form-group"><label>Satuan</label><input name="satuan" maxlength="80" placeholder="Bulan, unit, paket, orang"></div>
-                <div class="form-group span-2"><label>Keterangan</label><textarea name="keterangan" placeholder="Spesifikasi atau catatan item"></textarea></div>
+                <div class="form-group span-2"><label>Keterangan <span class="required">*</span></label><textarea name="keterangan" maxlength="2000" placeholder="Tuliskan rincian barang, jasa, atau pekerjaan" required></textarea></div>
             </div>
             <div class="pks-inline-actions"><button type="button" class="btn btn-ghost" data-pks-toggle="new-item">Batal</button><button type="submit" class="btn btn-primary">Simpan Item</button></div>
         </form>
     </div><?php endif ?>
     <div class="table-wrap">
         <table class="pks-item-table">
-            <thead><tr><th>No.</th><th>Nama Barang / Jasa</th><th>Jumlah</th><th>Satuan</th><th>Keterangan</th><?php if ($isEditMode): ?><th>Aksi</th><?php endif ?></tr></thead>
+            <thead><tr><th>No.</th><th>Keterangan</th><?php if ($isEditMode): ?><th>Aksi</th><?php endif ?></tr></thead>
             <tbody>
             <?php if ($items === []): ?>
-                <tr><td colspan="<?= $isEditMode ? 6 : 5 ?>"><div class="empty-state compact"><span>□</span><strong>Belum ada item pekerjaan</strong><p><?= $isEditMode ? 'Tambahkan barang atau jasa yang termasuk dalam ruang lingkup PKS.' : 'Barang atau jasa belum dicatat pada PKS ini.' ?></p></div></td></tr>
+                <tr><td colspan="<?= $isEditMode ? 3 : 2 ?>"><div class="empty-state compact"><span>□</span><strong>Belum ada item pekerjaan</strong><p><?= $isEditMode ? 'Tambahkan keterangan barang atau jasa yang termasuk dalam ruang lingkup PKS.' : 'Keterangan barang atau jasa belum dicatat pada PKS ini.' ?></p></div></td></tr>
             <?php else: ?>
                 <?php foreach ($items as $index => $item): ?>
-                    <tr><td><strong><?= $index + 1 ?></strong></td><td><strong><?= esc($item['nama_item']) ?></strong></td><td><?= $formatNumber($item['jumlah']) ?></td><td><?= esc($item['satuan'] ?: '-') ?></td><td class="cell-wrap"><?= esc($item['keterangan'] ?: '-') ?></td><?php if ($isEditMode): ?><td><div class="action-buttons"><button type="button" class="icon-btn" data-pks-toggle="edit-item-<?= $item['id'] ?>" title="Ubah">✎</button><form action="<?= $baseUrl . '/item/' . $item['id'] . '/hapus' ?>" method="post" class="pks-delete-form" data-confirm="Hapus item <?= esc($item['nama_item'], 'attr') ?>?"><?= csrf_field() ?><button type="submit" class="icon-btn icon-btn-delete" title="Hapus">×</button></form></div></td><?php endif ?></tr>
-                    <?php if ($isEditMode): ?><tr class="pks-edit-row" id="edit-item-<?= $item['id'] ?>" hidden><td colspan="6"><div class="pks-inline-form compact"><form action="<?= $baseUrl . '/item/' . $item['id'] ?>" method="post"><?= csrf_field() ?><div class="form-grid pks-item-grid"><div class="form-group span-2"><label>Nama Barang / Jasa</label><input name="nama_item" maxlength="250" value="<?= esc($item['nama_item']) ?>" required></div><div class="form-group"><label>Jumlah</label><input name="jumlah" type="number" min="0" step="0.01" value="<?= esc($item['jumlah'] ?? '') ?>"></div><div class="form-group"><label>Satuan</label><input name="satuan" maxlength="80" value="<?= esc($item['satuan'] ?? '') ?>"></div><div class="form-group span-2"><label>Keterangan</label><textarea name="keterangan"><?= esc($item['keterangan'] ?? '') ?></textarea></div></div><div class="pks-inline-actions"><button type="button" class="btn btn-ghost" data-pks-toggle="edit-item-<?= $item['id'] ?>">Batal</button><button type="submit" class="btn btn-primary">Simpan Perubahan</button></div></form></div></td></tr><?php endif ?>
+                    <tr><td><strong><?= $index + 1 ?></strong></td><td class="cell-wrap"><?= esc($item['keterangan'] ?: '-') ?></td><?php if ($isEditMode): ?><td><div class="action-buttons"><button type="button" class="icon-btn" data-pks-toggle="edit-item-<?= $item['id'] ?>" title="Ubah">✎</button><form action="<?= $baseUrl . '/item/' . $item['id'] . '/hapus' ?>" method="post" class="pks-delete-form" data-confirm="Hapus item pekerjaan ini?"><?= csrf_field() ?><button type="submit" class="icon-btn icon-btn-delete" title="Hapus">×</button></form></div></td><?php endif ?></tr>
+                    <?php if ($isEditMode): ?><tr class="pks-edit-row" id="edit-item-<?= $item['id'] ?>" hidden><td colspan="3"><div class="pks-inline-form compact"><form action="<?= $baseUrl . '/item/' . $item['id'] ?>" method="post"><?= csrf_field() ?><div class="form-grid pks-item-grid"><div class="form-group span-2"><label>Keterangan <span class="required">*</span></label><textarea name="keterangan" maxlength="2000" required><?= esc($item['keterangan'] ?? '') ?></textarea></div></div><div class="pks-inline-actions"><button type="button" class="btn btn-ghost" data-pks-toggle="edit-item-<?= $item['id'] ?>">Batal</button><button type="submit" class="btn btn-primary">Simpan Perubahan</button></div></form></div></td></tr><?php endif ?>
                 <?php endforeach ?>
             <?php endif ?>
             </tbody>

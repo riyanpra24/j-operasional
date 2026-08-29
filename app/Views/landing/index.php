@@ -1,6 +1,15 @@
-<?php $landingCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1'; ?>
+<?php
+$landingCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
+$loginError        = session()->getFlashdata('login_error');
+$logoutSuccess     = session()->getFlashdata('logout_success');
+$openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
+    || $loginError !== null
+    || $logoutSuccess !== null
+    || service('request')->getGet('login') === '1';
+?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,64 +19,194 @@
     <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>?v=<?= esc($landingCssVersion, 'attr') ?>">
     <script src="<?= base_url('assets/url-mask.js') ?>"></script>
 </head>
-<body class="landing-page landing-single-page">
+
+<body class="landing-page geo-landing-page">
     <a class="landing-skip-link" href="#beranda">Lewati ke konten utama</a>
 
-    <header class="single-landing-header">
-        <a class="single-landing-brand" href="<?= site_url('/') ?>" aria-label="Jamkrindo Kanwil Surabaya">
-            <span class="single-brand-logo">
+    <header class="geo-landing-header">
+        <a class="geo-landing-brand" href="<?= site_url('/') ?>" aria-label="Jamkrindo Kanwil Surabaya">
+            <span class="geo-brand-logo">
                 <img src="<?= base_url('assets/jamkrindo-kanwil-surabaya.png') ?>" alt="Jamkrindo Kanwil Surabaya">
             </span>
         </a>
-        <nav class="single-landing-nav" aria-label="Navigasi utama">
+        <nav class="geo-landing-nav" aria-label="Navigasi utama">
             <a class="active" href="#beranda">Beranda</a>
             <a href="#fitur-ringkas">Fitur</a>
             <a href="#fitur-ringkas">Alur Kerja</a>
             <a href="#fitur-ringkas">Keamanan</a>
         </nav>
-        <a class="single-nav-login" href="<?= $isLoggedIn ? site_url('dashboard') : site_url('login') ?>">
-            <?= $isLoggedIn ? 'Dashboard' : 'Masuk' ?><span aria-hidden="true">→</span>
-        </a>
     </header>
 
-    <main class="single-landing-main" id="beranda">
-        <div class="single-landing-copy">
-            <p class="single-landing-kicker"><span></span> REGISTER OPERASIONAL DIGITAL</p>
-            <h1>Operasional.<br><em>Terhubung.</em></h1>
-            <h2>Document Management System</h2>
-            <p class="single-landing-description">Kelola penerimaan, distribusi, agenda, dan progres dokumen dalam satu sistem yang tertib, aman, serta mudah dipantau.</p>
+    <main class="geo-landing-main" id="beranda">
+        <section class="geo-landing-copy">
+            <p class="geo-landing-kicker">PORTAL DIGITAL OPERASIONAL KANWIL SURABAYA</p>
+            <h1 class="geo-landing-wordmark">
+                <img src="<?= base_url('assets/images/jaksa-wordmark.png') ?>" alt="JAKSA">
+            </h1>
+            <h2 class="geo-landing-acronym" aria-label="Jamkrindo Kanwil Surabaya Operasional">
+                <span><b>JA</b>mkrindo</span>
+                <i aria-hidden="true">|</i>
+                <span><b>K</b>anwil</span>
+                <i aria-hidden="true">|</i>
+                <span><b>S</b>urabaya</span>
+                <i aria-hidden="true">|</i>
+                <span>oper<b>A</b>sional</span>
+            </h2>
+            <p class="geo-landing-description" id="fitur-ringkas">Akses dashboard, pengelolaan, monitoring, dan kegiatan operasional dalam satu sistem operasional yang tertib, aman, serta mudah dipantau.</p>
 
-            <div class="single-landing-actions">
-                <a class="single-primary-action" href="<?= $isLoggedIn ? site_url('dashboard') : site_url('login') ?>">
-                    <?= $isLoggedIn ? 'Buka Dashboard' : 'Masuk ke Sistem' ?><span aria-hidden="true">→</span>
-                </a>
-                <span class="single-access-note"><i aria-hidden="true">✓</i> Akses sesuai kewenangan</span>
+            <div class="geo-landing-actions">
+                <?php if ($isLoggedIn): ?>
+                    <a class="geo-primary-action" href="<?= site_url('dashboard') ?>">Buka Dashboard<span aria-hidden="true">→</span></a>
+                <?php else: ?>
+                    <button class="geo-primary-action" type="button" data-login-open>Masuk ke Sistem<span aria-hidden="true">→</span></button>
+                <?php endif ?>
             </div>
+        </section>
 
-            <div class="single-feature-row" id="fitur-ringkas" aria-label="Keunggulan Jamkrindo Kanwil Surabaya">
-                <article><span>01</span><div><strong>Register Digital</strong><small>Data dokumen terpusat</small></div></article>
-                <article><span>02</span><div><strong>Distribusi Terarah</strong><small>Proses mudah dipantau</small></div></article>
-                <article><span>03</span><div><strong>Agenda Terhubung</strong><small>Riwayat terdokumentasi</small></div></article>
+        <aside class="geo-landing-art" aria-hidden="true">
+            <div class="geo-tech-grid"></div>
+            <div class="geo-system-visual">
+                <div class="geo-system-orbit orbit-one"></div>
+                <div class="geo-system-orbit orbit-two"></div>
+                <span class="geo-system-connection connection-one"></span>
+                <span class="geo-system-connection connection-two"></span>
+                <span class="geo-system-connection connection-three"></span>
+                <span class="geo-system-connection connection-four"></span>
+
+                <div class="geo-core-card">
+                    <span class="geo-core-icon">▦</span>
+                    <strong>KANWIL SURABAYA</strong>
+                    <small>OPERASIONAL</small>
+                </div>
+
+                <div class="geo-flow-node node-incoming"><b>01</b><span>Umum</span></div>
+                <div class="geo-flow-node node-agenda"><b>02</b><span>Akuntansi</span></div>
+                <div class="geo-flow-node node-distribution"><b>03</b><span>SDM</span></div>
+                <div class="geo-flow-node node-archive"><b>04</b><span>Agendaris</span></div>
             </div>
-
-            <div class="single-landing-dots" aria-hidden="true"><i class="active"></i><i></i><i></i><i></i></div>
-        </div>
-
-        <div class="single-wave-art" aria-hidden="true">
-            <svg viewBox="0 0 820 720" preserveAspectRatio="xMidYMid slice">
-                <defs>
-                    <linearGradient id="waveMain" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#126fc1"/><stop offset=".5" stop-color="#0ca8b0"/><stop offset="1" stop-color="#27bd8d"/></linearGradient>
-                    <linearGradient id="waveDeep" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#124da7"/><stop offset="1" stop-color="#087fba"/></linearGradient>
-                    <linearGradient id="waveSoft" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#18a8b2"/><stop offset="1" stop-color="#29c095"/></linearGradient>
-                </defs>
-                <path fill="#1262ad" d="M820 0V720H54c48-93 132-109 184-181 74-103 36-215 139-295 95-74 207-14 299-71C742 132 772 65 820 0Z"/>
-                <path fill="url(#waveMain)" d="M820 28V720H115c58-74 143-93 194-171 69-105 27-202 117-270 92-69 196-5 277-62 58-40 77-109 117-189Z"/>
-                <path fill="#147baa" opacity=".86" d="M820 287V720H248c59-60 107-130 190-145 85-15 138 31 221-6 68-31 103-100 161-163Z"/>
-                <path fill="url(#waveSoft)" d="M820 321V720H306c51-63 99-108 173-116 79-9 126 28 202-9 61-30 92-91 139-151Z"/>
-                <path fill="url(#waveDeep)" d="M820 552V720H526c51-58 99-107 168-112 50-4 84 15 126 7Z"/>
-            </svg>
-            <div class="single-wave-badge"><span>✓</span><div><small>SISTEM AKTIF</small><strong>Dokumen terpantau</strong></div></div>
-        </div>
+            <span class="geo-decor-dot dot-one"></span>
+            <span class="geo-decor-dot dot-two"></span>
+            <span class="geo-decor-dot dot-three"></span>
+        </aside>
     </main>
+
+    <div
+        class="landing-login-modal<?= $openLoginModal ? ' open' : '' ?>"
+        data-login-modal
+        data-open-on-load="<?= $openLoginModal ? 'true' : 'false' ?>"
+        aria-hidden="<?= $openLoginModal ? 'false' : 'true' ?>"
+        <?= $openLoginModal ? '' : 'hidden' ?>>
+        <button type="button" class="landing-login-backdrop" data-login-close aria-label="Tutup formulir login"></button>
+        <section class="landing-login-dialog" role="dialog" aria-modal="true" aria-labelledby="landingLoginTitle">
+            <button type="button" class="landing-login-close" data-login-close aria-label="Tutup">×</button>
+
+            <header class="landing-login-header">
+                <span class="landing-login-mark" aria-hidden="true"></span>
+                <div>
+                    <small>JAMKRINDO KANWIL SURABAYA</small>
+                    <strong id="landingLoginTitle">Masuk ke Sistem</strong>
+                    <p>Gunakan akun operasional yang telah diberikan.</p>
+                </div>
+            </header>
+
+            <div class="landing-login-body">
+                <?php if ($loginError): ?>
+                    <div class="landing-login-alert danger" role="alert"><?= esc($loginError) ?></div>
+                <?php endif ?>
+
+                <?php if ($logoutSuccess): ?>
+                    <div class="landing-login-alert success" role="status"><?= esc($logoutSuccess) ?></div>
+                <?php endif ?>
+
+                <form action="<?= site_url('login') ?>" method="post" class="landing-login-form">
+                    <?= csrf_field() ?>
+                    <div class="form-group">
+                        <label for="landingUsername">Username</label>
+                        <input
+                            id="landingUsername"
+                            name="username"
+                            type="text"
+                            value="<?= esc(old('username')) ?>"
+                            placeholder="Masukkan username"
+                            autocomplete="username"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="landingPassword">Password</label>
+                        <div class="landing-password-field">
+                            <input
+                                id="landingPassword"
+                                name="password"
+                                type="password"
+                                placeholder="Masukkan password"
+                                autocomplete="current-password"
+                                required>
+                            <button type="button" data-landing-password-toggle aria-label="Tampilkan password">Lihat</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="landing-login-submit">Masuk ke Sistem <span aria-hidden="true">→</span></button>
+                </form>
+                <p class="landing-login-help">Hubungi IT Kanwil apabila mengalami kendala akses.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        (() => {
+            const modal = document.querySelector('[data-login-modal]');
+            if (!modal) return;
+
+            const username = document.getElementById('landingUsername');
+            const password = document.getElementById('landingPassword');
+            const passwordToggle = document.querySelector('[data-landing-password-toggle]');
+            let previousFocus = null;
+
+            const openModal = () => {
+                previousFocus = document.activeElement;
+                modal.hidden = false;
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('landing-modal-open');
+                requestAnimationFrame(() => {
+                    modal.classList.add('open');
+                    username?.focus();
+                });
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('open');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('landing-modal-open');
+                window.setTimeout(() => {
+                    modal.hidden = true;
+                    previousFocus?.focus?.();
+                }, 180);
+            };
+
+            document.querySelectorAll('[data-login-open]').forEach((button) => button.addEventListener('click', openModal));
+            modal.querySelectorAll('[data-login-close]').forEach((button) => button.addEventListener('click', closeModal));
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !modal.hidden) closeModal();
+            });
+
+            passwordToggle?.addEventListener('click', () => {
+                const visible = password?.type === 'text';
+                if (!password) return;
+                password.type = visible ? 'password' : 'text';
+                passwordToggle.textContent = visible ? 'Lihat' : 'Sembunyikan';
+                passwordToggle.setAttribute('aria-label', visible ? 'Tampilkan password' : 'Sembunyikan password');
+            });
+
+            if (modal.dataset.openOnLoad === 'true') {
+                openModal();
+                const url = new URL(window.location.href);
+                if (url.searchParams.has('login')) {
+                    url.searchParams.delete('login');
+                    window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+                }
+            }
+        })();
+    </script>
 </body>
+
 </html>

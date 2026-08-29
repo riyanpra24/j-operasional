@@ -1,6 +1,7 @@
 <?php
 $loginError    = $loginErrorOverride ?? session()->getFlashdata('login_error');
 $logoutSuccess = session()->getFlashdata('logout_success');
+$loginCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -11,7 +12,7 @@ $logoutSuccess = session()->getFlashdata('logout_success');
     <meta name="description" content="Login Sistem Register Operasional">
     <title><?= esc($title ?? 'Login') ?> | J-Operasional</title>
     <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg?v=2') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>?v=<?= esc($loginCssVersion, 'attr') ?>">
     <script src="<?= base_url('assets/url-mask.js') ?>"></script>
 </head>
 

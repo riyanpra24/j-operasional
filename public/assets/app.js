@@ -128,16 +128,56 @@
         setMobileSidebar(false);
     });
 
+    const navigationGroups = Array.from(document.querySelectorAll('[data-nav-group]'));
+    const setNavigationGroupOpen = (group, open) => {
+        const groupToggle = group?.querySelector('[data-nav-toggle]');
+        const groupSubmenu = group?.querySelector('[data-nav-submenu]');
+        if (!group || !groupToggle || !groupSubmenu) return;
+
+        group.classList.toggle('open', open);
+        groupToggle.setAttribute('aria-expanded', String(open));
+        groupSubmenu.hidden = !open;
+    };
+
     document.querySelectorAll('[data-nav-toggle]').forEach((toggle) => {
         toggle.addEventListener('click', () => {
             const group = toggle.closest('[data-nav-group]');
             const submenu = group?.querySelector('[data-nav-submenu]');
             if (!group || !submenu) return;
             const open = !group.classList.contains('open');
-            group.classList.toggle('open', open);
-            toggle.setAttribute('aria-expanded', String(open));
-            submenu.hidden = !open;
+
+            if (open) {
+                navigationGroups.forEach((otherGroup) => {
+                    if (otherGroup !== group) setNavigationGroupOpen(otherGroup, false);
+                });
+            }
+
+            setNavigationGroupOpen(group, open);
         });
+    });
+
+    const profileMenu = document.querySelector('[data-profile-menu]');
+    const profileToggle = profileMenu?.querySelector('[data-profile-toggle]');
+    const profileDropdown = profileMenu?.querySelector('[data-profile-dropdown]');
+    const setProfileMenuOpen = (open) => {
+        if (!profileMenu || !profileToggle || !profileDropdown) return;
+        profileMenu.classList.toggle('open', open);
+        profileToggle.setAttribute('aria-expanded', String(open));
+        profileDropdown.hidden = !open;
+    };
+
+    profileToggle?.addEventListener('click', () => {
+        setProfileMenuOpen(!profileMenu.classList.contains('open'));
+    });
+    document.addEventListener('click', (event) => {
+        if (profileMenu?.classList.contains('open') && !profileMenu.contains(event.target)) {
+            setProfileMenuOpen(false);
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || !profileMenu?.classList.contains('open')) return;
+        setProfileMenuOpen(false);
+        profileToggle?.focus();
     });
 
     document.querySelectorAll('.alert-close').forEach((button) => {

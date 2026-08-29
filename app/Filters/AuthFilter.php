@@ -51,7 +51,9 @@ class AuthFilter implements FilterInterface
                 ]);
         }
 
-        return redirect()->to(site_url('login'))->with('login_error', 'Silakan login untuk mengakses sistem.');
+        return redirect()->to(site_url('/'))
+            ->with('open_login_modal', true)
+            ->with('login_error', 'Silakan login untuk mengakses sistem.');
     }
 
     private function expiredResponse(RequestInterface $request): ResponseInterface
@@ -64,11 +66,13 @@ class AuthFilter implements FilterInterface
                 ->setJSON([
                     'success'      => false,
                     'message'      => $message,
-                    'redirect_url' => site_url('login'),
+                    'redirect_url' => site_url('/') . '?login=1',
                 ]);
         }
 
-        return redirect()->to(site_url('login'))->with('login_error', $message);
+        return redirect()->to(site_url('/'))
+            ->with('open_login_modal', true)
+            ->with('login_error', $message);
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

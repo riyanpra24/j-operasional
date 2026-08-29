@@ -10,7 +10,7 @@ class Auth extends BaseController
 {
     private const LOGIN_LIFETIME_SECONDS = 7200;
 
-    public function login(): string|RedirectResponse
+    public function login(): RedirectResponse
     {
         if (session()->get('auth_user_id') !== null) {
             $expiresAt = (int) session()->get('auth_expires_at');
@@ -21,15 +21,12 @@ class Auth extends BaseController
 
             $this->clearAuthentication();
 
-            return view('auth/login', [
-                'title'              => 'Login',
-                'loginErrorOverride' => 'Sesi login telah berakhir setelah 2 jam. Silakan login kembali.',
-            ]);
+            return redirect()->to(site_url('/'))
+                ->with('open_login_modal', true)
+                ->with('login_error', 'Sesi login telah berakhir setelah 2 jam. Silakan login kembali.');
         }
 
-        return view('auth/login', [
-            'title' => 'Login',
-        ]);
+        return redirect()->to(site_url('/'))->with('open_login_modal', true);
     }
 
     public function attempt(): RedirectResponse
@@ -40,7 +37,10 @@ class Auth extends BaseController
         ];
 
         if (! $this->validate($rules)) {
-            return redirect()->back()->withInput()->with('login_error', 'Username dan password wajib diisi.');
+            return redirect()->back()
+                ->withInput()
+                ->with('open_login_modal', true)
+                ->with('login_error', 'Username dan password wajib diisi.');
         }
 
         $username = trim((string) $this->request->getPost('username'));
@@ -48,13 +48,19 @@ class Auth extends BaseController
         $user     = (new UserModel())->where('username', $username)->first();
 
         if ($user === null || ! password_verify($password, $user['password_hash'])) {
-            return redirect()->back()->withInput()->with('login_error', 'Username atau password tidak sesuai.');
+            return redirect()->back()
+                ->withInput()
+                ->with('open_login_modal', true)
+                ->with('login_error', 'Username atau password tidak sesuai.');
         }
 
         $role = strtolower((string) ($user['role'] ?? ''));
 
         if (! UserRoles::isValid($role)) {
-            return redirect()->back()->withInput()->with('login_error', 'Role akun tidak dikenali. Hubungi administrator.');
+            return redirect()->back()
+                ->withInput()
+                ->with('open_login_modal', true)
+                ->with('login_error', 'Role akun tidak dikenali. Hubungi administrator.');
         }
 
         session()->regenerate(true);
@@ -74,7 +80,9 @@ class Auth extends BaseController
     {
         $this->clearAuthentication();
 
-        return redirect()->to(site_url('login'))->with('logout_success', 'Anda berhasil keluar dari sistem.');
+        return redirect()->to(site_url('/'))
+            ->with('open_login_modal', true)
+            ->with('logout_success', 'Anda berhasil keluar dari sistem.');
     }
 
     private function clearAuthentication(): void

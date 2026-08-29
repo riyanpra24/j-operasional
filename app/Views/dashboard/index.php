@@ -17,7 +17,7 @@ $angleOne   = isset($jenisTop[0]) ? (int) round(((int) $jenisTop[0]['total'] / $
 $angleTwo   = $angleOne + (isset($jenisTop[1]) ? (int) round(((int) $jenisTop[1]['total'] / $jenisTotal) * 360) : 0);
 $donutStyle = $jenis === []
     ? 'background:#edf0f4'
-    : "background:conic-gradient(#ffae34 0 {$angleOne}deg,#10aaa5 {$angleOne}deg {$angleTwo}deg,#2d4b9c {$angleTwo}deg 360deg)";
+    : "background:conic-gradient(#005aa9 0 {$angleOne}deg,#00aaa6 {$angleOne}deg {$angleTwo}deg,#2398c5 {$angleTwo}deg 360deg)";
 $todayRate = $stats['total'] > 0 ? min(100, (int) round(($stats['today'] / $stats['total']) * 100)) : 0;
 $monthRate = $stats['total'] > 0 ? min(100, (int) round(($stats['month'] / $stats['total']) * 100)) : 0;
 $months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
@@ -56,7 +56,7 @@ $registerUrl = $canAccessSecurity ? site_url('dokumen-masuk') : site_url('agenda
             <div class="reference-y-axis"><span><?= $maxChart ?></span><span><?= (int) ceil($maxChart * .75) ?></span><span><?= (int) ceil($maxChart * .5) ?></span><span><?= (int) ceil($maxChart * .25) ?></span><span>0</span></div>
             <div class="reference-svg-wrap">
                 <svg viewBox="0 0 <?= $chartWidth ?> <?= $chartHeight ?>" preserveAspectRatio="none" aria-label="Grafik dokumen masuk">
-                    <defs><linearGradient id="referenceArea" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#ffb13b" stop-opacity=".28"/><stop offset="100%" stop-color="#ffb13b" stop-opacity=".04"/></linearGradient></defs>
+                    <defs><linearGradient id="referenceArea" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#005aa9" stop-opacity=".3"/><stop offset="100%" stop-color="#00aaa6" stop-opacity=".04"/></linearGradient></defs>
                     <?php foreach ([40,70,100,130,165] as $y): ?><line x1="0" y1="<?= $y ?>" x2="680" y2="<?= $y ?>" class="reference-grid-line"/><?php endforeach ?>
                     <path d="<?= esc($areaPath) ?>" fill="url(#referenceArea)"/>
                     <polyline points="<?= esc($polyline) ?>" class="reference-chart-line"/>

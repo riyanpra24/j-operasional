@@ -254,9 +254,9 @@ class PksBarangJasa extends BaseController
 
     public function destroyItem(int $id, int $itemId): RedirectResponse
     {
-        $item = $this->findOwnedItem($id, $itemId);
+        $this->findOwnedItem($id, $itemId);
         $this->item->delete($itemId);
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', 'Item ' . $item['nama_item'] . ' berhasil dihapus.');
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', 'Item pekerjaan berhasil dihapus.');
     }
 
     private function baseListQuery(): PksKerjasamaModel
@@ -520,13 +520,9 @@ class PksBarangJasa extends BaseController
 
     private function itemPayload(int $id): array
     {
-        $jumlah = trim((string) $this->request->getPost('jumlah'));
         return [
             'kerjasama_id' => $id,
-            'nama_item' => trim((string) $this->request->getPost('nama_item')),
-            'jumlah' => $jumlah === '' ? null : (float) $jumlah,
-            'satuan' => trim((string) $this->request->getPost('satuan')) ?: null,
-            'keterangan' => trim((string) $this->request->getPost('keterangan')) ?: null,
+            'keterangan' => trim((string) $this->request->getPost('keterangan')),
         ];
     }
 
@@ -534,9 +530,7 @@ class PksBarangJasa extends BaseController
     {
         $validation = service('validation');
         $validation->setRules([
-            'nama_item' => 'required|max_length[250]',
-            'jumlah' => 'permit_empty|greater_than_equal_to[0]',
-            'satuan' => 'permit_empty|max_length[80]',
+            'keterangan' => 'required|max_length[2000]',
         ]);
         $validation->run($data);
         return $validation->getErrors();
