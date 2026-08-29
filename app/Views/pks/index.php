@@ -54,6 +54,10 @@ $summaryCards = [
 </section>
 
 <section class="panel register-panel pks-table-panel">
+    <div class="pks-table-realtime" aria-label="Waktu acuan perhitungan masa berlaku">
+        <span aria-hidden="true"></span>
+        <p>Dihitung otomatis per <strong data-pks-current-date><?= esc($calculationDate) ?></strong> WIB</p>
+    </div>
     <div class="table-wrap">
         <table>
             <thead><tr><th>No.</th><th>Nomor PKS</th><th>Nama Kerja Sama</th><th>Mitra</th><th>Dokumen Terakhir</th><th>Masa Berlaku</th><th>Nilai Terakhir</th><th>Status</th><th>Aksi</th></tr></thead>
@@ -68,7 +72,7 @@ $summaryCards = [
                         <td><div class="pks-name-cell"><strong><?= esc($record['nama_kerjasama']) ?></strong><span><?= esc($record['unit_pengelola'] ?: 'Unit belum diisi') ?></span></div></td>
                         <td><?= esc($record['nama_mitra']) ?></td>
                         <td><div class="pks-name-cell"><strong><?= esc($record['nomor_dokumen_terakhir'] ?: 'Belum ada') ?></strong><span><?= (int) $record['jumlah_dokumen'] ?> riwayat</span></div></td>
-                        <td><div class="date-cell"><strong><?= $formatDate($record['periode_selesai_terakhir']) ?></strong><span><?= $record['periode_mulai_terakhir'] ? $formatDate($record['periode_mulai_terakhir']) . ' s.d.' : 'Periode belum diisi' ?></span></div></td>
+                        <td><div class="date-cell"><strong><?= $formatDate($record['periode_selesai_terakhir']) ?></strong><span><?= $record['periode_mulai_terakhir'] ? $formatDate($record['periode_mulai_terakhir']) . ' s.d.' : 'Periode belum diisi' ?></span><?php if ($record['periode_selesai_terakhir']): ?><span class="pks-expiry-countdown <?= esc($record['remaining_class']) ?>" data-pks-expiry-date="<?= esc($record['periode_selesai_terakhir']) ?>" aria-live="polite"><?= esc($record['remaining_label']) ?></span><?php endif ?></div></td>
                         <td><strong><?= $formatMoney($record['nilai_terakhir']) ?></strong></td>
                         <td><span class="pks-status <?= esc($record['status_class']) ?>"><?= esc($record['status_label']) ?></span></td>
                         <td><div class="action-buttons">
@@ -192,6 +196,49 @@ $summaryCards = [
     </section>
 </div>
 
+<script>
+(() => {
+    const countdowns = [...document.querySelectorAll('[data-pks-expiry-date]')];
+    const currentDateLabel = document.querySelector('[data-pks-current-date]');
+    const warningDays = <?= (int) $expiryWarningDays ?>;
+    const jakartaDateParts = () => {
+        const parts = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Jakarta',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+        }).formatToParts(new Date());
+        return Object.fromEntries(parts.filter(part => part.type !== 'literal').map(part => [part.type, Number(part.value)]));
+    };
+    const dayIndex = ({ year, month, day }) => Math.floor(Date.UTC(year, month - 1, day) / 86400000);
+    const updateCountdowns = () => {
+        const today = jakartaDateParts();
+        const todayIndex = dayIndex(today);
+        if (currentDateLabel) {
+            currentDateLabel.textContent = `${String(today.day).padStart(2, '0')}-${String(today.month).padStart(2, '0')}-${today.year}`;
+        }
+        countdowns.forEach(countdown => {
+            const match = countdown.dataset.pksExpiryDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (!match) return;
+            const remainingDays = dayIndex({ year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) }) - todayIndex;
+            countdown.classList.remove('active', 'warning', 'today', 'expired');
+            if (remainingDays < 0) {
+                countdown.classList.add('expired');
+                countdown.textContent = `Lewat ${Math.abs(remainingDays)} hari`;
+            } else if (remainingDays === 0) {
+                countdown.classList.add('today');
+                countdown.textContent = 'Berakhir hari ini';
+            } else {
+                countdown.classList.add(remainingDays <= warningDays ? 'warning' : 'active');
+                countdown.textContent = `Sisa ${remainingDays} hari`;
+            }
+        });
+    };
+    updateCountdowns();
+    window.setInterval(updateCountdowns, 60000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) updateCountdowns(); });
+})();
+</script>
 <script>
 (() => {
     const modal = document.getElementById('pksMainModal');

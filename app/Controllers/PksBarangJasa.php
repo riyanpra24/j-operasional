@@ -63,6 +63,8 @@ class PksBarangJasa extends BaseController
             'pager' => $this->kerjasama->pager,
             'filters' => compact('keyword', 'status', 'perPage'),
             'summary' => $summary,
+            'calculationDate' => $this->today()->format('d-m-Y'),
+            'expiryWarningDays' => self::EXPIRY_WARNING_DAYS,
         ]);
     }
 
@@ -322,12 +324,13 @@ class PksBarangJasa extends BaseController
         $latestStart = '(SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1)';
         $latestEnd = '(SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1)';
         $warningDays = self::EXPIRY_WARNING_DAYS;
+        $today = db_connect()->escape($this->today()->format('Y-m-d'));
 
         $conditions = [
-            'aktif' => "$latestStart <= CURRENT_DATE() AND $latestEnd >= CURRENT_DATE() AND DATEDIFF($latestEnd, CURRENT_DATE()) > $warningDays",
-            'segera' => "$latestStart <= CURRENT_DATE() AND $latestEnd >= CURRENT_DATE() AND DATEDIFF($latestEnd, CURRENT_DATE()) <= $warningDays",
-            'berakhir' => "$latestEnd < CURRENT_DATE()",
-            'belum' => "($latestStart IS NULL OR $latestEnd IS NULL OR $latestStart > CURRENT_DATE())",
+            'aktif' => "$latestStart <= $today AND $latestEnd >= $today AND DATEDIFF($latestEnd, $today) > $warningDays",
+            'segera' => "$latestStart <= $today AND $latestEnd >= $today AND DATEDIFF($latestEnd, $today) <= $warningDays",
+            'berakhir' => "$latestEnd < $today",
+            'belum' => "($latestStart IS NULL OR $latestEnd IS NULL OR $latestStart > $today)",
         ];
 
         $query->where($conditions[$status], null, false);
@@ -336,22 +339,63 @@ class PksBarangJasa extends BaseController
     private function statusFromDates(?string $start, ?string $end): array
     {
         if (! $start || ! $end) {
-            return ['status_key' => 'belum', 'status_label' => 'Belum ada dokumen', 'status_class' => 'neutral'];
+            return [
+                'status_key' => 'belum',
+                'status_label' => 'Belum ada dokumen',
+                'status_class' => 'neutral',
+                'remaining_days' => null,
+                'remaining_label' => 'Masa berlaku belum diisi',
+                'remaining_class' => 'neutral',
+            ];
         }
 
-        $today = new \DateTimeImmutable('today');
-        $startDate = new \DateTimeImmutable($start);
-        $endDate = new \DateTimeImmutable($end);
+        $timezone = new \DateTimeZone(config('App')->appTimezone);
+        $today = $this->today();
+        $startDate = (new \DateTimeImmutable($start, $timezone))->setTime(0, 0);
+        $endDate = (new \DateTimeImmutable($end, $timezone))->setTime(0, 0);
+        $remainingDays = (int) $today->diff($endDate)->format('%r%a');
+        $remaining = $this->remainingDayMeta($remainingDays);
+
         if ($today < $startDate) {
-            return ['status_key' => 'belum', 'status_label' => 'Belum dimulai', 'status_class' => 'neutral'];
+            return array_merge(['status_key' => 'belum', 'status_label' => 'Belum dimulai', 'status_class' => 'neutral'], $remaining);
         }
         if ($today > $endDate) {
-            return ['status_key' => 'berakhir', 'status_label' => 'Berakhir', 'status_class' => 'expired'];
+            return array_merge(['status_key' => 'berakhir', 'status_label' => 'Berakhir', 'status_class' => 'expired'], $remaining);
         }
-        if ((int) $today->diff($endDate)->format('%a') <= self::EXPIRY_WARNING_DAYS) {
-            return ['status_key' => 'segera', 'status_label' => 'Segera berakhir', 'status_class' => 'warning'];
+        if ($remainingDays <= self::EXPIRY_WARNING_DAYS) {
+            return array_merge(['status_key' => 'segera', 'status_label' => 'Segera berakhir', 'status_class' => 'warning'], $remaining);
         }
-        return ['status_key' => 'aktif', 'status_label' => 'Aktif', 'status_class' => 'active'];
+        return array_merge(['status_key' => 'aktif', 'status_label' => 'Aktif', 'status_class' => 'active'], $remaining);
+    }
+
+    private function remainingDayMeta(int $remainingDays): array
+    {
+        if ($remainingDays < 0) {
+            return [
+                'remaining_days' => $remainingDays,
+                'remaining_label' => 'Lewat ' . abs($remainingDays) . ' hari',
+                'remaining_class' => 'expired',
+            ];
+        }
+
+        if ($remainingDays === 0) {
+            return [
+                'remaining_days' => 0,
+                'remaining_label' => 'Berakhir hari ini',
+                'remaining_class' => 'today',
+            ];
+        }
+
+        return [
+            'remaining_days' => $remainingDays,
+            'remaining_label' => 'Sisa ' . $remainingDays . ' hari',
+            'remaining_class' => $remainingDays <= self::EXPIRY_WARNING_DAYS ? 'warning' : 'active',
+        ];
+    }
+
+    private function today(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('today', new \DateTimeZone(config('App')->appTimezone));
     }
 
     private function mainPayload(): array

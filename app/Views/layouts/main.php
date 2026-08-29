@@ -28,6 +28,22 @@ $errors  = session()->getFlashdata('errors') ?? [];
 $appCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
 $appJsVersion  = is_file(FCPATH . 'assets/app.js') ? (string) filemtime(FCPATH . 'assets/app.js') : '1';
 $authExpiresAt = (int) session()->get('auth_expires_at');
+$roleNotifications = [
+    'total' => 0,
+    'incoming_count' => 0,
+    'outgoing_count' => 0,
+    'items' => [],
+];
+$notificationEnabled = in_array($currentRole, ['security', 'agendaris'], true);
+$notificationRoleLabel = strtoupper($roleLabel);
+$notificationAllUrl = '#';
+if ($currentRole === 'security') {
+    $roleNotifications = (new \App\Libraries\SecurityNotificationService())->summary();
+    $notificationAllUrl = site_url('distribusi-dokumen');
+} elseif ($currentRole === 'agendaris') {
+    $roleNotifications = (new \App\Libraries\AgendarisNotificationService())->summary();
+    $notificationAllUrl = site_url('agendaris/progres-dokumen');
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -63,22 +79,24 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
     <?php endif ?>
     <div class="app-shell">
         <aside class="sidebar" id="sidebar">
-            <a href="<?= site_url('dashboard') ?>" class="brand" aria-label="Dashboard Operasional">
-                <span class="brand-mark">ϟ</span>
-                <span><strong>J-Operasional</strong><small>Document Management</small></span>
+            <a href="<?= site_url('dashboard') ?>" class="brand brand-jaksa" aria-label="Dashboard JAKSA — Jamkrindo Kanwil Surabaya Operasional">
+                <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-wordmark.png') ?>" alt="JAKSA">
+                <span class="brand-jaksa-expansion" aria-label="Jamkrindo Kanwil Surabaya Operasional">
+                    <b>JA</b>mkrindo <i>·</i> <b>K</b>anwil <i>·</i> <b>S</b>urabaya <i>·</i> oper<b>A</b>sional
+                </span>
             </a>
 
             <nav class="main-nav" aria-label="Navigasi utama">
                 <p class="nav-label">MENU UTAMA</p>
                 <a href="<?= site_url('dashboard') ?>" class="nav-link <?= $segment === 'dashboard' ? 'active' : '' ?>" title="Dashboard">
                     <span class="nav-icon icon-dashboard" aria-hidden="true"><i>◆</i></span>
-                    Dashboard
+                    <span class="nav-link-text">Dashboard</span>
                 </a>
                 <?php if ($canAccessSecurity): ?>
                 <div class="nav-group <?= $securityActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $securityActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $securityActive ? 'true' : 'false' ?>" aria-controls="securitySubmenu" title="Security">
                         <span class="nav-icon image-nav-icon security-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/security-policeman.png') ?>" alt=""></span>
-                        <span>Security</span>
+                        <span class="nav-link-text">Security</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
                     <div class="nav-submenu" id="securitySubmenu" data-nav-submenu <?= $securityActive ? '' : 'hidden' ?>>
@@ -101,7 +119,7 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <div class="nav-group <?= $agendarisActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $agendarisActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $agendarisActive ? 'true' : 'false' ?>" aria-controls="agendarisSubmenu" title="Agendaris">
                         <span class="nav-icon image-nav-icon agendaris-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/agendaris-agenda.png') ?>" alt=""></span>
-                        <span>Agendaris</span>
+                        <span class="nav-link-text">Agendaris</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
                     <div class="nav-submenu" id="agendarisSubmenu" data-nav-submenu <?= $agendarisActive ? '' : 'hidden' ?>>
@@ -124,7 +142,7 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <div class="nav-group <?= $generalSectionActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $generalSectionActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $generalSectionActive ? 'true' : 'false' ?>" aria-controls="generalSectionSubmenu" title="Bagian Umum 1">
                         <span class="nav-icon" aria-hidden="true"><i>▤</i></span>
-                        <span>Bagian Umum 1</span>
+                        <span class="nav-link-text">Bagian Umum 1</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
                     <div class="nav-submenu" id="generalSectionSubmenu" data-nav-submenu <?= $generalSectionActive ? '' : 'hidden' ?>>
@@ -139,7 +157,7 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <div class="nav-group <?= $accountManagementActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $accountManagementActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $accountManagementActive ? 'true' : 'false' ?>" aria-controls="accountManagementSubmenu" title="Kelola Akun">
                         <span class="nav-icon" aria-hidden="true"><i>♙</i></span>
-                        <span>Kelola Akun</span>
+                        <span class="nav-link-text">Kelola Akun</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
                     <div class="nav-submenu" id="accountManagementSubmenu" data-nav-submenu <?= $accountManagementActive ? '' : 'hidden' ?>>
@@ -157,7 +175,7 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <p class="nav-label nav-label-spaced">KONFIGURASI</p>
                 <span class="nav-link nav-link-muted" title="Database Aktif">
                     <span class="nav-icon" aria-hidden="true"><i>◉</i></span>
-                    Database Aktif
+                    <span class="nav-link-text">Database Aktif</span>
                     <span class="nav-status-dot"></span>
                 </span>
             </nav>
@@ -175,8 +193,59 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                     <strong><?= esc($title ?? 'Dashboard') ?></strong>
                 </div>
                 <div class="topbar-meta">
-                    <button class="topbar-icon" type="button" aria-label="Notifikasi">♢<i></i></button>
-                    <span class="date-pill"><?= date('d M Y') ?></span>
+                    <?php if ($notificationEnabled): ?>
+                    <div class="topbar-notification" data-notification-menu>
+                        <button class="topbar-icon topbar-notification-trigger" type="button" data-notification-toggle aria-label="Notifikasi <?= esc($roleLabel, 'attr') ?>: <?= (int) $roleNotifications['total'] ?> antrean perlu ditindaklanjuti" aria-expanded="false" aria-controls="roleNotificationMenu">
+                            <svg class="topbar-bell-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+                                <path d="M10 21h4"></path>
+                            </svg>
+                            <?php if ($roleNotifications['total'] > 0): ?><b class="topbar-notification-badge"><?= $roleNotifications['total'] > 99 ? '99+' : (int) $roleNotifications['total'] ?></b><?php endif ?>
+                        </button>
+                        <section class="topbar-notification-dropdown" id="roleNotificationMenu" data-notification-dropdown hidden aria-label="Daftar notifikasi <?= esc($roleLabel, 'attr') ?>">
+                            <header>
+                                <div><small>NOTIFIKASI <?= esc($notificationRoleLabel) ?></small><strong>Antrean tindakan</strong></div>
+                                <span><?= (int) $roleNotifications['total'] ?> perlu diproses</span>
+                            </header>
+                            <div class="topbar-notification-summary">
+                                <span><b><?= (int) $roleNotifications['incoming_count'] ?></b> Dokumen Masuk</span>
+                                <span><b><?= (int) $roleNotifications['outgoing_count'] ?></b> Dokumen Keluar</span>
+                            </div>
+                            <div class="topbar-notification-list">
+                                <?php if ($roleNotifications['items'] === []): ?>
+                                    <div class="topbar-notification-empty"><span>✓</span><strong>Semua antrean sudah selesai</strong><p>Belum ada dokumen yang perlu ditindaklanjuti.</p></div>
+                                <?php else: ?>
+                                    <?php foreach ($roleNotifications['items'] as $notification): ?>
+                                    <a class="topbar-notification-item <?= esc($notification['type']) ?>" href="<?= esc($notification['url']) ?>">
+                                        <span class="topbar-notification-item-icon" aria-hidden="true"><?= $notification['type'] === 'incoming' ? '↓' : '↑' ?></span>
+                                        <span class="topbar-notification-item-copy">
+                                            <strong><?= esc($notification['title']) ?></strong>
+                                            <small><?= esc($notification['description']) ?></small>
+                                            <time><?= esc($notification['time']) ?></time>
+                                        </span>
+                                        <i aria-hidden="true">›</i>
+                                    </a>
+                                    <?php endforeach ?>
+                                <?php endif ?>
+                            </div>
+                            <footer><a href="<?= esc($notificationAllUrl) ?>">Buka seluruh antrean <span aria-hidden="true">→</span></a></footer>
+                        </section>
+                    </div>
+                    <?php else: ?>
+                    <button class="topbar-icon" type="button" aria-label="Notifikasi belum tersedia untuk role ini">
+                        <svg class="topbar-bell-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+                            <path d="M10 21h4"></path>
+                        </svg>
+                    </button>
+                    <?php endif ?>
+                    <span class="date-pill" aria-label="Tanggal dan waktu sistem Asia Jakarta">
+                        <span class="date-pill-date" data-system-date><?= date('d M Y') ?></span>
+                        <time class="date-pill-time" datetime="<?= date('c') ?>">
+                            <span data-system-time><?= date('H:i:s') ?></span>
+                            <small>WIB</small>
+                        </time>
+                    </span>
                     <div class="topbar-profile" data-profile-menu>
                         <button class="topbar-profile-trigger" type="button" data-profile-toggle aria-expanded="false" aria-controls="topbarProfileMenu">
                             <span class="topbar-profile-avatar" aria-hidden="true"><?= esc($initial) ?></span>

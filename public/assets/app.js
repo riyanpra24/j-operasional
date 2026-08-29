@@ -118,6 +118,34 @@
         window.setTimeout(redirectToLogin, remainingMilliseconds);
     }
 
+    const systemDate = document.querySelector('[data-system-date]');
+    const systemTime = document.querySelector('[data-system-time]');
+    const systemTimeElement = systemTime?.closest('time');
+    if (systemDate || systemTime) {
+        const dateFormatter = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Jakarta',
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+        });
+        const timeFormatter = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Jakarta',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hourCycle: 'h23',
+        });
+        const updateSystemClock = () => {
+            const now = new Date();
+            if (systemDate) systemDate.textContent = dateFormatter.format(now);
+            if (systemTime) systemTime.textContent = timeFormatter.format(now);
+            if (systemTimeElement) systemTimeElement.dateTime = now.toISOString();
+        };
+
+        updateSystemClock();
+        window.setInterval(updateSystemClock, 1000);
+    }
+
     const reloadOperationalPage = () => {
         if (typeof window.__operationalRouteUrl === 'string' && window.__operationalRouteUrl !== '') {
             window.location.replace(window.__operationalRouteUrl);
@@ -199,6 +227,11 @@
             if (!group || !submenu) return;
             const open = !group.classList.contains('open');
 
+            // Pindahkan sorotan menu saat induk dipilih tanpa mengganti halaman.
+            document.querySelectorAll('.main-nav > .nav-link.active, [data-nav-toggle].active')
+                .forEach((activeLink) => activeLink.classList.remove('active'));
+            toggle.classList.add('active');
+
             if (open) {
                 navigationGroups.forEach((otherGroup) => {
                     if (otherGroup !== group) setNavigationGroupOpen(otherGroup, false);
@@ -212,25 +245,48 @@
     const profileMenu = document.querySelector('[data-profile-menu]');
     const profileToggle = profileMenu?.querySelector('[data-profile-toggle]');
     const profileDropdown = profileMenu?.querySelector('[data-profile-dropdown]');
+    const notificationMenu = document.querySelector('[data-notification-menu]');
+    const notificationToggle = notificationMenu?.querySelector('[data-notification-toggle]');
+    const notificationDropdown = notificationMenu?.querySelector('[data-notification-dropdown]');
     const setProfileMenuOpen = (open) => {
         if (!profileMenu || !profileToggle || !profileDropdown) return;
         profileMenu.classList.toggle('open', open);
         profileToggle.setAttribute('aria-expanded', String(open));
         profileDropdown.hidden = !open;
     };
+    const setNotificationMenuOpen = (open) => {
+        if (!notificationMenu || !notificationToggle || !notificationDropdown) return;
+        notificationMenu.classList.toggle('open', open);
+        notificationToggle.setAttribute('aria-expanded', String(open));
+        notificationDropdown.hidden = !open;
+    };
 
     profileToggle?.addEventListener('click', () => {
+        setNotificationMenuOpen(false);
         setProfileMenuOpen(!profileMenu.classList.contains('open'));
+    });
+    notificationToggle?.addEventListener('click', () => {
+        setProfileMenuOpen(false);
+        setNotificationMenuOpen(!notificationMenu.classList.contains('open'));
     });
     document.addEventListener('click', (event) => {
         if (profileMenu?.classList.contains('open') && !profileMenu.contains(event.target)) {
             setProfileMenuOpen(false);
         }
+        if (notificationMenu?.classList.contains('open') && !notificationMenu.contains(event.target)) {
+            setNotificationMenuOpen(false);
+        }
     });
     document.addEventListener('keydown', (event) => {
-        if (event.key !== 'Escape' || !profileMenu?.classList.contains('open')) return;
-        setProfileMenuOpen(false);
-        profileToggle?.focus();
+        if (event.key !== 'Escape') return;
+        if (profileMenu?.classList.contains('open')) {
+            setProfileMenuOpen(false);
+            profileToggle?.focus();
+        }
+        if (notificationMenu?.classList.contains('open')) {
+            setNotificationMenuOpen(false);
+            notificationToggle?.focus();
+        }
     });
 
     document.querySelectorAll('.alert-close').forEach((button) => {
