@@ -4,6 +4,9 @@ $segment = $uri->getSegment(1);
 $securityActive = in_array($segment, ['dokumen-masuk', 'dokumen-keluar', 'distribusi-dokumen'], true);
 $agendarisActive = $segment === 'agendaris';
 $accountManagementActive = $segment === 'kelola-akun';
+$accountManagementPage = $accountManagementActive && $uri->getTotalSegments() >= 2 && $uri->getSegment(2) === 'session-account'
+    ? 'session-account'
+    : 'add-account';
 $generalSectionActive = $segment === 'bagian-umum-1';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
 $currentRole = (string) session()->get('auth_role');
@@ -133,10 +136,23 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 </div>
                 <?php endif ?>
                 <?php if ($currentRole === 'admin'): ?>
-                <a href="<?= site_url('kelola-akun') ?>" class="nav-link <?= $accountManagementActive ? 'active' : '' ?>" title="Kelola Akun">
-                    <span class="nav-icon" aria-hidden="true"><i>♙</i></span>
-                    Kelola Akun
-                </a>
+                <div class="nav-group <?= $accountManagementActive ? 'open' : '' ?>" data-nav-group>
+                    <button type="button" class="nav-link nav-parent <?= $accountManagementActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $accountManagementActive ? 'true' : 'false' ?>" aria-controls="accountManagementSubmenu" title="Kelola Akun">
+                        <span class="nav-icon" aria-hidden="true"><i>♙</i></span>
+                        <span>Kelola Akun</span>
+                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                    </button>
+                    <div class="nav-submenu" id="accountManagementSubmenu" data-nav-submenu <?= $accountManagementActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('kelola-akun') ?>" class="nav-sublink <?= $accountManagementActive && $accountManagementPage === 'add-account' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Add Account
+                        </a>
+                        <a href="<?= site_url('kelola-akun/session-account') ?>" class="nav-sublink <?= $accountManagementActive && $accountManagementPage === 'session-account' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Session Account
+                        </a>
+                    </div>
+                </div>
                 <?php endif ?>
                 <p class="nav-label nav-label-spaced">KONFIGURASI</p>
                 <span class="nav-link nav-link-muted" title="Database Aktif">

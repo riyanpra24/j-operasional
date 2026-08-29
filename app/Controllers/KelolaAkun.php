@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\AccountSessionManager;
 use App\Models\UserModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -47,7 +48,7 @@ class KelolaAkun extends BaseController
         }
 
         return view('kelola_akun/index', [
-            'title'   => 'Kelola Akun',
+            'title'   => 'Add Account',
             'users'   => $this->model->orderBy('created_at', 'ASC')->orderBy('id', 'ASC')->paginate($perPage, 'users'),
             'pager'   => $this->model->pager,
             'filters' => compact('keyword', 'role', 'perPage'),
@@ -71,6 +72,93 @@ class KelolaAkun extends BaseController
                 'updated_at'   => $this->formatDate($user['updated_at']),
             ],
         ]);
+    }
+
+    public function sessions(): string
+    {
+        $keyword = trim((string) $this->request->getGet('q'));
+        $role    = trim((string) $this->request->getGet('role'));
+        $manager = new AccountSessionManager();
+        $manager->pruneExpired();
+
+        $builder = db_connect()->table('user_sessions AS user_sessions')
+            ->select([
+                'user_sessions.user_id',
+                'user_sessions.ip_address',
+                'user_sessions.user_agent',
+                'user_sessions.last_seen_at',
+                'user_sessions.expires_at',
+                'user_sessions.created_at AS session_started_at',
+                'users.username',
+                'users.display_name',
+                'users.role',
+            ])
+            ->join('users', 'users.id = user_sessions.user_id', 'inner')
+            ->where('user_sessions.expires_at >', date('Y-m-d H:i:s'));
+
+        if ($keyword !== '') {
+            $builder->groupStart()
+                ->like('users.username', $keyword)
+                ->orLike('users.display_name', $keyword)
+                ->orLike('user_sessions.ip_address', $keyword)
+                ->groupEnd();
+        }
+
+        if (UserRoles::isValid($role)) {
+            $builder->where('users.role', $role);
+        } else {
+            $role = '';
+        }
+
+        $activeSessions = $builder
+            ->orderBy('user_sessions.last_seen_at', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        foreach ($activeSessions as &$activeSession) {
+            $activeSession['device_label'] = $this->deviceLabel((string) $activeSession['user_agent']);
+        }
+        unset($activeSession);
+
+        $totalUsers  = $this->model->countAllResults();
+        $activeCount = db_connect()->table('user_sessions')
+            ->where('expires_at >', date('Y-m-d H:i:s'))
+            ->countAllResults();
+
+        return view('kelola_akun/sessions', [
+            'title'          => 'Session Account',
+            'sessions'       => $activeSessions,
+            'filters'        => compact('keyword', 'role'),
+            'totalUsers'     => $totalUsers,
+            'activeCount'    => $activeCount,
+            'availableCount' => max(0, $totalUsers - $activeCount),
+            'currentUserId'  => (int) session()->get('auth_user_id'),
+        ]);
+    }
+
+    public function resetSession(int $id): RedirectResponse
+    {
+        $user = $this->findOrFail($id);
+
+        if ((int) session()->get('auth_user_id') === $id) {
+            return redirect()->to(site_url('kelola-akun/session-account'))
+                ->with('error', 'Sesi admin yang sedang digunakan tidak dapat direset. Gunakan menu logout untuk keluar.');
+        }
+
+        $released = (new AccountSessionManager())->releaseAllForUser($id);
+
+        if ($released === null) {
+            return redirect()->to(site_url('kelola-akun/session-account'))
+                ->with('error', "Sesi akun {$user['username']} gagal direset.");
+        }
+
+        if ($released === 0) {
+            return redirect()->to(site_url('kelola-akun/session-account'))
+                ->with('success', "Akun {$user['username']} sudah tidak memiliki sesi aktif.");
+        }
+
+        return redirect()->to(site_url('kelola-akun/session-account'))
+            ->with('success', "Sesi akun {$user['username']} berhasil direset. Perangkat terkait akan keluar otomatis.");
     }
 
     public function store(): RedirectResponse
@@ -236,5 +324,28 @@ class KelolaAkun extends BaseController
     private function formatDate(?string $date): string
     {
         return $date ? date('d-m-Y H:i', strtotime($date)) . ' WIB' : '-';
+    }
+
+    private function deviceLabel(string $userAgent): string
+    {
+        $browser = match (true) {
+            str_contains($userAgent, 'Edg/')     => 'Microsoft Edge',
+            str_contains($userAgent, 'OPR/')     => 'Opera',
+            str_contains($userAgent, 'Chrome/')  => 'Google Chrome',
+            str_contains($userAgent, 'Firefox/') => 'Mozilla Firefox',
+            str_contains($userAgent, 'Safari/')  => 'Safari',
+            default                              => 'Browser tidak dikenal',
+        };
+        $platform = match (true) {
+            str_contains($userAgent, 'Windows')             => 'Windows',
+            str_contains($userAgent, 'Android')             => 'Android',
+            str_contains($userAgent, 'iPhone'),
+            str_contains($userAgent, 'iPad')                => 'iOS',
+            str_contains($userAgent, 'Macintosh')           => 'macOS',
+            str_contains($userAgent, 'Linux')               => 'Linux',
+            default                                         => 'Perangkat tidak dikenal',
+        };
+
+        return $browser . ' · ' . $platform;
     }
 }

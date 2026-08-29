@@ -39,6 +39,8 @@ $routes->group('bagian-umum-1/pks-barang-jasa', static function (RouteCollection
 // Pengelolaan akun (administrator)
 $routes->group('kelola-akun', static function (RouteCollection $routes): void {
     $routes->get('/', 'KelolaAkun::index', ['as' => 'kelola_akun.index']);
+    $routes->get('session-account', 'KelolaAkun::sessions', ['as' => 'kelola_akun.sessions']);
+    $routes->post('session-account/(:num)/reset', 'KelolaAkun::resetSession/$1', ['as' => 'kelola_akun.sessions.reset']);
     $routes->post('/', 'KelolaAkun::store', ['as' => 'kelola_akun.store']);
     $routes->get('(:num)', 'KelolaAkun::show/$1', ['as' => 'kelola_akun.show']);
     $routes->post('(:num)', 'KelolaAkun::update/$1', ['as' => 'kelola_akun.update']);

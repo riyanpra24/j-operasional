@@ -167,6 +167,49 @@ class AccountSessionManager
         }
     }
 
+    /**
+     * Cabut seluruh sesi aktif milik satu akun dari sisi administrator.
+     *
+     * @return int|null Jumlah sesi yang dicabut, atau null ketika database gagal.
+     */
+    public function releaseAllForUser(int $userId): ?int
+    {
+        if ($userId <= 0) {
+            return 0;
+        }
+
+        try {
+            $deleted = $this->db->table('user_sessions')
+                ->where('user_id', $userId)
+                ->delete();
+
+            return $deleted ? $this->db->affectedRows() : null;
+        } catch (Throwable $exception) {
+            log_message('error', 'Gagal mereset sesi akun: {message}', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    public function pruneExpired(): int
+    {
+        try {
+            $deleted = $this->db->table('user_sessions')
+                ->where('expires_at <=', date('Y-m-d H:i:s'))
+                ->delete();
+
+            return $deleted ? $this->db->affectedRows() : 0;
+        } catch (Throwable $exception) {
+            log_message('error', 'Gagal membersihkan sesi kedaluwarsa: {message}', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            return 0;
+        }
+    }
+
     private function hashToken(string $token): string
     {
         return hash('sha256', $token);

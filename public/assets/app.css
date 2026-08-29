@@ -2619,3 +2619,56 @@ input:focus,select:focus,textarea:focus { border-color:#00aaa6;box-shadow:0 0 0 
 }
 .nav-link.active .image-nav-icon::before,
 .nav-parent.active .image-nav-icon::before { background:#fff; }
+
+/* Administrator - Session Account */
+.session-account-heading { align-items:center; }
+.session-live-indicator {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 12px;
+    color:#006f83;
+    background:#edf9f8;
+    border:1px solid #bfe7e3;
+    border-radius:999px;
+    font-size:8px;
+    font-weight:850;
+    letter-spacing:.35px;
+    text-transform:uppercase;
+}
+.session-live-indicator i { width:7px;height:7px;background:#00aaa6;border-radius:50%;box-shadow:0 0 0 4px rgba(0,170,166,.13); }
+.session-stat-grid { grid-template-columns:repeat(3,minmax(150px,1fr)); }
+.session-stat-grid article { position:relative;overflow:hidden; }
+.session-stat-grid article::after { position:absolute;top:0;right:0;left:0;height:3px;background:linear-gradient(90deg,#005aa9,#00aaa6);content:""; }
+.session-stat-active { background:linear-gradient(135deg,#f3f9fd,#effbf9)!important;border-color:#b9dfe4!important; }
+.session-filter-form { grid-template-columns:minmax(260px,1.5fr) minmax(180px,.65fr) auto; }
+.session-table-panel { border-top-color:#005aa9; }
+.session-table-header { display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 17px;border-bottom:1px solid #e5edf1; }
+.session-table-header strong,.session-table-header small { display:block; }
+.session-table-header strong { color:#173b5e;font-size:11px; }
+.session-table-header small { margin-top:3px;color:#8a9aaa;font-size:8px; }
+.session-table-header > span { padding:6px 9px;color:#007d8c;background:#e9f7f6;border-radius:999px;font-size:7.5px;font-weight:800;white-space:nowrap; }
+.session-table-panel table { min-width:1120px; }
+.session-table-panel td { vertical-align:middle; }
+.session-table-panel .account-name-cell > div { min-width:0; }
+.session-table-panel .account-name-cell strong,.session-table-panel .account-name-cell small { display:block; }
+.session-table-panel .account-name-cell small { margin-top:2px;color:#8797a8;font-size:7.5px; }
+.session-device { display:inline-flex;align-items:center;gap:7px;color:#45617a;font-size:8.5px;font-weight:700;white-space:nowrap; }
+.session-device i { display:grid;place-items:center;width:23px;height:23px;color:#007f9e;background:#e8f5f7;border-radius:7px;font-size:9px;font-style:normal; }
+.session-ip { padding:5px 7px;color:#315e74;background:#f0f6f8;border:1px solid #dce9ed;border-radius:6px;font-family:Consolas,monospace;font-size:8px;white-space:nowrap; }
+.session-current-badge { display:inline-flex;padding:6px 9px;color:#087b69;background:#e8f8f2;border:1px solid #bee5d7;border-radius:999px;font-size:7.5px;font-weight:850;white-space:nowrap; }
+.session-reset-button { min-height:30px;padding:0 10px;border-radius:8px;font-size:7.5px;white-space:nowrap; }
+.session-reset-button:hover { color:#fff;background:#bd4651;border-color:#bd4651;box-shadow:0 6px 13px rgba(189,70,81,.19); }
+.session-reset-warning { display:grid;place-items:center;width:48px;height:48px;margin:0 auto 13px;color:#fff;background:linear-gradient(145deg,#005aa9,#00aaa6);border-radius:15px;box-shadow:0 9px 20px rgba(0,90,169,.22);font-size:24px;font-weight:850; }
+@media (max-width:800px) {
+    .session-filter-form { grid-template-columns:1fr 1fr; }
+    .session-filter-form .filter-actions { grid-column:span 2; }
+}
+@media (max-width:600px) {
+    .session-account-heading { align-items:flex-start; }
+    .session-live-indicator { margin-top:8px; }
+    .session-stat-grid { grid-template-columns:1fr; }
+    .session-filter-form { grid-template-columns:1fr; }
+    .session-filter-form .filter-actions { grid-column:auto; }
+    .session-table-header { align-items:flex-start;flex-direction:column; }
+}

@@ -10,8 +10,8 @@ $editId = session()->getFlashdata('account_edit_id');
 <section class="heading-actions account-heading">
     <div>
         <span class="eyebrow">ADMINISTRATOR</span>
-        <h1>Kelola Akun</h1>
-        <p>Kelola akun dan hak akses pengguna J-Operasional.</p>
+        <h1>Add Account</h1>
+        <p>Tambah, ubah, dan kelola hak akses pengguna J-Operasional.</p>
     </div>
     <button type="button" class="btn btn-primary" data-account-create>＋ Tambah Akun</button>
 </section>
