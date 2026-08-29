@@ -8,7 +8,10 @@ class Landing extends BaseController
 {
     public function index(): string|RedirectResponse
     {
-        if (session()->get('auth_user_id') !== null) {
+        $isLoggedIn = session()->get('auth_user_id') !== null;
+        $showLanding = $this->request->getGet('view') === 'landing';
+
+        if ($isLoggedIn && ! $showLanding) {
             $lastRoute = (string) session()->get('auth_last_route');
 
             return redirect()->to(site_url($lastRoute !== '' ? $lastRoute : 'dashboard'));
@@ -16,7 +19,7 @@ class Landing extends BaseController
 
         return view('landing/index', [
             'title'      => 'Jamkrindo Kanwil Surabaya',
-            'isLoggedIn' => false,
+            'isLoggedIn' => $isLoggedIn,
         ]);
     }
 }

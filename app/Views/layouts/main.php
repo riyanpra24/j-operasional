@@ -44,7 +44,7 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
         } catch (error) {}
     </script>
 </head>
-<body data-auth-expires-at="<?= $authExpiresAt ?>" data-login-url="<?= esc(site_url('login'), 'attr') ?>">
+<body data-auth-expires-at="<?= $authExpiresAt ?>" data-login-url="<?= esc(site_url('login'), 'attr') ?>" data-landing-url="<?= esc(site_url('/') . '?view=landing', 'attr') ?>">
     <?php if ($successToast): ?>
         <div class="success-toast" role="status" aria-live="polite" data-success-toast>
             <span class="success-toast-icon" aria-hidden="true">✓</span>
@@ -68,7 +68,7 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <?php if ($canAccessSecurity): ?>
                 <div class="nav-group <?= $securityActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $securityActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $securityActive ? 'true' : 'false' ?>" aria-controls="securitySubmenu" title="Security">
-                        <span class="nav-icon security-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/security-policeman.png') ?>" alt=""></span>
+                        <span class="nav-icon image-nav-icon security-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/security-policeman.png') ?>" alt=""></span>
                         <span>Security</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
@@ -91,7 +91,7 @@ $authExpiresAt = (int) session()->get('auth_expires_at');
                 <?php if ($canAccessAgendaris): ?>
                 <div class="nav-group <?= $agendarisActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $agendarisActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $agendarisActive ? 'true' : 'false' ?>" aria-controls="agendarisSubmenu" title="Agendaris">
-                        <span class="nav-icon" aria-hidden="true"><i>▦</i></span>
+                        <span class="nav-icon image-nav-icon agendaris-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/agendaris-agenda.png') ?>" alt=""></span>
                         <span>Agendaris</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>

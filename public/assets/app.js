@@ -1,6 +1,7 @@
 (() => {
     const authExpiresAt = Number(document.body.dataset.authExpiresAt || 0);
     const loginUrl = document.body.dataset.loginUrl || '';
+    const landingUrl = document.body.dataset.landingUrl || '/';
     const activeTabStorageKey = 'j-operasional-active-tab';
     const currentTabStorageKey = 'j-operasional-current-tab';
     const tabWindowPrefix = 'j-operasional-tab:';
@@ -18,8 +19,13 @@
                 <p>AKSES DIBATASI</p>
                 <h1>Akun sedang digunakan di tab lain</h1>
                 <span>Akses pada tab ini diblokir. Silakan lanjutkan pekerjaan pada tab pertama; sesi di tab pertama tetap aktif.</span>
-                <button type="button" class="btn btn-primary" data-duplicate-tab-retry>Periksa kembali</button>
+                <div class="duplicate-tab-actions">
+                    <a class="btn btn-secondary duplicate-tab-home" href="/" data-duplicate-tab-home>← Kembali ke Landing Page</a>
+                    <button type="button" class="btn btn-primary" data-duplicate-tab-retry>Periksa kembali</button>
+                </div>
             </main>`;
+        const homeLink = document.querySelector('[data-duplicate-tab-home]');
+        if (homeLink) homeLink.href = landingUrl;
         document.querySelector('[data-duplicate-tab-retry]')?.addEventListener('click', () => window.location.reload());
     };
 

@@ -840,6 +840,11 @@ body { background: #e9edef; }
 .duplicate-tab-card h1 { margin:9px 0 10px;color:#2e3c53;font-size:24px;line-height:1.3; }
 .duplicate-tab-card > span:not(.duplicate-tab-icon) { display:block;color:#78879a;font-size:12px;line-height:1.7; }
 .duplicate-tab-card .btn { margin-top:24px; }
+.duplicate-tab-actions { display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:24px; }
+.duplicate-tab-actions .btn { margin-top:0; }
+.duplicate-tab-home { color:#005a9f;background:#fff;border-color:#bdd5e3; }
+.duplicate-tab-home:hover { color:#00457f;background:#edf7fa;border-color:#83beca; }
+@media (max-width:520px) { .duplicate-tab-actions { align-items:stretch;flex-direction:column; }.duplicate-tab-actions .btn { width:100%; } }
 
 /* Ringkasan popup PKS disusun dua kolom agar padat dan tetap mudah dipindai. */
 .pks-detail-popup-body .pks-detail-summary { grid-template-columns:repeat(2,minmax(0,1fr));gap:9px; }
@@ -2585,29 +2590,31 @@ input:focus,select:focus,textarea:focus { border-color:#00aaa6;box-shadow:0 0 0 
 }
 @media print { .topbar-profile { display:none!important; } }
 
-/* Ikon Security: gradasi saat normal, putih saat menu aktif. */
-.security-nav-icon,
-.nav-link:hover .security-nav-icon {
+/* Ikon bergambar: gradasi saat normal, putih saat menu aktif. */
+.image-nav-icon,
+.nav-link:hover .image-nav-icon {
     color:#005aa9;
     background:#fff;
     border-color:#cfe6ed;
     box-shadow:0 3px 9px rgba(0,90,169,.1);
 }
-.security-nav-icon img { display:none; }
-.security-nav-icon::before {
+.image-nav-icon img { display:none; }
+.image-nav-icon::before {
     width:16px;
     height:16px;
     background:linear-gradient(145deg,#005aa9 0%,#007fae 55%,#00aaa6 100%);
     content:"";
-    -webkit-mask:url("images/security-policeman.png") center/contain no-repeat;
-    mask:url("images/security-policeman.png") center/contain no-repeat;
+    -webkit-mask:var(--nav-image) center/contain no-repeat;
+    mask:var(--nav-image) center/contain no-repeat;
 }
-.nav-link.active .security-nav-icon,
-.nav-parent.active .security-nav-icon {
+.security-nav-icon { --nav-image:url("images/security-policeman.png"); }
+.agendaris-nav-icon { --nav-image:url("images/agendaris-agenda.png"); }
+.nav-link.active .image-nav-icon,
+.nav-parent.active .image-nav-icon {
     color:#fff;
     background:linear-gradient(145deg,#005aa9 0%,#007fae 55%,#00aaa6 100%);
     border-color:transparent;
     box-shadow:0 4px 11px rgba(0,90,169,.22);
 }
-.nav-link.active .security-nav-icon::before,
-.nav-parent.active .security-nav-icon::before { background:#fff; }
+.nav-link.active .image-nav-icon::before,
+.nav-parent.active .image-nav-icon::before { background:#fff; }
