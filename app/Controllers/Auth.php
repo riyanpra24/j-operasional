@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\AccountSessionManager;
 use App\Models\UserModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use Config\UserRoles;
@@ -63,13 +64,36 @@ class Auth extends BaseController
                 ->with('login_error', 'Role akun tidak dikenali. Hubungi administrator.');
         }
 
+        $expiresAt    = time() + self::LOGIN_LIFETIME_SECONDS;
+        $sessionLock = (new AccountSessionManager())->acquire(
+            (int) $user['id'],
+            $expiresAt,
+            $this->request->getIPAddress(),
+            $this->request->getUserAgent()->getAgentString(),
+        );
+
+        if ($sessionLock['status'] === 'active') {
+            return redirect()->back()
+                ->withInput()
+                ->with('open_login_modal', true)
+                ->with('login_error', 'Akun sedang digunakan di perangkat lain. Silakan logout dari perangkat tersebut atau tunggu sesi berakhir.');
+        }
+
+        if ($sessionLock['status'] !== 'acquired' || ! isset($sessionLock['token'])) {
+            return redirect()->back()
+                ->withInput()
+                ->with('open_login_modal', true)
+                ->with('login_error', 'Login belum dapat diproses. Silakan coba kembali.');
+        }
+
         session()->regenerate(true);
         session()->set([
             'auth_user_id'      => (int) $user['id'],
             'auth_username'     => $user['username'],
             'auth_display_name' => $user['display_name'],
             'auth_role'         => $role,
-            'auth_expires_at'   => time() + self::LOGIN_LIFETIME_SECONDS,
+            'auth_expires_at'   => $expiresAt,
+            'auth_session_token' => $sessionLock['token'],
             'is_logged_in'      => true,
         ]);
 
@@ -87,12 +111,20 @@ class Auth extends BaseController
 
     private function clearAuthentication(): void
     {
+        $userId = (int) session()->get('auth_user_id');
+        $token  = (string) session()->get('auth_session_token');
+
+        if ($userId > 0 && $token !== '') {
+            (new AccountSessionManager())->release($userId, $token);
+        }
+
         session()->remove([
             'auth_user_id',
             'auth_username',
             'auth_display_name',
             'auth_role',
             'auth_expires_at',
+            'auth_session_token',
             'auth_last_route',
             'is_logged_in',
         ]);

@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use App\Libraries\AccountSessionManager;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -17,6 +18,7 @@ class AuthFilter implements FilterInterface
 
         if ($userId !== null) {
             $expiresAt = (int) $session->get('auth_expires_at');
+            $manager   = new AccountSessionManager();
 
             // Beri batas 2 jam pada sesi lama yang dibuat sebelum fitur ini tersedia.
             if ($expiresAt === 0) {
@@ -24,22 +26,37 @@ class AuthFilter implements FilterInterface
                 $session->set('auth_expires_at', $expiresAt);
             }
 
-            if (time() < $expiresAt) {
+            if (time() >= $expiresAt) {
+                $manager->release((int) $userId, (string) $session->get('auth_session_token'));
+                $this->clearAuthentication();
+
+                return $this->expiredResponse($request);
+            }
+
+            $token = (string) $session->get('auth_session_token');
+
+            // Sesi lama yang sudah login sebelum migrasi mengambil kunci saat request pertama.
+            if ($token === '') {
+                $claim = $manager->acquire(
+                    (int) $userId,
+                    $expiresAt,
+                    method_exists($request, 'getIPAddress') ? $request->getIPAddress() : null,
+                    method_exists($request, 'getUserAgent') ? $request->getUserAgent()->getAgentString() : null,
+                );
+
+                if ($claim['status'] === 'acquired' && isset($claim['token'])) {
+                    $token = $claim['token'];
+                    $session->set('auth_session_token', $token);
+                }
+            }
+
+            if ($token !== '' && $manager->validate((int) $userId, $token)) {
                 return null;
             }
 
-            $session->remove([
-                'auth_user_id',
-                'auth_username',
-                'auth_display_name',
-                'auth_role',
-                'auth_expires_at',
-                'auth_last_route',
-                'is_logged_in',
-            ]);
-            $session->regenerate(true);
+            $this->clearAuthentication();
 
-            return $this->expiredResponse($request);
+            return $this->invalidSessionResponse($request);
         }
 
         if ($request->isAJAX()) {
@@ -73,6 +90,42 @@ class AuthFilter implements FilterInterface
         return redirect()->to(site_url('/'))
             ->with('open_login_modal', true)
             ->with('login_error', $message);
+    }
+
+    private function invalidSessionResponse(RequestInterface $request): ResponseInterface
+    {
+        $message = 'Sesi akun sudah tidak aktif atau akun sedang digunakan pada perangkat lain. Silakan login kembali.';
+
+        if ($request->isAJAX()) {
+            return service('response')
+                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)
+                ->setJSON([
+                    'success'      => false,
+                    'message'      => $message,
+                    'redirect_url' => site_url('/') . '?login=1',
+                ]);
+        }
+
+        return redirect()->to(site_url('/'))
+            ->with('open_login_modal', true)
+            ->with('login_error', $message);
+    }
+
+    private function clearAuthentication(): void
+    {
+        $session = session();
+
+        $session->remove([
+            'auth_user_id',
+            'auth_username',
+            'auth_display_name',
+            'auth_role',
+            'auth_expires_at',
+            'auth_session_token',
+            'auth_last_route',
+            'is_logged_in',
+        ]);
+        $session->regenerate(true);
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
