@@ -36,6 +36,50 @@ $routes->group('bagian-umum-1/pks-barang-jasa', static function (RouteCollection
     $routes->post('(:num)/item/(:num)/hapus', 'PksBarangJasa::destroyItem/$1/$2', ['as' => 'pks.item.destroy']);
 });
 
+$routes->get(
+    'bagian-umum-1/pengadaan-barang-jasa',
+    'PengadaanBarangJasa::index',
+    ['as' => 'pengadaan_barang_jasa.index'],
+);
+
+$routes->group('bagian-umum-1/dokumen-spk', static function (RouteCollection $routes): void {
+    $routes->get('/', 'DokumenSpk::index', ['as' => 'dokumen_spk.index']);
+    $routes->get('generate-nomor', 'DokumenSpk::generateNumber', ['as' => 'dokumen_spk.generate_number']);
+    $routes->post('/', 'DokumenSpk::store', ['as' => 'dokumen_spk.store']);
+    $routes->post('(:num)', 'DokumenSpk::update/$1', ['as' => 'dokumen_spk.update']);
+    $routes->post('(:num)/hapus', 'DokumenSpk::destroy/$1', ['as' => 'dokumen_spk.destroy']);
+});
+
+$routes->get(
+    'bagian-umum-1/non-belanja-modal',
+    'NonBelanjaModal::index',
+    ['as' => 'non_belanja_modal.index'],
+);
+
+// Bagian Umum 2
+$routes->get(
+    'bagian-umum-2',
+    'BagianUmum2::index',
+    ['as' => 'bagian_umum_2.index'],
+);
+
+$routes->group('bagian-umum-2/monitoring-kendaraan', static function (RouteCollection $routes): void {
+    $routes->get('/', 'MonitoringKendaraan::index', ['as' => 'monitoring_kendaraan.index']);
+    $routes->get('data-kendaraan', 'MonitoringKendaraan::vehicles', ['as' => 'monitoring_kendaraan.vehicles']);
+    $routes->post('data-kendaraan', 'MonitoringKendaraan::storeVehicle', ['as' => 'monitoring_kendaraan.vehicles.store']);
+    $routes->post('data-kendaraan/(:num)', 'MonitoringKendaraan::updateVehicle/$1', ['as' => 'monitoring_kendaraan.vehicles.update']);
+    $routes->post('data-kendaraan/(:num)/hapus', 'MonitoringKendaraan::destroyVehicle/$1', ['as' => 'monitoring_kendaraan.vehicles.destroy']);
+    $routes->get('servis-perawatan', 'MonitoringKendaraan::maintenance', ['as' => 'monitoring_kendaraan.maintenance']);
+    $routes->post('servis-perawatan', 'MonitoringKendaraan::storeMaintenance', ['as' => 'monitoring_kendaraan.maintenance.store']);
+    $routes->post('servis-perawatan/(:num)', 'MonitoringKendaraan::updateMaintenance/$1', ['as' => 'monitoring_kendaraan.maintenance.update']);
+    $routes->post('servis-perawatan/(:num)/hapus', 'MonitoringKendaraan::destroyMaintenance/$1', ['as' => 'monitoring_kendaraan.maintenance.destroy']);
+    $routes->get('dokumen-kendaraan', 'MonitoringKendaraan::documents', ['as' => 'monitoring_kendaraan.documents']);
+    $routes->post('dokumen-kendaraan', 'MonitoringKendaraan::storeDocument', ['as' => 'monitoring_kendaraan.documents.store']);
+    $routes->post('dokumen-kendaraan/(:num)', 'MonitoringKendaraan::updateDocument/$1', ['as' => 'monitoring_kendaraan.documents.update']);
+    $routes->post('dokumen-kendaraan/(:num)/hapus', 'MonitoringKendaraan::destroyDocument/$1', ['as' => 'monitoring_kendaraan.documents.destroy']);
+    $routes->get('riwayat-laporan', 'MonitoringKendaraan::reports', ['as' => 'monitoring_kendaraan.reports']);
+});
+
 // Pengelolaan akun (administrator)
 $routes->group('kelola-akun', static function (RouteCollection $routes): void {
     $routes->get('/', 'KelolaAkun::index', ['as' => 'kelola_akun.index']);

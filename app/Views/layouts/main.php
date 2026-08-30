@@ -8,6 +8,10 @@ $accountManagementPage = $accountManagementActive && $uri->getTotalSegments() >=
     ? 'session-account'
     : 'add-account';
 $generalSectionActive = $segment === 'bagian-umum-1';
+$generalSectionPage = $generalSectionActive && $uri->getTotalSegments() >= 2
+    ? $uri->getSegment(2)
+    : 'pks-barang-jasa';
+$generalSectionTwoActive = $segment === 'bagian-umum-2';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
 $currentRole = (string) session()->get('auth_role');
 $displayName = (string) session()->get('auth_display_name');
@@ -15,6 +19,7 @@ $authUsername = (string) session()->get('auth_username');
 $canAccessSecurity = in_array($currentRole, ['admin', 'security'], true);
 $canAccessAgendaris = in_array($currentRole, ['admin', 'agendaris'], true);
 $canAccessGeneralSection = in_array($currentRole, ['admin', 'umum_1'], true);
+$canAccessGeneralSectionTwo = in_array($currentRole, ['admin', 'umum_2'], true);
 $incomingArchive = $segment === 'dokumen-masuk';
 $incomingWorkspace = in_array($segment, ['dashboard', 'dokumen-masuk', 'distribusi-dokumen'], true);
 $roleLabel = \Config\UserRoles::label($currentRole);
@@ -141,14 +146,41 @@ if ($currentRole === 'security') {
                 <?php if ($canAccessGeneralSection): ?>
                 <div class="nav-group <?= $generalSectionActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $generalSectionActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $generalSectionActive ? 'true' : 'false' ?>" aria-controls="generalSectionSubmenu" title="Bagian Umum 1">
-                        <span class="nav-icon" aria-hidden="true"><i>▤</i></span>
+                        <span class="nav-icon image-nav-icon general-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Bagian Umum 1</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
                     <div class="nav-submenu" id="generalSectionSubmenu" data-nav-submenu <?= $generalSectionActive ? '' : 'hidden' ?>>
-                        <a href="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="nav-sublink <?= $generalSectionActive ? 'active' : '' ?>">
+                        <a href="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'pks-barang-jasa' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             PKS Barang dan Jasa
+                        </a>
+                        <a href="<?= site_url('bagian-umum-1/dokumen-spk') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'dokumen-spk' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dokumen SPK
+                        </a>
+                        <a href="<?= site_url('bagian-umum-1/pengadaan-barang-jasa') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'pengadaan-barang-jasa' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Pengadaan Barang Jasa
+                        </a>
+                        <a href="<?= site_url('bagian-umum-1/non-belanja-modal') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'non-belanja-modal' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Non Belanja Modal
+                        </a>
+                    </div>
+                </div>
+                <?php endif ?>
+                <?php if ($canAccessGeneralSectionTwo): ?>
+                <div class="nav-group <?= $generalSectionTwoActive ? 'open' : '' ?>" data-nav-group>
+                    <button type="button" class="nav-link nav-parent <?= $generalSectionTwoActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $generalSectionTwoActive ? 'true' : 'false' ?>" aria-controls="generalSectionTwoSubmenu" title="Bagian Umum 2">
+                        <span class="nav-icon image-nav-icon general-nav-icon" aria-hidden="true"></span>
+                        <span class="nav-link-text">Bagian Umum 2</span>
+                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                    </button>
+                    <div class="nav-submenu" id="generalSectionTwoSubmenu" data-nav-submenu <?= $generalSectionTwoActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('bagian-umum-2/monitoring-kendaraan/data-kendaraan') ?>" class="nav-sublink <?= $generalSectionTwoActive && $uri->getSegment(2) === 'monitoring-kendaraan' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Monitoring Kendaraan
                         </a>
                     </div>
                 </div>
