@@ -32,6 +32,7 @@ $error   = session()->getFlashdata('error');
 $errors  = session()->getFlashdata('errors') ?? [];
 $appCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
 $appJsVersion  = is_file(FCPATH . 'assets/app.js') ? (string) filemtime(FCPATH . 'assets/app.js') : '1';
+$requiredMarkersVersion = is_file(FCPATH . 'assets/required-markers.js') ? (string) filemtime(FCPATH . 'assets/required-markers.js') : '1';
 $authExpiresAt = (int) session()->get('auth_expires_at');
 $roleNotifications = [
     'total' => 0,
@@ -56,10 +57,11 @@ if ($currentRole === 'security') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sistem register dokumen masuk operasional">
-    <title><?= esc($title ?? 'Operasional') ?> | Register Operasional</title>
-    <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg?v=2') ?>">
+    <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
+    <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>?v=<?= esc($appCssVersion, 'attr') ?>">
     <script src="<?= base_url('assets/url-mask.js') ?>"></script>
+    <script src="<?= base_url('assets/required-markers.js') ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
     <script>
         try {
             if (window.innerWidth > 900 && localStorage.getItem('j-operasional-sidebar') === 'collapsed') {

@@ -5,6 +5,7 @@
     const formModal = document.getElementById('vehicleCrudFormModal');
     const deleteModal = document.getElementById('vehicleCrudDeleteModal');
     const form = formModal.querySelector('[data-vehicle-crud-form]');
+    const editDeleteButton = form.querySelector('[data-crud-edit-delete]');
     const baseUrl = root.dataset.baseUrl;
     const openModal = modal => {
         modal.hidden = false;
@@ -30,6 +31,10 @@
         formModal.querySelector('[data-crud-form-title]').textContent = root.dataset.createTitle;
         formModal.querySelector('[data-crud-form-icon]').textContent = '＋';
         formModal.querySelector('[data-crud-submit]').textContent = 'Simpan data';
+        if (editDeleteButton) {
+            editDeleteButton.hidden = true;
+            editDeleteButton.dataset.vehicleCrudDelete = '';
+        }
         fillForm(data);
         announcePrepared('create', data);
         openModal(formModal);
@@ -40,6 +45,16 @@
         formModal.querySelector('[data-crud-form-title]').textContent = root.dataset.editTitle;
         formModal.querySelector('[data-crud-form-icon]').textContent = '✎';
         formModal.querySelector('[data-crud-submit]').textContent = 'Simpan perubahan';
+        if (editDeleteButton) {
+            const vehicleName = data.nama_kendaraan === 'Lainnya' && data.nama_kendaraan_lainnya
+                ? data.nama_kendaraan_lainnya
+                : data.nama_kendaraan;
+            editDeleteButton.dataset.vehicleCrudDelete = JSON.stringify({
+                id: Number(data.id),
+                label: data.delete_label || `${data.nomor_polisi || ''} · ${vehicleName || 'Kendaraan'}`,
+            });
+            editDeleteButton.hidden = false;
+        }
         fillForm(data);
         announcePrepared('edit', data);
         openModal(formModal);

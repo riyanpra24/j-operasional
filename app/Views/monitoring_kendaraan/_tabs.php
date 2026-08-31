@@ -5,8 +5,12 @@ $tabs = [
     'documents' => ['label' => 'Dokumen Kendaraan', 'description' => 'STNK, pajak, KIR, asuransi', 'icon' => '▣', 'url' => site_url('bagian-umum-2/monitoring-kendaraan/dokumen-kendaraan')],
     'reports' => ['label' => 'Riwayat & Laporan', 'description' => 'Rekap aktivitas armada', 'icon' => '↗', 'url' => site_url('bagian-umum-2/monitoring-kendaraan/riwayat-laporan')],
 ];
+$canViewReports = (string) session()->get('auth_role') === 'admin';
+if (! $canViewReports) {
+    unset($tabs['reports']);
+}
 ?>
-<nav class="vehicle-module-tabs" aria-label="Menu Monitoring Kendaraan">
+<nav class="vehicle-module-tabs <?= count($tabs) === 3 ? 'vehicle-module-tabs-three' : '' ?>" aria-label="Menu Monitoring Kendaraan">
     <?php foreach ($tabs as $key => $tab): ?>
         <a href="<?= esc($tab['url']) ?>" class="vehicle-module-tab <?= $activePage === $key ? 'active' : '' ?>" <?= $activePage === $key ? 'aria-current="page"' : '' ?>>
             <span aria-hidden="true"><?= esc($tab['icon']) ?></span>

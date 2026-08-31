@@ -11,7 +11,19 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class MonitoringKendaraan extends BaseController
 {
-    private const VEHICLE_STATUSES = ['Tersedia', 'Digunakan', 'Perawatan', 'Tidak Aktif'];
+    private const VEHICLE_NAMES = [
+        'Kendaraan Pinwil',
+        'Kendaraan Wakil Pinwil',
+        'Kendaraan Operasional Kantor',
+        'Lainnya',
+    ];
+    private const VEHICLE_TYPES = ['Mobil', 'Motor'];
+    private const VEHICLE_OWNERSHIP_STATUSES = ['Kendaraan Aset', 'Kendaraan Sewa'];
+    private const VEHICLE_STATUSES = ['Digunakan', 'Perawatan', 'Tidak Aktif', 'Lainnya'];
+    private const VEHICLE_DRIVERS = ['Eryuninto', 'Riyanto', 'Fransiskus Medhison', 'Lainnya'];
+    private const VEHICLE_MANAGEMENT_UNITS = ['Bagian Umum 1', 'Bagian Umum 2'];
+    private const SERVICE_BUDGETS = ['Asuransi', 'Kantor'];
+    private const OFFICE_SERVICE_COMPANY = 'PT. Jaminan Kredit Indonesia (Persero)';
     private const DOCUMENT_TYPES = ['STNK', 'Pajak', 'KIR', 'Asuransi', 'Lainnya'];
 
     public function index(): RedirectResponse
@@ -24,11 +36,18 @@ class MonitoringKendaraan extends BaseController
         $keyword = trim((string) $this->request->getGet('q'));
         $status = trim((string) $this->request->getGet('status'));
         $perPage = $this->perPage();
+        $isAdmin = $this->isAdmin();
         $model = new VehicleModel();
+
+        if ($isAdmin) {
+            $model->withDeleted();
+        }
 
         if ($keyword !== '') {
             $model->groupStart()->like('nomor_polisi', $keyword)->orLike('nama_kendaraan', $keyword)
+                ->orLike('nama_kendaraan_lainnya', $keyword)
                 ->orLike('merek', $keyword)->orLike('tipe', $keyword)->orLike('unit_pengguna', $keyword)
+                ->orLike('unit_pengguna_lainnya', $keyword)
                 ->orLike('pic', $keyword)->groupEnd();
         }
         if (in_array($status, self::VEHICLE_STATUSES, true)) {
@@ -43,7 +62,13 @@ class MonitoringKendaraan extends BaseController
             'records' => $model->orderBy('nomor_polisi', 'ASC')->paginate($perPage, 'vehicles'),
             'pager' => $model->pager,
             'filters' => compact('keyword', 'status', 'perPage'),
+            'vehicleNames' => self::VEHICLE_NAMES,
+            'vehicleTypes' => self::VEHICLE_TYPES,
+            'vehicleOwnershipStatuses' => self::VEHICLE_OWNERSHIP_STATUSES,
             'statuses' => self::VEHICLE_STATUSES,
+            'drivers' => self::VEHICLE_DRIVERS,
+            'managementUnits' => self::VEHICLE_MANAGEMENT_UNITS,
+            'isAdmin' => $isAdmin,
         ]);
     }
 
@@ -71,8 +96,11 @@ class MonitoringKendaraan extends BaseController
     public function updateVehicle(int $id): RedirectResponse
     {
         $model = new VehicleModel();
+        if ($this->isAdmin()) {
+            $model->withDeleted();
+        }
         $vehicle = $this->findOrFail($model, $id, 'Kendaraan tidak ditemukan.');
-        $data = $this->vehiclePayload();
+        $data = $this->vehiclePayload($vehicle);
         $errors = $this->validateVehicle($data, $id);
         if ($errors !== []) {
             return $this->formError('vehicles', 'edit', $data, $errors, $id);
@@ -88,26 +116,44 @@ class MonitoringKendaraan extends BaseController
 
     public function destroyVehicle(int $id): RedirectResponse
     {
+        $isAdmin = $this->isAdmin();
         $model = new VehicleModel();
+        if ($isAdmin) {
+            $model->withDeleted();
+        }
         $vehicle = $this->findOrFail($model, $id, 'Kendaraan tidak ditemukan.');
-        $this->recordActivity($vehicle, 'Kendaraan', $id, 'Dihapus', 'Data kendaraan dihapus beserta akses ke data turunannya.');
-        if (! $model->delete($id)) {
+        $description = $isAdmin
+            ? 'Data kendaraan dihapus permanen dari database beserta seluruh data turunannya.'
+            : 'Data kendaraan dihapus dari tampilan Bagian Umum 2 dan masih dapat dilihat oleh Administrator.';
+        $this->recordActivity($vehicle, 'Kendaraan', $id, 'Dihapus', $description);
+        if (! $model->delete($id, $isAdmin)) {
             return redirect()->to($this->pageUrl('vehicles'))->with('error', 'Data kendaraan gagal dihapus.');
         }
 
-        return redirect()->to($this->pageUrl('vehicles'))->with('success', "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus.");
+        $message = $isAdmin
+            ? "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus permanen dari database."
+            : "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus dari tampilan Bagian Umum 2.";
+
+        return redirect()->to($this->pageUrl('vehicles'))->with('success', $message);
     }
 
     public function maintenance(): string
     {
         $keyword = trim((string) $this->request->getGet('q'));
         $perPage = $this->perPage();
+        $isAdmin = $this->isAdmin();
         $model = new VehicleMaintenanceModel();
-        $model->select('vehicle_maintenance.*, vehicles.nomor_polisi, vehicles.nama_kendaraan')
-            ->join('vehicles', 'vehicles.id = vehicle_maintenance.vehicle_id')
-            ->where('vehicles.deleted_at', null);
+        if ($isAdmin) {
+            $model->withDeleted();
+        }
+        $model->select('vehicle_maintenance.*, vehicles.nomor_polisi, vehicles.nama_kendaraan, vehicles.nama_kendaraan_lainnya, vehicles.deleted_at AS vehicle_deleted_at')
+            ->join('vehicles', 'vehicles.id = vehicle_maintenance.vehicle_id');
+        if (! $isAdmin) {
+            $model->where('vehicles.deleted_at', null);
+        }
         if ($keyword !== '') {
             $model->groupStart()->like('vehicles.nomor_polisi', $keyword)->orLike('vehicles.nama_kendaraan', $keyword)
+                ->orLike('vehicles.nama_kendaraan_lainnya', $keyword)
                 ->orLike('vehicle_maintenance.jenis_perawatan', $keyword)->orLike('vehicle_maintenance.bengkel', $keyword)->groupEnd();
         }
 
@@ -118,6 +164,8 @@ class MonitoringKendaraan extends BaseController
             'pager' => $model->pager,
             'filters' => compact('keyword', 'perPage'),
             'vehicles' => $this->vehicleOptions(),
+            'serviceBudgets' => self::SERVICE_BUDGETS,
+            'isAdmin' => $isAdmin,
         ]);
     }
 
@@ -137,7 +185,7 @@ class MonitoringKendaraan extends BaseController
         }
 
         $vehicle = $this->vehicle((int) $data['vehicle_id']);
-        $this->synchronizeKilometer($vehicle, $data['kilometer']);
+        $this->synchronizeKilometer((int) $data['vehicle_id']);
         $this->recordActivity($vehicle, 'Servis', (int) $id, 'Ditambahkan', "Servis {$data['jenis_perawatan']} tanggal {$data['tanggal_servis']} ditambahkan.");
 
         return redirect()->to($this->pageUrl('maintenance'))->with('success', 'Data servis dan perawatan berhasil ditambahkan.');
@@ -146,6 +194,9 @@ class MonitoringKendaraan extends BaseController
     public function updateMaintenance(int $id): RedirectResponse
     {
         $model = new VehicleMaintenanceModel();
+        if ($this->isAdmin()) {
+            $model->withDeleted();
+        }
         $record = $this->findOrFail($model, $id, 'Data servis tidak ditemukan.');
         $data = $this->maintenancePayload($record);
         $errors = $this->validateMaintenance($data);
@@ -156,8 +207,12 @@ class MonitoringKendaraan extends BaseController
             return $this->formError('maintenance', 'edit', $data, $model->errors() ?: ['maintenance' => 'Perubahan data servis gagal disimpan.'], $id);
         }
 
+        $previousVehicleId = (int) $record['vehicle_id'];
         $vehicle = $this->vehicle((int) $data['vehicle_id']);
-        $this->synchronizeKilometer($vehicle, $data['kilometer']);
+        $this->synchronizeKilometer($previousVehicleId);
+        if ((int) $data['vehicle_id'] !== $previousVehicleId) {
+            $this->synchronizeKilometer((int) $data['vehicle_id']);
+        }
         $this->recordActivity($vehicle, 'Servis', $id, 'Diperbarui', "Servis {$data['jenis_perawatan']} tanggal {$data['tanggal_servis']} diperbarui.");
 
         return redirect()->to($this->pageUrl('maintenance'))->with('success', 'Data servis dan perawatan berhasil diperbarui.');
@@ -165,15 +220,28 @@ class MonitoringKendaraan extends BaseController
 
     public function destroyMaintenance(int $id): RedirectResponse
     {
+        $isAdmin = $this->isAdmin();
         $model = new VehicleMaintenanceModel();
+        if ($isAdmin) {
+            $model->withDeleted();
+        }
         $record = $this->findOrFail($model, $id, 'Data servis tidak ditemukan.');
-        $vehicle = $this->vehicle((int) $record['vehicle_id']);
-        $this->recordActivity($vehicle, 'Servis', $id, 'Dihapus', "Servis {$record['jenis_perawatan']} tanggal {$record['tanggal_servis']} dihapus.");
-        if (! $model->delete($id)) {
+        $vehicle = $this->vehicle((int) $record['vehicle_id'], $isAdmin);
+        $description = $isAdmin
+            ? "Servis {$record['jenis_perawatan']} tanggal {$record['tanggal_servis']} dihapus permanen dari database."
+            : "Servis {$record['jenis_perawatan']} tanggal {$record['tanggal_servis']} dihapus dari tampilan Bagian Umum 2 dan masih dapat dilihat oleh Administrator.";
+        $this->recordActivity($vehicle, 'Servis', $id, 'Dihapus', $description);
+        if (! $model->delete($id, $isAdmin)) {
             return redirect()->to($this->pageUrl('maintenance'))->with('error', 'Data servis gagal dihapus.');
         }
+        $this->synchronizeKilometer((int) $record['vehicle_id']);
 
-        return redirect()->to($this->pageUrl('maintenance'))->with('success', 'Data servis dan perawatan berhasil dihapus.');
+        return redirect()->to($this->pageUrl('maintenance'))->with(
+            'success',
+            $isAdmin
+                ? 'Data servis dan perawatan berhasil dihapus permanen dari database.'
+                : 'Data servis dan perawatan berhasil dihapus dari tampilan Bagian Umum 2.',
+        );
     }
 
     public function documents(): string
@@ -181,12 +249,19 @@ class MonitoringKendaraan extends BaseController
         $keyword = trim((string) $this->request->getGet('q'));
         $type = trim((string) $this->request->getGet('jenis'));
         $perPage = $this->perPage();
+        $isAdmin = $this->isAdmin();
         $model = new VehicleDocumentModel();
-        $model->select('vehicle_documents.*, vehicles.nomor_polisi, vehicles.nama_kendaraan')
-            ->join('vehicles', 'vehicles.id = vehicle_documents.vehicle_id')
-            ->where('vehicles.deleted_at', null);
+        if ($isAdmin) {
+            $model->withDeleted();
+        }
+        $model->select('vehicle_documents.*, vehicles.nomor_polisi, vehicles.nama_kendaraan, vehicles.nama_kendaraan_lainnya, vehicles.deleted_at AS vehicle_deleted_at')
+            ->join('vehicles', 'vehicles.id = vehicle_documents.vehicle_id');
+        if (! $isAdmin) {
+            $model->where('vehicles.deleted_at', null);
+        }
         if ($keyword !== '') {
             $model->groupStart()->like('vehicles.nomor_polisi', $keyword)->orLike('vehicles.nama_kendaraan', $keyword)
+                ->orLike('vehicles.nama_kendaraan_lainnya', $keyword)
                 ->orLike('vehicle_documents.nomor_dokumen', $keyword)->groupEnd();
         }
         if (in_array($type, self::DOCUMENT_TYPES, true)) {
@@ -203,6 +278,7 @@ class MonitoringKendaraan extends BaseController
             'filters' => compact('keyword', 'type', 'perPage'),
             'vehicles' => $this->vehicleOptions(),
             'documentTypes' => self::DOCUMENT_TYPES,
+            'isAdmin' => $isAdmin,
         ]);
     }
 
@@ -248,19 +324,36 @@ class MonitoringKendaraan extends BaseController
 
     public function destroyDocument(int $id): RedirectResponse
     {
+        $isAdmin = $this->isAdmin();
         $model = new VehicleDocumentModel();
+        if ($isAdmin) {
+            $model->withDeleted();
+        }
         $record = $this->findOrFail($model, $id, 'Dokumen kendaraan tidak ditemukan.');
-        $vehicle = $this->vehicle((int) $record['vehicle_id']);
-        $this->recordActivity($vehicle, 'Dokumen', $id, 'Dihapus', "Dokumen {$record['jenis_dokumen']} dihapus.");
-        if (! $model->delete($id)) {
+        $vehicle = $this->vehicle((int) $record['vehicle_id'], $isAdmin);
+        $description = $isAdmin
+            ? "Dokumen {$record['jenis_dokumen']} dihapus permanen dari database."
+            : "Dokumen {$record['jenis_dokumen']} dihapus dari tampilan Bagian Umum 2 dan masih dapat dilihat oleh Administrator.";
+        $this->recordActivity($vehicle, 'Dokumen', $id, 'Dihapus', $description);
+        if (! $model->delete($id, $isAdmin)) {
             return redirect()->to($this->pageUrl('documents'))->with('error', 'Dokumen kendaraan gagal dihapus.');
         }
 
-        return redirect()->to($this->pageUrl('documents'))->with('success', 'Dokumen kendaraan berhasil dihapus.');
+        return redirect()->to($this->pageUrl('documents'))->with(
+            'success',
+            $isAdmin
+                ? 'Dokumen kendaraan berhasil dihapus permanen dari database.'
+                : 'Dokumen kendaraan berhasil dihapus dari tampilan Bagian Umum 2.',
+        );
     }
 
-    public function reports(): string
+    public function reports(): string|RedirectResponse
     {
+        if (! $this->isAdmin()) {
+            return redirect()->to($this->pageUrl('vehicles'))
+                ->with('error', 'Riwayat & Laporan hanya dapat diakses oleh Administrator.');
+        }
+
         $keyword = trim((string) $this->request->getGet('q'));
         $type = trim((string) $this->request->getGet('jenis'));
         $perPage = $this->perPage();
@@ -285,12 +378,21 @@ class MonitoringKendaraan extends BaseController
         ]);
     }
 
-    private function vehiclePayload(): array
+    private function vehiclePayload(?array $existing = null): array
     {
+        $vehicleName = $this->cleanText($this->request->getPost('nama_kendaraan'));
+        $status = trim((string) $this->request->getPost('status'));
+        $managementUnit = $this->nullIfEmpty($this->request->getPost('pic'));
+        $initialKilometer = trim((string) $this->request->getPost('kilometer'));
+
         return [
             'nomor_polisi' => strtoupper($this->cleanText($this->request->getPost('nomor_polisi'))),
-            'nama_kendaraan' => $this->cleanText($this->request->getPost('nama_kendaraan')),
+            'nama_kendaraan' => $vehicleName,
+            'nama_kendaraan_lainnya' => $vehicleName === 'Lainnya'
+                ? $this->nullIfEmpty($this->request->getPost('nama_kendaraan_lainnya'))
+                : null,
             'jenis' => $this->cleanText($this->request->getPost('jenis')),
+            'status_kendaraan' => $this->cleanText($this->request->getPost('status_kendaraan')),
             'merek' => $this->nullIfEmpty($this->request->getPost('merek')),
             'tipe' => $this->nullIfEmpty($this->request->getPost('tipe')),
             'tahun' => $this->nullIfEmpty($this->request->getPost('tahun')),
@@ -298,9 +400,20 @@ class MonitoringKendaraan extends BaseController
             'nomor_rangka' => $this->nullIfEmpty($this->request->getPost('nomor_rangka')),
             'nomor_mesin' => $this->nullIfEmpty($this->request->getPost('nomor_mesin')),
             'unit_pengguna' => $this->nullIfEmpty($this->request->getPost('unit_pengguna')),
-            'pic' => $this->nullIfEmpty($this->request->getPost('pic')),
-            'kilometer' => trim((string) $this->request->getPost('kilometer')) ?: '0',
-            'status' => trim((string) $this->request->getPost('status')),
+            'unit_pengguna_lainnya' => $this->request->getPost('unit_pengguna') === 'Lainnya'
+                ? $this->nullIfEmpty($this->request->getPost('unit_pengguna_lainnya'))
+                : null,
+            'pic' => $managementUnit,
+            'pic_internal' => $this->internalPicForUnit($managementUnit),
+            // Kilometer awal dapat dicatat saat kendaraan dibuat. Setelah itu,
+            // perubahannya hanya mengikuti KM Saat Servis tertinggi.
+            'kilometer' => $existing === null
+                ? ($initialKilometer === '' ? '0' : $initialKilometer)
+                : (string) ($existing['kilometer'] ?? 0),
+            'status' => $status,
+            'status_lainnya' => $status === 'Lainnya'
+                ? $this->nullIfEmpty($this->request->getPost('status_lainnya'))
+                : null,
         ];
     }
 
@@ -310,6 +423,7 @@ class MonitoringKendaraan extends BaseController
         $serviceDate = $existing !== null && (string) session()->get('auth_role') !== 'admin'
             ? (string) $existing['tanggal_servis']
             : $submittedDate;
+        $serviceBudget = trim((string) $this->request->getPost('anggaran_servis'));
 
         return [
             'vehicle_id' => trim((string) $this->request->getPost('vehicle_id')),
@@ -319,7 +433,12 @@ class MonitoringKendaraan extends BaseController
             'kilometer' => $this->nullIfEmpty($this->request->getPost('kilometer')),
             'biaya' => trim((string) $this->request->getPost('biaya')) ?: '0',
             'servis_berikutnya_tanggal' => $this->nextServiceDate($serviceDate),
-            'servis_berikutnya_km' => $this->nullIfEmpty($this->request->getPost('servis_berikutnya_km')),
+            'anggaran_servis' => $serviceBudget,
+            'nama_perusahaan' => match ($serviceBudget) {
+                'Kantor' => self::OFFICE_SERVICE_COMPANY,
+                'Asuransi' => $this->nullIfEmpty($this->request->getPost('nama_perusahaan')),
+                default => null,
+            },
             'keterangan' => $this->nullIfEmpty($this->request->getPost('keterangan')),
             'link_berkas' => $this->nullIfEmpty($this->request->getPost('link_berkas')),
         ];
@@ -344,18 +463,32 @@ class MonitoringKendaraan extends BaseController
         $validation = service('validation');
         $validation->setRules([
             'nomor_polisi' => ['label' => 'Nomor polisi', 'rules' => 'required|max_length[20]|' . $uniquePlate],
-            'nama_kendaraan' => ['label' => 'Nama kendaraan', 'rules' => 'required|max_length[150]'],
-            'jenis' => ['label' => 'Jenis kendaraan', 'rules' => 'required|max_length[80]'],
+            'nama_kendaraan' => ['label' => 'Nama kendaraan', 'rules' => 'required|in_list[' . implode(',', self::VEHICLE_NAMES) . ']'],
+            'nama_kendaraan_lainnya' => [
+                'label' => 'Nama kendaraan lainnya',
+                'rules' => ($data['nama_kendaraan'] ?? '') === 'Lainnya' ? 'required|max_length[150]' : 'permit_empty|max_length[150]',
+            ],
+            'jenis' => ['label' => 'Jenis kendaraan', 'rules' => 'required|in_list[' . implode(',', self::VEHICLE_TYPES) . ']'],
+            'status_kendaraan' => ['label' => 'Status kendaraan', 'rules' => 'required|in_list[' . implode(',', self::VEHICLE_OWNERSHIP_STATUSES) . ']'],
             'merek' => ['label' => 'Merek', 'rules' => 'permit_empty|max_length[100]'],
             'tipe' => ['label' => 'Tipe', 'rules' => 'permit_empty|max_length[100]'],
             'tahun' => ['label' => 'Tahun', 'rules' => 'permit_empty|integer|greater_than_equal_to[1900]|less_than_equal_to[' . ((int) date('Y') + 1) . ']'],
             'warna' => ['label' => 'Warna', 'rules' => 'permit_empty|max_length[60]'],
             'nomor_rangka' => ['label' => 'Nomor rangka', 'rules' => 'permit_empty|max_length[100]'],
             'nomor_mesin' => ['label' => 'Nomor mesin', 'rules' => 'permit_empty|max_length[100]'],
-            'unit_pengguna' => ['label' => 'Unit pengguna', 'rules' => 'permit_empty|max_length[150]'],
-            'pic' => ['label' => 'PIC', 'rules' => 'permit_empty|max_length[150]'],
+            'unit_pengguna' => ['label' => 'Driver pengguna', 'rules' => 'permit_empty|in_list[' . implode(',', self::VEHICLE_DRIVERS) . ']'],
+            'unit_pengguna_lainnya' => [
+                'label' => 'Nama driver lainnya',
+                'rules' => ($data['unit_pengguna'] ?? '') === 'Lainnya' ? 'required|max_length[150]' : 'permit_empty|max_length[150]',
+            ],
+            'pic' => ['label' => 'Unit pengelola', 'rules' => 'permit_empty|in_list[' . implode(',', self::VEHICLE_MANAGEMENT_UNITS) . ']'],
+            'pic_internal' => ['label' => 'PIC internal', 'rules' => 'permit_empty|in_list[Angger Wicaksono,Agil Halis Kesawa]'],
             'kilometer' => ['label' => 'Kilometer', 'rules' => 'required|integer|greater_than_equal_to[0]'],
             'status' => ['label' => 'Status', 'rules' => 'required|in_list[' . implode(',', self::VEHICLE_STATUSES) . ']'],
+            'status_lainnya' => [
+                'label' => 'Status lainnya',
+                'rules' => ($data['status'] ?? '') === 'Lainnya' ? 'required|max_length[100]' : 'permit_empty|max_length[100]',
+            ],
         ]);
 
         return $validation->run($data) ? [] : $validation->getErrors();
@@ -369,10 +502,16 @@ class MonitoringKendaraan extends BaseController
             'tanggal_servis' => ['label' => 'Tanggal servis', 'rules' => 'required|valid_date[Y-m-d]'],
             'jenis_perawatan' => ['label' => 'Jenis perawatan', 'rules' => 'required|max_length[150]'],
             'bengkel' => ['label' => 'Bengkel', 'rules' => 'permit_empty|max_length[150]'],
-            'kilometer' => ['label' => 'Kilometer', 'rules' => 'permit_empty|integer|greater_than_equal_to[0]'],
+            'kilometer' => ['label' => 'Kilometer saat servis', 'rules' => 'required|integer|greater_than_equal_to[0]'],
             'biaya' => ['label' => 'Biaya', 'rules' => 'required|decimal|greater_than_equal_to[0]'],
             'servis_berikutnya_tanggal' => ['label' => 'Tanggal servis berikutnya', 'rules' => 'permit_empty|valid_date[Y-m-d]'],
-            'servis_berikutnya_km' => ['label' => 'Kilometer servis berikutnya', 'rules' => 'permit_empty|integer|greater_than_equal_to[0]'],
+            'anggaran_servis' => ['label' => 'Anggaran Service', 'rules' => 'required|in_list[' . implode(',', self::SERVICE_BUDGETS) . ']'],
+            'nama_perusahaan' => [
+                'label' => 'Nama perusahaan',
+                'rules' => ($data['anggaran_servis'] ?? '') === 'Kantor'
+                    ? 'required|in_list[' . self::OFFICE_SERVICE_COMPANY . ']'
+                    : (($data['anggaran_servis'] ?? '') === 'Asuransi' ? 'required|max_length[150]' : 'permit_empty|max_length[150]'),
+            ],
             'keterangan' => ['label' => 'Keterangan', 'rules' => 'permit_empty|max_length[5000]'],
             'link_berkas' => ['label' => 'Link berkas', 'rules' => 'permit_empty|max_length[2048]'],
         ]);
@@ -426,7 +565,7 @@ class MonitoringKendaraan extends BaseController
     {
         (new VehicleActivityLogModel())->insert([
             'vehicle_id' => (int) $vehicle['id'],
-            'vehicle_label' => $vehicle['nomor_polisi'] . ' · ' . $vehicle['nama_kendaraan'],
+            'vehicle_label' => $vehicle['nomor_polisi'] . ' · ' . $this->vehicleDisplayName($vehicle),
             'entity_type' => $entityType,
             'entity_id' => $entityId,
             'action' => $action,
@@ -462,11 +601,16 @@ class MonitoringKendaraan extends BaseController
         }, $records);
     }
 
-    private function synchronizeKilometer(array $vehicle, ?string $kilometer): void
+    private function synchronizeKilometer(int $vehicleId): void
     {
-        if ($kilometer !== null && (int) $kilometer > (int) $vehicle['kilometer']) {
-            (new VehicleModel())->update((int) $vehicle['id'], ['kilometer' => (int) $kilometer]);
-        }
+        $service = (new VehicleMaintenanceModel())
+            ->selectMax('kilometer', 'kilometer_terakhir')
+            ->where('vehicle_id', $vehicleId)
+            ->first();
+
+        (new VehicleModel())->update($vehicleId, [
+            'kilometer' => (int) ($service['kilometer_terakhir'] ?? 0),
+        ]);
     }
 
     private function nextServiceDate(string $serviceDate): ?string
@@ -488,12 +632,44 @@ class MonitoringKendaraan extends BaseController
 
     private function vehicleOptions(): array
     {
-        return (new VehicleModel())->orderBy('nomor_polisi', 'ASC')->findAll();
+        return array_map(function (array $vehicle): array {
+            $vehicle['nama_tampilan'] = $this->vehicleDisplayName($vehicle);
+
+            return $vehicle;
+        }, (new VehicleModel())->orderBy('nomor_polisi', 'ASC')->findAll());
     }
 
-    private function vehicle(int $id): array
+    private function vehicleDisplayName(array $vehicle): string
     {
-        return $this->findOrFail(new VehicleModel(), $id, 'Kendaraan tidak ditemukan.');
+        if (($vehicle['nama_kendaraan'] ?? '') === 'Lainnya' && ! empty($vehicle['nama_kendaraan_lainnya'])) {
+            return (string) $vehicle['nama_kendaraan_lainnya'];
+        }
+
+        return (string) ($vehicle['nama_kendaraan'] ?? '-');
+    }
+
+    private function internalPicForUnit(?string $unit): ?string
+    {
+        return match ($unit) {
+            'Bagian Umum 1' => 'Angger Wicaksono',
+            'Bagian Umum 2' => 'Agil Halis Kesawa',
+            default => null,
+        };
+    }
+
+    private function vehicle(int $id, bool $withDeleted = false): array
+    {
+        $model = new VehicleModel();
+        if ($withDeleted) {
+            $model->withDeleted();
+        }
+
+        return $this->findOrFail($model, $id, 'Kendaraan tidak ditemukan.');
+    }
+
+    private function isAdmin(): bool
+    {
+        return (string) session()->get('auth_role') === 'admin';
     }
 
     private function findOrFail($model, int $id, string $message): array

@@ -68,6 +68,7 @@ class KelolaAkun extends BaseController
                 'display_name' => $user['display_name'],
                 'role'         => $user['role'],
                 'role_label'   => $this->roleLabel($user['role']),
+                'admin_pin_status' => ! empty($user['admin_login_pin_hash']) ? 'Sudah diatur' : 'Belum diatur',
                 'created_at'   => $this->formatDate($user['created_at']),
                 'updated_at'   => $this->formatDate($user['updated_at']),
             ],
@@ -170,12 +171,16 @@ class KelolaAkun extends BaseController
             return $this->formError('create', $data, $errors);
         }
 
-        $id = $this->model->insert([
+        $insert = [
             'username'      => $data['username'],
             'display_name'  => $data['display_name'],
             'role'          => $data['role'],
             'password_hash' => password_hash($data['password'], PASSWORD_DEFAULT),
-        ], true);
+            'admin_login_pin_hash' => $data['role'] === 'admin'
+                ? password_hash($data['admin_login_pin'], PASSWORD_DEFAULT)
+                : null,
+        ];
+        $id = $this->model->insert($insert, true);
 
         if ($id === false) {
             return $this->formError('create', $data, $this->model->errors() ?: ['account' => 'Akun gagal disimpan.']);
@@ -198,6 +203,20 @@ class KelolaAkun extends BaseController
             $errors['role'] = 'Admin terakhir tidak dapat diubah menjadi role lain.';
         }
 
+        $changesAdminCredential = $user['role'] === 'admin'
+            && ($data['password'] !== '' || $data['admin_login_pin'] !== '');
+        if ($changesAdminCredential) {
+            if ($data['current_password'] === '' || ! password_verify($data['current_password'], (string) $user['password_hash'])) {
+                $errors['current_password'] = 'Password lama tidak sesuai.';
+            }
+
+            if (! empty($user['admin_login_pin_hash'])
+                && ($data['current_admin_login_pin'] === ''
+                    || ! password_verify($data['current_admin_login_pin'], (string) $user['admin_login_pin_hash']))) {
+                $errors['current_admin_login_pin'] = 'PIN lama tidak sesuai.';
+            }
+        }
+
         if ($errors !== []) {
             return $this->formError('edit', $data, $errors, $id);
         }
@@ -210,6 +229,11 @@ class KelolaAkun extends BaseController
 
         if ($data['password'] !== '') {
             $update['password_hash'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+        if ($data['role'] !== 'admin') {
+            $update['admin_login_pin_hash'] = null;
+        } elseif ($data['admin_login_pin'] !== '') {
+            $update['admin_login_pin_hash'] = password_hash($data['admin_login_pin'], PASSWORD_DEFAULT);
         }
 
         if (! $this->model->update($id, $update)) {
@@ -253,6 +277,9 @@ class KelolaAkun extends BaseController
             'display_name' => trim((string) $this->request->getPost('display_name')),
             'role'         => strtolower(trim((string) $this->request->getPost('role'))),
             'password'     => (string) $this->request->getPost('password'),
+            'admin_login_pin' => trim((string) $this->request->getPost('admin_login_pin')),
+            'current_password' => (string) $this->request->getPost('current_password'),
+            'current_admin_login_pin' => trim((string) $this->request->getPost('current_admin_login_pin')),
         ];
     }
 
@@ -271,6 +298,17 @@ class KelolaAkun extends BaseController
             'display_name' => 'required|max_length[150]',
             'role'         => 'required|in_list[' . implode(',', array_keys(UserRoles::LABELS)) . ']',
             'password'     => $passwordRule,
+            'admin_login_pin' => [
+                'label' => 'PIN login admin',
+                'rules' => 'permit_empty|regex_match[/^[0-9]{6}$/]',
+                'errors' => ['regex_match' => 'PIN login admin harus terdiri dari tepat 6 angka.'],
+            ],
+            'current_password' => 'permit_empty|max_length[255]',
+            'current_admin_login_pin' => [
+                'label' => 'PIN lama',
+                'rules' => 'permit_empty|regex_match[/^[0-9]{6}$/]',
+                'errors' => ['regex_match' => 'PIN lama harus terdiri dari tepat 6 angka.'],
+            ],
         ]);
 
         $validation->run($data);
@@ -285,19 +323,34 @@ class KelolaAkun extends BaseController
             $errors['username'] = 'Username sudah digunakan oleh akun lain.';
         }
 
+        if ($data['role'] === 'admin') {
+            $hasExistingPin = false;
+            if ($id !== null) {
+                $existing = $this->model->find($id);
+                $hasExistingPin = $existing !== null && ! empty($existing['admin_login_pin_hash']);
+            }
+            if ($data['admin_login_pin'] === '' && ! $hasExistingPin) {
+                $errors['admin_login_pin'] = 'PIN login admin wajib diatur untuk mengeluarkan sesi dari perangkat lain.';
+            }
+        }
+
         return $errors;
     }
 
     private function formError(string $modal, array $data, array $errors, ?int $id = null): RedirectResponse
     {
-        unset($data['password']);
+        unset($data['password'], $data['admin_login_pin'], $data['current_password'], $data['current_admin_login_pin']);
+        if ($id !== null) {
+            $existing = $this->model->find($id);
+            $data['has_admin_login_pin'] = $existing !== null && ! empty($existing['admin_login_pin_hash']);
+            $data['original_role'] = $existing['role'] ?? $data['role'];
+        }
 
-        return redirect()->to(site_url('kelola-akun'))->with([
-            'errors'            => $errors,
-            'account_modal'     => $modal,
-            'account_form_data' => $data,
-            'account_edit_id'   => $id,
-        ]);
+        return redirect()->to(site_url('kelola-akun'))
+            ->with('errors', $errors)
+            ->with('account_modal', $modal)
+            ->with('account_form_data', $data)
+            ->with('account_edit_id', $id);
     }
 
     private function adminCount(): int

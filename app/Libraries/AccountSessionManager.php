@@ -18,7 +18,7 @@ class AccountSessionManager
     /**
      * Mengambil kunci sesi eksklusif untuk satu akun.
      *
-     * @return array{status: 'acquired'|'active'|'error', token?: string, expires_at?: int}
+     * @return array{status: 'acquired'|'active'|'error', token?: string, expires_at?: int, ip_address?: string|null, user_agent?: string|null, last_seen_at?: string|null}
      */
     public function acquire(
         int $userId,
@@ -54,6 +54,9 @@ class AccountSessionManager
                     return [
                         'status'     => 'active',
                         'expires_at' => $existingExpiry,
+                        'ip_address' => $existing['ip_address'] ?? null,
+                        'user_agent' => $existing['user_agent'] ?? null,
+                        'last_seen_at' => $existing['last_seen_at'] ?? null,
                     ];
                 }
 
@@ -89,6 +92,69 @@ class AccountSessionManager
             }
 
             log_message('error', 'Gagal mengambil kunci sesi akun: {message}', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            return ['status' => 'error'];
+        }
+    }
+
+    /**
+     * Mengganti sesi aktif admin secara atomik setelah PIN takeover diverifikasi.
+     *
+     * @return array{status: 'acquired'|'error', token?: string}
+     */
+    public function takeOver(
+        int $userId,
+        int $expiresAt,
+        ?string $ipAddress = null,
+        ?string $userAgent = null,
+    ): array {
+        try {
+            $this->db->transBegin();
+
+            $usersTable = $this->db->escapeIdentifiers($this->db->prefixTable('users'));
+            $user = $this->db
+                ->query("SELECT id FROM {$usersTable} WHERE id = ? FOR UPDATE", [$userId])
+                ->getRowArray();
+
+            if ($user === null) {
+                $this->db->transRollback();
+
+                return ['status' => 'error'];
+            }
+
+            $this->db->table('user_sessions')->where('user_id', $userId)->delete();
+
+            $token = bin2hex(random_bytes(32));
+            $timestamp = date('Y-m-d H:i:s');
+            $inserted = $this->db->table('user_sessions')->insert([
+                'user_id' => $userId,
+                'token_hash' => $this->hashToken($token),
+                'ip_address' => $ipAddress !== '' ? $ipAddress : null,
+                'user_agent' => $this->limitUserAgent($userAgent),
+                'last_seen_at' => $timestamp,
+                'expires_at' => date('Y-m-d H:i:s', $expiresAt),
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ]);
+
+            if (! $inserted || ! $this->db->transStatus()) {
+                throw new RuntimeException('Gagal mengganti sesi admin aktif.');
+            }
+
+            $this->db->transCommit();
+
+            return [
+                'status' => 'acquired',
+                'token' => $token,
+            ];
+        } catch (Throwable $exception) {
+            if ($this->db->transDepth > 0) {
+                $this->db->transRollback();
+            }
+
+            log_message('error', 'Gagal mengambil alih sesi admin: {message}', [
                 'message' => $exception->getMessage(),
             ]);
 

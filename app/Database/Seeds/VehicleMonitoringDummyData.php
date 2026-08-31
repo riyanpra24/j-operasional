@@ -12,26 +12,26 @@ class VehicleMonitoringDummyData extends Seeder
     {
         $now = date('Y-m-d H:i:s');
         $vehicles = [
-            ['L 1234 ABC', 'Mobil Operasional 01', 'Mobil', 'Toyota', 'Innova Reborn', 2022, 'Silver', 'MHKDUMMY000001', '2GDDUMMY000001', 'Bagian Umum 2', 'Andi Prasetyo', 48250, 'Tersedia'],
-            ['L 5678 DEF', 'Mobil Operasional 02', 'Mobil', 'Honda', 'CR-V', 2021, 'Hitam', 'MHKDUMMY000002', '2GDDUMMY000002', 'Kanwil Surabaya', 'Dimas Saputra', 67340, 'Digunakan'],
-            ['L 9012 GHI', 'Mobil Operasional 03', 'Mobil', 'Mitsubishi', 'Xpander', 2023, 'Putih', 'MHKDUMMY000003', '2GDDUMMY000003', 'Bagian Umum 2', 'Rina Wulandari', 28900, 'Tersedia'],
-            ['L 3456 JKL', 'Mobil Operasional 04', 'Mobil', 'Toyota', 'Avanza', 2020, 'Abu-abu', 'MHKDUMMY000004', '2GDDUMMY000004', 'Operasional Kanwil', 'Budi Santoso', 91520, 'Perawatan'],
-            ['L 7890 MNO', 'Motor Operasional 01', 'Motor', 'Honda', 'Vario 160', 2024, 'Hitam', 'MHKDUMMY000005', '2GDDUMMY000005', 'Bagian Umum 2', 'Fajar Nugroho', 12840, 'Tersedia'],
-            ['L 2468 PQR', 'Motor Operasional 02', 'Motor', 'Yamaha', 'NMAX', 2022, 'Biru', 'MHKDUMMY000006', '2GDDUMMY000006', 'Operasional Kanwil', 'Siti Rahma', 34170, 'Digunakan'],
-            ['L 1357 STU', 'Minibus Operasional', 'Minibus', 'Isuzu', 'Elf', 2019, 'Putih', 'MHKDUMMY000007', '2GDDUMMY000007', 'Kanwil Surabaya', 'Eko Setiawan', 124600, 'Perawatan'],
-            ['L 8642 VWX', 'Kendaraan Tamu', 'Minibus', 'Toyota', 'HiAce', 2021, 'Silver', 'MHKDUMMY000008', '2GDDUMMY000008', 'Sekretariat Kanwil', 'Maya Lestari', 55820, 'Tidak Aktif'],
+            ['L 1234 ABC', 'Mobil Operasional 01', 'Mobil', 'Toyota', 'Innova Reborn', 2022, 'Silver', 'MHKDUMMY000001', '2GDDUMMY000001', 'Eryuninto', 'Andi Prasetyo', 48250, 'Tersedia'],
+            ['L 5678 DEF', 'Mobil Operasional 02', 'Mobil', 'Honda', 'CR-V', 2021, 'Hitam', 'MHKDUMMY000002', '2GDDUMMY000002', 'Riyanto', 'Dimas Saputra', 67340, 'Digunakan'],
+            ['L 9012 GHI', 'Mobil Operasional 03', 'Mobil', 'Mitsubishi', 'Xpander', 2023, 'Putih', 'MHKDUMMY000003', '2GDDUMMY000003', 'Fransiskus Medhison', 'Rina Wulandari', 28900, 'Tersedia'],
+            ['L 3456 JKL', 'Mobil Operasional 04', 'Mobil', 'Toyota', 'Avanza', 2020, 'Abu-abu', 'MHKDUMMY000004', '2GDDUMMY000004', 'Eryuninto', 'Budi Santoso', 91520, 'Perawatan'],
+            ['L 7890 MNO', 'Motor Operasional 01', 'Motor', 'Honda', 'Vario 160', 2024, 'Hitam', 'MHKDUMMY000005', '2GDDUMMY000005', 'Riyanto', 'Fajar Nugroho', 12840, 'Tersedia'],
+            ['L 2468 PQR', 'Motor Operasional 02', 'Motor', 'Yamaha', 'NMAX', 2022, 'Biru', 'MHKDUMMY000006', '2GDDUMMY000006', 'Fransiskus Medhison', 'Siti Rahma', 34170, 'Digunakan'],
+            ['L 1357 STU', 'Minibus Operasional', 'Minibus', 'Isuzu', 'Elf', 2019, 'Putih', 'MHKDUMMY000007', '2GDDUMMY000007', 'Eryuninto', 'Eko Setiawan', 124600, 'Perawatan'],
+            ['L 8642 VWX', 'Kendaraan Tamu', 'Minibus', 'Toyota', 'HiAce', 2021, 'Silver', 'MHKDUMMY000008', '2GDDUMMY000008', 'Riyanto', 'Maya Lestari', 55820, 'Tidak Aktif'],
         ];
 
         $maintenance = [
-            ['L 1234 ABC', '2026-08-10', 'Servis berkala dan ganti oli', 'Auto2000 Surabaya', 48000, 1850000, '2026-11-10', 58000, 'Pemeriksaan rutin 10.000 km.', 'https://example.com/dummy/servis-innova-agustus-2026.pdf'],
-            ['L 1234 ABC', '2026-03-05', 'Penggantian kampas rem', 'Auto2000 Surabaya', 42100, 2350000, '2026-06-05', null, 'Kampas rem depan dan pemeriksaan cakram.', null],
-            ['L 5678 DEF', '2026-07-18', 'Servis berkala', 'Honda Surabaya Center', 65200, 2100000, '2026-10-18', 75200, 'Servis berkala tiga bulanan.', 'https://example.com/dummy/servis-crv-juli-2026.pdf'],
-            ['L 9012 GHI', '2026-06-22', 'Ganti oli dan filter', 'Mitsubishi Motors Surabaya', 25750, 1450000, '2026-09-22', 35750, null, null],
-            ['L 3456 JKL', '2026-08-27', 'Perbaikan sistem pendingin', 'Bengkel Sejahtera', 91520, 4750000, '2026-11-27', 96500, 'Kendaraan masih dalam proses perawatan.', 'https://example.com/dummy/perbaikan-avanza-agustus-2026.pdf'],
-            ['L 7890 MNO', '2026-08-02', 'Servis ringan', 'AHASS Surabaya', 12000, 425000, '2026-11-02', 16000, 'Ganti oli mesin dan pemeriksaan rem.', null],
-            ['L 2468 PQR', '2026-05-14', 'Servis CVT', 'Yamaha Service Surabaya', 30200, 875000, '2026-08-14', 36200, null, 'https://example.com/dummy/servis-nmax-mei-2026.pdf'],
-            ['L 1357 STU', '2026-08-25', 'Perbaikan kaki-kaki', 'Isuzu Surabaya', 124600, 6800000, '2026-11-25', 129000, 'Menunggu suku cadang tie rod.', 'https://example.com/dummy/perbaikan-elf-agustus-2026.pdf'],
-            ['L 8642 VWX', '2026-02-12', 'Servis berkala', 'Auto2000 Surabaya', 54000, 3200000, '2026-05-12', 64000, 'Kendaraan sementara tidak dioperasikan.', null],
+            ['L 1234 ABC', '2026-08-10', 'Servis berkala dan ganti oli', 'Auto2000 Surabaya', 48000, 1850000, '2026-11-10', 'Pemeriksaan rutin 10.000 km.', 'https://example.com/dummy/servis-innova-agustus-2026.pdf'],
+            ['L 1234 ABC', '2026-03-05', 'Penggantian kampas rem', 'Auto2000 Surabaya', 42100, 2350000, '2026-06-05', 'Kampas rem depan dan pemeriksaan cakram.', null],
+            ['L 5678 DEF', '2026-07-18', 'Servis berkala', 'Honda Surabaya Center', 65200, 2100000, '2026-10-18', 'Servis berkala tiga bulanan.', 'https://example.com/dummy/servis-crv-juli-2026.pdf'],
+            ['L 9012 GHI', '2026-06-22', 'Ganti oli dan filter', 'Mitsubishi Motors Surabaya', 25750, 1450000, '2026-09-22', null, null],
+            ['L 3456 JKL', '2026-08-27', 'Perbaikan sistem pendingin', 'Bengkel Sejahtera', 91520, 4750000, '2026-11-27', 'Kendaraan masih dalam proses perawatan.', 'https://example.com/dummy/perbaikan-avanza-agustus-2026.pdf'],
+            ['L 7890 MNO', '2026-08-02', 'Servis ringan', 'AHASS Surabaya', 12000, 425000, '2026-11-02', 'Ganti oli mesin dan pemeriksaan rem.', null],
+            ['L 2468 PQR', '2026-05-14', 'Servis CVT', 'Yamaha Service Surabaya', 30200, 875000, '2026-08-14', null, 'https://example.com/dummy/servis-nmax-mei-2026.pdf'],
+            ['L 1357 STU', '2026-08-25', 'Perbaikan kaki-kaki', 'Isuzu Surabaya', 124600, 6800000, '2026-11-25', 'Menunggu suku cadang tie rod.', 'https://example.com/dummy/perbaikan-elf-agustus-2026.pdf'],
+            ['L 8642 VWX', '2026-02-12', 'Servis berkala', 'Auto2000 Surabaya', 54000, 3200000, '2026-05-12', 'Kendaraan sementara tidak dioperasikan.', null],
         ];
 
         $documents = [
@@ -63,8 +63,10 @@ class VehicleMonitoringDummyData extends Seeder
 
             $this->db->table('vehicles')->insert([
                 'nomor_polisi' => $plate,
-                'nama_kendaraan' => $name,
-                'jenis' => $type,
+                'nama_kendaraan' => 'Lainnya',
+                'nama_kendaraan_lainnya' => $name,
+                'jenis' => $type === 'Motor' ? 'Motor' : 'Mobil',
+                'status_kendaraan' => 'Kendaraan Aset',
                 'merek' => $brand,
                 'tipe' => $model,
                 'tahun' => $year,
@@ -72,9 +74,12 @@ class VehicleMonitoringDummyData extends Seeder
                 'nomor_rangka' => $frame,
                 'nomor_mesin' => $engine,
                 'unit_pengguna' => $unit,
-                'pic' => $pic,
+                'unit_pengguna_lainnya' => null,
+                'pic' => 'Bagian Umum 2',
+                'pic_internal' => 'Agil Halis Kesawa',
                 'kilometer' => $kilometer,
-                'status' => $status,
+                'status' => $status === 'Tersedia' ? 'Lainnya' : $status,
+                'status_lainnya' => $status === 'Tersedia' ? 'Tersedia' : null,
                 'created_by' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -84,7 +89,7 @@ class VehicleMonitoringDummyData extends Seeder
             $this->log($vehicleId, "{$plate} · {$name}", 'Kendaraan', $vehicleId, 'Ditambahkan', 'Data kendaraan dummy ditambahkan.', $now);
         }
 
-        foreach ($maintenance as [$plate, $date, $type, $workshop, $kilometer, $cost, $nextDate, $nextKm, $notes, $link]) {
+        foreach ($maintenance as [$plate, $date, $type, $workshop, $kilometer, $cost, $nextDate, $notes, $link]) {
             $vehicleId = $vehicleIds[$plate];
             $exists = $this->db->table('vehicle_maintenance')->where(['vehicle_id' => $vehicleId, 'tanggal_servis' => $date, 'jenis_perawatan' => $type])->countAllResults() > 0;
             if ($exists) {
@@ -99,7 +104,8 @@ class VehicleMonitoringDummyData extends Seeder
                 'kilometer' => $kilometer,
                 'biaya' => $cost,
                 'servis_berikutnya_tanggal' => $nextDate,
-                'servis_berikutnya_km' => $nextKm,
+                'anggaran_servis' => 'Kantor',
+                'nama_perusahaan' => 'PT. Jaminan Kredit Indonesia (Persero)',
                 'keterangan' => $notes,
                 'link_berkas' => $link,
                 'created_by' => null,

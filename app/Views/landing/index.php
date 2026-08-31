@@ -1,7 +1,14 @@
 <?php
 $landingCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
+$requiredMarkersVersion = is_file(FCPATH . 'assets/required-markers.js') ? (string) filemtime(FCPATH . 'assets/required-markers.js') : '1';
 $loginError        = session()->getFlashdata('login_error');
 $logoutSuccess     = session()->getFlashdata('logout_success');
+$openAdminTakeover = (bool) session()->getFlashdata('open_admin_takeover_modal');
+$adminTakeoverError = session()->getFlashdata('admin_takeover_error');
+$adminTakeoverName = (string) session()->get('admin_takeover_display_name');
+$adminTakeoverDevice = (string) session()->get('admin_takeover_device');
+$adminTakeoverIp = (string) session()->get('admin_takeover_ip');
+$adminTakeoverLastSeen = (string) session()->get('admin_takeover_last_seen_at');
 $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
     || $loginError !== null
     || $logoutSuccess !== null
@@ -14,10 +21,11 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Jamkrindo Kanwil Surabaya, sistem pengelolaan dokumen operasional.">
-    <title><?= esc($title ?? 'Jamkrindo Kanwil Surabaya') ?> | Document Management</title>
-    <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg?v=2') ?>">
+    <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
+    <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>?v=<?= esc($landingCssVersion, 'attr') ?>">
     <script src="<?= base_url('assets/url-mask.js') ?>"></script>
+    <script src="<?= base_url('assets/required-markers.js') ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
 </head>
 
 <body class="landing-page geo-landing-page">
@@ -151,6 +159,47 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
         </section>
     </div>
 
+    <div
+        class="landing-login-modal<?= $openAdminTakeover ? ' open' : '' ?>"
+        data-admin-takeover-modal
+        data-open-on-load="<?= $openAdminTakeover ? 'true' : 'false' ?>"
+        aria-hidden="<?= $openAdminTakeover ? 'false' : 'true' ?>"
+        <?= $openAdminTakeover ? '' : 'hidden' ?>>
+        <button type="button" class="landing-login-backdrop" data-admin-takeover-close aria-label="Tutup konfirmasi sesi admin"></button>
+        <section class="landing-login-dialog admin-takeover-dialog" role="alertdialog" aria-modal="true" aria-labelledby="adminTakeoverTitle">
+            <button type="button" class="landing-login-close" data-admin-takeover-close aria-label="Tutup">×</button>
+            <header class="landing-login-header">
+                <span class="landing-login-mark admin-takeover-mark" aria-hidden="true">!</span>
+                <div>
+                    <small>PERINGATAN SESI ADMIN</small>
+                    <strong id="adminTakeoverTitle">Akun digunakan di perangkat lain</strong>
+                    <p>Masukkan PIN khusus untuk mengeluarkan sesi lama dan melanjutkan login di perangkat ini.</p>
+                </div>
+            </header>
+            <div class="landing-login-body">
+                <div class="admin-takeover-device">
+                    <strong><?= esc($adminTakeoverName !== '' ? $adminTakeoverName : 'Administrator') ?></strong>
+                    <span><?= esc($adminTakeoverDevice !== '' ? $adminTakeoverDevice : 'Perangkat tidak dikenal') ?></span>
+                    <?php if ($adminTakeoverIp !== ''): ?><small>IP <?= esc($adminTakeoverIp) ?></small><?php endif ?>
+                    <?php if ($adminTakeoverLastSeen !== ''): ?><small>Terakhir aktif <?= date('d-m-Y H:i', strtotime($adminTakeoverLastSeen)) ?> WIB</small><?php endif ?>
+                </div>
+                <?php if ($adminTakeoverError): ?><div class="landing-login-alert danger" role="alert"><?= esc($adminTakeoverError) ?></div><?php endif ?>
+                <form action="<?= site_url('login/admin-takeover') ?>" method="post" class="landing-login-form">
+                    <?= csrf_field() ?>
+                    <div class="form-group">
+                        <label for="adminTakeoverPin">PIN login admin</label>
+                        <div class="landing-password-field">
+                            <input id="adminTakeoverPin" name="admin_login_pin" type="password" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code" placeholder="Masukkan 6 angka" required>
+                            <button type="button" data-admin-pin-toggle aria-label="Tampilkan PIN">Lihat</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="landing-login-submit admin-takeover-submit">Keluarkan perangkat lain <span aria-hidden="true">→</span></button>
+                </form>
+                <p class="landing-login-help">Tindakan ini langsung menonaktifkan sesi admin pada perangkat sebelumnya.</p>
+            </div>
+        </section>
+    </div>
+
     <script>
         (() => {
             const modal = document.querySelector('[data-login-modal]');
@@ -205,6 +254,36 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
                     window.history.replaceState({}, '', url.pathname + url.search + url.hash);
                 }
             }
+
+            const takeoverModal = document.querySelector('[data-admin-takeover-modal]');
+            const takeoverPin = document.getElementById('adminTakeoverPin');
+            const takeoverPinToggle = document.querySelector('[data-admin-pin-toggle]');
+            const openTakeover = () => {
+                if (!takeoverModal) return;
+                takeoverModal.hidden = false;
+                takeoverModal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('landing-modal-open');
+                requestAnimationFrame(() => {
+                    takeoverModal.classList.add('open');
+                    takeoverPin?.focus();
+                });
+            };
+            const closeTakeover = () => {
+                if (!takeoverModal) return;
+                takeoverModal.classList.remove('open');
+                takeoverModal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('landing-modal-open');
+                window.setTimeout(() => { takeoverModal.hidden = true; }, 180);
+            };
+            takeoverModal?.querySelectorAll('[data-admin-takeover-close]').forEach(button => button.addEventListener('click', closeTakeover));
+            takeoverPinToggle?.addEventListener('click', () => {
+                if (!takeoverPin) return;
+                const visible = takeoverPin.type === 'text';
+                takeoverPin.type = visible ? 'password' : 'text';
+                takeoverPinToggle.textContent = visible ? 'Lihat' : 'Sembunyikan';
+                takeoverPinToggle.setAttribute('aria-label', visible ? 'Tampilkan PIN' : 'Sembunyikan PIN');
+            });
+            if (takeoverModal?.dataset.openOnLoad === 'true') openTakeover();
         })();
     </script>
 </body>

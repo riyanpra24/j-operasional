@@ -12,6 +12,7 @@ $routes->setAutoRoute(false);
 $routes->group('', static function (RouteCollection $routes): void {
     $routes->get('login', 'Auth::login', ['as' => 'login']);
     $routes->post('login', 'Auth::attempt', ['as' => 'login.attempt']);
+    $routes->post('login/admin-takeover', 'Auth::takeoverAdminSession', ['as' => 'login.admin_takeover']);
     $routes->post('logout', 'Auth::logout', ['as' => 'logout']);
 });
 

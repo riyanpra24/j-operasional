@@ -13,6 +13,6 @@ class VehicleMaintenanceModel extends Model
     protected $useTimestamps = true;
     protected $allowedFields = [
         'vehicle_id', 'tanggal_servis', 'jenis_perawatan', 'bengkel', 'kilometer', 'biaya',
-        'servis_berikutnya_tanggal', 'servis_berikutnya_km', 'keterangan', 'link_berkas', 'created_by',
+        'servis_berikutnya_tanggal', 'anggaran_servis', 'nama_perusahaan', 'keterangan', 'link_berkas', 'created_by',
     ];
 }

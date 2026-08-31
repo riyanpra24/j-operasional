@@ -22,21 +22,18 @@
                 <span class="duplicate-tab-icon" aria-hidden="true">!</span>
                 <p>AKSES DIBATASI</p>
                 <h1>Akun sedang digunakan di tab lain</h1>
-                <span data-duplicate-tab-message>Akses pada tab ini diblokir. Silakan lanjutkan pekerjaan pada tab pertama; sesi di tab pertama tetap aktif.</span>
+                <span data-duplicate-tab-message>Akses pada tab ini diblokir. Pilih Periksa kembali untuk mengakhiri sesi aktif dan kembali ke Landing Page.</span>
                 <div class="duplicate-tab-actions">
-                    <button type="button" class="btn btn-secondary duplicate-tab-home" data-duplicate-tab-home>← Kembali ke Landing Page</button>
                     <button type="button" class="btn btn-primary" data-duplicate-tab-retry>Periksa kembali</button>
                 </div>
             </main>`;
-        const homeButton = document.querySelector('[data-duplicate-tab-home]');
         const retryButton = document.querySelector('[data-duplicate-tab-retry]');
         const blockerMessage = document.querySelector('[data-duplicate-tab-message]');
 
-        homeButton?.addEventListener('click', async () => {
+        retryButton?.addEventListener('click', async () => {
             if (logoutUrl === '' || csrfName === '' || csrfHash === '') return;
-            homeButton.disabled = true;
-            if (retryButton) retryButton.disabled = true;
-            homeButton.textContent = 'Mengakhiri sesi...';
+            retryButton.disabled = true;
+            retryButton.textContent = 'Memproses kembali...';
 
             try {
                 const formData = new FormData();
@@ -59,12 +56,10 @@
                 window.location.replace(landingUrl);
             } catch (error) {
                 if (blockerMessage) blockerMessage.textContent = error.message || 'Sesi belum dapat diakhiri. Silakan coba kembali.';
-                homeButton.disabled = false;
-                if (retryButton) retryButton.disabled = false;
-                homeButton.textContent = '← Kembali ke Landing Page';
+                retryButton.disabled = false;
+                retryButton.textContent = 'Periksa kembali';
             }
         });
-        document.querySelector('[data-duplicate-tab-retry]')?.addEventListener('click', () => window.location.reload());
     };
 
     window.addEventListener('storage', (event) => {
