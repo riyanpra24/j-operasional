@@ -124,7 +124,7 @@ class MonitoringKendaraan extends BaseController
         $vehicle = $this->findOrFail($model, $id, 'Kendaraan tidak ditemukan.');
         $description = $isAdmin
             ? 'Data kendaraan dihapus permanen dari database beserta seluruh data turunannya.'
-            : 'Data kendaraan dihapus dari tampilan Bagian Umum 2 dan masih dapat dilihat oleh Administrator.';
+            : 'Data kendaraan dihapus dari akun pengguna, tetapi history tetap tercatat di database.';
         $this->recordActivity($vehicle, 'Kendaraan', $id, 'Dihapus', $description);
         if (! $model->delete($id, $isAdmin)) {
             return redirect()->to($this->pageUrl('vehicles'))->with('error', 'Data kendaraan gagal dihapus.');
@@ -132,7 +132,7 @@ class MonitoringKendaraan extends BaseController
 
         $message = $isAdmin
             ? "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus permanen dari database."
-            : "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus dari tampilan Bagian Umum 2.";
+            : "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus dari akun Anda. History tetap tercatat di database.";
 
         return redirect()->to($this->pageUrl('vehicles'))->with('success', $message);
     }
@@ -229,7 +229,7 @@ class MonitoringKendaraan extends BaseController
         $vehicle = $this->vehicle((int) $record['vehicle_id'], $isAdmin);
         $description = $isAdmin
             ? "Servis {$record['jenis_perawatan']} tanggal {$record['tanggal_servis']} dihapus permanen dari database."
-            : "Servis {$record['jenis_perawatan']} tanggal {$record['tanggal_servis']} dihapus dari tampilan Bagian Umum 2 dan masih dapat dilihat oleh Administrator.";
+            : "Servis {$record['jenis_perawatan']} tanggal {$record['tanggal_servis']} dihapus dari akun pengguna, tetapi history tetap tercatat di database.";
         $this->recordActivity($vehicle, 'Servis', $id, 'Dihapus', $description);
         if (! $model->delete($id, $isAdmin)) {
             return redirect()->to($this->pageUrl('maintenance'))->with('error', 'Data servis gagal dihapus.');
@@ -240,7 +240,7 @@ class MonitoringKendaraan extends BaseController
             'success',
             $isAdmin
                 ? 'Data servis dan perawatan berhasil dihapus permanen dari database.'
-                : 'Data servis dan perawatan berhasil dihapus dari tampilan Bagian Umum 2.',
+                : 'Data servis dan perawatan berhasil dihapus dari akun Anda. History tetap tercatat di database.',
         );
     }
 
@@ -333,7 +333,7 @@ class MonitoringKendaraan extends BaseController
         $vehicle = $this->vehicle((int) $record['vehicle_id'], $isAdmin);
         $description = $isAdmin
             ? "Dokumen {$record['jenis_dokumen']} dihapus permanen dari database."
-            : "Dokumen {$record['jenis_dokumen']} dihapus dari tampilan Bagian Umum 2 dan masih dapat dilihat oleh Administrator.";
+            : "Dokumen {$record['jenis_dokumen']} dihapus dari akun pengguna, tetapi history tetap tercatat di database.";
         $this->recordActivity($vehicle, 'Dokumen', $id, 'Dihapus', $description);
         if (! $model->delete($id, $isAdmin)) {
             return redirect()->to($this->pageUrl('documents'))->with('error', 'Dokumen kendaraan gagal dihapus.');
@@ -343,7 +343,7 @@ class MonitoringKendaraan extends BaseController
             'success',
             $isAdmin
                 ? 'Dokumen kendaraan berhasil dihapus permanen dari database.'
-                : 'Dokumen kendaraan berhasil dihapus dari tampilan Bagian Umum 2.',
+                : 'Dokumen kendaraan berhasil dihapus dari akun Anda. History tetap tercatat di database.',
         );
     }
 
@@ -472,10 +472,10 @@ class MonitoringKendaraan extends BaseController
             'status_kendaraan' => ['label' => 'Status kendaraan', 'rules' => 'required|in_list[' . implode(',', self::VEHICLE_OWNERSHIP_STATUSES) . ']'],
             'merek' => ['label' => 'Merek', 'rules' => 'permit_empty|max_length[100]'],
             'tipe' => ['label' => 'Tipe', 'rules' => 'permit_empty|max_length[100]'],
-            'tahun' => ['label' => 'Tahun', 'rules' => 'permit_empty|integer|greater_than_equal_to[1900]|less_than_equal_to[' . ((int) date('Y') + 1) . ']'],
+            'tahun' => ['label' => 'Tahun', 'rules' => 'required|integer|greater_than_equal_to[1900]|less_than_equal_to[' . ((int) date('Y') + 1) . ']'],
             'warna' => ['label' => 'Warna', 'rules' => 'permit_empty|max_length[60]'],
-            'nomor_rangka' => ['label' => 'Nomor rangka', 'rules' => 'permit_empty|max_length[100]'],
-            'nomor_mesin' => ['label' => 'Nomor mesin', 'rules' => 'permit_empty|max_length[100]'],
+            'nomor_rangka' => ['label' => 'Nomor rangka', 'rules' => 'required|max_length[100]'],
+            'nomor_mesin' => ['label' => 'Nomor mesin', 'rules' => 'required|max_length[100]'],
             'unit_pengguna' => ['label' => 'Driver pengguna', 'rules' => 'permit_empty|in_list[' . implode(',', self::VEHICLE_DRIVERS) . ']'],
             'unit_pengguna_lainnya' => [
                 'label' => 'Nama driver lainnya',

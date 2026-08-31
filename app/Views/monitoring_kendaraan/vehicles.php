@@ -88,11 +88,11 @@
         </section>
 
         <section class="modal-form-grid vehicle-form-grid vehicle-form-step" data-vehicle-form-step="1" hidden>
-            <div class="form-group"><label for="vehicleYear">Tahun</label><input id="vehicleYear" name="tahun" type="number" min="1900" max="<?= (int) date('Y') + 1 ?>"></div>
+            <div class="form-group"><label for="vehicleYear">Tahun <span>*</span></label><input id="vehicleYear" name="tahun" type="number" min="1900" max="<?= (int) date('Y') + 1 ?>" required></div>
             <div class="form-group"><label for="vehicleColor">Warna</label><input id="vehicleColor" name="warna" maxlength="60"></div>
             <div class="form-group modal-span-2"><label for="vehicleKm">Kilometer</label><input id="vehicleKm" name="kilometer" type="number" min="0" value="0" inputmode="numeric"><small id="vehicleKmHelp">Isi kilometer awal kendaraan.</small></div>
-            <div class="form-group"><label for="vehicleFrame">Nomor Rangka</label><input id="vehicleFrame" name="nomor_rangka" maxlength="100"></div>
-            <div class="form-group"><label for="vehicleEngine">Nomor Mesin</label><input id="vehicleEngine" name="nomor_mesin" maxlength="100"></div>
+            <div class="form-group"><label for="vehicleFrame">Nomor Rangka <span>*</span></label><input id="vehicleFrame" name="nomor_rangka" maxlength="100" required></div>
+            <div class="form-group"><label for="vehicleEngine">Nomor Mesin <span>*</span></label><input id="vehicleEngine" name="nomor_mesin" maxlength="100" required></div>
         </section>
 
         <section class="modal-form-grid vehicle-form-grid vehicle-form-step" data-vehicle-form-step="2" hidden>
@@ -114,7 +114,7 @@
     </footer>
 </form></section></div>
 
-<div class="account-modal vehicle-crud-modal" id="vehicleCrudDeleteModal" hidden aria-hidden="true"><button type="button" class="modal-backdrop" data-vehicle-crud-delete-close></button><section class="modal-dialog delete-modal-dialog" role="alertdialog" aria-modal="true"><div class="delete-modal-body"><span class="delete-warning-icon">!</span><h2><?= $isAdmin ? 'Hapus Kendaraan Permanen?' : 'Hapus Kendaraan?' ?></h2><p><strong data-crud-delete-name></strong> <?= $isAdmin ? 'akan dihapus permanen dari database beserta data servis dan dokumennya.' : 'akan hilang dari akun Bagian Umum 2, tetapi tetap tersimpan dan dapat dilihat oleh Administrator.' ?></p></div><form method="post" action="" data-crud-delete-form class="delete-modal-actions"><?= csrf_field() ?><button type="button" class="btn btn-ghost" data-vehicle-crud-delete-close>Batal</button><button type="submit" class="btn btn-delete"><?= $isAdmin ? 'Ya, hapus permanen' : 'Ya, hapus' ?></button></form></section></div>
+<div class="account-modal vehicle-crud-modal" id="vehicleCrudDeleteModal" hidden aria-hidden="true"><button type="button" class="modal-backdrop" data-vehicle-crud-delete-close></button><section class="modal-dialog delete-modal-dialog" role="alertdialog" aria-modal="true"><div class="delete-modal-body"><span class="delete-warning-icon">!</span><h2><?= $isAdmin ? 'Hapus Kendaraan Permanen?' : 'Hapus Kendaraan?' ?></h2><p><strong data-crud-delete-name></strong> <?= $isAdmin ? 'akan dihapus permanen dari database beserta data servis dan dokumennya.' : 'akan hilang dari akun Anda, tetapi history tetap tercatat di database.' ?></p></div><form method="post" action="" data-crud-delete-form class="delete-modal-actions"><?= csrf_field() ?><button type="button" class="btn btn-ghost" data-vehicle-crud-delete-close>Batal</button><button type="submit" class="btn btn-delete"><?= $isAdmin ? 'Ya, hapus permanen' : 'Ya, hapus' ?></button></form></section></div>
 
 <?= view('monitoring_kendaraan/_crud_script') ?>
 <script>
