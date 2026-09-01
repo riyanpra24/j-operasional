@@ -4,7 +4,7 @@
         <div class="delete-modal-body">
             <span class="delete-warning-icon">!</span>
             <h2 id="deleteModalTitle" data-delete-title>Hapus dokumen?</h2>
-            <p id="deleteModalDescription" data-delete-description>Dokumen <strong data-delete-label></strong> akan dihapus permanen dari database.</p>
+            <p id="deleteModalDescription" data-delete-description>Dokumen <strong data-delete-label></strong> <?= (string) session()->get('auth_role') === 'admin' ? 'akan dihapus permanen dan tidak dapat dipulihkan.' : 'akan dihapus.' ?></p>
             <div class="modal-alert" data-delete-error hidden></div>
         </div>
         <form method="post" action="" data-delete-form class="delete-modal-actions">

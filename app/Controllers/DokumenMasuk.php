@@ -341,8 +341,8 @@ class DokumenMasuk extends BaseController
             return redirect()->back()->with('errors', ['delete' => $message]);
         }
 
-        if (! $this->model->delete($id, true)) {
-            $errors = $this->model->errors() ?: ['delete' => 'Dokumen gagal dihapus dari database.'];
+        if (! $this->deleteRecord($this->model, 'dokumen_masuk', $id)) {
+            $errors = $this->model->errors() ?: ['delete' => 'Dokumen gagal dihapus.'];
 
             if ($this->request->isAJAX()) {
                 return $this->ajaxError($errors);
@@ -351,7 +351,9 @@ class DokumenMasuk extends BaseController
             return redirect()->back()->with('errors', $errors);
         }
 
-        $message = "Dokumen dari {$dokumen['pengirim']} telah dihapus permanen dari database.";
+        $message = $this->currentRoleIsAdmin()
+            ? "Dokumen dari {$dokumen['pengirim']} berhasil dihapus permanen."
+            : "Dokumen dari {$dokumen['pengirim']} berhasil dihapus.";
         session()->setFlashdata('success', $message);
 
         if ($this->request->isAJAX()) {

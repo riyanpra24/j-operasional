@@ -59,7 +59,7 @@ class DokumenKeluar extends BaseController
             $this->model->where('tanggal_pengiriman <=', $to);
         }
 
-        $jenisBuilder = db_connect()->table('dokumen_keluar')->select('jenis_surat');
+        $jenisBuilder = db_connect()->table('dokumen_keluar')->select('jenis_surat')->where('deleted_at', null);
         if ($securityView) {
             $jenisBuilder->where('progres', 'Diambil Ekspedisi');
         } else {
@@ -245,11 +245,13 @@ class DokumenKeluar extends BaseController
 
         $dokumen = $this->findDokumen($id);
 
-        if (! $this->model->delete($id, true)) {
+        if (! $this->deleteRecord($this->model, 'dokumen_keluar', $id)) {
             return $this->validationError($this->model->errors() ?: ['Surat Keluar gagal dihapus.']);
         }
 
-        $message = "Surat Keluar nomor {$dokumen['nomor_surat']} berhasil dihapus permanen dari database.";
+        $message = $this->currentRoleIsAdmin()
+            ? "Surat Keluar nomor {$dokumen['nomor_surat']} berhasil dihapus permanen."
+            : "Surat Keluar nomor {$dokumen['nomor_surat']} berhasil dihapus.";
         session()->setFlashdata('success', $message);
 
         return $this->successResponse($message);

@@ -9,6 +9,8 @@ class DokumenKeluarModel extends Model
     protected $table         = 'dokumen_keluar';
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
+    protected $useSoftDeletes = true;
+    protected $deletedField  = 'deleted_at';
     protected $allowedFields = [
         'nomor_surat',
         'jenis_surat',

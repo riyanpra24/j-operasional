@@ -103,6 +103,7 @@ final class SecurityNotificationService
     {
         return db_connect()->table('dokumen_keluar')
             ->join('distribusi_dokumen', 'distribusi_dokumen.dokumen_keluar_id = dokumen_keluar.id', 'inner')
+            ->where('dokumen_keluar.deleted_at', null)
             ->groupStart()
                 ->where('dokumen_keluar.progres', null)
                 ->orWhere('dokumen_keluar.progres !=', 'Diambil Ekspedisi')

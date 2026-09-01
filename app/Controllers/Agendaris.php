@@ -65,6 +65,7 @@ class Agendaris extends BaseController
 
         $jenisOptions = db_connect()->table('agendaris')
             ->select('jenis')
+            ->where('deleted_at', null)
             ->where('progres', 'Selesai')
             ->where('jenis IS NOT NULL', null, false)
             ->where('jenis !=', '')
@@ -297,12 +298,14 @@ class Agendaris extends BaseController
     {
         $agenda = $this->findJoined($id);
 
-        if (! $this->model->delete($id, true)) {
+        if (! $this->deleteRecord($this->model, 'agendaris', $id)) {
             return $this->validationError($this->model->errors() ?: ['Data agendaris gagal dihapus.']);
         }
 
         $nomor = $agenda['nomor_surat'] ?: 'belum diisi';
-        $message = "Surat nomor {$nomor} berhasil dihapus permanen dari Agendaris.";
+        $message = $this->currentRoleIsAdmin()
+            ? "Surat nomor {$nomor} berhasil dihapus permanen."
+            : "Surat nomor {$nomor} berhasil dihapus.";
         session()->setFlashdata('success', $message);
 
         return $this->successResponse($message);
@@ -474,6 +477,7 @@ class Agendaris extends BaseController
             ->select('agendaris.*, dokumen_masuk.penyerahan_at')
             ->join('dokumen_masuk', 'dokumen_masuk.id = agendaris.dokumen_masuk_id', 'left')
             ->where('agendaris.id', $id)
+            ->where('agendaris.deleted_at', null)
             ->get()
             ->getRowArray();
 

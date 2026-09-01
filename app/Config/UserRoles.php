@@ -21,8 +21,8 @@ class UserRoles extends BaseConfig
         'agendaris' => ['agendaris'],
         'umum_1'    => ['bagian-umum-1'],
         'umum_2'    => ['bagian-umum-2'],
-        'akutansi'  => [],
-        'sdm'       => [],
+        'akutansi'  => ['akutansi'],
+        'sdm'       => ['sdm'],
     ];
 
     public static function label(string $role): string

@@ -41,7 +41,7 @@ class KelolaAkun extends BaseController
             $role = '';
         }
 
-        $counts = ['total' => $this->model->countAll()];
+        $counts = ['total' => (new UserModel())->countAllResults()];
 
         foreach (array_keys(UserRoles::LABELS) as $roleName) {
             $counts[$roleName] = $this->model->where('role', $roleName)->countAllResults();
@@ -263,11 +263,13 @@ class KelolaAkun extends BaseController
             return redirect()->to(site_url('kelola-akun'))->with('error', 'Admin terakhir tidak dapat dihapus.');
         }
 
-        if (! $this->model->delete($id)) {
-            return redirect()->to(site_url('kelola-akun'))->with('error', 'Akun gagal dihapus dari database.');
+        if (! $this->deleteRecord($this->model, 'users', $id)) {
+            return redirect()->to(site_url('kelola-akun'))->with('error', 'Akun gagal dihapus.');
         }
 
-        return redirect()->to(site_url('kelola-akun'))->with('success', "Akun {$user['username']} berhasil dihapus dari database.");
+        (new AccountSessionManager())->releaseAllForUser($id);
+
+        return redirect()->to(site_url('kelola-akun'))->with('success', "Akun {$user['username']} berhasil dihapus permanen.");
     }
 
     private function payload(): array

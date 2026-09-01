@@ -197,12 +197,12 @@ class DokumenSpk extends BaseController
     public function destroy(int $id): RedirectResponse
     {
         $record = $this->findRecord($id);
-        if (! $this->records->delete($id)) {
+        if (! $this->deleteRecord($this->records, 'dokumen_spk', $id)) {
             return redirect()->to(site_url('bagian-umum-1/dokumen-spk'))->with('error', 'Dokumen gagal dihapus.');
         }
 
         return redirect()->to(site_url('bagian-umum-1/dokumen-spk'))
-            ->with('success', 'Dokumen ' . $record['nomor_dokumen'] . ' berhasil dihapus.');
+            ->with('success', 'Dokumen ' . $record['nomor_dokumen'] . ($this->currentRoleIsAdmin() ? ' berhasil dihapus permanen.' : ' berhasil dihapus.'));
     }
 
     private function payload(?array $existing = null): array

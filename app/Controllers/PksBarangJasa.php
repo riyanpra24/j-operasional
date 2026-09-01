@@ -163,20 +163,12 @@ class PksBarangJasa extends BaseController
     public function destroy(int $id): RedirectResponse
     {
         $record = $this->findRecord($id);
-        $mitraId = (int) $record['mitra_id'];
-        $db = db_connect();
-        $db->transStart();
-        $this->kerjasama->delete($id);
-        if ($this->kerjasama->where('mitra_id', $mitraId)->countAllResults() === 0) {
-            $this->mitra->delete($mitraId);
-        }
-        $db->transComplete();
-
-        if (! $db->transStatus()) {
+        if (! $this->deleteRecord($this->kerjasama, 'pks_kerjasama', $id)) {
             return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))->with('error', 'Data PKS gagal dihapus.');
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))->with('success', 'PKS ' . $record['kode_internal'] . ' beserta riwayatnya berhasil dihapus.');
+        $message = 'PKS ' . $record['kode_internal'] . ' beserta riwayatnya berhasil dihapus';
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))->with('success', $message . ($this->currentRoleIsAdmin() ? ' permanen.' : '.'));
     }
 
     public function storeDocument(int $id): RedirectResponse
@@ -223,9 +215,12 @@ class PksBarangJasa extends BaseController
             return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')
                 ->with('error', 'Dokumen PKS induk tidak dapat dihapus. Hapus data PKS secara keseluruhan jika memang diperlukan.');
         }
-        $this->dokumen->delete($documentId);
+        if (! $this->deleteRecord($this->dokumen, 'pks_dokumen_kerjasama', $documentId)) {
+            return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('error', 'Dokumen belum dapat dihapus.');
+        }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('success', $document['jenis_dokumen'] . ' nomor ' . $document['nomor_dokumen'] . ' berhasil dihapus.');
+        $message = $document['jenis_dokumen'] . ' nomor ' . $document['nomor_dokumen'] . ' berhasil dihapus';
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('success', $message . ($this->currentRoleIsAdmin() ? ' permanen.' : '.'));
     }
 
     public function storeItem(int $id): RedirectResponse
@@ -257,28 +252,31 @@ class PksBarangJasa extends BaseController
     public function destroyItem(int $id, int $itemId): RedirectResponse
     {
         $this->findOwnedItem($id, $itemId);
-        $this->item->delete($itemId);
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', 'Item pekerjaan berhasil dihapus.');
+        if (! $this->deleteRecord($this->item, 'pks_item_kerjasama', $itemId)) {
+            return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('error', 'Item pekerjaan belum dapat dihapus.');
+        }
+        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', $this->currentRoleIsAdmin() ? 'Item pekerjaan berhasil dihapus permanen.' : 'Item pekerjaan berhasil dihapus.');
     }
 
     private function baseListQuery(): PksKerjasamaModel
     {
         return $this->kerjasama
             ->select("pks_kerjasama.*, pks_mitra.nama_mitra, pks_mitra.alamat, pks_mitra.nama_kontak, pks_mitra.jabatan_kontak, pks_mitra.telepon, pks_mitra.email,
-                (SELECT d.id FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS dokumen_induk_id,
-                (SELECT d.nomor_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS nomor_dokumen,
-                (SELECT d.tanggal_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS tanggal_dokumen,
-                (SELECT d.jangka_waktu_bulan FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS jangka_waktu_bulan,
-                (SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS periode_mulai,
-                (SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS periode_selesai,
-                (SELECT d.nilai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS nilai,
-                (SELECT d.link_berkas FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.jenis_dokumen = 'PKS' LIMIT 1) AS link_berkas,
-                (SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1) AS periode_mulai_terakhir,
-                (SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1) AS periode_selesai_terakhir,
-                (SELECT d.nomor_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1) AS nomor_dokumen_terakhir,
-                (SELECT d.nilai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1) AS nilai_terakhir,
-                (SELECT COUNT(*) FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id) AS jumlah_dokumen", false)
-            ->join('pks_mitra', 'pks_mitra.id = pks_kerjasama.mitra_id');
+                (SELECT d.id FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS dokumen_induk_id,
+                (SELECT d.nomor_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS nomor_dokumen,
+                (SELECT d.tanggal_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS tanggal_dokumen,
+                (SELECT d.jangka_waktu_bulan FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS jangka_waktu_bulan,
+                (SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS periode_mulai,
+                (SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS periode_selesai,
+                (SELECT d.nilai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS nilai,
+                (SELECT d.link_berkas FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS link_berkas,
+                (SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL ORDER BY d.urutan DESC LIMIT 1) AS periode_mulai_terakhir,
+                (SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL ORDER BY d.urutan DESC LIMIT 1) AS periode_selesai_terakhir,
+                (SELECT d.nomor_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL ORDER BY d.urutan DESC LIMIT 1) AS nomor_dokumen_terakhir,
+                (SELECT d.nilai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL ORDER BY d.urutan DESC LIMIT 1) AS nilai_terakhir,
+                (SELECT COUNT(*) FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL) AS jumlah_dokumen", false)
+            ->join('pks_mitra', 'pks_mitra.id = pks_kerjasama.mitra_id')
+            ->where('pks_mitra.deleted_at', null);
     }
 
     private function detailPageData(int $id, bool $isEditMode): array
@@ -321,8 +319,8 @@ class PksBarangJasa extends BaseController
             return;
         }
 
-        $latestStart = '(SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1)';
-        $latestEnd = '(SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id ORDER BY d.urutan DESC LIMIT 1)';
+        $latestStart = '(SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL ORDER BY d.urutan DESC LIMIT 1)';
+        $latestEnd = '(SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL ORDER BY d.urutan DESC LIMIT 1)';
         $warningDays = self::EXPIRY_WARNING_DAYS;
         $today = db_connect()->escape($this->today()->format('Y-m-d'));
 
@@ -598,7 +596,9 @@ class PksBarangJasa extends BaseController
     private function findRecord(int $id): array
     {
         $record = $this->kerjasama->select('pks_kerjasama.*, pks_mitra.nama_mitra, pks_mitra.alamat, pks_mitra.nama_kontak, pks_mitra.jabatan_kontak, pks_mitra.telepon, pks_mitra.email')
-            ->join('pks_mitra', 'pks_mitra.id = pks_kerjasama.mitra_id')->find($id);
+            ->join('pks_mitra', 'pks_mitra.id = pks_kerjasama.mitra_id')
+            ->where('pks_mitra.deleted_at', null)
+            ->find($id);
         if ($record === null) {
             throw PageNotFoundException::forPageNotFound('Data PKS tidak ditemukan.');
         }

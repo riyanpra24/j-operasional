@@ -20,6 +20,10 @@ $routes->group('', static function (RouteCollection $routes): void {
 $routes->get('/', 'Landing::index', ['as' => 'landing']);
 $routes->get('dashboard', 'Dashboard::index', ['as' => 'dashboard']);
 
+// Halaman awal modul SDM dan Akutansi
+$routes->get('sdm', 'Sdm::index', ['as' => 'sdm.index']);
+$routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);
+
 // Bagian Umum 1 - Pengelolaan PKS Barang dan Jasa
 $routes->group('bagian-umum-1/pks-barang-jasa', static function (RouteCollection $routes): void {
     $routes->get('/', 'PksBarangJasa::index', ['as' => 'pks.index']);
@@ -91,6 +95,11 @@ $routes->group('kelola-akun', static function (RouteCollection $routes): void {
     $routes->post('(:num)', 'KelolaAkun::update/$1', ['as' => 'kelola_akun.update']);
     $routes->post('(:num)/hapus', 'KelolaAkun::destroy/$1', ['as' => 'kelola_akun.destroy']);
 });
+
+// Pusat pemulihan data (khusus administrator)
+$routes->get('data-terhapus', 'DeletedData::index', ['as' => 'deleted_data.index']);
+$routes->post('data-terhapus/(:segment)/(:num)/pulihkan', 'DeletedData::restore/$1/$2', ['as' => 'deleted_data.restore']);
+$routes->post('data-terhapus/(:segment)/(:num)/hapus-permanen', 'DeletedData::destroy/$1/$2', ['as' => 'deleted_data.destroy']);
 
 // Security - Dokumen Masuk
 $routes->group('dokumen-masuk', static function (RouteCollection $routes): void {

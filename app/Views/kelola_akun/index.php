@@ -128,7 +128,7 @@ $editId = session()->getFlashdata('account_edit_id');
 <div class="account-modal" id="accountDeleteModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-account-delete-close aria-label="Batal hapus"></button>
     <section class="modal-dialog delete-modal-dialog" role="alertdialog" aria-modal="true" aria-labelledby="accountDeleteTitle">
-        <div class="delete-modal-body"><span class="delete-warning-icon">!</span><h2 id="accountDeleteTitle">Hapus Akun?</h2><p>Akun <strong data-account-delete-name></strong> akan dihapus permanen dari database.</p></div>
+        <div class="delete-modal-body"><span class="delete-warning-icon">!</span><h2 id="accountDeleteTitle">Hapus Akun?</h2><p>Akun <strong data-account-delete-name></strong> akan dihapus permanen dan tidak dapat dipulihkan.</p></div>
         <form method="post" action="" data-account-delete-form class="delete-modal-actions"><?= csrf_field() ?><button type="button" class="btn btn-ghost" data-account-delete-close>Batal</button><button type="submit" class="btn btn-delete">Ya, hapus</button></form>
     </section>
 </div>

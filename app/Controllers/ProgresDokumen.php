@@ -62,6 +62,7 @@ class ProgresDokumen extends BaseController
 
         $jenisOptions = db_connect()->table('agendaris')
             ->select('jenis')
+            ->where('deleted_at', null)
             ->where('progres', 'Menunggu Penyelesaian')
             ->where('jenis IS NOT NULL', null, false)
             ->where('jenis !=', '')
@@ -281,11 +282,13 @@ class ProgresDokumen extends BaseController
             return $this->lockedResponse();
         }
 
-        if (! $this->model->delete($id, true)) {
+        if (! $this->deleteRecord($this->model, 'dokumen_keluar', $id)) {
             return $this->validationError($this->model->errors() ?: ['Progres Dokumen Keluar gagal dihapus.']);
         }
 
-        $message = "Dokumen nomor {$dokumen['nomor_surat']} berhasil dihapus permanen dari database.";
+        $message = $this->currentRoleIsAdmin()
+            ? "Dokumen nomor {$dokumen['nomor_surat']} berhasil dihapus permanen."
+            : "Dokumen nomor {$dokumen['nomor_surat']} berhasil dihapus.";
         session()->setFlashdata('success', $message);
 
         return $this->successResponse($message);

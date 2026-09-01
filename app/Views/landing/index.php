@@ -208,6 +208,7 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
             const username = document.getElementById('landingUsername');
             const password = document.getElementById('landingPassword');
             const passwordToggle = document.querySelector('[data-landing-password-toggle]');
+            const loginForm = modal.querySelector('.landing-login-form');
             let previousFocus = null;
 
             const openModal = () => {
@@ -246,6 +247,19 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
                 passwordToggle.setAttribute('aria-label', visible ? 'Tampilkan password' : 'Sembunyikan password');
             });
 
+            loginForm?.addEventListener('submit', (event) => {
+                if (loginForm.dataset.submitting === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+                loginForm.dataset.submitting = 'true';
+                const submitButton = loginForm.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Memproses...';
+                }
+            });
+
             if (modal.dataset.openOnLoad === 'true') {
                 openModal();
                 const url = new URL(window.location.href);
@@ -258,6 +272,7 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
             const takeoverModal = document.querySelector('[data-admin-takeover-modal]');
             const takeoverPin = document.getElementById('adminTakeoverPin');
             const takeoverPinToggle = document.querySelector('[data-admin-pin-toggle]');
+            const takeoverForm = takeoverModal?.querySelector('.landing-login-form');
             const openTakeover = () => {
                 if (!takeoverModal) return;
                 takeoverModal.hidden = false;
@@ -282,6 +297,18 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
                 takeoverPin.type = visible ? 'password' : 'text';
                 takeoverPinToggle.textContent = visible ? 'Lihat' : 'Sembunyikan';
                 takeoverPinToggle.setAttribute('aria-label', visible ? 'Tampilkan PIN' : 'Sembunyikan PIN');
+            });
+            takeoverForm?.addEventListener('submit', (event) => {
+                if (takeoverForm.dataset.submitting === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+                takeoverForm.dataset.submitting = 'true';
+                const submitButton = takeoverForm.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Memproses...';
+                }
             });
             if (takeoverModal?.dataset.openOnLoad === 'true') openTakeover();
         })();

@@ -9,6 +9,7 @@ class PksItemModel extends Model
     protected $table = 'pks_item_kerjasama';
     protected $primaryKey = 'id';
     protected $returnType = 'array';
+    protected $useSoftDeletes = true;
     protected $useTimestamps = true;
     protected $allowedFields = ['kerjasama_id', 'keterangan'];
 }

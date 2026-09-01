@@ -39,10 +39,6 @@ class MonitoringKendaraan extends BaseController
         $isAdmin = $this->isAdmin();
         $model = new VehicleModel();
 
-        if ($isAdmin) {
-            $model->withDeleted();
-        }
-
         if ($keyword !== '') {
             $model->groupStart()->like('nomor_polisi', $keyword)->orLike('nama_kendaraan', $keyword)
                 ->orLike('nama_kendaraan_lainnya', $keyword)
@@ -96,9 +92,6 @@ class MonitoringKendaraan extends BaseController
     public function updateVehicle(int $id): RedirectResponse
     {
         $model = new VehicleModel();
-        if ($this->isAdmin()) {
-            $model->withDeleted();
-        }
         $vehicle = $this->findOrFail($model, $id, 'Kendaraan tidak ditemukan.');
         $data = $this->vehiclePayload($vehicle);
         $errors = $this->validateVehicle($data, $id);
@@ -116,24 +109,16 @@ class MonitoringKendaraan extends BaseController
 
     public function destroyVehicle(int $id): RedirectResponse
     {
-        $isAdmin = $this->isAdmin();
         $model = new VehicleModel();
-        if ($isAdmin) {
-            $model->withDeleted();
-        }
         $vehicle = $this->findOrFail($model, $id, 'Kendaraan tidak ditemukan.');
-        $description = $isAdmin
-            ? 'Data kendaraan dihapus permanen dari database beserta seluruh data turunannya.'
-            : 'Data kendaraan dihapus dari akun pengguna, tetapi history tetap tercatat di database.';
-        $this->recordActivity($vehicle, 'Kendaraan', $id, 'Dihapus', $description);
-        if (! $model->delete($id, $isAdmin)) {
+        $this->recordActivity($vehicle, 'Kendaraan', $id, 'Dihapus', 'Data kendaraan dihapus.');
+        if (! $this->deleteRecord($model, 'vehicles', $id)) {
             return redirect()->to($this->pageUrl('vehicles'))->with('error', 'Data kendaraan gagal dihapus.');
         }
 
-        $message = $isAdmin
-            ? "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus permanen dari database."
-            : "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus dari akun Anda. History tetap tercatat di database.";
-
+        $message = $this->currentRoleIsAdmin()
+            ? "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus permanen."
+            : "Kendaraan {$vehicle['nomor_polisi']} berhasil dihapus.";
         return redirect()->to($this->pageUrl('vehicles'))->with('success', $message);
     }
 
@@ -143,14 +128,9 @@ class MonitoringKendaraan extends BaseController
         $perPage = $this->perPage();
         $isAdmin = $this->isAdmin();
         $model = new VehicleMaintenanceModel();
-        if ($isAdmin) {
-            $model->withDeleted();
-        }
         $model->select('vehicle_maintenance.*, vehicles.nomor_polisi, vehicles.nama_kendaraan, vehicles.nama_kendaraan_lainnya, vehicles.deleted_at AS vehicle_deleted_at')
             ->join('vehicles', 'vehicles.id = vehicle_maintenance.vehicle_id');
-        if (! $isAdmin) {
-            $model->where('vehicles.deleted_at', null);
-        }
+        $model->where('vehicles.deleted_at', null);
         if ($keyword !== '') {
             $model->groupStart()->like('vehicles.nomor_polisi', $keyword)->orLike('vehicles.nama_kendaraan', $keyword)
                 ->orLike('vehicles.nama_kendaraan_lainnya', $keyword)
@@ -194,9 +174,6 @@ class MonitoringKendaraan extends BaseController
     public function updateMaintenance(int $id): RedirectResponse
     {
         $model = new VehicleMaintenanceModel();
-        if ($this->isAdmin()) {
-            $model->withDeleted();
-        }
         $record = $this->findOrFail($model, $id, 'Data servis tidak ditemukan.');
         $data = $this->maintenancePayload($record);
         $errors = $this->validateMaintenance($data);
@@ -220,28 +197,16 @@ class MonitoringKendaraan extends BaseController
 
     public function destroyMaintenance(int $id): RedirectResponse
     {
-        $isAdmin = $this->isAdmin();
         $model = new VehicleMaintenanceModel();
-        if ($isAdmin) {
-            $model->withDeleted();
-        }
         $record = $this->findOrFail($model, $id, 'Data servis tidak ditemukan.');
-        $vehicle = $this->vehicle((int) $record['vehicle_id'], $isAdmin);
-        $description = $isAdmin
-            ? "Servis {$record['jenis_perawatan']} tanggal {$record['tanggal_servis']} dihapus permanen dari database."
-            : "Servis {$record['jenis_perawatan']} tanggal {$record['tanggal_servis']} dihapus dari akun pengguna, tetapi history tetap tercatat di database.";
-        $this->recordActivity($vehicle, 'Servis', $id, 'Dihapus', $description);
-        if (! $model->delete($id, $isAdmin)) {
+        $vehicle = $this->vehicle((int) $record['vehicle_id']);
+        $this->recordActivity($vehicle, 'Servis', $id, 'Dihapus', "Servis {$record['jenis_perawatan']} tanggal {$record['tanggal_servis']} dihapus.");
+        if (! $this->deleteRecord($model, 'vehicle_maintenance', $id)) {
             return redirect()->to($this->pageUrl('maintenance'))->with('error', 'Data servis gagal dihapus.');
         }
         $this->synchronizeKilometer((int) $record['vehicle_id']);
 
-        return redirect()->to($this->pageUrl('maintenance'))->with(
-            'success',
-            $isAdmin
-                ? 'Data servis dan perawatan berhasil dihapus permanen dari database.'
-                : 'Data servis dan perawatan berhasil dihapus dari akun Anda. History tetap tercatat di database.',
-        );
+        return redirect()->to($this->pageUrl('maintenance'))->with('success', $this->currentRoleIsAdmin() ? 'Data servis dan perawatan berhasil dihapus permanen.' : 'Data servis dan perawatan berhasil dihapus.');
     }
 
     public function documents(): string
@@ -251,14 +216,9 @@ class MonitoringKendaraan extends BaseController
         $perPage = $this->perPage();
         $isAdmin = $this->isAdmin();
         $model = new VehicleDocumentModel();
-        if ($isAdmin) {
-            $model->withDeleted();
-        }
         $model->select('vehicle_documents.*, vehicles.nomor_polisi, vehicles.nama_kendaraan, vehicles.nama_kendaraan_lainnya, vehicles.deleted_at AS vehicle_deleted_at')
             ->join('vehicles', 'vehicles.id = vehicle_documents.vehicle_id');
-        if (! $isAdmin) {
-            $model->where('vehicles.deleted_at', null);
-        }
+        $model->where('vehicles.deleted_at', null);
         if ($keyword !== '') {
             $model->groupStart()->like('vehicles.nomor_polisi', $keyword)->orLike('vehicles.nama_kendaraan', $keyword)
                 ->orLike('vehicles.nama_kendaraan_lainnya', $keyword)
@@ -324,27 +284,15 @@ class MonitoringKendaraan extends BaseController
 
     public function destroyDocument(int $id): RedirectResponse
     {
-        $isAdmin = $this->isAdmin();
         $model = new VehicleDocumentModel();
-        if ($isAdmin) {
-            $model->withDeleted();
-        }
         $record = $this->findOrFail($model, $id, 'Dokumen kendaraan tidak ditemukan.');
-        $vehicle = $this->vehicle((int) $record['vehicle_id'], $isAdmin);
-        $description = $isAdmin
-            ? "Dokumen {$record['jenis_dokumen']} dihapus permanen dari database."
-            : "Dokumen {$record['jenis_dokumen']} dihapus dari akun pengguna, tetapi history tetap tercatat di database.";
-        $this->recordActivity($vehicle, 'Dokumen', $id, 'Dihapus', $description);
-        if (! $model->delete($id, $isAdmin)) {
+        $vehicle = $this->vehicle((int) $record['vehicle_id']);
+        $this->recordActivity($vehicle, 'Dokumen', $id, 'Dihapus', "Dokumen {$record['jenis_dokumen']} dihapus.");
+        if (! $this->deleteRecord($model, 'vehicle_documents', $id)) {
             return redirect()->to($this->pageUrl('documents'))->with('error', 'Dokumen kendaraan gagal dihapus.');
         }
 
-        return redirect()->to($this->pageUrl('documents'))->with(
-            'success',
-            $isAdmin
-                ? 'Dokumen kendaraan berhasil dihapus permanen dari database.'
-                : 'Dokumen kendaraan berhasil dihapus dari akun Anda. History tetap tercatat di database.',
-        );
+        return redirect()->to($this->pageUrl('documents'))->with('success', $this->currentRoleIsAdmin() ? 'Dokumen kendaraan berhasil dihapus permanen.' : 'Dokumen kendaraan berhasil dihapus.');
     }
 
     public function reports(): string|RedirectResponse

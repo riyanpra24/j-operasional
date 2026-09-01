@@ -9,6 +9,7 @@ class AgendarisModel extends Model
     protected $table         = 'agendaris';
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
+    protected $useSoftDeletes = true;
     protected $allowedFields = [
         'pengirim',
         'penerima',
@@ -40,4 +41,5 @@ class AgendarisModel extends Model
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }

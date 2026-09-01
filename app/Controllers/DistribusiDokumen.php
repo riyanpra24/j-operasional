@@ -378,6 +378,7 @@ class DistribusiDokumen extends BaseController
             ->select('dokumen_keluar.*')
             ->join('distribusi_dokumen', 'distribusi_dokumen.dokumen_keluar_id = dokumen_keluar.id', 'inner')
             ->where('dokumen_keluar.id', $id)
+            ->where('dokumen_keluar.deleted_at', null)
             ->where('dokumen_keluar.progres !=', 'Diambil Ekspedisi')
             ->get()
             ->getRowArray();

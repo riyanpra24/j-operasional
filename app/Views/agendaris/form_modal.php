@@ -1,3 +1,22 @@
+<?php
+$dispositionRecipients = [
+    'M. Robith Azmi',
+    'Aneka Prasyanti W.S',
+    'Hilmiyah Fitriana',
+    'DeniTri Kuncoro',
+    'Dhia Shofiah Mardiana',
+    'Faridatul Mukhodaroh',
+    'Muhammad Khoirudin',
+    'Alfan Andrianto',
+    'Indro Hartanto',
+    'Najmah Arofah',
+    'Ridhotul Khafshoh Islami',
+    'Kiki Ramadhani Suyono',
+    'Angger Wicaksono',
+    'Tri Novita Sari',
+    'Agil Halis Kesawa',
+];
+?>
 <div class="agendaris-form-modal" id="agendarisFormModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-agendaris-form-close aria-label="Tutup form"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="agendarisFormTitle">
@@ -59,7 +78,15 @@
                                 <div class="disposition-stage-panel">
                                     <header><div><strong>Disposisi <?= $step ?></strong><small>Tahap penerusan dan pemantauan dokumen</small></div><span class="disposition-stage-state" data-disposition-state="<?= $step ?>">Belum ditentukan</span></header>
                                     <div class="disposition-stage-fields">
-                                        <div class="form-group disposition-recipient-field"><label for="agenda_disposisi_<?= $step ?>">Tujuan / Penerima</label><input id="agenda_disposisi_<?= $step ?>" name="disposisi_<?= $step ?>" maxlength="255" placeholder="Nama petugas atau unit tujuan" data-disposition-recipient="<?= $step ?>"></div>
+                                        <div class="form-group disposition-recipient-field">
+                                            <label for="agenda_disposisi_<?= $step ?>">Tujuan / Penerima</label>
+                                            <select id="agenda_disposisi_<?= $step ?>" name="disposisi_<?= $step ?>" data-disposition-recipient="<?= $step ?>">
+                                                <option value="">Pilih tujuan / penerima</option>
+                                                <?php foreach ($dispositionRecipients as $recipient): ?>
+                                                    <option value="<?= esc($recipient, 'attr') ?>"><?= esc($recipient) ?></option>
+                                                <?php endforeach ?>
+                                            </select>
+                                        </div>
                                         <div class="form-group"><label for="agenda_disposisi_<?= $step ?>_status">Status</label><select id="agenda_disposisi_<?= $step ?>_status" name="disposisi_<?= $step ?>_status" data-disposition-status="<?= $step ?>"><option value="Menunggu">Menunggu</option><option value="Diterima">Diterima</option><option value="Diproses">Diproses</option><option value="Diteruskan">Diteruskan</option><option value="Selesai">Selesai</option></select></div>
                                         <div class="form-group"><label for="agenda_disposisi_<?= $step ?>_waktu">Tanggal</label><input id="agenda_disposisi_<?= $step ?>_waktu" type="date" name="disposisi_<?= $step ?>_waktu" data-disposition-time="<?= $step ?>"></div>
                                         <div class="form-group disposition-note-field"><label for="agenda_disposisi_<?= $step ?>_catatan">Catatan / Instruksi</label><textarea id="agenda_disposisi_<?= $step ?>_catatan" name="disposisi_<?= $step ?>_catatan" maxlength="1000" rows="2" placeholder="Instruksi atau hasil tindak lanjut"></textarea></div>

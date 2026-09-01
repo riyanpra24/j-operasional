@@ -9,6 +9,7 @@ class DokumenSpkModel extends Model
     protected $table = 'dokumen_spk';
     protected $primaryKey = 'id';
     protected $returnType = 'array';
+    protected $useSoftDeletes = true;
     protected $useTimestamps = true;
     protected $allowedFields = [
         'nomor_urut',

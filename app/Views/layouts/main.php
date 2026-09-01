@@ -3,15 +3,19 @@ $uri = service('uri');
 $segment = $uri->getSegment(1);
 $securityActive = in_array($segment, ['dokumen-masuk', 'dokumen-keluar', 'distribusi-dokumen'], true);
 $agendarisActive = $segment === 'agendaris';
-$accountManagementActive = $segment === 'kelola-akun';
-$accountManagementPage = $accountManagementActive && $uri->getTotalSegments() >= 2 && $uri->getSegment(2) === 'session-account'
-    ? 'session-account'
-    : 'add-account';
+$accountManagementActive = in_array($segment, ['kelola-akun', 'data-terhapus'], true);
+$accountManagementPage = $segment === 'data-terhapus'
+    ? 'deleted-data'
+    : ($accountManagementActive && $uri->getTotalSegments() >= 2 && $uri->getSegment(2) === 'session-account'
+        ? 'session-account'
+        : 'add-account');
 $generalSectionActive = $segment === 'bagian-umum-1';
 $generalSectionPage = $generalSectionActive && $uri->getTotalSegments() >= 2
     ? $uri->getSegment(2)
     : 'pks-barang-jasa';
 $generalSectionTwoActive = $segment === 'bagian-umum-2';
+$sdmActive = $segment === 'sdm';
+$akutansiActive = $segment === 'akutansi';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
 $currentRole = (string) session()->get('auth_role');
 $displayName = (string) session()->get('auth_display_name');
@@ -20,6 +24,8 @@ $canAccessSecurity = in_array($currentRole, ['admin', 'security'], true);
 $canAccessAgendaris = in_array($currentRole, ['admin', 'agendaris'], true);
 $canAccessGeneralSection = in_array($currentRole, ['admin', 'umum_1'], true);
 $canAccessGeneralSectionTwo = in_array($currentRole, ['admin', 'umum_2'], true);
+$canAccessSdm = in_array($currentRole, ['admin', 'sdm'], true);
+$canAccessAkutansi = in_array($currentRole, ['admin', 'akutansi'], true);
 $incomingArchive = $segment === 'dokumen-masuk';
 $incomingWorkspace = in_array($segment, ['dashboard', 'dokumen-masuk', 'distribusi-dokumen'], true);
 $roleLabel = \Config\UserRoles::label($currentRole);
@@ -43,6 +49,16 @@ $roleNotifications = [
 $notificationEnabled = in_array($currentRole, ['security', 'agendaris'], true);
 $notificationRoleLabel = strtoupper($roleLabel);
 $notificationAllUrl = '#';
+$deletedDataCount = 0;
+if ($currentRole === 'admin') {
+    try {
+        foreach (['dokumen_masuk', 'agendaris', 'dokumen_keluar', 'dokumen_spk', 'pks_kerjasama', 'pks_dokumen_kerjasama', 'pks_item_kerjasama', 'users', 'vehicles', 'vehicle_maintenance', 'vehicle_documents'] as $deletedTable) {
+            $deletedDataCount += db_connect()->table($deletedTable)->where('deleted_at IS NOT NULL', null, false)->countAllResults();
+        }
+    } catch (\Throwable) {
+        $deletedDataCount = 0;
+    }
+}
 if ($currentRole === 'security') {
     $roleNotifications = (new \App\Libraries\SecurityNotificationService())->summary();
     $notificationAllUrl = site_url('distribusi-dokumen');
@@ -165,10 +181,6 @@ if ($currentRole === 'security') {
                             <span aria-hidden="true">●</span>
                             Pengadaan Barang Jasa
                         </a>
-                        <a href="<?= site_url('bagian-umum-1/non-belanja-modal') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'non-belanja-modal' ? 'active' : '' ?>">
-                            <span aria-hidden="true">●</span>
-                            Non Belanja Modal
-                        </a>
                     </div>
                 </div>
                 <?php endif ?>
@@ -187,6 +199,18 @@ if ($currentRole === 'security') {
                     </div>
                 </div>
                 <?php endif ?>
+                <?php if ($canAccessSdm): ?>
+                <a href="<?= site_url('sdm') ?>" class="nav-link <?= $sdmActive ? 'active' : '' ?>" title="SDM &amp; Teller">
+                    <span class="nav-icon image-nav-icon sdm-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/people.png') ?>" alt=""></span>
+                    <span class="nav-link-text">SDM &amp; Teller</span>
+                </a>
+                <?php endif ?>
+                <?php if ($canAccessAkutansi): ?>
+                <a href="<?= site_url('akutansi') ?>" class="nav-link <?= $akutansiActive ? 'active' : '' ?>" title="Akutansi">
+                    <span class="nav-icon image-nav-icon accounting-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/indonesian-rupiah.png') ?>" alt=""></span>
+                    <span class="nav-link-text">Akutansi</span>
+                </a>
+                <?php endif ?>
                 <?php if ($currentRole === 'admin'): ?>
                 <div class="nav-group <?= $accountManagementActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $accountManagementActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $accountManagementActive ? 'true' : 'false' ?>" aria-controls="accountManagementSubmenu" title="Kelola Akun">
@@ -202,6 +226,11 @@ if ($currentRole === 'security') {
                         <a href="<?= site_url('kelola-akun/session-account') ?>" class="nav-sublink <?= $accountManagementActive && $accountManagementPage === 'session-account' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Session Account
+                        </a>
+                        <a href="<?= site_url('data-terhapus') ?>" class="nav-sublink <?= $accountManagementPage === 'deleted-data' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Data Terhapus
+                            <?php if ($deletedDataCount > 0): ?><b class="nav-deleted-badge" title="<?= $deletedDataCount ?> data dihapus role lain"><?= $deletedDataCount > 99 ? '99+' : $deletedDataCount ?></b><?php endif ?>
                         </a>
                     </div>
                 </div>

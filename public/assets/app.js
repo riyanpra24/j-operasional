@@ -1181,9 +1181,27 @@
 
     const refreshDispositionForm = () => agendaDispositionStages.forEach(updateDispositionFormState);
 
+    const clearLegacyDispositionOptions = () => {
+        agendaDispositionStages.forEach((stage) => {
+            stage.querySelectorAll('[data-disposition-recipient] option[data-legacy]').forEach((option) => option.remove());
+        });
+    };
+
+    const setDispositionRecipientValue = (field, value) => {
+        if (!field) return;
+        const recipient = value || '';
+        field.querySelectorAll('option[data-legacy]').forEach((option) => option.remove());
+        if (recipient && !Array.from(field.options).some((option) => option.value === recipient)) {
+            const legacyOption = new Option(`${recipient} (data lama)`, recipient, true, true);
+            legacyOption.dataset.legacy = 'true';
+            field.add(legacyOption);
+        }
+        field.value = recipient;
+    };
+
     agendaDispositionStages.forEach((stage) => {
         const step = stage.dataset.dispositionFormStage;
-        stage.querySelector(`[data-disposition-recipient="${step}"]`)?.addEventListener('input', () => updateDispositionFormState(stage));
+        stage.querySelector(`[data-disposition-recipient="${step}"]`)?.addEventListener('change', () => updateDispositionFormState(stage));
         stage.querySelector(`[data-disposition-status="${step}"]`)?.addEventListener('change', () => updateDispositionFormState(stage));
     });
 
@@ -1268,6 +1286,7 @@
 
     const openAgendaCreate = () => {
         if (!agendaForm || !agendaFormModal) return;
+        clearLegacyDispositionOptions();
         agendaForm.reset();
         agendaForm.action = agendaCreateUrl;
         agendaFormTitle.textContent = 'Tambah Surat Masuk';
@@ -1295,6 +1314,7 @@
 
     const openAgendaEdit = async (url) => {
         if (!agendaForm || !agendaFormModal || !url) return;
+        clearLegacyDispositionOptions();
         agendaForm.reset();
         setAgendaStep(1);
         setAgendaSourceLock(false);
@@ -1318,10 +1338,8 @@
             agendaForm.elements.nomor_agendaris.value = data.nomor_agendaris_value;
             agendaForm.elements.tanggal_agendaris.value = data.tanggal_agendaris_value;
             agendaForm.elements.perihal_surat.value = data.perihal_surat;
-            agendaForm.elements.disposisi_1.value = data.disposisi_1_value || '';
-            agendaForm.elements.disposisi_2.value = data.disposisi_2_value || '';
-            agendaForm.elements.disposisi_3.value = data.disposisi_3_value || '';
             for (let step = 1; step <= 3; step += 1) {
+                setDispositionRecipientValue(agendaForm.elements[`disposisi_${step}`], data[`disposisi_${step}_value`]);
                 agendaForm.elements[`disposisi_${step}_status`].value = data[`disposisi_${step}_status_value`] || 'Menunggu';
                 agendaForm.elements[`disposisi_${step}_waktu`].value = data[`disposisi_${step}_waktu_value`] || '';
                 agendaForm.elements[`disposisi_${step}_catatan`].value = data[`disposisi_${step}_catatan_value`] || '';

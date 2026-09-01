@@ -78,7 +78,7 @@
                         <td><strong>Rp <?= number_format((float)$record['biaya'], 0, ',', '.') ?></strong></td>
                         <td><strong><?= $record['servis_berikutnya_tanggal'] ? date('d-m-Y', strtotime($record['servis_berikutnya_tanggal'])) : '-' ?></strong></td>
                         <td>
-                            <div class="action-buttons"><button type="button" class="icon-btn" data-maintenance-detail='<?= esc(json_encode($viewData), 'attr') ?>' title="Lihat detail" aria-label="Lihat detail servis">⌕</button><?php if ($record['link_berkas']): ?><a class="icon-btn" href="<?= esc($record['link_berkas']) ?>" target="_blank" rel="noopener noreferrer" title="Buka berkas">↗</a><?php endif ?><?php if (! $isDeleted || $isAdmin): ?><button type="button" class="icon-btn" data-vehicle-crud-edit='<?= esc(json_encode($editData), 'attr') ?>' title="<?= $isDeleted ? 'Edit atau hapus permanen' : 'Edit' ?>">✎</button><?php endif ?></div>
+                            <div class="action-buttons"><button type="button" class="icon-btn" data-maintenance-detail='<?= esc(json_encode($viewData), 'attr') ?>' title="Lihat detail" aria-label="Lihat detail servis">⌕</button><?php if ($record['link_berkas']): ?><a class="icon-btn" href="<?= esc($record['link_berkas']) ?>" target="_blank" rel="noopener noreferrer" title="Buka berkas">↗</a><?php endif ?><?php if (! $isDeleted): ?><button type="button" class="icon-btn" data-vehicle-crud-edit='<?= esc(json_encode($editData), 'attr') ?>' title="Edit">✎</button><?php endif ?></div>
                         </td>
                     </tr>
                     <?php endforeach ?><?php endif ?>
@@ -218,8 +218,8 @@
 <div class="account-modal vehicle-crud-modal" id="vehicleCrudDeleteModal" hidden aria-hidden="true"><button type="button" class="modal-backdrop" data-vehicle-crud-delete-close></button>
     <section class="modal-dialog delete-modal-dialog" role="alertdialog" aria-modal="true">
         <div class="delete-modal-body"><span class="delete-warning-icon">!</span>
-            <h2><?= $isAdmin ? 'Hapus Data Servis Permanen?' : 'Hapus Data Servis?' ?></h2>
-            <p><strong data-crud-delete-name></strong> <?= $isAdmin ? 'akan dihapus permanen dari database.' : 'akan hilang dari akun Anda, tetapi history tetap tercatat di database.' ?></p>
+            <h2>Hapus Data Servis?</h2>
+            <p><strong data-crud-delete-name></strong> <?= $isAdmin ? 'akan dihapus permanen dan tidak dapat dipulihkan.' : 'akan dihapus.' ?></p>
         </div>
         <form method="post" action="" data-crud-delete-form class="delete-modal-actions"><?= csrf_field() ?><button type="button" class="btn btn-ghost" data-vehicle-crud-delete-close>Batal</button><button type="submit" class="btn btn-delete"><?= $isAdmin ? 'Ya, hapus permanen' : 'Ya, hapus' ?></button></form>
     </section>

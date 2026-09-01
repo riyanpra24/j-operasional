@@ -183,7 +183,7 @@ $isEditMode = $isEditMode ?? false;
 <?php if ($isEditMode): ?><div class="pks-delete-modal" id="pksDeleteModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-pks-delete-close aria-label="Batal hapus"></button>
     <section class="modal-dialog delete-modal-dialog" role="alertdialog" aria-modal="true" aria-labelledby="pksDeleteTitle">
-        <div class="delete-modal-body"><span class="delete-warning-icon">!</span><h2 id="pksDeleteTitle">Hapus PKS?</h2><p><strong><?= esc($record['kode_internal']) ?></strong> beserta seluruh riwayat dokumen dan item pekerjaan akan dihapus permanen.</p></div>
+        <div class="delete-modal-body"><span class="delete-warning-icon">!</span><h2 id="pksDeleteTitle">Hapus PKS?</h2><p><strong><?= esc($record['kode_internal']) ?></strong> beserta seluruh riwayat dokumen dan item pekerjaan <?= (string) session()->get('auth_role') === 'admin' ? 'akan dihapus permanen dan tidak dapat dipulihkan.' : 'akan dihapus.' ?></p></div>
         <form method="post" action="<?= $baseUrl . '/hapus' ?>" class="delete-modal-actions"><?= csrf_field() ?><button type="button" class="btn btn-ghost" data-pks-delete-close>Batal</button><button type="submit" class="btn btn-delete">Ya, hapus PKS</button></form>
     </section>
 </div><?php endif ?>

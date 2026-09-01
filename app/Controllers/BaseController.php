@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
+use CodeIgniter\Model;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -55,6 +56,7 @@ abstract class BaseController extends Controller
                 'distribusi-dokumen',
                 'agendaris',
                 'kelola-akun',
+                'data-terhapus',
                 'bagian-umum-1',
             ];
 
@@ -62,5 +64,33 @@ abstract class BaseController extends Controller
                 session()->set('auth_last_route', implode('/', $segments));
             }
         }
+    }
+
+    /**
+     * Administrator menghapus permanen. Role lain menyimpan penanda penghapus
+     * sebelum data disembunyikan melalui soft delete.
+     */
+    protected function deleteRecord(Model $model, string $table, int $id): bool
+    {
+        $isAdmin = (string) session()->get('auth_role') === 'admin';
+        if ($isAdmin) {
+            return $model->delete($id, true);
+        }
+
+        $db = db_connect();
+        $db->transStart();
+        $metadataUpdated = $db->table($table)->where('id', $id)->update([
+            'deleted_by_role' => (string) session()->get('auth_role'),
+            'deleted_by_name' => (string) session()->get('auth_display_name'),
+        ]);
+        $deleted = $metadataUpdated && $model->delete($id);
+        $db->transComplete();
+
+        return $deleted && $db->transStatus();
+    }
+
+    protected function currentRoleIsAdmin(): bool
+    {
+        return (string) session()->get('auth_role') === 'admin';
     }
 }

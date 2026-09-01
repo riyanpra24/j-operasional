@@ -93,12 +93,14 @@ final class AgendarisNotificationService
     private function pendingIncomingBuilder()
     {
         return db_connect()->table('agendaris')
+            ->where('deleted_at', null)
             ->where('progres', 'Menunggu Penyelesaian');
     }
 
     private function pendingOutgoingBuilder()
     {
         return db_connect()->table('dokumen_keluar')
+            ->where('deleted_at', null)
             ->groupStart()
                 ->where('status_agendaris', null)
                 ->orWhere('status_agendaris !=', 'Selesai')

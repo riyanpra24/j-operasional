@@ -85,27 +85,31 @@ class Dashboard extends BaseController
         $incomingPending = $incomingBase()
             ->groupStart()->where('pengambilan', null)->orWhere('pengambilan', '')->groupEnd()
             ->countAllResults();
-        $outgoingTotal = $db->table('dokumen_keluar')->countAllResults();
+        $outgoingTotal = $db->table('dokumen_keluar')->where('deleted_at', null)->countAllResults();
         $outgoingWaiting = $db->table('dokumen_keluar')
+            ->where('deleted_at', null)
             ->groupStart()->where('progres !=', 'Diambil Ekspedisi')->orWhere('progres', null)->orWhere('progres', '')->groupEnd()
             ->countAllResults();
         $distributionTotal = $db->table('distribusi_dokumen')->countAllResults();
 
-        $agendaIncomingTotal = $db->table('agendaris')->countAllResults();
+        $agendaIncomingTotal = $db->table('agendaris')->where('deleted_at', null)->countAllResults();
         $agendaIncomingPending = $db->table('agendaris')
+            ->where('deleted_at', null)
             ->groupStart()->where('progres !=', 'Selesai')->orWhere('progres', null)->orWhere('progres', '')->groupEnd()
             ->countAllResults();
         $agendaOutgoingPending = $db->table('dokumen_keluar')
+            ->where('deleted_at', null)
             ->groupStart()->where('status_agendaris !=', 'Selesai')->orWhere('status_agendaris', null)->orWhere('status_agendaris', '')->groupEnd()
             ->countAllResults();
 
         $pksRows = $db->table('pks_kerjasama k')
             ->select(
                 'k.id, '
-                . '(SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = k.id ORDER BY d.urutan DESC LIMIT 1) AS periode_mulai, '
-                . '(SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = k.id ORDER BY d.urutan DESC LIMIT 1) AS periode_selesai',
+                . '(SELECT d.periode_mulai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = k.id AND d.deleted_at IS NULL ORDER BY d.urutan DESC LIMIT 1) AS periode_mulai, '
+                . '(SELECT d.periode_selesai FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = k.id AND d.deleted_at IS NULL ORDER BY d.urutan DESC LIMIT 1) AS periode_selesai',
                 false,
             )
+            ->where('k.deleted_at', null)
             ->get()
             ->getResultArray();
         $pksSummary = ['total' => count($pksRows), 'aktif' => 0, 'segera' => 0, 'berakhir' => 0, 'belum' => 0];
@@ -124,8 +128,9 @@ class Dashboard extends BaseController
             }
         }
 
-        $spkTotal = $db->table('dokumen_spk')->countAllResults();
+        $spkTotal = $db->table('dokumen_spk')->where('deleted_at', null)->countAllResults();
         $spkComplete = $db->table('dokumen_spk')
+            ->where('deleted_at', null)
             ->where('tanggal_dokumen IS NOT NULL', null, false)
             ->where('link_berkas IS NOT NULL', null, false)
             ->where('link_berkas !=', '')
@@ -151,14 +156,17 @@ class Dashboard extends BaseController
         $vehicleDocumentExpired = $vehicleDocumentBase()->where('masa_berlaku <', $today)->countAllResults();
         $vehicleLogTotal = $db->table('vehicle_activity_logs')->countAllResults();
 
-        $userTotal = $db->table('users')->countAllResults();
+        $userTotal = $db->table('users')->where('deleted_at', null)->countAllResults();
         $activeSessions = $db->table('user_sessions')->where('expires_at >', $now)->countAllResults();
 
         $todayCount = static function (string $table) use ($db, $today): int {
-            return $db->table($table)
+            $builder = $db->table($table)
                 ->where('created_at >=', $today . ' 00:00:00')
-                ->where('created_at <=', $today . ' 23:59:59')
-                ->countAllResults();
+                ->where('created_at <=', $today . ' 23:59:59');
+            if ($table !== 'vehicle_activity_logs') {
+                $builder->where('deleted_at', null);
+            }
+            return $builder->countAllResults();
         };
         $todayActivity = $todayCount('dokumen_masuk')
             + $todayCount('agendaris')
@@ -172,9 +180,9 @@ class Dashboard extends BaseController
         $trendStart = date('Y-m-01', strtotime($trendAnchor . ' -5 months'));
         $trendSources = [
             ['table' => 'dokumen_masuk', 'soft_delete' => true],
-            ['table' => 'agendaris', 'soft_delete' => false],
-            ['table' => 'pks_kerjasama', 'soft_delete' => false],
-            ['table' => 'dokumen_spk', 'soft_delete' => false],
+            ['table' => 'agendaris', 'soft_delete' => true],
+            ['table' => 'pks_kerjasama', 'soft_delete' => true],
+            ['table' => 'dokumen_spk', 'soft_delete' => true],
             ['table' => 'vehicle_activity_logs', 'soft_delete' => false],
         ];
         foreach ($trendSources as $source) {
@@ -237,7 +245,6 @@ class Dashboard extends BaseController
                     ['label' => 'PKS Barang & Jasa', 'value' => $pksSummary['total'], 'meta' => $pksSummary['aktif'] . ' aktif · ' . $pksSummary['segera'] . ' segera berakhir', 'url' => site_url('bagian-umum-1/pks-barang-jasa')],
                     ['label' => 'Dokumen SPK', 'value' => $spkTotal, 'meta' => $spkIncomplete . ' belum lengkap', 'url' => site_url('bagian-umum-1/dokumen-spk')],
                     ['label' => 'Pengadaan Barang Jasa', 'value' => '—', 'meta' => 'Belum ada data', 'url' => site_url('bagian-umum-1/pengadaan-barang-jasa')],
-                    ['label' => 'Non Belanja Modal', 'value' => '—', 'meta' => 'Belum ada data', 'url' => site_url('bagian-umum-1/non-belanja-modal')],
                 ],
             ],
             [
@@ -256,13 +263,13 @@ class Dashboard extends BaseController
         foreach ($db->table('dokumen_masuk')->select('id, pengirim, perihal, created_at')->where('deleted_at', null)->orderBy('created_at', 'DESC')->limit(5)->get()->getResultArray() as $row) {
             $recent[] = ['section' => 'Security', 'title' => 'Dokumen masuk dari ' . $row['pengirim'], 'description' => $row['perihal'] ?: 'Dokumen masuk baru', 'time' => $row['created_at'], 'tone' => 'blue', 'url' => site_url('dokumen-masuk/' . $row['id'])];
         }
-        foreach ($db->table('agendaris')->select('id, pengirim, perihal_surat, created_at')->orderBy('created_at', 'DESC')->limit(5)->get()->getResultArray() as $row) {
+        foreach ($db->table('agendaris')->select('id, pengirim, perihal_surat, created_at')->where('deleted_at', null)->orderBy('created_at', 'DESC')->limit(5)->get()->getResultArray() as $row) {
             $recent[] = ['section' => 'Agendaris', 'title' => 'Agenda surat dari ' . $row['pengirim'], 'description' => $row['perihal_surat'] ?: 'Agenda surat masuk', 'time' => $row['created_at'], 'tone' => 'purple', 'url' => site_url('agendaris/surat-masuk')];
         }
-        foreach ($db->table('pks_kerjasama')->select('id, kode_internal, nama_kerjasama, created_at')->orderBy('created_at', 'DESC')->limit(5)->get()->getResultArray() as $row) {
+        foreach ($db->table('pks_kerjasama')->select('id, kode_internal, nama_kerjasama, created_at')->where('deleted_at', null)->orderBy('created_at', 'DESC')->limit(5)->get()->getResultArray() as $row) {
             $recent[] = ['section' => 'Bagian Umum 1', 'title' => 'PKS ' . $row['kode_internal'], 'description' => $row['nama_kerjasama'], 'time' => $row['created_at'], 'tone' => 'orange', 'url' => site_url('bagian-umum-1/pks-barang-jasa/' . $row['id'])];
         }
-        foreach ($db->table('dokumen_spk')->select('id, nomor_dokumen, perihal, created_at')->orderBy('created_at', 'DESC')->limit(5)->get()->getResultArray() as $row) {
+        foreach ($db->table('dokumen_spk')->select('id, nomor_dokumen, perihal, created_at')->where('deleted_at', null)->orderBy('created_at', 'DESC')->limit(5)->get()->getResultArray() as $row) {
             $recent[] = ['section' => 'Bagian Umum 1', 'title' => 'SPK ' . $row['nomor_dokumen'], 'description' => $row['perihal'], 'time' => $row['created_at'], 'tone' => 'orange', 'url' => site_url('bagian-umum-1/dokumen-spk')];
         }
         foreach ($db->table('vehicle_activity_logs')->select('vehicle_label, entity_type, action, description, created_at')->orderBy('created_at', 'DESC')->limit(5)->get()->getResultArray() as $row) {
