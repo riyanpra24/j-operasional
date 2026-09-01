@@ -3,16 +3,45 @@
     const loginUrl = document.body.dataset.loginUrl || '';
     const landingUrl = document.body.dataset.landingUrl || '/';
     const logoutUrl = document.body.dataset.logoutUrl || '';
+    const sessionHeartbeatUrl = document.body.dataset.sessionHeartbeatUrl || '';
     const csrfName = document.body.dataset.csrfName || '';
     const csrfHash = document.body.dataset.csrfHash || '';
     const activeTabStorageKey = 'j-operasional-active-tab';
     const currentTabStorageKey = 'j-operasional-current-tab';
     const tabWindowPrefix = 'j-operasional-tab:';
     const logoutSignalStorageKey = 'j-operasional-force-logout';
+    const activeTabLifetimeMilliseconds = 60000;
+    const activeTabHeartbeatMilliseconds = 5000;
+    const serverHeartbeatMilliseconds = 30000;
 
     const randomTabId = () => {
         if (window.crypto?.randomUUID) return window.crypto.randomUUID();
         return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    };
+
+    const readActiveTab = () => {
+        const stored = localStorage.getItem(activeTabStorageKey);
+        if (!stored) return null;
+
+        try {
+            const parsed = JSON.parse(stored);
+            if (parsed && typeof parsed.id === 'string' && Number.isFinite(Number(parsed.seenAt))) {
+                return { id: parsed.id, seenAt: Number(parsed.seenAt) };
+            }
+        } catch (error) {
+            // Format lama hanya berisi ID tab dan dianggap sudah kedaluwarsa.
+        }
+
+        return { id: stored, seenAt: 0 };
+    };
+
+    const writeActiveTab = (tabId) => {
+        localStorage.setItem(activeTabStorageKey, JSON.stringify({ id: tabId, seenAt: Date.now() }));
+    };
+
+    const removeOwnedActiveTab = (tabId) => {
+        const activeTab = readActiveTab();
+        if (activeTab?.id === tabId) localStorage.removeItem(activeTabStorageKey);
     };
 
     const showDuplicateTabBlocker = () => {
@@ -22,7 +51,7 @@
                 <span class="duplicate-tab-icon" aria-hidden="true">!</span>
                 <p>AKSES DIBATASI</p>
                 <h1>Akun sedang digunakan di tab lain</h1>
-                <span data-duplicate-tab-message>Akses pada tab ini diblokir. Pilih Periksa kembali untuk mengakhiri sesi aktif dan kembali ke Landing Page.</span>
+                <span data-duplicate-tab-message>Akses pada tab ini diblokir. Tutup tab sebelumnya, lalu pilih Periksa kembali.</span>
                 <div class="duplicate-tab-actions">
                     <button type="button" class="btn btn-primary" data-duplicate-tab-retry>Periksa kembali</button>
                 </div>
@@ -31,6 +60,16 @@
         const blockerMessage = document.querySelector('[data-duplicate-tab-message]');
 
         retryButton?.addEventListener('click', async () => {
+            const currentTabId = sessionStorage.getItem(currentTabStorageKey) || '';
+            const activeTab = readActiveTab();
+            const activeTabIsFresh = activeTab && (Date.now() - activeTab.seenAt) < activeTabLifetimeMilliseconds;
+
+            if (!activeTabIsFresh && currentTabId !== '') {
+                writeActiveTab(currentTabId);
+                window.location.reload();
+                return;
+            }
+
             if (logoutUrl === '' || csrfName === '' || csrfHash === '') return;
             retryButton.disabled = true;
             retryButton.textContent = 'Memproses kembali...';
@@ -85,11 +124,12 @@
             sessionStorage.setItem(currentTabStorageKey, currentTabId);
             window.name = `${tabWindowPrefix}${currentTabId}`;
 
-            const activeTabId = localStorage.getItem(activeTabStorageKey);
-            if (activeTabId && activeTabId !== currentTabId) {
+            const activeTab = readActiveTab();
+            const activeTabIsFresh = activeTab && (Date.now() - activeTab.seenAt) < activeTabLifetimeMilliseconds;
+            if (activeTabIsFresh && activeTab.id !== currentTabId) {
                 duplicateTabDetected = true;
             } else {
-                localStorage.setItem(activeTabStorageKey, currentTabId);
+                writeActiveTab(currentTabId);
             }
         } catch (error) {
             // Browser tanpa Web Storage tetap memakai validasi sesi server.
@@ -99,6 +139,45 @@
     if (duplicateTabDetected) {
         showDuplicateTabBlocker();
         return;
+    }
+
+    if (loginUrl !== '') {
+        const currentTabId = sessionStorage.getItem(currentTabStorageKey) || '';
+        const maintainActiveTab = () => {
+            if (currentTabId !== '') writeActiveTab(currentTabId);
+        };
+
+        maintainActiveTab();
+        window.setInterval(maintainActiveTab, activeTabHeartbeatMilliseconds);
+        window.addEventListener('pagehide', () => removeOwnedActiveTab(currentTabId));
+        window.addEventListener('beforeunload', () => removeOwnedActiveTab(currentTabId));
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) maintainActiveTab();
+        });
+    }
+
+    if (sessionHeartbeatUrl !== '' && csrfName !== '' && csrfHash !== '') {
+        const sendSessionHeartbeat = async () => {
+            try {
+                const formData = new FormData();
+                formData.append(csrfName, csrfHash);
+                const response = await fetch(sessionHeartbeatUrl, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                });
+                if (response.status === 401) window.location.replace(landingUrl);
+            } catch (error) {
+                // Gangguan jaringan sementara tidak langsung mengeluarkan pengguna.
+            }
+        };
+
+        sendSessionHeartbeat();
+        window.setInterval(sendSessionHeartbeat, serverHeartbeatMilliseconds);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) sendSessionHeartbeat();
+        });
     }
 
     if (authExpiresAt > 0 && loginUrl !== '') {

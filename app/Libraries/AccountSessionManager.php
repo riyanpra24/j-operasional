@@ -8,6 +8,9 @@ use Throwable;
 
 class AccountSessionManager
 {
+    private const HEARTBEAT_TOUCH_INTERVAL_SECONDS = 30;
+    private const STALE_SESSION_SECONDS = 120;
+
     private BaseConnection $db;
 
     public function __construct(?BaseConnection $db = null)
@@ -47,8 +50,9 @@ class AccountSessionManager
 
             if ($existing !== null) {
                 $existingExpiry = strtotime((string) $existing['expires_at']) ?: 0;
+                $existingLastSeen = strtotime((string) ($existing['last_seen_at'] ?? '')) ?: 0;
 
-                if ($existingExpiry > $now) {
+                if ($existingExpiry > $now && $existingLastSeen > $now - self::STALE_SESSION_SECONDS) {
                     $this->db->transRollback();
 
                     return [
@@ -195,7 +199,7 @@ class AccountSessionManager
 
             $lastSeenAt = strtotime((string) $session['last_seen_at']) ?: 0;
 
-            if ($lastSeenAt <= time() - 60) {
+            if ($lastSeenAt <= time() - self::HEARTBEAT_TOUCH_INTERVAL_SECONDS) {
                 $this->db->table('user_sessions')
                     ->where('user_id', $userId)
                     ->where('token_hash', $tokenHash)
@@ -263,7 +267,10 @@ class AccountSessionManager
     {
         try {
             $deleted = $this->db->table('user_sessions')
-                ->where('expires_at <=', date('Y-m-d H:i:s'))
+                ->groupStart()
+                    ->where('expires_at <=', date('Y-m-d H:i:s'))
+                    ->orWhere('last_seen_at <=', date('Y-m-d H:i:s', time() - self::STALE_SESSION_SECONDS))
+                ->groupEnd()
                 ->delete();
 
             return $deleted ? $this->db->affectedRows() : 0;

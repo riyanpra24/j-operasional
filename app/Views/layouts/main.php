@@ -91,6 +91,7 @@ if ($currentRole === 'security') {
     data-login-url="<?= esc(site_url('login'), 'attr') ?>"
     data-landing-url="<?= esc(site_url('/') . '?login=1', 'attr') ?>"
     data-logout-url="<?= esc(site_url('logout'), 'attr') ?>"
+    data-session-heartbeat-url="<?= esc(site_url('session/heartbeat'), 'attr') ?>"
     data-csrf-name="<?= esc(csrf_token(), 'attr') ?>"
     data-csrf-hash="<?= esc(csrf_hash(), 'attr') ?>">
     <?php if ($successToast): ?>

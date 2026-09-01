@@ -201,6 +201,14 @@ class Auth extends BaseController
             ->with('logout_success', 'Anda berhasil keluar dari sistem.');
     }
 
+    public function heartbeat()
+    {
+        return $this->response->setJSON([
+            'success' => true,
+            'server_time' => time(),
+        ]);
+    }
+
     private function clearAuthentication(): void
     {
         $userId = (int) session()->get('auth_user_id');
