@@ -5,7 +5,7 @@
     <div>
         <p class="eyebrow">SDM &amp; TELLER</p>
         <h1><?= $historyMode ? 'Riwayat Dokumen Masuk' : 'Dokumen Masuk' ?></h1>
-        <p><?= $historyMode ? 'Dokumen yang pernah diterima dan sudah diteruskan oleh' : 'Dokumen Agendaris dengan disposisi terakhir kepada' ?> <strong><?= esc($recipientName !== '' ? $recipientName : 'pengguna aktif') ?></strong>.</p>
+        <p><?= $historyMode ? 'Dokumen yang pernah diterima dan sudah diteruskan oleh' : 'Dokumen Agendaris dengan disposisi terakhir kepada' ?> <strong><?= esc(($recipientScopeLabel ?? '') !== '' ? $recipientScopeLabel : 'pengguna aktif') ?></strong>.</p>
     </div>
     <?php if (! $historyMode): ?>
         <form method="post" action="<?= site_url('sdm/dokumen-masuk/sinkronkan') ?>">
@@ -41,13 +41,13 @@
             <thead><tr><th>No</th><th>Sumber</th><th>Nomor Agendaris</th><th>Tanggal Surat</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tracking Disposisi</th><th>Tanggal Diterima</th><th>Aksi</th></tr></thead>
             <tbody>
             <?php if ($documents === []): ?>
-                <tr><td colspan="10"><div class="empty-state"><span aria-hidden="true">▤</span><strong><?= $historyMode ? 'Belum ada riwayat dokumen masuk' : 'Belum ada dokumen masuk untuk Anda' ?></strong><p><?= $historyMode ? 'Dokumen yang sudah Anda teruskan akan tersimpan di halaman ini.' : 'Dokumen akan muncul otomatis ketika nama Anda menjadi penerima disposisi terakhir.' ?></p></div></td></tr>
+                <tr><td colspan="10"><div class="empty-state"><span aria-hidden="true">▤</span><strong><?= $historyMode ? 'Belum ada riwayat dokumen masuk' : (($isAdminView ?? false) ? 'Belum ada disposisi aktif ke akun SDM & Teller' : 'Belum ada dokumen masuk untuk Anda') ?></strong><p><?= $historyMode ? 'Dokumen yang sudah diteruskan akan tersimpan di halaman ini.' : (($isAdminView ?? false) ? 'Dokumen lama yang sudah diteruskan dapat diperiksa melalui submenu Riwayat Dokumen.' : 'Dokumen akan muncul otomatis ketika nama Anda menjadi penerima disposisi terakhir.') ?></p></div></td></tr>
             <?php else: ?>
                 <?php $rowNumber = (($pager->getCurrentPage($pagerGroup) - 1) * $filters['perPage']) + 1; ?>
                 <?php foreach ($documents as $document): ?>
                     <?php
                     $statusClass = ['Menunggu' => 'pending', 'Diterima' => 'received', 'Diproses' => 'active', 'Diteruskan' => 'forwarded', 'Selesai' => 'completed'][$document['status_disposisi_terakhir']] ?? 'empty';
-                    $canEditDisposition = ! $historyMode && mb_strtolower(trim((string) $document['disposisi_terakhir'])) === mb_strtolower(trim($recipientName));
+                    $canEditDisposition = ! ($isAdminView ?? false) && ! $historyMode && mb_strtolower(trim((string) $document['disposisi_terakhir'])) === mb_strtolower(trim($recipientName));
                     $dispositions = [];
                     for ($step = 1; $step <= \Config\Disposition::MAX_STEPS; $step++) {
                         if (trim((string) ($document["disposisi_{$step}"] ?? '')) === '') continue;

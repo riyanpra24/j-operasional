@@ -82,6 +82,7 @@ class Sdm extends BaseController
     private function documentList(bool $historyMode): string
     {
         $recipientName = trim((string) session()->get('auth_display_name'));
+        $currentRole = (string) session()->get('auth_role');
         $keyword = trim((string) $this->request->getGet('q'));
         $status = trim((string) $this->request->getGet('status'));
         $perPage = (int) $this->request->getGet('per_page');
@@ -125,15 +126,21 @@ class Sdm extends BaseController
             false,
         );
         $model->join('dokumen_masuk', 'dokumen_masuk.id = agendaris.dokumen_masuk_id', 'left');
-        $model->where('agendaris.progres', 'Selesai');
 
-        if ($recipientName === '') {
+        $scopedRecipients = $currentRole === 'admin'
+            ? $this->activeSdmRecipientNames()
+            : ($recipientName !== '' ? [$recipientName] : []);
+        $recipientSqlList = implode(', ', array_map(
+            static fn (string $name): string => db_connect()->escape(mb_strtolower(trim($name))),
+            $scopedRecipients,
+        ));
+
+        if ($scopedRecipients === []) {
             $model->where('1 = 0', null, false);
         } elseif ($historyMode) {
-            $escapedRecipient = db_connect()->escape(mb_strtolower($recipientName));
             $model->groupStart();
             for ($step = 1; $step <= Disposition::MAX_STEPS; $step++) {
-                $condition = "LOWER(TRIM(agendaris.disposisi_{$step})) = {$escapedRecipient}";
+                $condition = "LOWER(TRIM(agendaris.disposisi_{$step})) IN ({$recipientSqlList})";
                 if ($step === 1) {
                     $model->where($condition, null, false);
                 } else {
@@ -142,13 +149,17 @@ class Sdm extends BaseController
             }
             $model->groupEnd();
             $model->where(
-                'LOWER(TRIM(' . $latestRecipientSql . ')) <> ' . $escapedRecipient,
+                'LOWER(TRIM(' . $latestRecipientSql . ")) NOT IN ({$recipientSqlList})",
                 null,
                 false,
             );
         } else {
+            $model->groupStart()
+                ->where('agendaris.progres', 'Selesai')
+                ->orWhere('agendaris.sdm_processed_at IS NOT NULL', null, false)
+                ->groupEnd();
             $model->where(
-                'LOWER(TRIM(' . $latestRecipientSql . ')) = ' . db_connect()->escape(mb_strtolower($recipientName)),
+                'LOWER(TRIM(' . $latestRecipientSql . ")) IN ({$recipientSqlList})",
                 null,
                 false,
             );
@@ -178,6 +189,8 @@ class Sdm extends BaseController
                 ->paginate($perPage, $pagerGroup),
             'pager' => $model->pager,
             'recipientName' => $recipientName,
+            'recipientScopeLabel' => $currentRole === 'admin' ? 'seluruh akun SDM & Teller' : $recipientName,
+            'isAdminView' => $currentRole === 'admin',
             'statusOptions' => $allowedStatuses,
             'recipientOptions' => Disposition::RECIPIENTS,
             'filters' => compact('keyword', 'status', 'perPage'),
@@ -195,7 +208,7 @@ class Sdm extends BaseController
 
         if (
             $document === null
-            || ($document['progres'] ?? '') !== 'Selesai'
+            || (($document['progres'] ?? '') !== 'Selesai' && empty($document['sdm_processed_at']))
             || $latestStep === 0
             || ! $this->belongsToCurrentUser($document, $latestStep)
         ) {
@@ -322,6 +335,21 @@ class Sdm extends BaseController
         }
 
         return count($matches) === 1 ? $matches[0] : null;
+    }
+
+    private function activeSdmRecipientNames(): array
+    {
+        $rows = db_connect()->table('users')
+            ->select('display_name')
+            ->where('role', 'sdm')
+            ->where('deleted_at IS NULL', null, false)
+            ->get()
+            ->getResultArray();
+
+        return array_values(array_filter(array_map(
+            static fn (array $row): string => trim((string) ($row['display_name'] ?? '')),
+            $rows,
+        )));
     }
 
     private function recipientNameParts(string $name): array
