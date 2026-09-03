@@ -24,6 +24,7 @@ $routes->get('dashboard', 'Dashboard::index', ['as' => 'dashboard']);
 // Halaman awal modul SDM & Teller dan Akutansi
 $routes->get('sdm', 'Sdm::index', ['as' => 'sdm.index']);
 $routes->get('sdm/dokumen-masuk', 'Sdm::incomingDocuments', ['as' => 'sdm.dokumen_masuk']);
+$routes->post('sdm/dokumen-masuk/sinkronkan', 'Sdm::synchronizeIncomingDocuments', ['as' => 'sdm.dokumen_masuk.synchronize']);
 $routes->get('sdm/riwayat', 'Sdm::incomingDocumentHistory', ['as' => 'sdm.riwayat']);
 $routes->post('sdm/dokumen-masuk/(:num)', 'Sdm::updateIncomingDocument/$1', ['as' => 'sdm.dokumen_masuk.update']);
 $routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);

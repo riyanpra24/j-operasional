@@ -1,12 +1,18 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<section class="page-heading">
+<section class="page-heading <?= ! $historyMode ? 'heading-actions' : '' ?>">
     <div>
         <p class="eyebrow">SDM &amp; TELLER</p>
         <h1><?= $historyMode ? 'Riwayat Dokumen Masuk' : 'Dokumen Masuk' ?></h1>
         <p><?= $historyMode ? 'Dokumen yang pernah diterima dan sudah diteruskan oleh' : 'Dokumen Agendaris dengan disposisi terakhir kepada' ?> <strong><?= esc($recipientName !== '' ? $recipientName : 'pengguna aktif') ?></strong>.</p>
     </div>
+    <?php if (! $historyMode): ?>
+        <form method="post" action="<?= site_url('sdm/dokumen-masuk/sinkronkan') ?>">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn btn-secondary btn-agendaris-sync" title="Sinkronkan dokumen lama dari Agendaris tanpa membuat data ganda">↻ Sinkronkan Data</button>
+        </form>
+    <?php endif ?>
 </section>
 
 <section class="panel filter-panel">
@@ -32,10 +38,10 @@
 <section class="panel register-panel agendaris-table-panel">
     <div class="table-wrap">
         <table>
-            <thead><tr><th>No.</th><th>Nomor Agendaris</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tanggal Diterima</th><th>Disposisi Terakhir</th><th>Status</th><th>Catatan / Instruksi</th><th>Berkas</th><th>Aksi</th></tr></thead>
+            <thead><tr><th>No</th><th>Sumber</th><th>Nomor Agendaris</th><th>Tanggal Surat</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tracking Disposisi</th><th>Tanggal Diterima</th><th>Aksi</th></tr></thead>
             <tbody>
             <?php if ($documents === []): ?>
-                <tr><td colspan="11"><div class="empty-state"><span aria-hidden="true">▤</span><strong><?= $historyMode ? 'Belum ada riwayat dokumen masuk' : 'Belum ada dokumen masuk untuk Anda' ?></strong><p><?= $historyMode ? 'Dokumen yang sudah Anda teruskan akan tersimpan di halaman ini.' : 'Dokumen akan muncul otomatis ketika nama Anda menjadi penerima disposisi terakhir.' ?></p></div></td></tr>
+                <tr><td colspan="10"><div class="empty-state"><span aria-hidden="true">▤</span><strong><?= $historyMode ? 'Belum ada riwayat dokumen masuk' : 'Belum ada dokumen masuk untuk Anda' ?></strong><p><?= $historyMode ? 'Dokumen yang sudah Anda teruskan akan tersimpan di halaman ini.' : 'Dokumen akan muncul otomatis ketika nama Anda menjadi penerima disposisi terakhir.' ?></p></div></td></tr>
             <?php else: ?>
                 <?php $rowNumber = (($pager->getCurrentPage($pagerGroup) - 1) * $filters['perPage']) + 1; ?>
                 <?php foreach ($documents as $document): ?>
@@ -84,15 +90,14 @@
                     ?>
                     <tr>
                         <td><strong><?= $rowNumber++ ?></strong></td>
+                        <td><strong><?= $document['dokumen_masuk_id'] !== null ? 'Security' : 'Input Manual' ?></strong></td>
                         <td><strong><?= $document['nomor_agendaris'] ? esc($document['nomor_agendaris']) : '<span class="agenda-incomplete">Belum dibuat</span>' ?></strong></td>
+                        <td><?= $document['tanggal_surat'] ? date('d-m-Y', strtotime($document['tanggal_surat'])) : '<span class="agenda-incomplete">Belum diisi</span>' ?></td>
                         <td><strong><?= $document['nomor_surat'] ? esc($document['nomor_surat']) : '<span class="agenda-incomplete">Belum diisi</span>' ?></strong></td>
                         <td class="cell-wrap"><?= esc($document['perihal_surat']) ?></td>
                         <td><?= esc($document['pengirim']) ?></td>
+                        <td><div class="disposition-table-tracking"><strong><?= esc($document['disposisi_terakhir']) ?></strong><span><?= $document['waktu_disposisi_terakhir'] ? date('d-m-Y H:i', strtotime($document['waktu_disposisi_terakhir'])) . ' WIB' : 'Waktu belum dicatat' ?></span><em class="disposition-status-badge <?= $statusClass ?>"><?= esc($document['status_disposisi_terakhir']) ?></em></div></td>
                         <td><?= $document['tanggal_diterima'] ? date('d-m-Y', strtotime($document['tanggal_diterima'])) : '-' ?></td>
-                        <td><div class="disposition-table-tracking"><strong><?= esc($document['disposisi_terakhir']) ?></strong><span><?= $document['waktu_disposisi_terakhir'] ? date('d-m-Y H:i', strtotime($document['waktu_disposisi_terakhir'])) . ' WIB' : 'Waktu belum dicatat' ?></span></div></td>
-                        <td><em class="disposition-status-badge <?= $statusClass ?>"><?= esc($document['status_disposisi_terakhir']) ?></em></td>
-                        <td class="cell-wrap"><?= $document['catatan_disposisi_terakhir'] ? esc($document['catatan_disposisi_terakhir']) : '<span class="agenda-incomplete">Belum ada catatan</span>' ?></td>
-                        <td><?php if ($document['berkas_link']): ?><a class="btn btn-outline" href="<?= esc($document['berkas_link'], 'attr') ?>" target="_blank" rel="noopener noreferrer">Buka</a><?php else: ?><span class="agenda-incomplete">Tidak ada</span><?php endif ?></td>
                         <td><div class="table-actions"><button type="button" class="icon-btn" title="Lihat dokumen dan riwayat disposisi" data-sdm-document-view='<?= $documentModalJson ?>'>⌕</button><?php if ($canEditDisposition): ?><button type="button" class="icon-btn" title="Edit disposisi" data-sdm-document-edit='<?= $documentModalJson ?>'>✎</button><?php else: ?><span class="disposition-history-only">Riwayat</span><?php endif ?></div></td>
                     </tr>
                 <?php endforeach ?>

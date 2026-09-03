@@ -215,7 +215,7 @@ if ($currentRole === 'security') {
                         </a>
                         <a href="<?= site_url('sdm/riwayat') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'riwayat' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
-                            Riwayat
+                            Riwayat Dokumen
                         </a>
                     </div>
                 </div>

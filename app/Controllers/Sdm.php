@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\AgendarisModel;
+use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use Config\Disposition;
 
@@ -23,6 +24,59 @@ class Sdm extends BaseController
     public function incomingDocumentHistory(): string
     {
         return $this->documentList(true);
+    }
+
+    public function synchronizeIncomingDocuments(): RedirectResponse
+    {
+        $model = new AgendarisModel();
+        $documents = $model->findAll();
+        $updatedDocuments = 0;
+        $normalizedRecipients = 0;
+        $db = db_connect();
+
+        $db->transStart();
+
+        foreach ($documents as $document) {
+            $updates = [];
+
+            for ($step = 1; $step <= Disposition::MAX_STEPS; $step++) {
+                $field = "disposisi_{$step}";
+                $currentRecipient = trim((string) ($document[$field] ?? ''));
+                if ($currentRecipient === '') {
+                    continue;
+                }
+
+                $canonicalRecipient = $this->canonicalRecipient($currentRecipient);
+                if ($canonicalRecipient !== null && $canonicalRecipient !== $currentRecipient) {
+                    $updates[$field] = $canonicalRecipient;
+                    $normalizedRecipients++;
+                }
+            }
+
+            if ($updates !== []) {
+                if (! $model->update((int) $document['id'], $updates)) {
+                    $db->transRollback();
+
+                    return redirect()->to(site_url('sdm/dokumen-masuk'))
+                        ->with('error', 'Sinkronisasi belum berhasil. Silakan coba kembali.');
+                }
+
+                $updatedDocuments++;
+            }
+        }
+
+        $db->transComplete();
+
+        if (! $db->transStatus()) {
+            return redirect()->to(site_url('sdm/dokumen-masuk'))
+                ->with('error', 'Sinkronisasi belum berhasil. Silakan coba kembali.');
+        }
+
+        $message = $updatedDocuments > 0
+            ? "{$updatedDocuments} dokumen lama berhasil disinkronkan ({$normalizedRecipients} nama penerima diperbaiki)."
+            : 'Seluruh dokumen Agendaris sudah tersinkron dengan SDM & Teller.';
+
+        return redirect()->to(site_url('sdm/dokumen-masuk'))->with('sync_success', $message);
     }
 
     private function documentList(bool $historyMode): string
@@ -240,6 +294,42 @@ class Sdm extends BaseController
         $currentUser = mb_strtolower(trim((string) session()->get('auth_display_name')));
 
         return $recipient !== '' && $currentUser !== '' && hash_equals($recipient, $currentUser);
+    }
+
+    private function canonicalRecipient(string $recipient): ?string
+    {
+        $recipientParts = $this->recipientNameParts($recipient);
+        if ($recipientParts === []) {
+            return null;
+        }
+
+        $matches = [];
+        foreach (Disposition::RECIPIENTS as $canonicalRecipient) {
+            $canonicalParts = $this->recipientNameParts($canonicalRecipient);
+            if ($recipientParts === $canonicalParts) {
+                return $canonicalRecipient;
+            }
+
+            // Nama lama minimal dua kata boleh dicocokkan dengan awalan nama
+            // lengkap, misalnya "Kiki Ramadhani" ke "Kiki Ramadhani Suyono".
+            if (
+                count($recipientParts) >= 2
+                && count($recipientParts) < count($canonicalParts)
+                && array_slice($canonicalParts, 0, count($recipientParts)) === $recipientParts
+            ) {
+                $matches[] = $canonicalRecipient;
+            }
+        }
+
+        return count($matches) === 1 ? $matches[0] : null;
+    }
+
+    private function recipientNameParts(string $name): array
+    {
+        $normalized = mb_strtolower(trim($name));
+        $normalized = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $normalized) ?? '';
+
+        return array_values(array_filter(preg_split('/\s+/u', trim($normalized)) ?: []));
     }
 
     private function dateTimeValue(string $date, mixed $fallback): string
