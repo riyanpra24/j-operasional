@@ -35,7 +35,7 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Jamkrindo Kanwil Surabaya, sistem pengelolaan dokumen operasional.">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
-    <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg') ?>">
+    <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
     <link rel="preload" as="image" type="image/webp" href="<?= base_url('assets/images/jaksa-wordmark.webp') ?>" fetchpriority="high">
     <link rel="stylesheet" href="<?= base_url($landingCssAsset) ?>?v=<?= esc($landingCssVersion, 'attr') ?>">
     <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>

@@ -25,7 +25,7 @@ $urlMaskVersion = is_file(FCPATH . $urlMaskAsset) ? (string) filemtime(FCPATH . 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Login Sistem Register Operasional">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
-    <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg') ?>">
+    <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
     <link rel="stylesheet" href="<?= base_url($loginCssAsset) ?>?v=<?= esc($loginCssVersion, 'attr') ?>">
     <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>
     <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
