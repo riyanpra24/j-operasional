@@ -13,7 +13,7 @@ class UserRoles extends BaseConfig
         'umum_1'    => 'Umum 1',
         'umum_2'    => 'Umum 2',
         'akutansi'  => 'Akutansi',
-        'sdm'       => 'SDM',
+        'sdm'       => 'SDM & Teller',
     ];
 
     public const MODULE_PREFIXES = [

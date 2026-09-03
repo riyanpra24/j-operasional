@@ -1232,6 +1232,8 @@
     // Security lainnya tetap dikunci.
     const agendaSourceFieldNames = ['tanggal_diterima', 'penerima', 'pengambilan', 'jenis'];
     const agendaDispositionStages = agendaFormModal?.querySelectorAll('[data-disposition-form-stage]') || [];
+    const agendaEditHistorySection = agendaFormModal?.querySelector('[data-agendaris-edit-history-section]');
+    const agendaEditHistory = agendaFormModal?.querySelector('[data-agendaris-edit-history]');
     const agendaLastStep = agendaStepPanels.length || 1;
     let agendaCurrentStep = 1;
 
@@ -1276,6 +1278,23 @@
             field.add(legacyOption);
         }
         field.value = recipient;
+    };
+
+    const renderAgendaEditHistory = (timeline = []) => {
+        if (!agendaEditHistory || !agendaEditHistorySection) return;
+        const filled = timeline.filter((item) => item.terisi);
+        agendaEditHistorySection.hidden = filled.length === 0;
+        agendaEditHistory.innerHTML = filled.map((item) => {
+            const status = item.status || 'Menunggu';
+            const statusClass = ({ Menunggu:'pending', Diterima:'received', Diproses:'active', Diteruskan:'forwarded', Selesai:'completed' }[status] || 'empty');
+            return `<article class="disposition-detail-item filled">
+                <span class="disposition-detail-dot">${String(item.urutan).padStart(2, '0')}</span>
+                <div class="disposition-detail-card">
+                    <header><div><h3>${escapeHtml(item.penerima)}</h3><time>${escapeHtml(item.waktu)}</time></div><span class="disposition-status-badge ${statusClass}">${escapeHtml(status)}</span></header>
+                    <p>${escapeHtml(item.catatan)}</p>
+                </div>
+            </article>`;
+        }).join('');
     };
 
     agendaDispositionStages.forEach((stage) => {
@@ -1374,6 +1393,7 @@
         setAgendaSourceLock(false);
         setAgendaLink(true);
         setAgendaNumberState(false);
+        renderAgendaEditHistory([]);
         refreshDispositionForm();
         agendaErrors.hidden = true;
         agendaStatus.textContent = '';
@@ -1402,6 +1422,7 @@
         agendaFormTitle.textContent = 'Edit Surat Masuk';
         agendaSubmit.textContent = 'Simpan perubahan';
         agendaStatus.textContent = 'Memuat data...';
+        renderAgendaEditHistory([]);
         showAgendaForm();
 
         try {
@@ -1417,13 +1438,14 @@
             agendaForm.elements.nomor_agendaris.value = data.nomor_agendaris_value;
             agendaForm.elements.tanggal_agendaris.value = data.tanggal_agendaris_value;
             agendaForm.elements.perihal_surat.value = data.perihal_surat;
-            for (let step = 1; step <= 3; step += 1) {
+            for (let step = 1; step <= agendaDispositionStages.length; step += 1) {
                 setDispositionRecipientValue(agendaForm.elements[`disposisi_${step}`], data[`disposisi_${step}_value`]);
                 agendaForm.elements[`disposisi_${step}_status`].value = data[`disposisi_${step}_status_value`] || 'Menunggu';
                 agendaForm.elements[`disposisi_${step}_waktu`].value = data[`disposisi_${step}_waktu_value`] || '';
                 agendaForm.elements[`disposisi_${step}_catatan`].value = data[`disposisi_${step}_catatan_value`] || '';
             }
             agendaForm.elements.progres.value = data.progres || 'Menunggu Penyelesaian';
+            renderAgendaEditHistory(data.disposisi_timeline || []);
             setAgendaSourceLock(Boolean(data.source_locked));
             setAgendaLink(true, data.berkas_link || '');
             setAgendaNumberState(Boolean(data.nomor_agendaris_value));
@@ -2107,9 +2129,11 @@
 
     const reopenProgressModal = document.querySelector('#reopenProgressModal');
     const reopenProgressForm = reopenProgressModal?.querySelector('[data-reopen-progress-form]');
-    const reopenProgressLabel = reopenProgressModal?.querySelector('[data-reopen-progress-label]');
+    const reopenProgressTitle = reopenProgressModal?.querySelector('[data-reopen-progress-title]');
+    const reopenProgressDescription = reopenProgressModal?.querySelector('[data-reopen-progress-description]');
     const reopenProgressError = reopenProgressModal?.querySelector('[data-reopen-progress-error]');
     const reopenProgressSubmit = reopenProgressModal?.querySelector('[data-reopen-progress-submit]');
+    const reopenProgressDefaultTitle = reopenProgressTitle?.textContent || 'Kembalikan ke Progres Dokumen?';
 
     const closeReopenProgress = () => {
         if (!reopenProgressModal) return;
@@ -2121,8 +2145,21 @@
 
     document.querySelectorAll('[data-reopen-progress]').forEach((button) => button.addEventListener('click', () => {
         if (!reopenProgressModal || !reopenProgressForm) return;
+        const lockedMessage = button.dataset.reopenLockedMessage || '';
         reopenProgressForm.action = button.dataset.reopenUrl;
-        reopenProgressLabel.textContent = button.dataset.reopenLabel || 'Dokumen ini';
+        reopenProgressForm.hidden = false;
+        if (reopenProgressSubmit) reopenProgressSubmit.hidden = lockedMessage !== '';
+        if (reopenProgressTitle) reopenProgressTitle.textContent = lockedMessage !== '' ? 'Disposisi telah diproses' : reopenProgressDefaultTitle;
+        if (reopenProgressDescription) {
+            if (lockedMessage !== '') {
+                reopenProgressDescription.textContent = lockedMessage;
+            } else {
+                reopenProgressDescription.replaceChildren();
+                const label = document.createElement('strong');
+                label.textContent = button.dataset.reopenLabel || 'Dokumen ini';
+                reopenProgressDescription.append(label, ` ${reopenProgressDescription.dataset.defaultDescription || ''}`);
+            }
+        }
         reopenProgressError.hidden = true;
         reopenProgressModal.hidden = false;
         reopenProgressModal.setAttribute('aria-hidden', 'false');

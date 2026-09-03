@@ -7,6 +7,7 @@ use App\Models\AgendarisModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
+use Config\Disposition;
 
 class Agendaris extends BaseController
 {
@@ -192,6 +193,16 @@ class Agendaris extends BaseController
     {
         $agenda = $this->findJoined($id);
 
+        $dispositionData = [];
+        for ($step = 1; $step <= Disposition::MAX_STEPS; $step++) {
+            $recipient = $agenda["disposisi_{$step}"] ?? null;
+            $dispositionData["disposisi_{$step}"] = $recipient ?: 'Belum diisi';
+            $dispositionData["disposisi_{$step}_value"] = $recipient ?: '';
+            $dispositionData["disposisi_{$step}_status_value"] = ($agenda["disposisi_{$step}_status"] ?? null) ?: 'Menunggu';
+            $dispositionData["disposisi_{$step}_waktu_value"] = $this->dateTimeLocalValue($agenda["disposisi_{$step}_waktu"] ?? null);
+            $dispositionData["disposisi_{$step}_catatan_value"] = ($agenda["disposisi_{$step}_catatan"] ?? null) ?: '';
+        }
+
         return $this->response->setJSON([
             'success' => true,
             'agenda'  => [
@@ -220,21 +231,7 @@ class Agendaris extends BaseController
                 'tanggal_agendaris_value' => $agenda['tanggal_agendaris'] ?: '',
                 'perihal_surat'       => $agenda['perihal_surat'],
                 'berkas_link'         => $agenda['berkas_link'] ?: '',
-                'disposisi_1'         => $agenda['disposisi_1'] ?: 'Belum diisi',
-                'disposisi_1_value'   => $agenda['disposisi_1'] ?: '',
-                'disposisi_1_status_value' => $agenda['disposisi_1_status'] ?: 'Menunggu',
-                'disposisi_1_waktu_value'  => $this->dateTimeLocalValue($agenda['disposisi_1_waktu'] ?? null),
-                'disposisi_1_catatan_value'=> $agenda['disposisi_1_catatan'] ?: '',
-                'disposisi_2'         => $agenda['disposisi_2'] ?: 'Belum diisi',
-                'disposisi_2_value'   => $agenda['disposisi_2'] ?: '',
-                'disposisi_2_status_value' => $agenda['disposisi_2_status'] ?: 'Menunggu',
-                'disposisi_2_waktu_value'  => $this->dateTimeLocalValue($agenda['disposisi_2_waktu'] ?? null),
-                'disposisi_2_catatan_value'=> $agenda['disposisi_2_catatan'] ?: '',
-                'disposisi_3'         => $agenda['disposisi_3'] ?: 'Belum diisi',
-                'disposisi_3_value'   => $agenda['disposisi_3'] ?: '',
-                'disposisi_3_status_value' => $agenda['disposisi_3_status'] ?: 'Menunggu',
-                'disposisi_3_waktu_value'  => $this->dateTimeLocalValue($agenda['disposisi_3_waktu'] ?? null),
-                'disposisi_3_catatan_value'=> $agenda['disposisi_3_catatan'] ?: '',
+                ...$dispositionData,
                 'disposisi_timeline'  => $this->dispositionTimeline($agenda),
                 'progres'             => $agenda['progres'] ?: 'Menunggu Penyelesaian',
                 'created_at'          => date('d-m-Y H:i', strtotime($agenda['created_at'])) . ' WIB',
@@ -248,7 +245,7 @@ class Agendaris extends BaseController
     public function update(int $id): ResponseInterface
     {
         $agenda = $this->findJoined($id);
-        $data   = $this->payload();
+        $data   = $this->payload($agenda);
 
         if ($agenda['dokumen_masuk_id'] !== null) {
             // Hanya Pengirim yang boleh diperbarui oleh Agendaris. Field
@@ -262,6 +259,16 @@ class Agendaris extends BaseController
 
         if ($errors !== []) {
             return $this->validationError($errors);
+        }
+
+        if ($this->isDispositionLockedForAgendaris($agenda)) {
+            if ($this->agendarisDispositionChanged($agenda, $data)) {
+                return $this->dispositionLockedResponse();
+            }
+
+            // Jangan izinkan request langsung memindahkan dokumen keluar dari
+            // inbox SDM & Teller setelah disposisinya diproses.
+            $data['progres'] = $agenda['progres'];
         }
 
         if (! $this->model->update($id, $data)) {
@@ -280,6 +287,10 @@ class Agendaris extends BaseController
                 'message' => 'Dokumen sudah berada di Progres Dokumen.',
                 'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
             ]);
+        }
+
+        if ($this->isDispositionLockedForAgendaris($agenda)) {
+            return $this->dispositionLockedResponse();
         }
 
         if (! $this->model->update($id, ['progres' => 'Menunggu Penyelesaian'])) {
@@ -311,7 +322,7 @@ class Agendaris extends BaseController
         return $this->successResponse($message);
     }
 
-    private function payload(): array
+    private function payload(?array $existing = null): array
     {
         $data = [
             'pengirim'         => trim((string) $this->request->getPost('pengirim')),
@@ -328,7 +339,15 @@ class Agendaris extends BaseController
             'progres'          => trim((string) $this->request->getPost('progres')),
         ];
 
-        for ($step = 1; $step <= 3; $step++) {
+        for ($step = 1; $step <= Disposition::MAX_STEPS; $step++) {
+            if ($step > Disposition::AGENDARIS_EDITABLE_STEPS) {
+                $data["disposisi_{$step}"] = $existing["disposisi_{$step}"] ?? null;
+                $data["disposisi_{$step}_status"] = $existing["disposisi_{$step}_status"] ?? null;
+                $data["disposisi_{$step}_waktu"] = $existing["disposisi_{$step}_waktu"] ?? null;
+                $data["disposisi_{$step}_catatan"] = $existing["disposisi_{$step}_catatan"] ?? null;
+                continue;
+            }
+
             $recipient = $this->nullIfEmpty($this->request->getPost("disposisi_{$step}"));
             $data["disposisi_{$step}"] = $recipient;
 
@@ -349,7 +368,7 @@ class Agendaris extends BaseController
 
     private function validateAgenda(array $data, ?int $ignoreId = null): array
     {
-        $validation = service('validation')->setRules([
+        $rules = [
             'pengirim'         => 'required|max_length[255]',
             'penerima'         => 'permit_empty|max_length[255]',
             'pengambilan'      => 'permit_empty|max_length[255]',
@@ -361,31 +380,26 @@ class Agendaris extends BaseController
             'tanggal_agendaris'=> 'permit_empty|valid_date[Y-m-d]',
             'perihal_surat'    => 'required|max_length[255]',
             'berkas_link'      => 'permit_empty|max_length[2048]',
-            'disposisi_1'      => 'permit_empty|max_length[255]',
-            'disposisi_1_status' => 'permit_empty|in_list[Menunggu,Diterima,Diproses,Diteruskan,Selesai]',
-            'disposisi_1_waktu'  => 'permit_empty|valid_date[Y-m-d H:i:s]',
-            'disposisi_1_catatan'=> 'permit_empty|max_length[1000]',
-            'disposisi_2'      => 'permit_empty|max_length[255]',
-            'disposisi_2_status' => 'permit_empty|in_list[Menunggu,Diterima,Diproses,Diteruskan,Selesai]',
-            'disposisi_2_waktu'  => 'permit_empty|valid_date[Y-m-d H:i:s]',
-            'disposisi_2_catatan'=> 'permit_empty|max_length[1000]',
-            'disposisi_3'      => 'permit_empty|max_length[255]',
-            'disposisi_3_status' => 'permit_empty|in_list[Menunggu,Diterima,Diproses,Diteruskan,Selesai]',
-            'disposisi_3_waktu'  => 'permit_empty|valid_date[Y-m-d H:i:s]',
-            'disposisi_3_catatan'=> 'permit_empty|max_length[1000]',
             'progres'          => 'required|in_list[Menunggu Penyelesaian,Selesai]',
-        ]);
+        ];
+
+        for ($step = 1; $step <= Disposition::MAX_STEPS; $step++) {
+            $rules["disposisi_{$step}"] = 'permit_empty|max_length[255]';
+            $rules["disposisi_{$step}_status"] = 'permit_empty|in_list[' . implode(',', Disposition::STATUSES) . ']';
+            $rules["disposisi_{$step}_waktu"] = 'permit_empty|valid_date[Y-m-d H:i:s]';
+            $rules["disposisi_{$step}_catatan"] = 'permit_empty|max_length[1000]';
+        }
+
+        $validation = service('validation')->setRules($rules);
 
         if (! $validation->run($data)) {
             return array_values($validation->getErrors());
         }
 
-        if ($data['disposisi_2'] !== null && $data['disposisi_1'] === null) {
-            return ['Disposisi 1 harus diisi sebelum Disposisi 2.'];
-        }
-
-        if ($data['disposisi_3'] !== null && $data['disposisi_2'] === null) {
-            return ['Disposisi 2 harus diisi sebelum Disposisi 3.'];
+        for ($step = 2; $step <= Disposition::MAX_STEPS; $step++) {
+            if ($data["disposisi_{$step}"] !== null && $data['disposisi_' . ($step - 1)] === null) {
+                return ['Disposisi ' . ($step - 1) . " harus diisi sebelum Disposisi {$step}."];
+            }
         }
 
         if ($data['nomor_agendaris'] !== null) {
@@ -418,6 +432,39 @@ class Agendaris extends BaseController
         $value = trim((string) $value);
 
         return $value === '' ? null : $value;
+    }
+
+    private function isDispositionLockedForAgendaris(array $agenda): bool
+    {
+        return (string) session()->get('auth_role') === 'agendaris'
+            && trim((string) ($agenda['sdm_processed_at'] ?? '')) !== '';
+    }
+
+    private function agendarisDispositionChanged(array $agenda, array $proposed): bool
+    {
+        for ($step = 1; $step <= Disposition::AGENDARIS_EDITABLE_STEPS; $step++) {
+            foreach ([
+                "disposisi_{$step}",
+                "disposisi_{$step}_status",
+                "disposisi_{$step}_waktu",
+                "disposisi_{$step}_catatan",
+            ] as $field) {
+                if ((string) ($agenda[$field] ?? '') !== (string) ($proposed[$field] ?? '')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function dispositionLockedResponse(): ResponseInterface
+    {
+        return $this->response->setStatusCode(409)->setJSON([
+            'success' => false,
+            'message' => 'Disposisi telah diproses oleh SDM & Teller. Hubungi Administrator untuk tindakan selanjutnya.',
+            'csrf'    => ['name' => csrf_token(), 'hash' => csrf_hash()],
+        ]);
     }
 
     private function normalizeDateTime(mixed $value): ?string
@@ -454,7 +501,7 @@ class Agendaris extends BaseController
     {
         $timeline = [];
 
-        for ($step = 1; $step <= 3; $step++) {
+        for ($step = 1; $step <= Disposition::MAX_STEPS; $step++) {
             $recipient = trim((string) ($agenda["disposisi_{$step}"] ?? ''));
             $time = $agenda["disposisi_{$step}_waktu"] ?? null;
 

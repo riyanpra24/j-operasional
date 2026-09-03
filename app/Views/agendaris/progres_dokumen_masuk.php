@@ -44,13 +44,13 @@
                 <td><?= esc($row['pengirim']) ?></td>
                 <?php
                     $activeDisposition = 0;
-                    for ($step = 1; $step <= 3; $step++) {
+                    for ($step = 1; $step <= \Config\Disposition::MAX_STEPS; $step++) {
                         if (trim((string) ($row["disposisi_{$step}"] ?? '')) !== '') $activeDisposition = $step;
                     }
                     $trackingStatus = $activeDisposition > 0 ? ($row["disposisi_{$activeDisposition}_status"] ?? 'Menunggu') : 'Belum ditentukan';
                     $trackingClass = ['Menunggu' => 'pending', 'Diterima' => 'received', 'Diproses' => 'active', 'Diteruskan' => 'forwarded', 'Selesai' => 'completed'][$trackingStatus] ?? 'empty';
                 ?>
-                <td><div class="disposition-table-tracking"><strong><?= $activeDisposition > 0 ? esc($row["disposisi_{$activeDisposition}"]) : 'Belum ada disposisi' ?></strong><span><?= $activeDisposition > 0 ? "Tahap {$activeDisposition} dari 3" : 'Tracking belum dimulai' ?></span><em class="disposition-status-badge <?= $trackingClass ?>"><?= esc($trackingStatus) ?></em></div></td>
+                <td><div class="disposition-table-tracking"><strong><?= $activeDisposition > 0 ? esc($row["disposisi_{$activeDisposition}"]) : 'Belum ada disposisi' ?></strong><span><?= $activeDisposition > 0 ? 'Tahap ' . $activeDisposition . ' · maksimal ' . \Config\Disposition::MAX_STEPS : 'Tracking belum dimulai' ?></span><em class="disposition-status-badge <?= $trackingClass ?>"><?= esc($trackingStatus) ?></em></div></td>
                 <?php $completed = ($row['progres'] ?? '') === 'Selesai'; ?>
                 <td><span class="pickup-status <?= $completed ? 'completed' : 'pending' ?>"><?= esc($row['progres'] ?? 'Menunggu Penyelesaian') ?></span></td>
                 <td><div class="table-actions">

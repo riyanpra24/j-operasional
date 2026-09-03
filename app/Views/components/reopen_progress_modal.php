@@ -3,8 +3,8 @@
     <section class="modal-dialog delete-modal-dialog" role="alertdialog" aria-modal="true" aria-labelledby="reopenProgressTitle" aria-describedby="reopenProgressDescription">
         <div class="delete-modal-body">
             <span class="delete-warning-icon">!</span>
-            <h2 id="reopenProgressTitle"><?= esc($reopenTitle ?? 'Kembalikan ke Progres Dokumen?') ?></h2>
-            <p id="reopenProgressDescription"><strong data-reopen-progress-label></strong> <?= esc($reopenDescription ?? 'akan hilang dari arsip dan kembali ke Progres Dokumen agar dapat diedit.') ?></p>
+            <h2 id="reopenProgressTitle" data-reopen-progress-title><?= esc($reopenTitle ?? 'Kembalikan ke Progres Dokumen?') ?></h2>
+            <p id="reopenProgressDescription" data-reopen-progress-description data-default-description="<?= esc($reopenDescription ?? 'akan hilang dari arsip dan kembali ke Progres Dokumen agar dapat diedit.', 'attr') ?>"><strong data-reopen-progress-label></strong> <?= esc($reopenDescription ?? 'akan hilang dari arsip dan kembali ke Progres Dokumen agar dapat diedit.') ?></p>
             <div class="modal-alert" data-reopen-progress-error hidden></div>
         </div>
         <form method="post" action="" data-reopen-progress-form class="delete-modal-actions">

@@ -15,6 +15,7 @@ $generalSectionPage = $generalSectionActive && $uri->getTotalSegments() >= 2
     : 'pks-barang-jasa';
 $generalSectionTwoActive = $segment === 'bagian-umum-2';
 $sdmActive = $segment === 'sdm';
+$sdmPage = $sdmActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : '';
 $akutansiActive = $segment === 'akutansi';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
 $currentRole = (string) session()->get('auth_role');
@@ -201,10 +202,23 @@ if ($currentRole === 'security') {
                 </div>
                 <?php endif ?>
                 <?php if ($canAccessSdm): ?>
-                <a href="<?= site_url('sdm') ?>" class="nav-link <?= $sdmActive ? 'active' : '' ?>" title="SDM &amp; Teller">
-                    <span class="nav-icon image-nav-icon sdm-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/people.png') ?>" alt=""></span>
-                    <span class="nav-link-text">SDM &amp; Teller</span>
-                </a>
+                <div class="nav-group <?= $sdmActive ? 'open' : '' ?>" data-nav-group>
+                    <button type="button" class="nav-link nav-parent <?= $sdmActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $sdmActive ? 'true' : 'false' ?>" aria-controls="sdmSubmenu" title="SDM &amp; Teller">
+                        <span class="nav-icon image-nav-icon sdm-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/people.png') ?>" alt=""></span>
+                        <span class="nav-link-text">SDM &amp; Teller</span>
+                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                    </button>
+                    <div class="nav-submenu" id="sdmSubmenu" data-nav-submenu <?= $sdmActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('sdm/dokumen-masuk') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'dokumen-masuk' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dokumen Masuk
+                        </a>
+                        <a href="<?= site_url('sdm/riwayat') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'riwayat' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Riwayat
+                        </a>
+                    </div>
+                </div>
                 <?php endif ?>
                 <?php if ($canAccessAkutansi): ?>
                 <a href="<?= site_url('akutansi') ?>" class="nav-link <?= $akutansiActive ? 'active' : '' ?>" title="Akutansi">

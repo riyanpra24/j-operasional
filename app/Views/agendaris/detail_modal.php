@@ -29,7 +29,7 @@
             </section>
             <section class="agendaris-detail-section disposition-detail-section" aria-labelledby="agendarisDetailDispositionHeading">
                 <div class="modal-section-heading agendaris-detail-section-heading"><span>03</span><div><strong id="agendarisDetailDispositionHeading">Tracking Disposisi</strong><small>Posisi, status, waktu, dan catatan setiap tahap</small></div></div>
-                <div class="disposition-detail-timeline" data-agendaris-disposition-timeline></div>
+                <div class="disposition-detail-timeline disposition-history-compact" data-agendaris-disposition-timeline></div>
             </section>
             <section class="agendaris-detail-section" aria-labelledby="agendarisDetailStatusHeading">
                 <div class="modal-section-heading agendaris-detail-section-heading"><span>04</span><div><strong id="agendarisDetailStatusHeading">Status Dokumen</strong><small>Status akhir penyelesaian Dokumen Masuk</small></div></div>

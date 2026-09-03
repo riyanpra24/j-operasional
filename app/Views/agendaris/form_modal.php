@@ -1,22 +1,4 @@
-<?php
-$dispositionRecipients = [
-    'M. Robith Azmi',
-    'Aneka Prasyanti W.S',
-    'Hilmiyah Fitriana',
-    'DeniTri Kuncoro',
-    'Dhia Shofiah Mardiana',
-    'Faridatul Mukhodaroh',
-    'Muhammad Khoirudin',
-    'Alfan Andrianto',
-    'Indro Hartanto',
-    'Najmah Arofah',
-    'Ridhotul Khafshoh Islami',
-    'Kiki Ramadhani Suyono',
-    'Angger Wicaksono',
-    'Tri Novita Sari',
-    'Agil Halis Kesawa',
-];
-?>
+<?php $dispositionRecipients = \Config\Disposition::RECIPIENTS; ?>
 <div class="agendaris-form-modal" id="agendarisFormModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-agendaris-form-close aria-label="Tutup form"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="agendarisFormTitle">
@@ -70,9 +52,13 @@ $dispositionRecipients = [
             </div>
             <div class="modal-body agendaris-modal-body outgoing-distribution-step" data-agendaris-step="3" hidden>
                 <div class="modal-section-heading"><span>03</span><div><strong>Tracking Disposisi</strong><small>Catat posisi, status, waktu, dan instruksi penerusan dokumen</small></div></div>
+                <section class="disposition-edit-history" data-agendaris-edit-history-section hidden aria-label="Riwayat disposisi tersimpan">
+                    <header><div><strong>Riwayat Disposisi</strong><small>Seluruh tahap yang sudah tersimpan, termasuk tindak lanjut SDM &amp; Teller</small></div><span>Baca saja</span></header>
+                    <div class="disposition-detail-timeline disposition-history-compact" data-agendaris-edit-history></div>
+                </section>
                 <div class="modal-form-grid agendaris-form-grid">
                     <div class="modal-span-2 disposition-form-timeline" aria-label="Tracking disposisi dokumen">
-                        <?php for ($step = 1; $step <= 3; $step++): ?>
+                        <?php for ($step = 1; $step <= \Config\Disposition::AGENDARIS_EDITABLE_STEPS; $step++): ?>
                             <article class="disposition-form-stage" data-disposition-form-stage="<?= $step ?>">
                                 <div class="disposition-stage-marker"><span><?= str_pad((string) $step, 2, '0', STR_PAD_LEFT) ?></span><i></i></div>
                                 <div class="disposition-stage-panel">

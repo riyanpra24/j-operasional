@@ -21,8 +21,11 @@ $routes->group('', static function (RouteCollection $routes): void {
 $routes->get('/', 'Landing::index', ['as' => 'landing']);
 $routes->get('dashboard', 'Dashboard::index', ['as' => 'dashboard']);
 
-// Halaman awal modul SDM dan Akutansi
+// Halaman awal modul SDM & Teller dan Akutansi
 $routes->get('sdm', 'Sdm::index', ['as' => 'sdm.index']);
+$routes->get('sdm/dokumen-masuk', 'Sdm::incomingDocuments', ['as' => 'sdm.dokumen_masuk']);
+$routes->get('sdm/riwayat', 'Sdm::incomingDocumentHistory', ['as' => 'sdm.riwayat']);
+$routes->post('sdm/dokumen-masuk/(:num)', 'Sdm::updateIncomingDocument/$1', ['as' => 'sdm.dokumen_masuk.update']);
 $routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);
 
 // Bagian Umum 1 - Pengelolaan PKS Barang dan Jasa
@@ -96,6 +99,7 @@ $routes->group('kelola-akun', static function (RouteCollection $routes): void {
     $routes->post('(:num)', 'KelolaAkun::update/$1', ['as' => 'kelola_akun.update']);
     $routes->post('(:num)/hapus', 'KelolaAkun::destroy/$1', ['as' => 'kelola_akun.destroy']);
 });
+
 
 // Pusat pemulihan data (khusus administrator)
 $routes->get('data-terhapus', 'DeletedData::index', ['as' => 'deleted_data.index']);
