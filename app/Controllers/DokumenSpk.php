@@ -23,6 +23,7 @@ class DokumenSpk extends BaseController
         $keyword = trim((string) $this->request->getGet('q'));
         $completeness = trim((string) $this->request->getGet('kelengkapan'));
         $perPage = (int) $this->request->getGet('per_page');
+        $order = $this->requestedListOrder();
         $years = $this->availableYears();
         $yearParam = $this->request->getGet('tahun');
 
@@ -60,12 +61,19 @@ class DokumenSpk extends BaseController
         }
         $this->applyCompletenessFilter($query, $completeness);
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $query->orderBy('tanggal_dokumen', $direction)->orderBy('id', $direction);
+        } else {
+            $query->orderBy('tahun', 'DESC')->orderBy('nomor_urut', 'DESC');
+        }
+
         return view('dokumen_spk/index', [
             'title' => 'Dokumen SPK',
-            'records' => $this->decorate($query->orderBy('tahun', 'DESC')->orderBy('nomor_urut', 'DESC')->paginate($perPage, 'dokumen_spk')),
+            'records' => $this->decorate($query->paginate($perPage, 'dokumen_spk')),
             'pager' => $query->pager,
             'total' => $total,
-            'filters' => compact('keyword', 'completeness', 'perPage', 'year'),
+            'filters' => compact('keyword', 'completeness', 'perPage', 'year', 'order'),
             'years' => $years,
         ]);
     }

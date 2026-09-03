@@ -41,6 +41,7 @@ class DeletedData extends BaseController
         }
 
         $selectedType = trim((string) $this->request->getGet('jenis'));
+        $order = $this->requestedListOrder();
         if ($selectedType !== '' && ! isset(self::RESOURCES[$selectedType])) {
             $selectedType = '';
         }
@@ -70,7 +71,11 @@ class DeletedData extends BaseController
             }
         }
 
-        usort($records, static fn (array $left, array $right): int => strcmp($right['deleted_at'], $left['deleted_at']));
+        usort($records, static function (array $left, array $right) use ($order): int {
+            return $order === 'terlama'
+                ? strcmp($left['deleted_at'], $right['deleted_at'])
+                : strcmp($right['deleted_at'], $left['deleted_at']);
+        });
 
         return view('deleted_data/index', [
             'title' => 'Data Terhapus',
@@ -79,6 +84,7 @@ class DeletedData extends BaseController
             'counts' => $counts,
             'total' => array_sum($counts),
             'selectedType' => $selectedType,
+            'order' => $order,
         ]);
     }
 

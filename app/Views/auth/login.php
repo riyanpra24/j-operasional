@@ -1,8 +1,21 @@
 <?php
 $loginError    = $loginErrorOverride ?? session()->getFlashdata('login_error');
 $logoutSuccess = session()->getFlashdata('logout_success');
-$loginCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
-$requiredMarkersVersion = is_file(FCPATH . 'assets/required-markers.js') ? (string) filemtime(FCPATH . 'assets/required-markers.js') : '1';
+$resolveOptimizedAsset = static function (string $source, string $optimized): string {
+    $sourcePath = FCPATH . $source;
+    $optimizedPath = FCPATH . $optimized;
+
+    return is_file($optimizedPath)
+        && (! is_file($sourcePath) || filemtime($optimizedPath) >= filemtime($sourcePath))
+            ? $optimized
+            : $source;
+};
+$loginCssAsset = $resolveOptimizedAsset('assets/app.css', 'assets/app.min.css');
+$requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
+$urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
+$loginCssVersion = is_file(FCPATH . $loginCssAsset) ? (string) filemtime(FCPATH . $loginCssAsset) : '1';
+$requiredMarkersVersion = is_file(FCPATH . $requiredMarkersAsset) ? (string) filemtime(FCPATH . $requiredMarkersAsset) : '1';
+$urlMaskVersion = is_file(FCPATH . $urlMaskAsset) ? (string) filemtime(FCPATH . $urlMaskAsset) : '1';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -12,10 +25,10 @@ $requiredMarkersVersion = is_file(FCPATH . 'assets/required-markers.js') ? (stri
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Login Sistem Register Operasional">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
-    <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>?v=<?= esc($loginCssVersion, 'attr') ?>">
-    <script src="<?= base_url('assets/url-mask.js') ?>"></script>
-    <script src="<?= base_url('assets/required-markers.js') ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
+    <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg') ?>">
+    <link rel="stylesheet" href="<?= base_url($loginCssAsset) ?>?v=<?= esc($loginCssVersion, 'attr') ?>">
+    <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>
+    <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
 </head>
 
 <body class="login-page">

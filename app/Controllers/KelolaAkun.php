@@ -27,6 +27,7 @@ class KelolaAkun extends BaseController
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
         }
+        $order = $this->requestedListOrder();
 
         if ($keyword !== '') {
             $this->model->groupStart()
@@ -47,11 +48,18 @@ class KelolaAkun extends BaseController
             $counts[$roleName] = $this->model->where('role', $roleName)->countAllResults();
         }
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $this->model->orderBy('created_at', $direction)->orderBy('id', $direction);
+        } else {
+            $this->model->orderBy('created_at', 'ASC')->orderBy('id', 'ASC');
+        }
+
         return view('kelola_akun/index', [
             'title'   => 'Add Account',
-            'users'   => $this->model->orderBy('created_at', 'ASC')->orderBy('id', 'ASC')->paginate($perPage, 'users'),
+            'users'   => $this->model->paginate($perPage, 'users'),
             'pager'   => $this->model->pager,
-            'filters' => compact('keyword', 'role', 'perPage'),
+            'filters' => compact('keyword', 'role', 'perPage', 'order'),
             'counts'  => $counts,
         ]);
     }
@@ -79,6 +87,7 @@ class KelolaAkun extends BaseController
     {
         $keyword = trim((string) $this->request->getGet('q'));
         $role    = trim((string) $this->request->getGet('role'));
+        $order   = $this->requestedListOrder();
         $manager = new AccountSessionManager();
         $manager->pruneExpired();
 
@@ -112,7 +121,7 @@ class KelolaAkun extends BaseController
         }
 
         $activeSessions = $builder
-            ->orderBy('user_sessions.last_seen_at', 'DESC')
+            ->orderBy('user_sessions.last_seen_at', $order === 'terlama' ? 'ASC' : 'DESC')
             ->get()
             ->getResultArray();
 
@@ -129,7 +138,7 @@ class KelolaAkun extends BaseController
         return view('kelola_akun/sessions', [
             'title'          => 'Session Account',
             'sessions'       => $activeSessions,
-            'filters'        => compact('keyword', 'role'),
+            'filters'        => compact('keyword', 'role', 'order'),
             'totalUsers'     => $totalUsers,
             'activeCount'    => $activeCount,
             'availableCount' => max(0, $totalUsers - $activeCount),

@@ -86,6 +86,7 @@ class Sdm extends BaseController
         $keyword = trim((string) $this->request->getGet('q'));
         $status = trim((string) $this->request->getGet('status'));
         $perPage = (int) $this->request->getGet('per_page');
+        $order = $this->requestedListOrder();
 
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
@@ -180,12 +181,13 @@ class Sdm extends BaseController
         }
 
         $pagerGroup = $historyMode ? 'sdm_incoming_history' : 'sdm_incoming_documents';
+        $direction = $order === 'terlama' ? 'ASC' : 'DESC';
 
         return view('sdm/dokumen_masuk', [
             'title' => ($historyMode ? 'Riwayat Dokumen Masuk' : 'Dokumen Masuk') . ' | SDM & Teller',
             'documents' => $model
-                ->orderBy('waktu_disposisi_terakhir', 'DESC')
-                ->orderBy('agendaris.id', 'DESC')
+                ->orderBy('waktu_disposisi_terakhir', $direction)
+                ->orderBy('agendaris.id', $direction)
                 ->paginate($perPage, $pagerGroup),
             'pager' => $model->pager,
             'recipientName' => $recipientName,
@@ -193,7 +195,7 @@ class Sdm extends BaseController
             'isAdminView' => $currentRole === 'admin',
             'statusOptions' => $allowedStatuses,
             'recipientOptions' => Disposition::RECIPIENTS,
-            'filters' => compact('keyword', 'status', 'perPage'),
+            'filters' => compact('keyword', 'status', 'perPage', 'order'),
             'historyMode' => $historyMode,
             'pagerGroup' => $pagerGroup,
             'listUrl' => site_url($historyMode ? 'sdm/riwayat' : 'sdm/dokumen-masuk'),

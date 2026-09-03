@@ -16,7 +16,7 @@
 </section>
 
 <section class="panel filter-panel">
-    <form method="get" action="<?= esc($listUrl, 'attr') ?>" class="agendaris-filter-form">
+    <form method="get" action="<?= esc($listUrl, 'attr') ?>" class="agendaris-filter-form sdm-list-filter-form">
         <div class="form-group search-group">
             <label for="sdm_document_q">Cari dokumen</label>
             <div class="input-with-icon"><span>⌕</span><input id="sdm_document_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor surat, perihal, pengirim, atau jenis..."></div>
@@ -30,6 +30,7 @@
                 <?php endforeach ?>
             </select>
         </div>
+        <?= view('components/list_order_filter', ['id' => 'sdm_document_order', 'value' => $filters['order']]) ?>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
         <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= esc($listUrl, 'attr') ?>" class="btn btn-ghost">Reset</a></div>
     </form>
@@ -109,6 +110,7 @@
         <form method="get" action="<?= esc($listUrl, 'attr') ?>" class="table-length-form">
             <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>">
             <input type="hidden" name="status" value="<?= esc($filters['status']) ?>">
+            <input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">
             <label for="sdm_document_per_page">Tampilkan</label>
             <select id="sdm_document_per_page" name="per_page" aria-label="Jumlah baris per halaman" data-table-length><?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select>
             <span>data</span>

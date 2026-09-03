@@ -31,6 +31,7 @@ $summaryCards = [
             'q' => $filters['keyword'],
             'status' => $statusKey,
             'per_page' => $filters['perPage'],
+            'urutan' => $filters['order'],
         ], static fn ($value): bool => $value !== '');
         $cardUrl = site_url('bagian-umum-1/pks-barang-jasa') . ($cardQuery === [] ? '' : '?' . http_build_query($cardQuery));
         $isActiveCard = $filters['status'] === $statusKey;
@@ -49,6 +50,7 @@ $summaryCards = [
             <label for="pksSearch">Cari PKS</label>
             <div class="input-with-icon"><span>⌕</span><input id="pksSearch" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor PKS, nama kerja sama, mitra, atau unit"></div>
         </div>
+        <?= view('components/list_order_filter', ['id' => 'pksOrder', 'value' => $filters['order']]) ?>
         <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="btn btn-ghost">Reset</a></div>
     </form>
 </section>
@@ -89,6 +91,7 @@ $summaryCards = [
         <form method="get" action="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="table-length-form">
             <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>">
             <?php if ($filters['status'] !== ''): ?><input type="hidden" name="status" value="<?= esc($filters['status']) ?>"><?php endif ?>
+            <input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">
             <label for="pksPerPage">Tampilkan</label><select id="pksPerPage" name="per_page" onchange="this.form.submit()">
                 <?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?>
             </select><span>data</span>

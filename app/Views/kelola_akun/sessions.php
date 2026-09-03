@@ -32,6 +32,7 @@
                 <?php endforeach ?>
             </select>
         </div>
+        <?= view('components/list_order_filter', ['id' => 'sessionOrder', 'value' => $filters['order']]) ?>
         <div class="filter-actions"><button class="btn btn-outline" type="submit">Terapkan</button><a class="btn btn-ghost" href="<?= site_url('kelola-akun/session-account') ?>">Reset filter</a></div>
     </form>
 </section>

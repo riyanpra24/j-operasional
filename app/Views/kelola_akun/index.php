@@ -38,6 +38,7 @@ $editId = session()->getFlashdata('account_edit_id');
                 <?php endforeach ?>
             </select>
         </div>
+        <?= view('components/list_order_filter', ['id' => 'accountOrder', 'value' => $filters['order']]) ?>
         <div class="filter-actions"><button class="btn btn-outline" type="submit">Terapkan</button><a class="btn btn-ghost" href="<?= site_url('kelola-akun') ?>">Reset</a></div>
     </form>
 </section>
@@ -79,7 +80,7 @@ $editId = session()->getFlashdata('account_edit_id');
     </div>
     <div class="table-list-footer">
         <form method="get" action="<?= site_url('kelola-akun') ?>" class="table-length-form">
-            <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="role" value="<?= esc($filters['role']) ?>">
+            <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="role" value="<?= esc($filters['role']) ?>"><input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">
             <label for="accountPerPage">Tampilkan</label><select id="accountPerPage" name="per_page" onchange="this.form.submit()">
                 <?php foreach ([10,20,50,100] as $option): ?><option value="<?= $option ?>" <?= $filters['perPage'] === $option ? 'selected' : '' ?>><?= $option ?></option><?php endforeach ?>
             </select><span>data</span>

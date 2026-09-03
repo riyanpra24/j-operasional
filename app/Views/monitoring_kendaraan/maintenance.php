@@ -17,6 +17,7 @@
         <div class="form-group"><label for="maintenanceSearch">Cari servis</label>
             <div class="input-with-icon"><span>⌕</span><input id="maintenanceSearch" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor polisi, kendaraan, jenis perawatan, atau bengkel"></div>
         </div>
+        <?= view('components/list_order_filter', ['id' => 'maintenanceOrder', 'value' => $filters['order']]) ?>
         <div class="filter-actions"><button class="btn btn-secondary" type="submit">Terapkan</button><a class="btn btn-ghost" href="<?= site_url('bagian-umum-2/monitoring-kendaraan/servis-perawatan') ?>">Reset</a></div>
     </form>
 </section>
@@ -86,7 +87,7 @@
         </table>
     </div>
     <div class="table-list-footer">
-        <form method="get" class="table-length-form"><input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><label for="maintenancePerPage">Tampilkan</label><select id="maintenancePerPage" name="per_page" onchange="this.form.submit()"><?php foreach ([10, 20, 50, 100] as $option): ?><option value="<?= $option ?>" <?= $filters['perPage'] === $option ? 'selected' : '' ?>><?= $option ?></option><?php endforeach ?></select><span>data</span></form>
+        <form method="get" class="table-length-form"><input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>"><label for="maintenancePerPage">Tampilkan</label><select id="maintenancePerPage" name="per_page" onchange="this.form.submit()"><?php foreach ([10, 20, 50, 100] as $option): ?><option value="<?= $option ?>" <?= $filters['perPage'] === $option ? 'selected' : '' ?>><?= $option ?></option><?php endforeach ?></select><span>data</span></form>
         <div class="pagination-wrap"><?= $pager->links('maintenance') ?></div>
     </div>
 </section>

@@ -93,4 +93,14 @@ abstract class BaseController extends Controller
     {
         return (string) session()->get('auth_role') === 'admin';
     }
+
+    /**
+     * Nilai filter urutan yang dipakai bersama oleh seluruh halaman daftar.
+     */
+    protected function requestedListOrder(): string
+    {
+        $order = trim((string) $this->request->getGet('urutan'));
+
+        return in_array($order, ['terbaru', 'terlama'], true) ? $order : '';
+    }
 }

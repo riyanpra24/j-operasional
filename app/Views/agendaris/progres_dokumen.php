@@ -9,9 +9,10 @@
 <?= view('agendaris/progres_tabs', ['activeTab' => 'keluar']) ?>
 
 <section class="panel filter-panel">
-    <form method="get" action="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="agendaris-filter-form">
+    <form method="get" action="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="agendaris-filter-form progress-outgoing-filter-form">
         <div class="form-group search-group"><label for="progress_q">Cari dokumen</label><div class="input-with-icon"><span>⌕</span><input id="progress_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor surat, jenis, pelaksana, Security..."></div></div>
         <div class="form-group"><label for="progress_filter">Progres Security</label><select id="progress_filter" name="progres"><option value="">Semua progres Security</option><option value="Menunggu Ekspedisi" <?= $filters['progres'] === 'Menunggu Ekspedisi' ? 'selected' : '' ?>>Menunggu Ekspedisi</option><option value="Diambil Ekspedisi" <?= $filters['progres'] === 'Diambil Ekspedisi' ? 'selected' : '' ?>>Diambil Ekspedisi</option></select></div>
+        <?= view('components/list_order_filter', ['id' => 'progress_urutan', 'value' => $filters['order']]) ?>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
         <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="btn btn-ghost">Reset</a></div>
     </form>
@@ -28,7 +29,7 @@
             </tr><?php endforeach ?>
         <?php endif ?>
     </tbody></table></div>
-    <div class="table-list-footer"><form method="get" action="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="table-length-form"><input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="progres" value="<?= esc($filters['progres']) ?>"><label for="progress_per_page">Tampilkan</label><select id="progress_per_page" name="per_page" data-table-length><?php foreach ([10,20,50,100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select><span>data</span></form><?php if ($dokumen !== []): ?><div class="pagination-wrap"><?= $pager->links('progres_dokumen', 'default_full') ?></div><?php endif ?></div>
+    <div class="table-list-footer"><form method="get" action="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="table-length-form"><input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="progres" value="<?= esc($filters['progres']) ?>"><input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>"><label for="progress_per_page">Tampilkan</label><select id="progress_per_page" name="per_page" data-table-length><?php foreach ([10,20,50,100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select><span>data</span></form><?php if ($dokumen !== []): ?><div class="pagination-wrap"><?= $pager->links('progres_dokumen', 'default_full') ?></div><?php endif ?></div>
 </section>
 
 <?= view('agendaris/progres_form_modal') ?>

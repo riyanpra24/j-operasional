@@ -24,6 +24,7 @@
         <div class="form-group"><label for="incoming_progress_jenis">Jenis</label><select id="incoming_progress_jenis" name="jenis"><option value="">Semua jenis</option><?php foreach ($jenisOptions as $option): ?><option value="<?= esc($option) ?>" <?= $filters['jenis'] === $option ? 'selected' : '' ?>><?= esc($option) ?></option><?php endforeach ?></select></div>
         <div class="form-group"><label for="incoming_progress_dari">Dari tanggal diterima</label><input id="incoming_progress_dari" type="date" name="dari" value="<?= esc($filters['from']) ?>"></div>
         <div class="form-group"><label for="incoming_progress_sampai">Sampai tanggal diterima</label><input id="incoming_progress_sampai" type="date" name="sampai" value="<?= esc($filters['to']) ?>"></div>
+        <?= view('components/list_order_filter', ['id' => 'incoming_progress_urutan', 'value' => $filters['order']]) ?>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
         <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen') ?>" class="btn btn-ghost">Reset</a></div>
     </form>
@@ -67,6 +68,7 @@
             <input type="hidden" name="jenis" value="<?= esc($filters['jenis']) ?>">
             <input type="hidden" name="dari" value="<?= esc($filters['from']) ?>">
             <input type="hidden" name="sampai" value="<?= esc($filters['to']) ?>">
+            <input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">
             <label for="incoming_progress_per_page">Tampilkan</label>
             <select id="incoming_progress_per_page" name="per_page" aria-label="Jumlah baris per halaman" data-table-length><?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select>
             <span>data</span>

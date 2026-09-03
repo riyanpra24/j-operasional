@@ -36,6 +36,7 @@ class MonitoringKendaraan extends BaseController
         $keyword = trim((string) $this->request->getGet('q'));
         $status = trim((string) $this->request->getGet('status'));
         $perPage = $this->perPage();
+        $order = $this->requestedListOrder();
         $isAdmin = $this->isAdmin();
         $model = new VehicleModel();
 
@@ -52,12 +53,19 @@ class MonitoringKendaraan extends BaseController
             $status = '';
         }
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $model->orderBy('created_at', $direction)->orderBy('id', $direction);
+        } else {
+            $model->orderBy('nomor_polisi', 'ASC');
+        }
+
         return view('monitoring_kendaraan/vehicles', [
             'title' => 'Data Kendaraan',
             'activePage' => 'vehicles',
-            'records' => $model->orderBy('nomor_polisi', 'ASC')->paginate($perPage, 'vehicles'),
+            'records' => $model->paginate($perPage, 'vehicles'),
             'pager' => $model->pager,
-            'filters' => compact('keyword', 'status', 'perPage'),
+            'filters' => compact('keyword', 'status', 'perPage', 'order'),
             'vehicleNames' => self::VEHICLE_NAMES,
             'vehicleTypes' => self::VEHICLE_TYPES,
             'vehicleOwnershipStatuses' => self::VEHICLE_OWNERSHIP_STATUSES,
@@ -126,6 +134,7 @@ class MonitoringKendaraan extends BaseController
     {
         $keyword = trim((string) $this->request->getGet('q'));
         $perPage = $this->perPage();
+        $order = $this->requestedListOrder();
         $isAdmin = $this->isAdmin();
         $model = new VehicleMaintenanceModel();
         $model->select('vehicle_maintenance.*, vehicles.nomor_polisi, vehicles.nama_kendaraan, vehicles.nama_kendaraan_lainnya, vehicles.deleted_at AS vehicle_deleted_at')
@@ -137,12 +146,14 @@ class MonitoringKendaraan extends BaseController
                 ->orLike('vehicle_maintenance.jenis_perawatan', $keyword)->orLike('vehicle_maintenance.bengkel', $keyword)->groupEnd();
         }
 
+        $direction = $order === 'terlama' ? 'ASC' : 'DESC';
+
         return view('monitoring_kendaraan/maintenance', [
             'title' => 'Servis dan Perawatan',
             'activePage' => 'maintenance',
-            'records' => $model->orderBy('tanggal_servis', 'DESC')->orderBy('vehicle_maintenance.id', 'DESC')->paginate($perPage, 'maintenance'),
+            'records' => $model->orderBy('tanggal_servis', $direction)->orderBy('vehicle_maintenance.id', $direction)->paginate($perPage, 'maintenance'),
             'pager' => $model->pager,
-            'filters' => compact('keyword', 'perPage'),
+            'filters' => compact('keyword', 'perPage', 'order'),
             'vehicles' => $this->vehicleOptions(),
             'serviceBudgets' => self::SERVICE_BUDGETS,
             'isAdmin' => $isAdmin,
@@ -214,6 +225,7 @@ class MonitoringKendaraan extends BaseController
         $keyword = trim((string) $this->request->getGet('q'));
         $type = trim((string) $this->request->getGet('jenis'));
         $perPage = $this->perPage();
+        $order = $this->requestedListOrder();
         $isAdmin = $this->isAdmin();
         $model = new VehicleDocumentModel();
         $model->select('vehicle_documents.*, vehicles.nomor_polisi, vehicles.nama_kendaraan, vehicles.nama_kendaraan_lainnya, vehicles.deleted_at AS vehicle_deleted_at')
@@ -230,12 +242,19 @@ class MonitoringKendaraan extends BaseController
             $type = '';
         }
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $model->orderBy('tanggal_terbit', $direction)->orderBy('vehicle_documents.id', $direction);
+        } else {
+            $model->orderBy('masa_berlaku', 'ASC')->orderBy('vehicle_documents.id', 'DESC');
+        }
+
         return view('monitoring_kendaraan/documents', [
             'title' => 'Dokumen Kendaraan',
             'activePage' => 'documents',
-            'records' => $this->decorateDocuments($model->orderBy('masa_berlaku', 'ASC')->orderBy('vehicle_documents.id', 'DESC')->paginate($perPage, 'documents')),
+            'records' => $this->decorateDocuments($model->paginate($perPage, 'documents')),
             'pager' => $model->pager,
-            'filters' => compact('keyword', 'type', 'perPage'),
+            'filters' => compact('keyword', 'type', 'perPage', 'order'),
             'vehicles' => $this->vehicleOptions(),
             'documentTypes' => self::DOCUMENT_TYPES,
             'isAdmin' => $isAdmin,
@@ -305,6 +324,7 @@ class MonitoringKendaraan extends BaseController
         $keyword = trim((string) $this->request->getGet('q'));
         $type = trim((string) $this->request->getGet('jenis'));
         $perPage = $this->perPage();
+        $order = $this->requestedListOrder();
         $types = ['Kendaraan', 'Servis', 'Dokumen'];
         $model = new VehicleActivityLogModel();
         if ($keyword !== '') {
@@ -316,12 +336,14 @@ class MonitoringKendaraan extends BaseController
             $type = '';
         }
 
+        $direction = $order === 'terlama' ? 'ASC' : 'DESC';
+
         return view('monitoring_kendaraan/reports', [
             'title' => 'Riwayat & Laporan',
             'activePage' => 'reports',
-            'records' => $model->orderBy('created_at', 'DESC')->orderBy('id', 'DESC')->paginate($perPage, 'reports'),
+            'records' => $model->orderBy('created_at', $direction)->orderBy('id', $direction)->paginate($perPage, 'reports'),
             'pager' => $model->pager,
-            'filters' => compact('keyword', 'type', 'perPage'),
+            'filters' => compact('keyword', 'type', 'perPage', 'order'),
             'types' => $types,
         ]);
     }

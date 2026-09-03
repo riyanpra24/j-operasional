@@ -48,6 +48,7 @@ foreach ($records as $record) {
             <label for="spkCompleteness">Kelengkapan</label>
             <select id="spkCompleteness" name="kelengkapan"><option value="">Semua kondisi</option><option value="lengkap" <?= $filters['completeness'] === 'lengkap' ? 'selected' : '' ?>>Lengkap</option><option value="belum_lengkap" <?= $filters['completeness'] === 'belum_lengkap' ? 'selected' : '' ?>>Belum Lengkap</option></select>
         </div>
+        <?= view('components/list_order_filter', ['id' => 'spkUrutan', 'value' => $filters['order']]) ?>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
         <div class="filter-actions"><button class="btn btn-secondary" type="submit">Terapkan</button><a class="btn btn-ghost" href="<?= $baseUrl ?>">Reset</a></div>
     </form>
@@ -85,6 +86,7 @@ foreach ($records as $record) {
             <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>">
             <input type="hidden" name="tahun" value="<?= esc($yearQuery) ?>">
             <input type="hidden" name="kelengkapan" value="<?= esc($filters['completeness']) ?>">
+            <input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">
             <label for="spkPerPage">Tampilkan</label><select id="spkPerPage" name="per_page" onchange="this.form.submit()"><?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select><span>data</span>
         </form>
         <?php if ($records !== []): ?><div class="pagination-wrap"><?= $pager->links('dokumen_spk') ?></div><?php endif ?>

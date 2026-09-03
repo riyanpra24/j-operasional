@@ -37,9 +37,23 @@ $successToast = $syncSuccess ?: $success;
 $successToastTitle = $syncSuccess ? 'Sinkronisasi berhasil' : 'Berhasil';
 $error   = session()->getFlashdata('error');
 $errors  = session()->getFlashdata('errors') ?? [];
-$appCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
-$appJsVersion  = is_file(FCPATH . 'assets/app.js') ? (string) filemtime(FCPATH . 'assets/app.js') : '1';
-$requiredMarkersVersion = is_file(FCPATH . 'assets/required-markers.js') ? (string) filemtime(FCPATH . 'assets/required-markers.js') : '1';
+$resolveOptimizedAsset = static function (string $source, string $optimized): string {
+    $sourcePath = FCPATH . $source;
+    $optimizedPath = FCPATH . $optimized;
+
+    return is_file($optimizedPath)
+        && (! is_file($sourcePath) || filemtime($optimizedPath) >= filemtime($sourcePath))
+            ? $optimized
+            : $source;
+};
+$appCssAsset = $resolveOptimizedAsset('assets/app.css', 'assets/app.min.css');
+$appJsAsset = $resolveOptimizedAsset('assets/app.js', 'assets/app.min.js');
+$requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
+$urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
+$appCssVersion = is_file(FCPATH . $appCssAsset) ? (string) filemtime(FCPATH . $appCssAsset) : '1';
+$appJsVersion = is_file(FCPATH . $appJsAsset) ? (string) filemtime(FCPATH . $appJsAsset) : '1';
+$requiredMarkersVersion = is_file(FCPATH . $requiredMarkersAsset) ? (string) filemtime(FCPATH . $requiredMarkersAsset) : '1';
+$urlMaskVersion = is_file(FCPATH . $urlMaskAsset) ? (string) filemtime(FCPATH . $urlMaskAsset) : '1';
 $authExpiresAt = (int) session()->get('auth_expires_at');
 $roleNotifications = [
     'total' => 0,
@@ -53,9 +67,16 @@ $notificationAllUrl = '#';
 $deletedDataCount = 0;
 if ($currentRole === 'admin') {
     try {
-        foreach (['dokumen_masuk', 'agendaris', 'dokumen_keluar', 'dokumen_spk', 'pks_kerjasama', 'pks_dokumen_kerjasama', 'pks_item_kerjasama', 'users', 'vehicles', 'vehicle_maintenance', 'vehicle_documents'] as $deletedTable) {
-            $deletedDataCount += db_connect()->table($deletedTable)->where('deleted_at IS NOT NULL', null, false)->countAllResults();
-        }
+        $db = db_connect();
+        $deletedTables = ['dokumen_masuk', 'agendaris', 'dokumen_keluar', 'dokumen_spk', 'pks_kerjasama', 'pks_dokumen_kerjasama', 'pks_item_kerjasama', 'users', 'vehicles', 'vehicle_maintenance', 'vehicle_documents'];
+        $deletedCountQueries = array_map(
+            static fn (string $table): string => 'SELECT COUNT(*) AS total FROM ' . $db->protectIdentifiers($table) . ' WHERE deleted_at IS NOT NULL',
+            $deletedTables
+        );
+        $deletedCountRow = $db->query(
+            'SELECT COALESCE(SUM(total), 0) AS total FROM (' . implode(' UNION ALL ', $deletedCountQueries) . ') AS deleted_counts'
+        )->getRowArray();
+        $deletedDataCount = (int) ($deletedCountRow['total'] ?? 0);
     } catch (\Throwable) {
         $deletedDataCount = 0;
     }
@@ -75,10 +96,10 @@ if ($currentRole === 'security') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sistem register dokumen masuk operasional">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
-    <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>?v=<?= esc($appCssVersion, 'attr') ?>">
-    <script src="<?= base_url('assets/url-mask.js') ?>"></script>
-    <script src="<?= base_url('assets/required-markers.js') ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
+    <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg') ?>">
+    <link rel="stylesheet" href="<?= base_url($appCssAsset) ?>?v=<?= esc($appCssVersion, 'attr') ?>">
+    <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>
+    <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
     <script>
         try {
             if (window.innerWidth > 900 && localStorage.getItem('j-operasional-sidebar') === 'collapsed') {
@@ -105,7 +126,7 @@ if ($currentRole === 'security') {
     <div class="app-shell">
         <aside class="sidebar" id="sidebar">
             <a href="<?= site_url('dashboard') ?>" class="brand brand-jaksa" aria-label="Dashboard JAKSA — Jamkrindo Kanwil Surabaya Operasional">
-                <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-wordmark.png') ?>" alt="JAKSA">
+                <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-wordmark-sidebar.webp') ?>" width="224" height="49" alt="JAKSA" decoding="async">
                 <span class="brand-jaksa-expansion" aria-label="Jamkrindo Kanwil Surabaya Operasional">
                     <b>JA</b>mkrindo <i>·</i> <b>K</b>anwil <i>·</i> <b>S</b>urabaya <i>·</i> oper<b>A</b>sional
                 </span>
@@ -120,7 +141,7 @@ if ($currentRole === 'security') {
                 <?php if ($canAccessSecurity): ?>
                 <div class="nav-group <?= $securityActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $securityActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $securityActive ? 'true' : 'false' ?>" aria-controls="securitySubmenu" title="Security">
-                        <span class="nav-icon image-nav-icon security-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/security-policeman.png') ?>" alt=""></span>
+                        <span class="nav-icon image-nav-icon security-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Security</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
@@ -143,7 +164,7 @@ if ($currentRole === 'security') {
                 <?php if ($canAccessAgendaris): ?>
                 <div class="nav-group <?= $agendarisActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $agendarisActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $agendarisActive ? 'true' : 'false' ?>" aria-controls="agendarisSubmenu" title="Agendaris">
-                        <span class="nav-icon image-nav-icon agendaris-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/agendaris-agenda.png') ?>" alt=""></span>
+                        <span class="nav-icon image-nav-icon agendaris-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Agendaris</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
@@ -204,7 +225,7 @@ if ($currentRole === 'security') {
                 <?php if ($canAccessSdm): ?>
                 <div class="nav-group <?= $sdmActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $sdmActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $sdmActive ? 'true' : 'false' ?>" aria-controls="sdmSubmenu" title="SDM &amp; Teller">
-                        <span class="nav-icon image-nav-icon sdm-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/people.png') ?>" alt=""></span>
+                        <span class="nav-icon image-nav-icon sdm-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">SDM &amp; Teller</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
@@ -222,7 +243,7 @@ if ($currentRole === 'security') {
                 <?php endif ?>
                 <?php if ($canAccessAkutansi): ?>
                 <a href="<?= site_url('akutansi') ?>" class="nav-link <?= $akutansiActive ? 'active' : '' ?>" title="Akutansi">
-                    <span class="nav-icon image-nav-icon accounting-nav-icon" aria-hidden="true"><img src="<?= base_url('assets/images/indonesian-rupiah.png') ?>" alt=""></span>
+                    <span class="nav-icon image-nav-icon accounting-nav-icon" aria-hidden="true"></span>
                     <span class="nav-link-text">Akutansi</span>
                 </a>
                 <?php endif ?>
@@ -392,6 +413,6 @@ if ($currentRole === 'security') {
         <?= view('components/detail_modal', ['readOnly' => $incomingArchive]) ?>
         <?php if (! $incomingArchive): ?><?= view('components/edit_modal') ?><?= view('components/delete_modal') ?><?php endif ?>
     <?php endif ?>
-    <script src="<?= base_url('assets/app.js') ?>?v=<?= esc($appJsVersion, 'attr') ?>"></script>
+    <script src="<?= base_url($appJsAsset) ?>?v=<?= esc($appJsVersion, 'attr') ?>"></script>
 </body>
 </html>

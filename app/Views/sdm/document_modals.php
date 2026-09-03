@@ -198,6 +198,7 @@
         history.replaceChildren();
         for (let step = 1; step <= maxDispositionSteps; step += 1) {
             const item = dispositions.find((entry) => Number(entry.step) === step);
+            if (step === 5 && !item) continue;
             const article = document.createElement('article');
             article.className = `disposition-detail-item${item ? ' filled' : ''}`;
             const dot = document.createElement('span');

@@ -28,6 +28,7 @@ class DokumenKeluar extends BaseController
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
         }
+        $order = $this->requestedListOrder();
 
         if ($securityView) {
             $this->model->where('progres', 'Diambil Ekspedisi');
@@ -67,15 +68,22 @@ class DokumenKeluar extends BaseController
         }
         $jenisOptions = $jenisBuilder->groupBy('jenis_surat')->orderBy('jenis_surat', 'ASC')->get()->getResultArray();
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $this->model->orderBy('tanggal_pengiriman', $direction)->orderBy('id', $direction);
+        } else {
+            $this->model->orderBy('id', 'ASC');
+        }
+
         return view('dokumen_keluar/index', [
             'title'        => 'Dokumen Keluar',
             'securityView' => $securityView,
             'indexUrl'     => $indexUrl,
             'detailUrlPrefix' => $securityView ? 'dokumen-keluar' : 'agendaris/surat-keluar',
             'readOnly'     => true,
-            'dokumen'      => $this->model->orderBy('id', 'ASC')->paginate($perPage, 'dokumen_keluar'),
+            'dokumen'      => $this->model->paginate($perPage, 'dokumen_keluar'),
             'pager'        => $this->model->pager,
-            'filters'      => compact('keyword', 'jenis', 'from', 'to', 'perPage'),
+            'filters'      => compact('keyword', 'jenis', 'from', 'to', 'perPage', 'order'),
             'jenisOptions' => array_column($jenisOptions, 'jenis_surat'),
         ]);
     }

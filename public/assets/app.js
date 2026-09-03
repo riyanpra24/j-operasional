@@ -1614,7 +1614,9 @@
 
     const renderDispositionTimeline = (timeline = []) => {
         if (!agendaDispositionTimeline) return;
-        agendaDispositionTimeline.innerHTML = timeline.map((item) => `
+        agendaDispositionTimeline.innerHTML = timeline
+            .filter((item) => Number(item.urutan) !== 5 || item.terisi)
+            .map((item) => `
             <article class="disposition-detail-item${item.terisi ? ' filled' : ''}">
                 <span class="disposition-detail-dot">${String(item.urutan).padStart(2, '0')}</span>
                 <div class="disposition-detail-card">
@@ -2238,5 +2240,24 @@
         if (progressDeleteModal?.classList.contains('open')) closeProgressDelete();
         if (reopenProgressModal?.classList.contains('open')) closeReopenProgress();
         if (incomingProgressModal?.classList.contains('open')) closeIncomingProgress();
+    });
+})();
+
+// Tutup panel urutan saat pengguna berinteraksi di luar panel.
+(() => {
+    const orderMenus = [...document.querySelectorAll('.list-order-menu')];
+    if (orderMenus.length === 0) return;
+
+    document.addEventListener('pointerdown', (event) => {
+        orderMenus.forEach((menu) => {
+            if (menu.open && !menu.contains(event.target)) {
+                menu.removeAttribute('open');
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        orderMenus.forEach((menu) => menu.removeAttribute('open'));
     });
 })();

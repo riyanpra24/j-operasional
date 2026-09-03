@@ -31,6 +31,7 @@ class PksBarangJasa extends BaseController
         $keyword = trim((string) $this->request->getGet('q'));
         $status = trim((string) $this->request->getGet('status'));
         $perPage = (int) $this->request->getGet('per_page');
+        $order = $this->requestedListOrder();
 
         if (! in_array($status, ['aktif', 'segera', 'berakhir', 'belum'], true)) {
             $status = '';
@@ -57,11 +58,18 @@ class PksBarangJasa extends BaseController
         }
         $this->applyStatusFilter($query, $status);
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $query->orderBy('tanggal_dokumen', $direction)->orderBy('pks_kerjasama.id', $direction);
+        } else {
+            $query->orderBy('pks_kerjasama.updated_at', 'DESC');
+        }
+
         return view('pks/index', [
             'title' => 'PKS Barang dan Jasa',
-            'records' => $this->decorateRows($query->orderBy('pks_kerjasama.updated_at', 'DESC')->paginate($perPage, 'pks')),
+            'records' => $this->decorateRows($query->paginate($perPage, 'pks')),
             'pager' => $this->kerjasama->pager,
-            'filters' => compact('keyword', 'status', 'perPage'),
+            'filters' => compact('keyword', 'status', 'perPage', 'order'),
             'summary' => $summary,
             'calculationDate' => $this->today()->format('d-m-Y'),
             'expiryWarningDays' => self::EXPIRY_WARNING_DAYS,

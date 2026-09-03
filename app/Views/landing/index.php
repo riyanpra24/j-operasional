@@ -1,6 +1,19 @@
 <?php
-$landingCssVersion = is_file(FCPATH . 'assets/app.css') ? (string) filemtime(FCPATH . 'assets/app.css') : '1';
-$requiredMarkersVersion = is_file(FCPATH . 'assets/required-markers.js') ? (string) filemtime(FCPATH . 'assets/required-markers.js') : '1';
+$resolveOptimizedAsset = static function (string $source, string $optimized): string {
+    $sourcePath = FCPATH . $source;
+    $optimizedPath = FCPATH . $optimized;
+
+    return is_file($optimizedPath)
+        && (! is_file($sourcePath) || filemtime($optimizedPath) >= filemtime($sourcePath))
+            ? $optimized
+            : $source;
+};
+$landingCssAsset = $resolveOptimizedAsset('assets/app.css', 'assets/app.min.css');
+$requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
+$urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
+$landingCssVersion = is_file(FCPATH . $landingCssAsset) ? (string) filemtime(FCPATH . $landingCssAsset) : '1';
+$requiredMarkersVersion = is_file(FCPATH . $requiredMarkersAsset) ? (string) filemtime(FCPATH . $requiredMarkersAsset) : '1';
+$urlMaskVersion = is_file(FCPATH . $urlMaskAsset) ? (string) filemtime(FCPATH . $urlMaskAsset) : '1';
 $loginError        = session()->getFlashdata('login_error');
 $logoutSuccess     = session()->getFlashdata('logout_success');
 $openAdminTakeover = (bool) session()->getFlashdata('open_admin_takeover_modal');
@@ -22,10 +35,11 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Jamkrindo Kanwil Surabaya, sistem pengelolaan dokumen operasional.">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
-    <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>?v=<?= esc($landingCssVersion, 'attr') ?>">
-    <script src="<?= base_url('assets/url-mask.js') ?>"></script>
-    <script src="<?= base_url('assets/required-markers.js') ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
+    <link rel="icon" type="image/svg+xml" href="<?= base_url('favicon.svg') ?>">
+    <link rel="preload" as="image" type="image/webp" href="<?= base_url('assets/images/jaksa-wordmark.webp') ?>" fetchpriority="high">
+    <link rel="stylesheet" href="<?= base_url($landingCssAsset) ?>?v=<?= esc($landingCssVersion, 'attr') ?>">
+    <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>
+    <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
 </head>
 
 <body class="landing-page geo-landing-page">
@@ -34,7 +48,7 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
     <header class="geo-landing-header">
         <a class="geo-landing-brand" href="<?= site_url('/') ?>" aria-label="Jamkrindo Kanwil Surabaya">
             <span class="geo-brand-logo">
-                <img src="<?= base_url('assets/jamkrindo-kanwil-surabaya.png') ?>" alt="Jamkrindo Kanwil Surabaya">
+                <img src="<?= base_url('assets/jamkrindo-kanwil-surabaya.webp') ?>" width="520" height="268" alt="Jamkrindo Kanwil Surabaya" decoding="async">
             </span>
         </a>
         <nav class="geo-landing-nav" aria-label="Navigasi utama">
@@ -49,7 +63,7 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
         <section class="geo-landing-copy">
             <p class="geo-landing-kicker">PORTAL DIGITAL OPERASIONAL KANWIL SURABAYA</p>
             <h1 class="geo-landing-wordmark">
-                <img src="<?= base_url('assets/images/jaksa-wordmark.png') ?>" alt="JAKSA">
+                <img src="<?= base_url('assets/images/jaksa-wordmark.webp') ?>" width="1240" height="271" alt="JAKSA" fetchpriority="high">
             </h1>
             <h2 class="geo-landing-acronym" aria-label="Jamkrindo Kanwil Surabaya Operasional">
                 <span><b>JA</b>mkrindo</span>

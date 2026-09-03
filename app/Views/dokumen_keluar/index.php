@@ -12,6 +12,7 @@
         <div class="form-group"><label for="keluar_jenis_filter">Jenis Dokumen</label><select id="keluar_jenis_filter" name="jenis"><option value="">Semua jenis</option><?php foreach ($jenisOptions as $option): ?><option value="<?= esc($option) ?>" <?= $filters['jenis'] === $option ? 'selected' : '' ?>><?= esc($option) ?></option><?php endforeach ?></select></div>
         <div class="form-group"><label for="keluar_dari">Dari tanggal pengiriman</label><input id="keluar_dari" type="date" name="dari" value="<?= esc($filters['from']) ?>"></div>
         <div class="form-group"><label for="keluar_sampai">Sampai tanggal pengiriman</label><input id="keluar_sampai" type="date" name="sampai" value="<?= esc($filters['to']) ?>"></div>
+        <?= view('components/list_order_filter', ['id' => 'keluar_urutan', 'value' => $filters['order']]) ?>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
         <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= $indexUrl ?>" class="btn btn-ghost">Reset</a></div>
     </form>
@@ -45,7 +46,7 @@
     </tbody></table></div>
     <div class="table-list-footer">
         <form method="get" action="<?= $indexUrl ?>" class="table-length-form">
-            <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="jenis" value="<?= esc($filters['jenis']) ?>"><input type="hidden" name="dari" value="<?= esc($filters['from']) ?>"><input type="hidden" name="sampai" value="<?= esc($filters['to']) ?>">
+            <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="jenis" value="<?= esc($filters['jenis']) ?>"><input type="hidden" name="dari" value="<?= esc($filters['from']) ?>"><input type="hidden" name="sampai" value="<?= esc($filters['to']) ?>"><input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">
             <label for="keluar_per_page">Tampilkan</label><select id="keluar_per_page" name="per_page" aria-label="Jumlah baris per halaman" data-table-length><?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select><span>data</span>
         </form>
         <?php if ($dokumen !== []): ?><div class="pagination-wrap"><?= $pager->links('dokumen_keluar', 'default_full') ?></div><?php endif ?>

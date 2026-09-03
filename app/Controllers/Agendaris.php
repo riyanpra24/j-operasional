@@ -36,6 +36,7 @@ class Agendaris extends BaseController
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
         }
+        $order = $this->requestedListOrder();
 
         $this->model->select('agendaris.*');
         $this->model->where('agendaris.progres', 'Selesai');
@@ -75,11 +76,18 @@ class Agendaris extends BaseController
             ->get()
             ->getResultArray();
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $this->model->orderBy('agendaris.tanggal_diterima', $direction)->orderBy('agendaris.id', $direction);
+        } else {
+            $this->model->orderBy('agendaris.created_at', 'ASC')->orderBy('agendaris.id', 'ASC');
+        }
+
         return view('agendaris/index', [
             'title'   => 'Dokumen Masuk',
-            'agenda'  => $this->model->orderBy('agendaris.created_at', 'ASC')->orderBy('agendaris.id', 'ASC')->paginate($perPage, 'agendaris'),
+            'agenda'  => $this->model->paginate($perPage, 'agendaris'),
             'pager'   => $this->model->pager,
-            'filters' => compact('keyword', 'jenis', 'from', 'to', 'perPage'),
+            'filters' => compact('keyword', 'jenis', 'from', 'to', 'perPage', 'order'),
             'jenisOptions' => array_column($jenisOptions, 'jenis'),
         ]);
     }

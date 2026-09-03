@@ -12,6 +12,7 @@
     <form action="<?= site_url('bagian-umum-2/monitoring-kendaraan/data-kendaraan') ?>" method="get" class="vehicle-filter-form">
         <div class="form-group"><label for="vehicleSearch">Cari kendaraan</label><div class="input-with-icon"><span>⌕</span><input id="vehicleSearch" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor polisi, kendaraan, merek, driver, atau unit pengelola"></div></div>
         <div class="form-group"><label for="vehicleStatusFilter">Status</label><select id="vehicleStatusFilter" name="status"><option value="">Semua status</option><?php foreach ($statuses as $item): ?><option value="<?= esc($item) ?>" <?= $filters['status'] === $item ? 'selected' : '' ?>><?= esc($item) ?></option><?php endforeach ?></select></div>
+        <?= view('components/list_order_filter', ['id' => 'vehicleOrder', 'value' => $filters['order']]) ?>
         <div class="filter-actions"><button class="btn btn-secondary" type="submit">Terapkan</button><a class="btn btn-ghost" href="<?= site_url('bagian-umum-2/monitoring-kendaraan/data-kendaraan') ?>">Reset</a></div>
     </form>
 </section>
@@ -58,7 +59,7 @@
         </tr>
     <?php endforeach ?><?php endif ?>
     </tbody></table></div>
-    <div class="table-list-footer"><form method="get" class="table-length-form"><input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="status" value="<?= esc($filters['status']) ?>"><label for="vehiclePerPage">Tampilkan</label><select id="vehiclePerPage" name="per_page" onchange="this.form.submit()"><?php foreach ([10,20,50,100] as $option): ?><option value="<?= $option ?>" <?= $filters['perPage'] === $option ? 'selected' : '' ?>><?= $option ?></option><?php endforeach ?></select><span>data</span></form><div class="pagination-wrap"><?= $pager->links('vehicles') ?></div></div>
+    <div class="table-list-footer"><form method="get" class="table-length-form"><input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="status" value="<?= esc($filters['status']) ?>"><input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>"><label for="vehiclePerPage">Tampilkan</label><select id="vehiclePerPage" name="per_page" onchange="this.form.submit()"><?php foreach ([10,20,50,100] as $option): ?><option value="<?= $option ?>" <?= $filters['perPage'] === $option ? 'selected' : '' ?>><?= $option ?></option><?php endforeach ?></select><span>data</span></form><div class="pagination-wrap"><?= $pager->links('vehicles') ?></div></div>
 </section>
 
 <div class="account-modal vehicle-crud-modal" id="vehicleDetailModal" hidden aria-hidden="true"><button type="button" class="modal-backdrop" data-vehicle-detail-close aria-label="Tutup detail"></button><section class="modal-dialog vehicle-crud-dialog vehicle-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="vehicleDetailTitle"><header class="modal-header"><div class="modal-title-group"><span class="modal-title-icon">⌕</span><div><p>MONITORING KENDARAAN</p><h2 id="vehicleDetailTitle">Detail Kendaraan</h2></div></div><button type="button" class="modal-close" data-vehicle-detail-close>×</button></header><div class="modal-body vehicle-detail-body">

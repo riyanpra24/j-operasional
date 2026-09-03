@@ -15,7 +15,7 @@
 </section>
 
 <section class="panel filter-panel account-filter-panel">
-    <form action="<?= site_url('data-terhapus') ?>" method="get" class="account-filter-form">
+    <form action="<?= site_url('data-terhapus') ?>" method="get" class="account-filter-form deleted-data-filter-form">
         <div class="form-group">
             <label for="deletedDataType">Jenis data</label>
             <select id="deletedDataType" name="jenis">
@@ -25,6 +25,7 @@
                 <?php endforeach ?>
             </select>
         </div>
+        <?= view('components/list_order_filter', ['id' => 'deletedDataOrder', 'value' => $order]) ?>
         <div class="filter-actions">
             <button class="btn btn-outline" type="submit">Terapkan</button>
             <a class="btn btn-ghost" href="<?= site_url('data-terhapus') ?>">Reset</a>

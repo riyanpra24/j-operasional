@@ -27,6 +27,7 @@ class DokumenMasuk extends BaseController
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
         }
+        $order = $this->requestedListOrder();
 
         $this->model->where('pengambilan IS NOT NULL', null, false)
             ->where('pengambilan !=', '');
@@ -64,11 +65,18 @@ class DokumenMasuk extends BaseController
             ->get()
             ->getResultArray();
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $this->model->orderBy('tanggal', $direction)->orderBy('id', $direction);
+        } else {
+            $this->model->orderBy('created_at', 'ASC')->orderBy('id', 'ASC');
+        }
+
         return view('dokumen_masuk/index', [
             'title'   => 'Dokumen Masuk',
-            'dokumen' => $this->model->orderBy('created_at', 'ASC')->orderBy('id', 'ASC')->paginate($perPage, 'dokumen_masuk'),
+            'dokumen' => $this->model->paginate($perPage, 'dokumen_masuk'),
             'pager'   => $this->model->pager,
-            'filters' => compact('keyword', 'jenis', 'from', 'to', 'perPage'),
+            'filters' => compact('keyword', 'jenis', 'from', 'to', 'perPage', 'order'),
             'jenisOptions' => array_column($jenisOptions, 'jenis'),
         ]);
     }

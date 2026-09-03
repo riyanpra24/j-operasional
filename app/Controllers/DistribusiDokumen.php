@@ -22,6 +22,7 @@ class DistribusiDokumen extends BaseController
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
         }
+        $order = $this->requestedListOrder();
 
         if (! in_array($tab, ['masuk', 'keluar'], true)) {
             $tab = 'masuk';
@@ -75,13 +76,22 @@ class DistribusiDokumen extends BaseController
             $outgoing->where('dokumen_keluar.tanggal_pengiriman <=', $to);
         }
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $model->orderBy('tanggal', $direction)->orderBy('id', $direction);
+            $outgoing->orderBy('dokumen_keluar.tanggal_pengiriman', $direction)->orderBy('dokumen_keluar.id', $direction);
+        } else {
+            $model->orderBy('created_at', 'ASC')->orderBy('id', 'ASC');
+            $outgoing->orderBy('distribusi_dokumen.id', 'ASC');
+        }
+
         return view('distribusi_dokumen/index', [
             'title'          => 'Distribusi Dokumen',
-            'dokumen'        => $model->orderBy('created_at', 'ASC')->orderBy('id', 'ASC')->paginate($perPage, 'distribusi_dokumen'),
+            'dokumen'        => $model->paginate($perPage, 'distribusi_dokumen'),
             'pager'          => $model->pager,
-            'dokumenKeluar'  => $outgoing->orderBy('distribusi_dokumen.id', 'ASC')->paginate($perPage, 'distribusi_keluar'),
+            'dokumenKeluar'  => $outgoing->paginate($perPage, 'distribusi_keluar'),
             'pagerKeluar'    => $outgoing->pager,
-            'filters'        => compact('keyword', 'tab', 'from', 'to', 'perPage'),
+            'filters'        => compact('keyword', 'tab', 'from', 'to', 'perPage', 'order'),
         ]);
     }
 

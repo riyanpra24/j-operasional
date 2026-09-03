@@ -32,6 +32,7 @@ class ProgresDokumen extends BaseController
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
         }
+        $order = $this->requestedListOrder();
 
         $this->agendarisModel->select('agendaris.*')
             ->where('agendaris.progres', 'Menunggu Penyelesaian');
@@ -71,14 +72,22 @@ class ProgresDokumen extends BaseController
             ->get()
             ->getResultArray();
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $this->agendarisModel
+                ->orderBy('agendaris.tanggal_diterima', $direction)
+                ->orderBy('agendaris.id', $direction);
+        } else {
+            $this->agendarisModel
+                ->orderBy('agendaris.created_at', 'ASC')
+                ->orderBy('agendaris.id', 'ASC');
+        }
+
         return view('agendaris/progres_dokumen_masuk', [
             'title'  => 'Progres Dokumen',
-            'agenda' => $this->agendarisModel
-                ->orderBy('agendaris.created_at', 'ASC')
-                ->orderBy('agendaris.id', 'ASC')
-                ->paginate($perPage, 'progres_dokumen_masuk'),
+            'agenda' => $this->agendarisModel->paginate($perPage, 'progres_dokumen_masuk'),
             'pager'        => $this->agendarisModel->pager,
-            'filters'      => compact('keyword', 'jenis', 'from', 'to', 'perPage'),
+            'filters'      => compact('keyword', 'jenis', 'from', 'to', 'perPage', 'order'),
             'jenisOptions' => array_column($jenisOptions, 'jenis'),
         ]);
     }
@@ -121,6 +130,7 @@ class ProgresDokumen extends BaseController
         if (! in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
         }
+        $order = $this->requestedListOrder();
 
         // Progres Security dan penyelesaian Agendaris merupakan dua tahap terpisah.
         // Dokumen tetap berada di halaman ini setelah diambil ekspedisi sampai
@@ -146,11 +156,18 @@ class ProgresDokumen extends BaseController
             $this->model->where('progres', $progres);
         }
 
+        if ($order !== '') {
+            $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
+            $this->model->orderBy('tanggal_pengiriman', $direction)->orderBy('id', $direction);
+        } else {
+            $this->model->orderBy('id', 'ASC');
+        }
+
         return view('agendaris/progres_dokumen', [
             'title'   => 'Progres Dokumen',
-            'dokumen' => $this->model->orderBy('id', 'ASC')->paginate($perPage, 'progres_dokumen'),
+            'dokumen' => $this->model->paginate($perPage, 'progres_dokumen'),
             'pager'   => $this->model->pager,
-            'filters' => compact('keyword', 'progres', 'perPage'),
+            'filters' => compact('keyword', 'progres', 'perPage', 'order'),
         ]);
     }
 
