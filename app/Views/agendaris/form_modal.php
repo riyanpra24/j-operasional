@@ -66,13 +66,8 @@ $controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-
             <div class="modal-body agendaris-modal-body outgoing-distribution-step" data-agendaris-step="3" hidden>
                 <div class="modal-section-heading"><span>03</span>
                     <div><strong>Tracking Disposisi</strong><small>Catat posisi, status, waktu, dan instruksi penerusan dokumen</small></div>
+                    <button type="button" class="btn btn-secondary btn-sm disposition-history-trigger" data-agendaris-edit-history-open hidden aria-haspopup="dialog" aria-controls="agendarisDispositionHistoryModal" aria-expanded="false">↺ Riwayat Disposisi</button>
                 </div>
-                <section class="disposition-edit-history" data-agendaris-edit-history-section hidden aria-label="Riwayat disposisi tersimpan">
-                    <header>
-                        <div><strong>Riwayat Disposisi</strong><small>Seluruh tahap yang sudah tersimpan, termasuk tindak lanjut SDM &amp; Teller</small></div><span>Baca saja</span>
-                    </header>
-                    <div class="disposition-detail-timeline disposition-history-compact" data-agendaris-edit-history></div>
-                </section>
                 <div class="modal-form-grid agendaris-form-grid">
                     <div class="modal-span-2 disposition-form-timeline" aria-label="Tracking disposisi dokumen">
                         <?php for ($step = 1; $step <= \Config\Disposition::AGENDARIS_EDITABLE_STEPS; $step++): ?>
@@ -125,5 +120,30 @@ $controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-
             </div>
             <footer class="modal-footer"><span class="modal-submit-status" data-agendaris-status></span><button type="button" class="btn btn-ghost" data-agendaris-form-close>Batal</button><button type="button" class="btn btn-secondary" data-agendaris-step-back hidden>← Kembali</button><button type="button" class="btn btn-primary" data-agendaris-step-next>Selanjutnya →</button><button type="submit" class="btn btn-primary" data-agendaris-submit hidden>Simpan Surat Masuk</button></footer>
         </form>
+    </section>
+</div>
+
+<div class="agendaris-detail-modal agendaris-history-modal" id="agendarisDispositionHistoryModal" hidden aria-hidden="true">
+    <button type="button" class="modal-backdrop" data-agendaris-edit-history-close aria-label="Tutup riwayat disposisi"></button>
+    <section class="modal-dialog agendaris-modal-dialog agendaris-history-dialog" role="dialog" aria-modal="true" aria-labelledby="agendarisDispositionHistoryTitle" aria-describedby="agendarisDispositionHistoryDescription">
+        <header class="modal-header">
+            <div class="modal-title-group"><span class="modal-title-icon">↺</span>
+                <div>
+                    <p>TRACKING DOKUMEN</p>
+                    <h2 id="agendarisDispositionHistoryTitle">Riwayat Disposisi</h2>
+                </div>
+            </div>
+            <button type="button" class="modal-close" data-agendaris-edit-history-close aria-label="Tutup">×</button>
+        </header>
+        <div class="agendaris-detail-content">
+            <section class="agendaris-detail-section disposition-history-popup-section">
+                <div class="modal-section-heading agendaris-detail-section-heading"><span>03</span>
+                    <div><strong>Riwayat Disposisi Tersimpan</strong><small id="agendarisDispositionHistoryDescription">Seluruh tahap yang sudah tersimpan, termasuk tindak lanjut SDM &amp; Teller</small></div>
+                    <em class="disposition-history-readonly">Baca saja</em>
+                </div>
+                <div class="disposition-detail-timeline disposition-history-compact disposition-history-popup-list" data-agendaris-edit-history></div>
+            </section>
+        </div>
+        <footer class="modal-footer"><button type="button" class="btn btn-primary" data-agendaris-edit-history-close>Tutup</button></footer>
     </section>
 </div>

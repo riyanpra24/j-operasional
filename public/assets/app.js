@@ -1232,10 +1232,12 @@
     // Security lainnya tetap dikunci.
     const agendaSourceFieldNames = ['tanggal_diterima', 'penerima', 'pengambilan', 'jenis'];
     const agendaDispositionStages = agendaFormModal?.querySelectorAll('[data-disposition-form-stage]') || [];
-    const agendaEditHistorySection = agendaFormModal?.querySelector('[data-agendaris-edit-history-section]');
-    const agendaEditHistory = agendaFormModal?.querySelector('[data-agendaris-edit-history]');
+    const agendaEditHistoryButton = agendaFormModal?.querySelector('[data-agendaris-edit-history-open]');
+    const agendaEditHistoryModal = document.querySelector('#agendarisDispositionHistoryModal');
+    const agendaEditHistory = agendaEditHistoryModal?.querySelector('[data-agendaris-edit-history]');
     const agendaLastStep = agendaStepPanels.length || 1;
     let agendaCurrentStep = 1;
+    let agendaEditHistoryReturnFocus = null;
 
     const currentDateLocal = () => {
         const now = new Date();
@@ -1281,9 +1283,10 @@
     };
 
     const renderAgendaEditHistory = (timeline = []) => {
-        if (!agendaEditHistory || !agendaEditHistorySection) return;
+        if (!agendaEditHistory || !agendaEditHistoryButton) return;
         const filled = timeline.filter((item) => item.terisi);
-        agendaEditHistorySection.hidden = filled.length === 0;
+        agendaEditHistoryButton.hidden = filled.length === 0;
+        agendaEditHistoryButton.setAttribute('aria-expanded', 'false');
         agendaEditHistory.innerHTML = filled.map((item) => {
             const status = item.status || 'Menunggu';
             const statusClass = ({ Menunggu:'pending', Diterima:'received', Diproses:'active', Diteruskan:'forwarded', Selesai:'completed' }[status] || 'empty');
@@ -1295,6 +1298,28 @@
                 </div>
             </article>`;
         }).join('');
+    };
+
+    const closeAgendaEditHistory = () => {
+        if (!agendaEditHistoryModal || agendaEditHistoryModal.hidden) return;
+        agendaEditHistoryModal.classList.remove('open');
+        agendaEditHistoryModal.setAttribute('aria-hidden', 'true');
+        agendaEditHistoryButton?.setAttribute('aria-expanded', 'false');
+        window.setTimeout(() => {
+            agendaEditHistoryModal.hidden = true;
+            agendaEditHistoryReturnFocus?.focus();
+            agendaEditHistoryReturnFocus = null;
+        }, 180);
+    };
+
+    const openAgendaEditHistory = () => {
+        if (!agendaEditHistoryModal || !agendaEditHistoryButton || agendaEditHistoryButton.hidden) return;
+        agendaEditHistoryReturnFocus = document.activeElement;
+        agendaEditHistoryModal.hidden = false;
+        agendaEditHistoryModal.setAttribute('aria-hidden', 'false');
+        agendaEditHistoryButton.setAttribute('aria-expanded', 'true');
+        requestAnimationFrame(() => agendaEditHistoryModal.classList.add('open'));
+        window.setTimeout(() => agendaEditHistoryModal.querySelector('.modal-close')?.focus(), 120);
     };
 
     agendaDispositionStages.forEach((stage) => {
@@ -1359,6 +1384,7 @@
 
     const closeAgendaForm = () => {
         if (!agendaFormModal) return;
+        closeAgendaEditHistory();
         agendaFormModal.classList.remove('open');
         agendaFormModal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
@@ -1460,6 +1486,14 @@
     document.querySelector('[data-agendaris-add]')?.addEventListener('click', openAgendaCreate);
     document.querySelectorAll('[data-agendaris-edit]').forEach((button) => button.addEventListener('click', () => openAgendaEdit(button.dataset.agendarisUrl)));
     agendaFormModal?.querySelectorAll('[data-agendaris-form-close]').forEach((button) => button.addEventListener('click', closeAgendaForm));
+    agendaEditHistoryButton?.addEventListener('click', openAgendaEditHistory);
+    agendaEditHistoryModal?.querySelectorAll('[data-agendaris-edit-history-close]').forEach((button) => button.addEventListener('click', closeAgendaEditHistory));
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && agendaEditHistoryModal?.classList.contains('open')) {
+            event.stopImmediatePropagation();
+            closeAgendaEditHistory();
+        }
+    });
     agendaStepNext?.addEventListener('click', () => {
         agendaErrors.hidden = true;
         if (!validateAgendaStep(agendaCurrentStep)) return;

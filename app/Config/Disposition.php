@@ -10,6 +10,7 @@ final class Disposition
 
     public const RECIPIENTS = [
         'M. Robith Azmi',
+        'Antoro Asih',
         'Aneka Prasyanti W.S',
         'Hilmiyah Fitriana',
         'DeniTri Kuncoro',

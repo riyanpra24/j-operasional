@@ -532,6 +532,14 @@ body { background: #e9edef; }
 .disposition-history-compact .disposition-detail-card time { flex: 0 0 auto; margin: 0; font-size: 7px; }
 .disposition-history-compact .disposition-detail-card p { overflow: hidden; margin: 5px 0 0; padding-top: 5px; font-size: 7.5px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
 .disposition-history-only { display: inline-flex; align-items: center; padding: 5px 8px; color: #65778b; background: #edf2f5; border: 1px solid #dce5ea; border-radius: 999px; font-size: 7px; font-weight: 850; white-space: nowrap; }
+.disposition-history-trigger { margin-left: auto; color: #087f83; border-color: #b9ddda; background: #f1fbfa; }
+.disposition-history-trigger:hover { color: #056c70; border-color: #8fcfca; background: #e4f7f4; }
+.agendaris-history-modal { z-index: 150; }
+.agendaris-history-dialog { width: min(620px,100%); }
+.disposition-history-popup-section { width: 100%; padding-bottom: 10px; }
+.disposition-history-readonly { margin-left: auto; padding: 4px 7px; color: #68788a; background: #edf2f5; border: 1px solid #dce4e9; border-radius: 999px; font-size: 7px; font-style: normal; font-weight: 800; white-space: nowrap; }
+.disposition-history-popup-list { max-height: min(55vh,420px); padding-top: 13px; }
+.disposition-history-popup-list .disposition-detail-card p { white-space: normal; }
 .disposition-status-badge { display: inline-flex; padding: 4px 7px; border: 1px solid; border-radius: 999px; font-size: 7px; font-weight: 850; white-space: nowrap; }.disposition-status-badge.empty { color: #7d8996; background: #f0f3f5; border-color: #dde3e7; }.disposition-status-badge.pending { color: #a36b16; background: #fff4df; border-color: #efd5a0; }.disposition-status-badge.received { color: #3269a8; background: #edf5ff; border-color: #c9dcf3; }.disposition-status-badge.active { color: #087e79; background: #e3f7f4; border-color: #bde5df; }.disposition-status-badge.forwarded { color: #7155a3; background: #f3effc; border-color: #d9cff0; }.disposition-status-badge.completed { color: #31794f; background: #eaf7ef; border-color: #c5e6d1; }
 .disposition-table-tracking { display: grid; min-width: 130px; gap: 3px; }.disposition-table-tracking strong { max-width: 180px; overflow: hidden; color: #344158; font-size: 8.5px; text-overflow: ellipsis; white-space: nowrap; }.disposition-table-tracking > span { color: #8d99a7; font-size: 7px; }.disposition-table-tracking .disposition-status-badge { justify-self: start; margin-top: 2px; font-style: normal; }
 .agendaris-form-grid .field-source-locked label::after { margin-left: 4px; content: "🔒"; }
@@ -568,6 +576,7 @@ body { background: #e9edef; }
     .table-list-footer .pagination-wrap { margin-left: auto; padding: 4px 0; }
     .agendaris-form-modal,.agendaris-detail-modal,.agendaris-delete-modal { align-items: end; padding: 0; }
     .agendaris-modal-dialog,.agendaris-delete-modal .modal-dialog { width: 100%; max-height: 92vh; border-radius: 15px 15px 0 0; }
+    .modal-section-heading .disposition-history-trigger { min-height: 32px; padding-inline: 10px; }
     .agendaris-modal-body { overflow-y: auto; }
     .agendaris-form-grid,.agendaris-detail-grid { grid-template-columns: 1fr; }
     .agenda-number-control { grid-template-columns: 1fr; }
