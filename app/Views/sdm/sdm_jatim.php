@@ -1,3 +1,10 @@
+<?php
+/** @var array<string, mixed>|null $report */
+/** @var string|null $importError */
+/** @var list<array<string, mixed>> $attendanceImports */
+/** @var int|string|null $selectedImportId */
+/** @var array<string, mixed> $attendanceFilters */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
@@ -96,8 +103,8 @@
         'I' => 'Izin / sakit / cuti',
         'A' => 'Alpa',
         'TA' => 'Presensi tidak lengkap',
-        'TAM' => 'Hanya absen masuk',
-        'TAP' => 'Hanya absen pulang',
+        'TAM' => 'Hanya absen pulang',
+        'TAP' => 'Hanya absen masuk',
         'OFF' => 'Libur',
         '-' => 'Data belum lengkap',
     ];
@@ -160,7 +167,7 @@
                                             <td><span class="attendance-summary-badge <?= $anomaly['recap_code'] === 'A' ? 'attendance-summary-a' : 'attendance-summary-ta' ?>" title="Status ESS: <?= esc($anomaly['raw_status'] ?: '-', 'attr') ?>"><?= esc($anomaly['recap_code']) ?></span></td>
                                             <td><input type="time" name="records[<?= (int) $anomaly['id'] ?>][actual_in]" value="<?= esc(substr((string) $anomaly['actual_in'], 0, 5), 'attr') ?>"></td>
                                             <td><input type="time" name="records[<?= (int) $anomaly['id'] ?>][actual_out]" value="<?= esc(substr((string) $anomaly['actual_out'], 0, 5), 'attr') ?>"></td>
-                                            <td><select name="records[<?= (int) $anomaly['id'] ?>][recap_code]" required><?php foreach (['H' => 'Hadir', 'I' => 'Izin', 'A' => 'Alpa', 'TA' => 'Tidak Lengkap', 'TAM' => 'Hanya Absen Masuk', 'TAP' => 'Hanya Absen Pulang', 'OFF' => 'Libur'] as $code => $label): ?><option value="<?= $code ?>" <?= $anomaly['recap_code'] === $code ? 'selected' : '' ?>><?= esc($label) ?></option><?php endforeach ?></select></td>
+                                            <td><select name="records[<?= (int) $anomaly['id'] ?>][recap_code]" required><?php foreach (['H' => 'Hadir', 'I' => 'Izin', 'A' => 'Alpa', 'TA' => 'Tidak Lengkap', 'TAM' => 'Hanya Absen Pulang', 'TAP' => 'Hanya Absen Masuk', 'OFF' => 'Libur'] as $code => $label): ?><option value="<?= $code ?>" <?= $anomaly['recap_code'] === $code ? 'selected' : '' ?>><?= esc($label) ?></option><?php endforeach ?></select></td>
                                             <td><input type="text" name="records[<?= (int) $anomaly['id'] ?>][remark]" value="<?= esc($anomaly['remark'] ?? '', 'attr') ?>" maxlength="500" placeholder="Alasan koreksi"></td>
                                         </tr>
                                     <?php endforeach ?>
@@ -295,7 +302,7 @@
             <span><strong><?= number_format($report['summary']['EMPLOYEES'], 0, ',', '.') ?></strong> karyawan ditampilkan</span>
             <span>Disimpan <?= date('d-m-Y H:i', strtotime($report['imported_at'])) ?> WIB oleh <strong><?= esc($report['imported_by_name']) ?></strong></span>
         </div>
-        <footer class="sdm-attendance-note"><strong>Dasar pemetaan:</strong> PRS lengkap = H, hanya absen masuk = TAM, hanya absen pulang = TAP, presensi tidak lengkap lainnya = TA, CB2/RI/CT = I, ABS = A, dan OFF = hari libur.</footer>
+        <footer class="sdm-attendance-note"><strong>Dasar pemetaan:</strong> PRS lengkap = H, hanya absen masuk = TAP, hanya absen pulang = TAM, presensi tidak lengkap lainnya = TA, CB2/RI/CT = I, ABS = A, dan OFF = hari libur.</footer>
     </section>
 
     <div class="delete-modal attendance-recap-delete-modal" id="attendanceRecapDeleteModal" hidden aria-hidden="true">

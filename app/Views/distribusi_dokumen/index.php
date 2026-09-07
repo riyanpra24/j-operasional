@@ -1,3 +1,10 @@
+<?php
+/** @var list<array<string, mixed>> $dokumen */
+/** @var list<array<string, mixed>> $dokumenKeluar */
+/** @var array<string, mixed> $filters */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+/** @var \CodeIgniter\Pager\PagerInterface $pagerKeluar */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 

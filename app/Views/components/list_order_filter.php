@@ -1,4 +1,7 @@
 <?php
+/** @var string|null $id */
+/** @var string|null $value */
+
 $fieldId = $id ?? 'list_order';
 $selectedOrder = $value ?? '';
 $selectedLabel = [

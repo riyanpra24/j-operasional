@@ -1,3 +1,10 @@
+<?php
+/** @var string $title */
+/** @var string $action */
+/** @var string $submitLabel */
+/** @var string|null $returnUrl */
+/** @var array<string, mixed>|null $dokumen */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <?php

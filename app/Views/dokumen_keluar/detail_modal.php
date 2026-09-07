@@ -1,3 +1,7 @@
+<?php
+/** @var bool|null $readOnly */
+/** @var bool|null $securityView */
+?>
 <div class="agendaris-detail-modal" id="dokumenKeluarDetailModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-dokumen-keluar-detail-close aria-label="Tutup detail"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="dokumenKeluarDetailTitle">

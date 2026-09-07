@@ -41,19 +41,19 @@ final class EssAttendanceReportParserTest extends CIUnitTestCase
         $this->assertSame(4, $report['summary']['ROWS']);
         $this->assertSame(1, $report['summary']['H']);
         $this->assertSame(0, $report['summary']['TA']);
-        $this->assertSame(1, $report['summary']['TAM']);
-        $this->assertSame(0, $report['summary']['TAP']);
+        $this->assertSame(0, $report['summary']['TAM']);
+        $this->assertSame(1, $report['summary']['TAP']);
         $this->assertSame(1, $report['summary']['A']);
         $this->assertSame(1, $report['summary']['I']);
         $this->assertCount(4, $report['records']);
         $this->assertSame('H', $report['records'][0]['recap_code']);
-        $this->assertSame('TAM', $report['records'][1]['recap_code']);
+        $this->assertSame('TAP', $report['records'][1]['recap_code']);
         $this->assertSame('07:55:00', $report['records'][1]['actual_in']);
         $this->assertNull($report['records'][1]['actual_out']);
 
         $employees = array_column($report['employees'], null, 'employee_no');
         $this->assertSame('H', $employees['90873']['days'][3]);
-        $this->assertSame('TAM', $employees['90873']['days'][4]);
+        $this->assertSame('TAP', $employees['90873']['days'][4]);
         $this->assertSame('A', $employees['90870']['days'][3]);
         $this->assertSame('I', $employees['90870']['days'][4]);
     }
@@ -67,12 +67,12 @@ final class EssAttendanceReportParserTest extends CIUnitTestCase
         $report = (new EssAttendanceReportParser())->parse($this->fixturePath, 'attendance.xls');
 
         $this->assertCount(1, $report['records']);
-        $this->assertSame('TAM', $report['records'][0]['recap_code']);
+        $this->assertSame('TAP', $report['records'][0]['recap_code']);
         $this->assertSame('07:55:00', $report['records'][0]['actual_in']);
         $this->assertNull($report['records'][0]['actual_out']);
     }
 
-    public function testStoresCheckoutOnlyAsTap(): void
+    public function testStoresCheckoutOnlyAsTam(): void
     {
         file_put_contents($this->fixturePath, $this->reportHtml([
             $this->row('46237', 'Kiki Ramadhani Suyono', '90873', 'PRS', 'NSI,PRS', '', '17:10:00'),
@@ -81,7 +81,7 @@ final class EssAttendanceReportParserTest extends CIUnitTestCase
         $report = (new EssAttendanceReportParser())->parse($this->fixturePath, 'attendance.xls');
 
         $this->assertCount(1, $report['records']);
-        $this->assertSame('TAP', $report['records'][0]['recap_code']);
+        $this->assertSame('TAM', $report['records'][0]['recap_code']);
         $this->assertNull($report['records'][0]['actual_in']);
         $this->assertSame('17:10:00', $report['records'][0]['actual_out']);
     }

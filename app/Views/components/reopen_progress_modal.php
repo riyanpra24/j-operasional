@@ -1,3 +1,8 @@
+<?php
+/** @var string|null $reopenTitle */
+/** @var string|null $reopenDescription */
+/** @var string|null $reopenSubmitLabel */
+?>
 <div class="delete-modal" id="reopenProgressModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-reopen-progress-close aria-label="Batalkan"></button>
     <section class="modal-dialog delete-modal-dialog" role="alertdialog" aria-modal="true" aria-labelledby="reopenProgressTitle" aria-describedby="reopenProgressDescription">

@@ -1,3 +1,16 @@
+<?php
+/** @var string $activePage */
+/** @var list<array<string, mixed>> $records */
+/** @var array<string, mixed> $filters */
+/** @var list<string> $vehicleNames */
+/** @var list<string> $vehicleTypes */
+/** @var list<string> $vehicleOwnershipStatuses */
+/** @var list<string> $statuses */
+/** @var list<string> $drivers */
+/** @var list<string> $managementUnits */
+/** @var bool $isAdmin */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 

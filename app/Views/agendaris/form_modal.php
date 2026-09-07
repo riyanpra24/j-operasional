@@ -7,7 +7,12 @@ $controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-
     <button type="button" class="modal-backdrop" data-agendaris-form-close aria-label="Tutup form"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="agendarisFormTitle">
         <header class="modal-header">
-            <div class="modal-title-group"><span class="modal-title-icon">＋</span><div><p>AGENDARIS</p><h2 id="agendarisFormTitle" data-agendaris-form-title>Tambah Surat Masuk</h2></div></div>
+            <div class="modal-title-group"><span class="modal-title-icon">＋</span>
+                <div>
+                    <p>AGENDARIS</p>
+                    <h2 id="agendarisFormTitle" data-agendaris-form-title>Tambah Surat Masuk</h2>
+                </div>
+            </div>
             <button type="button" class="modal-close" data-agendaris-form-close aria-label="Tutup">×</button>
         </header>
         <form action="<?= site_url('agendaris/progres-dokumen-masuk') ?>" method="post" data-agendaris-form>
@@ -23,7 +28,9 @@ $controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-
                 <span data-agendaris-step-indicator="4"><b>04</b> Status Dokumen</span>
             </div>
             <div class="modal-body agendaris-modal-body outgoing-distribution-step" data-agendaris-step="1">
-                <div class="modal-section-heading"><span>01</span><div><strong>Data surat</strong><small data-agendaris-form-note>Lengkapi seluruh informasi Surat Masuk</small></div></div>
+                <div class="modal-section-heading"><span>01</span>
+                    <div><strong>Data surat</strong><small data-agendaris-form-note>Lengkapi seluruh informasi Surat Masuk</small></div>
+                </div>
                 <div class="modal-form-grid agendaris-form-grid">
                     <div class="form-group"><label for="agenda_pengirim">Pengirim <span class="required">*</span></label><input id="agenda_pengirim" name="pengirim" maxlength="255" placeholder="Nama pengirim" required></div>
                     <div class="form-group"><label for="agenda_tanggal_diterima">Tanggal Diterima <span class="required">*</span></label><input id="agenda_tanggal_diterima" type="date" name="tanggal_diterima" required></div>
@@ -34,7 +41,9 @@ $controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-
                 </div>
             </div>
             <div class="modal-body agendaris-modal-body outgoing-distribution-step" data-agendaris-step="2" hidden>
-                <div class="modal-section-heading"><span>02</span><div><strong>Data Agendaris</strong><small>Lengkapi nomor surat dan data agenda dokumen</small></div></div>
+                <div class="modal-section-heading"><span>02</span>
+                    <div><strong>Data Agendaris</strong><small>Lengkapi nomor surat dan data agenda dokumen</small></div>
+                </div>
                 <div class="modal-form-grid agendaris-form-grid">
                     <div class="form-group"><label for="agenda_nomor_surat">Nomor Surat <span class="required">*</span></label><input id="agenda_nomor_surat" name="nomor_surat" maxlength="150" placeholder="Nomor surat" required></div>
                     <div class="form-group"><label for="agenda_tanggal_surat">Tanggal Surat <span class="required">*</span></label><input id="agenda_tanggal_surat" type="date" name="tanggal_surat" required></div>
@@ -55,9 +64,13 @@ $controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-
                 </div>
             </div>
             <div class="modal-body agendaris-modal-body outgoing-distribution-step" data-agendaris-step="3" hidden>
-                <div class="modal-section-heading"><span>03</span><div><strong>Tracking Disposisi</strong><small>Catat posisi, status, waktu, dan instruksi penerusan dokumen</small></div></div>
+                <div class="modal-section-heading"><span>03</span>
+                    <div><strong>Tracking Disposisi</strong><small>Catat posisi, status, waktu, dan instruksi penerusan dokumen</small></div>
+                </div>
                 <section class="disposition-edit-history" data-agendaris-edit-history-section hidden aria-label="Riwayat disposisi tersimpan">
-                    <header><div><strong>Riwayat Disposisi</strong><small>Seluruh tahap yang sudah tersimpan, termasuk tindak lanjut SDM &amp; Teller</small></div><span>Baca saja</span></header>
+                    <header>
+                        <div><strong>Riwayat Disposisi</strong><small>Seluruh tahap yang sudah tersimpan, termasuk tindak lanjut SDM &amp; Teller</small></div><span>Baca saja</span>
+                    </header>
                     <div class="disposition-detail-timeline disposition-history-compact" data-agendaris-edit-history></div>
                 </section>
                 <div class="modal-form-grid agendaris-form-grid">
@@ -66,7 +79,9 @@ $controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-
                             <article class="disposition-form-stage" data-disposition-form-stage="<?= $step ?>">
                                 <div class="disposition-stage-marker"><span><?= str_pad((string) $step, 2, '0', STR_PAD_LEFT) ?></span><i></i></div>
                                 <div class="disposition-stage-panel">
-                                    <header><div><strong>Disposisi <?= $step ?></strong><small>Tahap penerusan dan pemantauan dokumen</small></div><span class="disposition-stage-state" data-disposition-state="<?= $step ?>">Belum ditentukan</span></header>
+                                    <header>
+                                        <div><strong>Disposisi <?= $step ?></strong><small>Tahap penerusan dan pemantauan dokumen</small></div><span class="disposition-stage-state" data-disposition-state="<?= $step ?>">Belum ditentukan</span>
+                                    </header>
                                     <div class="disposition-stage-fields">
                                         <div class="form-group disposition-recipient-field">
                                             <label for="agenda_disposisi_<?= $step ?>">Tujuan / Penerima</label>
@@ -77,7 +92,13 @@ $controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-
                                                 <?php endforeach ?>
                                             </select>
                                         </div>
-                                        <div class="form-group"><label for="agenda_disposisi_<?= $step ?>_status">Status</label><select id="agenda_disposisi_<?= $step ?>_status" name="disposisi_<?= $step ?>_status" data-disposition-status="<?= $step ?>"><option value="Menunggu">Menunggu</option><option value="Diterima">Diterima</option><option value="Diproses">Diproses</option><option value="Diteruskan">Diteruskan</option><option value="Selesai">Selesai</option></select></div>
+                                        <div class="form-group"><label for="agenda_disposisi_<?= $step ?>_status">Status</label><select id="agenda_disposisi_<?= $step ?>_status" name="disposisi_<?= $step ?>_status" data-disposition-status="<?= $step ?>">
+                                                <option value="Menunggu">Menunggu</option>
+                                                <option value="Diterima">Diterima</option>
+                                                <option value="Diproses">Diproses</option>
+                                                <option value="Diteruskan">Diteruskan</option>
+                                                <option value="Selesai">Selesai</option>
+                                            </select></div>
                                         <div class="form-group"><label for="agenda_disposisi_<?= $step ?>_waktu">Tanggal</label><input id="agenda_disposisi_<?= $step ?>_waktu" type="date" name="disposisi_<?= $step ?>_waktu" data-disposition-time="<?= $step ?>"></div>
                                         <div class="form-group disposition-note-field"><label for="agenda_disposisi_<?= $step ?>_catatan">Catatan / Instruksi</label><textarea id="agenda_disposisi_<?= $step ?>_catatan" name="disposisi_<?= $step ?>_catatan" maxlength="1000" rows="2" placeholder="Instruksi atau hasil tindak lanjut"></textarea></div>
                                     </div>
@@ -88,9 +109,14 @@ $controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-
                 </div>
             </div>
             <div class="modal-body agendaris-modal-body outgoing-distribution-step" data-agendaris-step="4" hidden>
-                <div class="modal-section-heading"><span>04</span><div><strong>Status Dokumen</strong><small>Tentukan progres akhir dan unduh lembar pengendalian</small></div></div>
+                <div class="modal-section-heading"><span>04</span>
+                    <div><strong>Status Dokumen</strong><small>Tentukan progres akhir dan unduh lembar pengendalian</small></div>
+                </div>
                 <div class="modal-form-grid agendaris-form-grid">
-                    <div class="form-group modal-span-2"><label for="agenda_progres">Progres <span class="required">*</span></label><select id="agenda_progres" name="progres" required><option value="Menunggu Penyelesaian">Menunggu Penyelesaian</option><option value="Selesai">Selesai</option></select><small>Dokumen berstatus Selesai akan tampil di menu Dokumen Masuk.</small></div>
+                    <div class="form-group modal-span-2"><label for="agenda_progres">Progres <span class="required">*</span></label><select id="agenda_progres" name="progres" required>
+                            <option value="Menunggu Penyelesaian">Menunggu Penyelesaian</option>
+                            <option value="Selesai">Selesai</option>
+                        </select><small>Dokumen berstatus Selesai akan tampil di menu Dokumen Masuk.</small></div>
                     <div class="form-group modal-span-2 agenda-control-sheet-action">
                         <button type="button" class="btn btn-secondary" data-agendaris-download-sheet data-download-url="<?= esc($controlSheetUrl, 'attr') ?>">↓ Download Lembar Pengendalian</button>
                         <small>PDF akan diisi otomatis dari Nomor Agenda, Tanggal Agenda, Nomor Surat, Tanggal Surat, dan Perihal.</small>

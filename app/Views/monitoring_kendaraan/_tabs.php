@@ -1,4 +1,6 @@
 <?php
+/** @var string $activePage */
+
 $tabs = [
     'vehicles' => ['label' => 'Data Kendaraan', 'description' => 'Identitas dan status armada', 'icon' => '▤', 'url' => site_url('bagian-umum-2/monitoring-kendaraan/data-kendaraan')],
     'maintenance' => ['label' => 'Servis & Perawatan', 'description' => 'Jadwal dan biaya servis', 'icon' => '⚙', 'url' => site_url('bagian-umum-2/monitoring-kendaraan/servis-perawatan')],

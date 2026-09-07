@@ -1,3 +1,6 @@
+<?php
+/** @var string $activeTab */
+?>
 <nav class="progress-document-tabs" role="tablist" aria-label="Jenis distribusi dokumen">
     <a href="<?= site_url('distribusi-dokumen?tab=masuk') ?>" class="progress-document-tab <?= $activeTab === 'masuk' ? 'active' : '' ?>" role="tab" aria-selected="<?= $activeTab === 'masuk' ? 'true' : 'false' ?>">
         <span aria-hidden="true">⇠</span>

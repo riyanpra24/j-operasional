@@ -1,3 +1,16 @@
+<?php
+/** @var list<array<string, mixed>> $documents */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+/** @var string $recipientName */
+/** @var string $recipientScopeLabel */
+/** @var bool $isAdminView */
+/** @var list<string> $statusOptions */
+/** @var list<string> $recipientOptions */
+/** @var array<string, mixed> $filters */
+/** @var bool $historyMode */
+/** @var string $pagerGroup */
+/** @var string $listUrl */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 

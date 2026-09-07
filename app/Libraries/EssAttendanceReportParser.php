@@ -280,10 +280,10 @@ final class EssAttendanceReportParser
 
         if ($record['status'] === 'PRS') {
             if ($hasActualIn && ! $hasActualOut) {
-                return 'TAM';
+                return 'TAP';
             }
             if (! $hasActualIn && $hasActualOut) {
-                return 'TAP';
+                return 'TAM';
             }
 
             return $hasActualIn && $hasActualOut && ! $hasIncompleteMarker ? 'H' : 'TA';
@@ -296,10 +296,10 @@ final class EssAttendanceReportParser
         // Baris dengan hanya salah satu jam tetap disimpan sebagai presensi
         // tidak lengkap, termasuk ketika kode status dari ESS kosong/tidak dikenal.
         if ($hasActualIn && ! $hasActualOut) {
-            return 'TAM';
+            return 'TAP';
         }
         if (! $hasActualIn && $hasActualOut) {
-            return 'TAP';
+            return 'TAM';
         }
         if ($hasIncompleteMarker) {
             return 'TA';

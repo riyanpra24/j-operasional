@@ -1,3 +1,6 @@
+<?php
+/** @var string $securityName */
+?>
 <div class="distribution-action-modal" id="outgoingDistributionModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-outgoing-distribution-close aria-label="Tutup distribusi Surat Keluar"></button>
     <section class="modal-dialog distribution-action-dialog" role="dialog" aria-modal="true" aria-labelledby="outgoingDistributionTitle">

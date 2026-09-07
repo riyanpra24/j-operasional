@@ -1,3 +1,6 @@
+<?php
+/** @var array<string, mixed> $dokumen */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <section class="page-heading detail-heading"><div><a href="<?= site_url('dokumen-masuk') ?>" class="back-link">← Dokumen masuk</a><p class="eyebrow">DETAIL DOKUMEN</p><h1>Detail Dokumen Masuk</h1><p>Dicatat <?= date('d-m-Y H:i', strtotime($dokumen['created_at'])) ?> WIB · diperbarui <?= date('d-m-Y H:i', strtotime($dokumen['updated_at'])) ?> WIB</p></div></section>

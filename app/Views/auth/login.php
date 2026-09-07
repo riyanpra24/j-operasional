@@ -1,4 +1,6 @@
 <?php
+/** @var string|null $loginErrorOverride */
+
 $loginError    = $loginErrorOverride ?? session()->getFlashdata('login_error');
 $logoutSuccess = session()->getFlashdata('logout_success');
 $resolveOptimizedAsset = static function (string $source, string $optimized): string {
@@ -7,8 +9,8 @@ $resolveOptimizedAsset = static function (string $source, string $optimized): st
 
     return is_file($optimizedPath)
         && (! is_file($sourcePath) || filemtime($optimizedPath) >= filemtime($sourcePath))
-            ? $optimized
-            : $source;
+        ? $optimized
+        : $source;
 };
 $loginCssAsset = $resolveOptimizedAsset('assets/app.css', 'assets/app.min.css');
 $requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');

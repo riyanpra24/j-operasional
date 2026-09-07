@@ -1,4 +1,13 @@
 <?php
+/** @var array<string, mixed> $record */
+/** @var list<array<string, mixed>> $documents */
+/** @var list<array<string, mixed>> $items */
+/** @var array<string, mixed>|null $latest */
+/** @var array{status_class: string, status_label: string} $status */
+/** @var int $nextSequence */
+/** @var bool|null $isEditMode */
+/** @var bool|null $isPopup */
+
 $isPopup = $isPopup ?? false;
 if (! $isPopup) {
     echo $this->extend('layouts/main');

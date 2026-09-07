@@ -1,3 +1,7 @@
+<?php
+/** @var bool $adminCanEditRecipient */
+/** @var string $securityName */
+?>
 <div class="edit-modal" id="editDokumenModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-edit-close aria-label="Tutup edit"></button>
     <section class="modal-dialog edit-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">

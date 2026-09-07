@@ -1,3 +1,11 @@
+<?php
+/** @var list<array<string, mixed>> $sessions */
+/** @var array<string, mixed> $filters */
+/** @var int $totalUsers */
+/** @var int $activeCount */
+/** @var int $availableCount */
+/** @var int|string $currentUserId */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <?php $roleLabels = \Config\UserRoles::LABELS; ?>

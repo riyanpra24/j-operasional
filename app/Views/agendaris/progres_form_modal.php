@@ -1,16 +1,51 @@
 <div class="agendaris-form-modal" id="progressDocumentFormModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-progress-form-close aria-label="Tutup form"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="progressDocumentFormTitle">
-        <header class="modal-header"><div class="modal-title-group"><span class="modal-title-icon">⇢</span><div><p>AGENDARIS</p><h2 id="progressDocumentFormTitle" data-progress-form-title>Tambah Progres Dokumen Keluar</h2></div></div><button type="button" class="modal-close" data-progress-form-close aria-label="Tutup">×</button></header>
-        <form method="post" action="<?= site_url('agendaris/progres-dokumen-keluar') ?>" data-progress-form><?= csrf_field() ?><div class="modal-alert" data-progress-errors hidden role="alert"></div><div class="modal-body agendaris-modal-body"><div class="modal-section-heading"><span>01</span><div><strong>Data Dokumen Keluar</strong><small>Lengkapi seluruh informasi dokumen dan distribusi</small></div></div><div class="modal-form-grid agendaris-form-grid">
-            <div class="form-group"><label>Nomor Surat <span class="required">*</span></label><input name="nomor_surat" maxlength="150" required></div><div class="form-group"><label>Jenis Dokumen <span class="required">*</span></label><input name="jenis_surat" maxlength="100" required></div>
-            <div class="form-group"><label>Jumlah Dokumen <span class="required">*</span></label><input name="jumlah_dokumen" maxlength="100" value="1" placeholder="Contoh: 2 berkas atau 1 amplop" required></div><?= view('components/ekspedisi_selector', ['prefix' => 'progress_outgoing', 'label' => 'Nama Ekspedisi', 'required' => true]) ?>
-            <div class="form-group"><label>Pemohon</label><input name="pemohon" maxlength="255"></div><div class="form-group"><label>Pelaksana</label><input name="pelaksana" maxlength="255"></div><div class="form-group"><label>UP</label><input name="up" maxlength="255"></div><div class="form-group"><label>Tanggal Pengiriman <span class="required">*</span></label><input type="date" name="tanggal_pengiriman" required></div>
-            <div class="form-group"><label>Nomor Resi</label><input name="nomor_resi" maxlength="100"></div><div class="form-group"><label>Tanggal Diterima</label><input type="date" name="tanggal_diterima"></div><div class="form-group"><label>Penerima</label><input name="penerima" maxlength="255"></div>
-            <div class="form-group field-source-locked"><label>Security</label><select name="security" disabled aria-disabled="true"><option value="">Diisi oleh Security</option><option value="Yanto Pujoyuwono">Yanto Pujoyuwono</option><option value="M. Aziz Dwi Pratomo">M. Aziz Dwi Pratomo</option><option value="Ach. Fathur Rozi">Ach. Fathur Rozi</option><option value="Yayak Andriyani">Yayak Andriyani</option></select><small>Hanya dapat diisi melalui menu Distribusi Dokumen oleh Security.</small></div><div class="form-group field-source-locked"><label>Tanggal Diterima Security</label><input type="date" name="tanggal_security" disabled aria-disabled="true"><small>Dicatat oleh Security saat proses distribusi.</small></div><div class="form-group field-source-locked"><label>Progres</label><select name="progres" disabled aria-disabled="true"><option value="Menunggu Ekspedisi">Menunggu Ekspedisi</option><option value="Diambil Ekspedisi">Diambil Ekspedisi</option></select><small>Hanya dapat diubah oleh Security.</small></div>
-            <div class="form-group modal-span-2"><label>Alamat Penerima <span class="required">*</span></label><textarea name="alamat_penerima" maxlength="2000" required></textarea></div>
-            <div class="form-group modal-span-2 agenda-link-field"><label for="progress_dokumen_link">Link Berkas</label><input id="progress_dokumen_link" type="url" name="dokumen_link" maxlength="2048" placeholder="https://..."><small>Tempel tautan HTTPS dari OneDrive, SharePoint, Google Drive, atau penyimpanan dokumen lainnya.</small></div>
-            <div class="form-group modal-span-2"><label>Status Penyelesaian Agendaris <span class="required">*</span></label><select name="status_agendaris" required><option value="Menunggu Penyelesaian">Menunggu Penyelesaian</option><option value="Selesai">Selesai</option></select><small>Pilih Selesai hanya jika pekerjaan Agendaris telah tuntas. Dokumen kemudian berpindah ke menu Dokumen Keluar Agendaris.</small></div>
-        </div></div><footer class="modal-footer"><span class="modal-submit-status" data-progress-status></span><button type="button" class="btn btn-ghost" data-progress-form-close>Batal</button><button type="submit" class="btn btn-primary" data-progress-submit>Simpan dokumen</button></footer></form>
+        <header class="modal-header">
+            <div class="modal-title-group"><span class="modal-title-icon">⇢</span>
+                <div>
+                    <p>AGENDARIS</p>
+                    <h2 id="progressDocumentFormTitle" data-progress-form-title>Tambah Progres Dokumen Keluar</h2>
+                </div>
+            </div><button type="button" class="modal-close" data-progress-form-close aria-label="Tutup">×</button>
+        </header>
+        <form method="post" action="<?= site_url('agendaris/progres-dokumen-keluar') ?>" data-progress-form><?= csrf_field() ?><div class="modal-alert" data-progress-errors hidden role="alert"></div>
+            <div class="modal-body agendaris-modal-body">
+                <div class="modal-section-heading"><span>01</span>
+                    <div><strong>Data Dokumen Keluar</strong><small>Lengkapi seluruh informasi dokumen dan distribusi</small></div>
+                </div>
+                <div class="modal-form-grid agendaris-form-grid">
+                    <div class="form-group"><label>Nomor Surat <span class="required">*</span></label><input name="nomor_surat" maxlength="150" required></div>
+                    <div class="form-group"><label>Jenis Dokumen <span class="required">*</span></label><input name="jenis_surat" maxlength="100" required></div>
+                    <div class="form-group"><label>Jumlah Dokumen <span class="required">*</span></label><input name="jumlah_dokumen" maxlength="100" value="1" placeholder="Contoh: 2 berkas atau 1 amplop" required></div><?= view('components/ekspedisi_selector', ['prefix' => 'progress_outgoing', 'label' => 'Nama Ekspedisi', 'required' => true]) ?>
+                    <div class="form-group"><label>Pemohon</label><input name="pemohon" maxlength="255"></div>
+                    <div class="form-group"><label>Pelaksana</label><input name="pelaksana" maxlength="255"></div>
+                    <div class="form-group"><label>UP</label><input name="up" maxlength="255"></div>
+                    <div class="form-group"><label>Tanggal Pengiriman <span class="required">*</span></label><input type="date" name="tanggal_pengiriman" required></div>
+                    <div class="form-group"><label>Nomor Resi</label><input name="nomor_resi" maxlength="100"></div>
+                    <div class="form-group"><label>Tanggal Diterima</label><input type="date" name="tanggal_diterima"></div>
+                    <div class="form-group"><label>Penerima</label><input name="penerima" maxlength="255"></div>
+                    <div class="form-group field-source-locked"><label>Security</label><select name="security" disabled aria-disabled="true">
+                            <option value="">Diisi oleh Security</option>
+                            <option value="Yanto Pujoyuwono">Yanto Pujoyuwono</option>
+                            <option value="M. Aziz Dwi Pratomo">M. Aziz Dwi Pratomo</option>
+                            <option value="Ach. Fathur Rozi">Ach. Fathur Rozi</option>
+                            <option value="Yayak Andriyani">Yayak Andriyani</option>
+                        </select><small>Hanya dapat diisi melalui menu Distribusi Dokumen oleh Security.</small></div>
+                    <div class="form-group field-source-locked"><label>Tanggal Diterima Security</label><input type="date" name="tanggal_security" disabled aria-disabled="true"><small>Dicatat oleh Security saat proses distribusi.</small></div>
+                    <div class="form-group field-source-locked"><label>Progres</label><select name="progres" disabled aria-disabled="true">
+                            <option value="Menunggu Ekspedisi">Menunggu Ekspedisi</option>
+                            <option value="Diambil Ekspedisi">Diambil Ekspedisi</option>
+                        </select><small>Hanya dapat diubah oleh Security.</small></div>
+                    <div class="form-group modal-span-2"><label>Alamat Penerima <span class="required">*</span></label><textarea name="alamat_penerima" maxlength="2000" required></textarea></div>
+                    <div class="form-group modal-span-2 agenda-link-field"><label for="progress_dokumen_link">Link Berkas</label><input id="progress_dokumen_link" type="url" name="dokumen_link" maxlength="2048" placeholder="https://..."><small>Tempel tautan HTTPS dari OneDrive, SharePoint, Google Drive, atau penyimpanan dokumen lainnya.</small></div>
+                    <div class="form-group modal-span-2"><label>Status Penyelesaian Agendaris <span class="required">*</span></label><select name="status_agendaris" required>
+                            <option value="Menunggu Penyelesaian">Menunggu Penyelesaian</option>
+                            <option value="Selesai">Selesai</option>
+                        </select><small>Pilih Selesai hanya jika pekerjaan Agendaris telah tuntas. Dokumen kemudian berpindah ke menu Dokumen Keluar Agendaris.</small></div>
+                </div>
+            </div>
+            <footer class="modal-footer"><span class="modal-submit-status" data-progress-status></span><button type="button" class="btn btn-ghost" data-progress-form-close>Batal</button><button type="submit" class="btn btn-primary" data-progress-submit>Simpan dokumen</button></footer>
+        </form>
     </section>
 </div>

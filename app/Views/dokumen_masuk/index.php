@@ -1,3 +1,9 @@
+<?php
+/** @var list<array<string, mixed>> $dokumen */
+/** @var array<string, mixed> $filters */
+/** @var list<string> $jenisOptions */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <section class="page-heading"><div><p class="eyebrow">BUKU REGISTER DIGITAL</p><h1>Dokumen Masuk</h1><p>Arsip baca-saja untuk dokumen masuk yang telah selesai diserahkan melalui Distribusi Dokumen.</p></div></section>

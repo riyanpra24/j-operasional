@@ -1,4 +1,7 @@
 <?php
+/** @var bool $isLoggedIn */
+/** @var string|null $title */
+
 $resolveOptimizedAsset = static function (string $source, string $optimized): string {
     $sourcePath = FCPATH . $source;
     $optimizedPath = FCPATH . $optimized;

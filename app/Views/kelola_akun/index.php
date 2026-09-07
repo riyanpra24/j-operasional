@@ -1,3 +1,9 @@
+<?php
+/** @var list<array<string, mixed>> $users */
+/** @var array<string, mixed> $filters */
+/** @var array<string, int> $counts */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <?php

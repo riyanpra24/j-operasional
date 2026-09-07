@@ -1,3 +1,12 @@
+<?php
+/** @var string $activePage */
+/** @var list<array<string, mixed>> $records */
+/** @var array<string, mixed> $filters */
+/** @var list<array<string, mixed>> $vehicles */
+/** @var array<int|string, mixed> $serviceBudgets */
+/** @var bool $isAdmin */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 

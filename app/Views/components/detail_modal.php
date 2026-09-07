@@ -1,3 +1,6 @@
+<?php
+/** @var bool $readOnly */
+?>
 <div class="detail-modal" id="detailDokumenModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-detail-close aria-label="Tutup detail"></button>
     <section class="modal-dialog detail-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">

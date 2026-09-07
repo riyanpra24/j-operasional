@@ -1,3 +1,14 @@
+<?php
+/** @var string $title */
+/** @var string $indexUrl */
+/** @var string $detailUrlPrefix */
+/** @var list<array<string, mixed>> $dokumen */
+/** @var array<string, mixed> $filters */
+/** @var list<string> $jenisOptions */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+/** @var bool $readOnly */
+/** @var bool|null $securityView */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 

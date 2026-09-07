@@ -1,3 +1,11 @@
+<?php
+/** @var list<array<string, mixed>> $records */
+/** @var array<string, mixed> $filters */
+/** @var array<string, int> $summary */
+/** @var string $calculationDate */
+/** @var int $expiryWarningDays */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <?php

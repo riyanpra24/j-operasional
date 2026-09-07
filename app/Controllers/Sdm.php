@@ -150,9 +150,9 @@ class Sdm extends BaseController
                 $actualOut = $this->validAttendanceTime((string) ($submitted['actual_out'] ?? ''));
                 if (in_array($code, ['TA', 'TAM', 'TAP'], true)) {
                     if ($actualIn !== null && $actualOut === null) {
-                        $code = 'TAM';
-                    } elseif ($actualIn === null && $actualOut !== null) {
                         $code = 'TAP';
+                    } elseif ($actualIn === null && $actualOut !== null) {
+                        $code = 'TAM';
                     } elseif ($actualIn !== null && $actualOut !== null && in_array($code, ['TAM', 'TAP'], true)) {
                         $code = 'H';
                     } elseif ($actualIn === null && $actualOut === null && in_array($code, ['TAM', 'TAP'], true)) {

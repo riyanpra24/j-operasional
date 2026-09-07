@@ -1,3 +1,8 @@
+<?php
+/** @var string $title */
+/** @var string $action */
+/** @var array<string, mixed>|null $record */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <?php

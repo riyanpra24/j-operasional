@@ -1,4 +1,10 @@
 <?php
+/** @var string|null $prefix */
+/** @var string|null $current */
+/** @var string|null $groupClass */
+/** @var string|null $label */
+/** @var bool|null $required */
+
 $prefix = $prefix ?? 'dokumen';
 $current = trim((string) ($current ?? ''));
 $groupClass = trim((string) ($groupClass ?? ''));

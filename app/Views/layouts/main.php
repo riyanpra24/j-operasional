@@ -1,4 +1,6 @@
 <?php
+/** @var string|null $title */
+
 $uri = service('uri');
 $segment = $uri->getSegment(1);
 $securityActive = in_array($segment, ['dokumen-masuk', 'dokumen-keluar', 'distribusi-dokumen'], true);

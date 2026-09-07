@@ -1,4 +1,6 @@
 <?php
+/** @var int|string $code */
+/** @var string $message */
 
 use CodeIgniter\CLI\CLI;
 

@@ -1,3 +1,11 @@
+<?php
+/** @var list<array<string, mixed>> $records */
+/** @var array<string, string> $resources */
+/** @var array<string, int> $counts */
+/** @var int $total */
+/** @var string $selectedType */
+/** @var string $order */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 

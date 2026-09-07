@@ -1,3 +1,10 @@
+<?php
+/** @var list<array<string, mixed>> $records */
+/** @var array<string, mixed> $filters */
+/** @var list<int|string> $years */
+/** @var int $total */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <?php

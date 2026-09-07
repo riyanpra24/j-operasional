@@ -1,3 +1,7 @@
+<?php
+/** @var list<string> $recipientOptions */
+/** @var list<string> $statusOptions */
+?>
 <div class="agendaris-detail-modal" id="sdmDocumentViewModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-sdm-document-view-close aria-label="Tutup detail"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="sdmDocumentViewTitle">
