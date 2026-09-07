@@ -238,6 +238,14 @@ if ($currentRole === 'security') {
                             <span aria-hidden="true">●</span>
                             Riwayat Dokumen
                         </a>
+                        <a href="<?= site_url('sdm/dashboard-kehadiran') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'dashboard-kehadiran' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dashboard Kehadiran
+                        </a>
+                        <a href="<?= site_url('sdm/sdm-jatim') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'sdm-jatim' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            SDM Jatim
+                        </a>
                     </div>
                 </div>
                 <?php endif ?>

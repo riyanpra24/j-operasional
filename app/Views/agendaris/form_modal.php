@@ -1,4 +1,8 @@
-<?php $dispositionRecipients = \Config\Disposition::RECIPIENTS; ?>
+<?php
+$dispositionRecipients = \Config\Disposition::RECIPIENTS;
+$controlSheetUrl = parse_url(site_url('agendaris/progres-dokumen-masuk/download-lembar-pengendalian'), PHP_URL_PATH)
+    ?: '/agendaris/progres-dokumen-masuk/download-lembar-pengendalian';
+?>
 <div class="agendaris-form-modal" id="agendarisFormModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-agendaris-form-close aria-label="Tutup form"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="agendarisFormTitle">
@@ -88,7 +92,7 @@
                 <div class="modal-form-grid agendaris-form-grid">
                     <div class="form-group modal-span-2"><label for="agenda_progres">Progres <span class="required">*</span></label><select id="agenda_progres" name="progres" required><option value="Menunggu Penyelesaian">Menunggu Penyelesaian</option><option value="Selesai">Selesai</option></select><small>Dokumen berstatus Selesai akan tampil di menu Dokumen Masuk.</small></div>
                     <div class="form-group modal-span-2 agenda-control-sheet-action">
-                        <button type="button" class="btn btn-secondary" data-agendaris-download-sheet data-download-url="<?= site_url('agendaris/progres-dokumen-masuk/download-lembar-pengendalian') ?>">↓ Download Lembar Pengendalian</button>
+                        <button type="button" class="btn btn-secondary" data-agendaris-download-sheet data-download-url="<?= esc($controlSheetUrl, 'attr') ?>">↓ Download Lembar Pengendalian</button>
                         <small>PDF akan diisi otomatis dari Nomor Agenda, Tanggal Agenda, Nomor Surat, Tanggal Surat, dan Perihal.</small>
                     </div>
                 </div>

@@ -2,10 +2,14 @@
 
 namespace App\Controllers;
 
+use App\Libraries\EssAttendanceReportParser;
 use App\Models\AgendarisModel;
+use App\Models\SdmAttendanceImportModel;
+use App\Models\SdmAttendanceRecordModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use Config\Disposition;
+use RuntimeException;
 
 class Sdm extends BaseController
 {
@@ -24,6 +28,494 @@ class Sdm extends BaseController
     public function incomingDocumentHistory(): string
     {
         return $this->documentList(true);
+    }
+
+    public function attendanceDashboard(): string
+    {
+        return view('sdm/dashboard_kehadiran', [
+            'title' => 'Dashboard Kehadiran | SDM & Teller',
+        ]);
+    }
+
+    public function sdmJatim(): string
+    {
+        return view('sdm/sdm_jatim', $this->attendancePageData(
+            (int) $this->request->getGet('import_id'),
+        ));
+    }
+
+    public function recapSdmJatimAttendance(): string|RedirectResponse
+    {
+        $file = $this->request->getFile('attendance_file');
+
+        if ($file === null || ! $file->isValid()) {
+            return view('sdm/sdm_jatim', $this->attendancePageData(
+                null,
+                'Pilih file Employee Attendance Report ESS yang akan direkap.',
+            ));
+        }
+
+        if ($file->getSize() > 5 * 1024 * 1024) {
+            return view('sdm/sdm_jatim', $this->attendancePageData(
+                null,
+                'Ukuran file terlalu besar. Maksimal ukuran file adalah 5 MB.',
+            ));
+        }
+
+        if (! in_array(strtolower($file->getClientExtension()), ['xls', 'html', 'htm'], true)) {
+            return view('sdm/sdm_jatim', $this->attendancePageData(
+                null,
+                'Format file belum didukung. Gunakan file ESS dengan ekstensi .xls.',
+            ));
+        }
+
+        try {
+            $hash = hash_file('sha256', $file->getTempName());
+            if ($hash === false) {
+                throw new RuntimeException('Identitas file ESS tidak dapat dibaca.');
+            }
+
+            $importModel = new SdmAttendanceImportModel();
+            $existingImport = $importModel->withDeleted()->where('source_hash', $hash)->first();
+            if ($existingImport !== null) {
+                if (! empty($existingImport['deleted_at'])) {
+                    $restored = db_connect()->table('sdm_attendance_imports')->where('id', (int) $existingImport['id'])->update([
+                        'deleted_at'      => null,
+                        'deleted_by_role' => null,
+                        'deleted_by_name' => null,
+                        'updated_at'      => date('Y-m-d H:i:s'),
+                    ]);
+                    if (! $restored) {
+                        throw new RuntimeException('Rekap yang pernah dihapus belum dapat dipulihkan.');
+                    }
+
+                    return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $existingImport['id']))
+                        ->with('success', 'Rekap yang pernah dihapus berhasil dipulihkan dan ditampilkan kembali.');
+                }
+
+                return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $existingImport['id']))
+                    ->with('success', 'File yang sama sudah pernah disimpan. Rekap tersimpan ditampilkan kembali.');
+            }
+
+            $report = (new EssAttendanceReportParser())->parse(
+                $file->getTempName(),
+                $file->getClientName(),
+            );
+            $importId = $this->saveAttendanceReport($report, $hash);
+
+            return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $importId))
+                ->with('success', 'Rekap absensi berhasil dibuat dan disimpan otomatis.');
+        } catch (\Throwable $exception) {
+            log_message('warning', 'Import rekap ESS gagal: {message}', ['message' => $exception->getMessage()]);
+
+            return view('sdm/sdm_jatim', $this->attendancePageData(null, $exception->getMessage()));
+        }
+    }
+
+    public function updateSdmJatimAnomalies(): RedirectResponse
+    {
+        $importId = (int) $this->request->getPost('import_id');
+        $submittedRecords = $this->request->getPost('records');
+        $redirectUrl = site_url('sdm/sdm-jatim?import_id=' . $importId);
+
+        $importModel = new SdmAttendanceImportModel();
+        if ($importId <= 0 || $importModel->find($importId) === null || ! is_array($submittedRecords)) {
+            return redirect()->to($redirectUrl)->with('error', 'Data anomali belum dapat diperbarui.');
+        }
+
+        $recordModel = new SdmAttendanceRecordModel();
+        $anomalyRecords = $recordModel
+            ->where('import_id', $importId)
+            ->whereIn('recap_code', ['A', 'TA', 'TAM', 'TAP'])
+            ->findAll();
+        $allowedCodes = ['H', 'I', 'A', 'TA', 'TAM', 'TAP', 'OFF'];
+        $db = db_connect();
+        $updated = 0;
+        $db->transBegin();
+
+        try {
+            foreach ($anomalyRecords as $record) {
+                $recordId = (int) $record['id'];
+                $submitted = $submittedRecords[$recordId] ?? null;
+                if (! is_array($submitted)) {
+                    continue;
+                }
+
+                $code = strtoupper(trim((string) ($submitted['recap_code'] ?? '')));
+                if (! in_array($code, $allowedCodes, true)) {
+                    throw new RuntimeException('Status koreksi absensi tidak valid.');
+                }
+
+                $actualIn = $this->validAttendanceTime((string) ($submitted['actual_in'] ?? ''));
+                $actualOut = $this->validAttendanceTime((string) ($submitted['actual_out'] ?? ''));
+                if (in_array($code, ['TA', 'TAM', 'TAP'], true)) {
+                    if ($actualIn !== null && $actualOut === null) {
+                        $code = 'TAM';
+                    } elseif ($actualIn === null && $actualOut !== null) {
+                        $code = 'TAP';
+                    } elseif ($actualIn !== null && $actualOut !== null && in_array($code, ['TAM', 'TAP'], true)) {
+                        $code = 'H';
+                    } elseif ($actualIn === null && $actualOut === null && in_array($code, ['TAM', 'TAP'], true)) {
+                        $code = 'TA';
+                    }
+                }
+
+                $payload = [
+                    'recap_code' => $code,
+                    'actual_in'  => $actualIn,
+                    'actual_out' => $actualOut,
+                    'remark'     => trim((string) ($submitted['remark'] ?? '')) ?: null,
+                ];
+
+                if ($recordModel->update($recordId, $payload) === false) {
+                    throw new RuntimeException('Salah satu data anomali belum dapat diperbarui.');
+                }
+                $updated++;
+            }
+
+            $this->refreshAttendanceImportSummary($importId, $importModel);
+            if ($db->transStatus() === false) {
+                throw new RuntimeException('Penyimpanan koreksi data anomali belum berhasil.');
+            }
+            $db->transCommit();
+        } catch (\Throwable $exception) {
+            $db->transRollback();
+            log_message('warning', 'Koreksi anomali absensi gagal: {message}', ['message' => $exception->getMessage()]);
+
+            return redirect()->to($redirectUrl)->with('error', $exception->getMessage());
+        }
+
+        return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $importId))
+            ->with('success', $updated . ' data anomali berhasil diperbarui.');
+    }
+
+    public function deleteSdmJatimAttendance(): RedirectResponse
+    {
+        $importId = (int) $this->request->getPost('import_id');
+        $importModel = new SdmAttendanceImportModel();
+        $import = $importId > 0 ? $importModel->find($importId) : null;
+
+        if ($import === null) {
+            return redirect()->to(site_url('sdm/sdm-jatim'))
+                ->with('error', 'Rekap absensi tidak ditemukan atau sudah dihapus.');
+        }
+
+        if (! $this->deleteRecord($importModel, 'sdm_attendance_imports', $importId)) {
+            return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $importId))
+                ->with('error', 'Rekap absensi belum dapat dihapus.');
+        }
+
+        return redirect()->to(site_url('sdm/sdm-jatim'))
+            ->with('success', 'Rekap absensi berhasil dihapus.');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function attendancePageData(?int $selectedImportId = null, ?string $error = null): array
+    {
+        $filters = [
+            'name'         => trim((string) $this->request->getGet('nama')),
+            'from'         => $this->validAttendanceDate((string) $this->request->getGet('dari')),
+            'to'           => $this->validAttendanceDate((string) $this->request->getGet('sampai')),
+            'mode'         => $this->request->getGet('mode') === 'detail' ? 'detail' : 'summary',
+            'employee_key' => trim((string) $this->request->getGet('pegawai')),
+        ];
+        $importModel = new SdmAttendanceImportModel();
+        $imports = $importModel
+            ->orderBy('period_start', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->findAll(24);
+        foreach ($imports as &$import) {
+            $period = new \DateTimeImmutable($import['period_start']);
+            $import['period_label'] = $this->attendanceMonthLabel((int) $period->format('n')) . ' ' . $period->format('Y');
+        }
+        unset($import);
+
+        if (($selectedImportId ?? 0) <= 0 && $imports !== []) {
+            $selectedImportId = (int) $imports[0]['id'];
+        }
+
+        $selectedImport = null;
+        foreach ($imports as $import) {
+            if ((int) $import['id'] === $selectedImportId) {
+                $selectedImport = $import;
+                break;
+            }
+        }
+
+        if ($selectedImport === null && $imports !== []) {
+            $selectedImport = $imports[0];
+            $selectedImportId = (int) $selectedImport['id'];
+        }
+
+        if ($selectedImport !== null) {
+            $periodStart = $selectedImport['period_start'];
+            $periodEnd = $selectedImport['period_end'];
+            if ($filters['from'] !== '' && ($filters['from'] < $periodStart || $filters['from'] > $periodEnd)) {
+                $filters['from'] = '';
+            }
+            if ($filters['to'] !== '' && ($filters['to'] < $periodStart || $filters['to'] > $periodEnd)) {
+                $filters['to'] = '';
+            }
+            if ($filters['from'] !== '' && $filters['to'] !== '' && $filters['from'] > $filters['to']) {
+                [$filters['from'], $filters['to']] = [$filters['to'], $filters['from']];
+            }
+        }
+
+        return [
+            'title'            => 'SDM Jatim | SDM & Teller',
+            'report'           => $selectedImport !== null ? $this->storedAttendanceReport($selectedImport, $filters) : null,
+            'importError'      => $error,
+            'attendanceImports' => $imports,
+            'selectedImportId' => $selectedImport !== null ? (int) $selectedImport['id'] : null,
+            'attendanceFilters' => $filters,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $report
+     */
+    private function saveAttendanceReport(array $report, string $hash): int
+    {
+        $db = db_connect();
+        $importModel = new SdmAttendanceImportModel();
+        $recordModel = new SdmAttendanceRecordModel();
+        $db->transBegin();
+
+        try {
+            $importId = $importModel->insert([
+                'source_name'      => $report['source_name'],
+                'source_hash'      => $hash,
+                'period_start'     => $report['period_start'],
+                'period_end'       => $report['period_end'],
+                'employee_count'   => $report['summary']['EMPLOYEES'],
+                'row_count'        => $report['summary']['ROWS'],
+                'hadir_count'      => $report['summary']['H'],
+                'izin_count'       => $report['summary']['I'],
+                'alpa_count'       => $report['summary']['A'],
+                'incomplete_count' => $report['summary']['TA'] + $report['summary']['TAM'] + $report['summary']['TAP'],
+                'off_count'        => $report['summary']['OFF'],
+                'other_count'      => $report['summary']['OTHER'],
+                'warnings_json'    => json_encode($report['warnings'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                'imported_by'      => session()->get('auth_user_id') ?: null,
+                'imported_by_name' => trim((string) session()->get('auth_display_name')) ?: null,
+            ], true);
+
+            if (! is_int($importId) && ! ctype_digit((string) $importId)) {
+                throw new RuntimeException('Data rekap belum dapat disimpan.');
+            }
+
+            $rows = [];
+            foreach ($report['records'] as $record) {
+                $rows[] = ['import_id' => (int) $importId] + $record;
+            }
+
+            foreach (array_chunk($rows, 200) as $chunk) {
+                if ($recordModel->insertBatch($chunk) === false) {
+                    throw new RuntimeException('Detail absensi belum dapat disimpan.');
+                }
+            }
+
+            if ($db->transStatus() === false) {
+                throw new RuntimeException('Penyimpanan rekap absensi belum berhasil.');
+            }
+
+            $db->transCommit();
+
+            return (int) $importId;
+        } catch (\Throwable $exception) {
+            $db->transRollback();
+            throw $exception;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $import
+     * @param array{name: string, from: string, to: string, mode: string, employee_key: string} $filters
+     * @return array<string, mixed>
+     */
+    private function storedAttendanceReport(array $import, array $filters): array
+    {
+        $recordModel = (new SdmAttendanceRecordModel())
+            ->where('import_id', (int) $import['id']);
+        if ($filters['name'] !== '') {
+            $recordModel->like('employee_name', $filters['name']);
+        }
+        if ($filters['from'] !== '') {
+            $recordModel->where('attendance_date >=', $filters['from']);
+        }
+        if ($filters['to'] !== '') {
+            $recordModel->where('attendance_date <=', $filters['to']);
+        }
+        $records = $recordModel
+            ->orderBy('employee_name', 'ASC')
+            ->orderBy('attendance_date', 'ASC')
+            ->findAll();
+        $employees = [];
+        $anomalies = [];
+        $summary = ['H' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'BL' => 0, 'OTHER' => 0];
+
+        foreach ($records as $record) {
+            $key = $record['employee_key'];
+            if (! isset($employees[$key])) {
+                $employees[$key] = [
+                    'employee_key'   => $record['employee_key'],
+                    'employee_no'    => $record['employee_no'] ?: '-',
+                    'employee_name'  => $record['employee_name'],
+                    'position'       => $record['position'],
+                    'organization'   => $record['organization'],
+                    'days'           => [],
+                    'day_details'    => [],
+                    'totals'         => ['H' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'BL' => 0],
+                    'attendance_rate' => null,
+                ];
+            }
+
+            $code = $record['recap_code'];
+            $day = (int) date('j', strtotime($record['attendance_date']));
+            $employees[$key]['days'][$day] = $code;
+            $employees[$key]['day_details'][$day] = [
+                'recap_code' => $code,
+                'actual_in'  => $record['actual_in'],
+                'actual_out' => $record['actual_out'],
+            ];
+            if (isset($employees[$key]['totals'][$code])) {
+                $employees[$key]['totals'][$code]++;
+            }
+            if (isset($summary[$code])) {
+                $summary[$code]++;
+            } else {
+                $summary['OTHER']++;
+            }
+            if (in_array($code, ['A', 'TA', 'TAM', 'TAP'], true)) {
+                $anomalies[] = [
+                    'id'              => (int) $record['id'],
+                    'employee_no'     => $record['employee_no'] ?: '-',
+                    'employee_name'   => $record['employee_name'],
+                    'attendance_date' => $record['attendance_date'],
+                    'actual_in'       => $record['actual_in'],
+                    'actual_out'      => $record['actual_out'],
+                    'raw_status'      => $record['raw_status'],
+                    'recap_code'      => $code,
+                    'remark'          => $record['remark'],
+                ];
+            }
+        }
+
+        foreach ($employees as &$employee) {
+            $workDays = $employee['totals']['H'] + $employee['totals']['I']
+                + $employee['totals']['A'] + $employee['totals']['TA']
+                + $employee['totals']['TAM'] + $employee['totals']['TAP'];
+            $employee['attendance_rate'] = $workDays > 0
+                ? round(($employee['totals']['H'] / $workDays) * 100, 1)
+                : null;
+        }
+        unset($employee);
+
+        $warnings = json_decode((string) ($import['warnings_json'] ?? '[]'), true);
+        if (! is_array($warnings)) {
+            $warnings = [];
+        }
+
+        $period = new \DateTimeImmutable($import['period_start']);
+        $displayStart = new \DateTimeImmutable($filters['from'] !== '' ? $filters['from'] : $import['period_start']);
+        $displayEnd = new \DateTimeImmutable($filters['to'] !== '' ? $filters['to'] : $import['period_end']);
+        foreach ($employees as &$employee) {
+            for ($date = $displayStart; $date <= $displayEnd; $date = $date->modify('+1 day')) {
+                $day = (int) $date->format('j');
+                if (! array_key_exists($day, $employee['day_details'])) {
+                    $employee['totals']['BL']++;
+                    $summary['BL']++;
+                }
+            }
+        }
+        unset($employee);
+        $summary['ROWS'] = count($records);
+        $summary['EMPLOYEES'] = count($employees);
+
+        return [
+            'source_name'     => $import['source_name'],
+            'period_start'    => $import['period_start'],
+            'period_end'      => $import['period_end'],
+            'period_label'    => $this->attendanceMonthLabel((int) $period->format('n')) . ' ' . $period->format('Y'),
+            'days_in_month'   => (int) $period->format('t'),
+            'display_start_day' => (int) $displayStart->format('j'),
+            'display_end_day' => (int) $displayEnd->format('j'),
+            'employees'       => array_values($employees),
+            'anomalies'       => $anomalies,
+            'summary'         => $summary,
+            'warnings'        => array_values($warnings),
+            'imported_at'     => $import['created_at'],
+            'imported_by_name' => $import['imported_by_name'] ?: 'Pengguna',
+        ];
+    }
+
+    private function attendanceMonthLabel(int $month): string
+    {
+        return [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ][$month];
+    }
+
+    private function validAttendanceDate(string $value): string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+
+        return $date !== false && $date->format('Y-m-d') === $value ? $value : '';
+    }
+
+    private function validAttendanceTime(string $value): ?string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+
+        foreach (['!H:i', '!H:i:s'] as $format) {
+            $time = \DateTimeImmutable::createFromFormat($format, $value);
+            if ($time !== false) {
+                return $time->format('H:i:s');
+            }
+        }
+
+        throw new RuntimeException('Format jam masuk atau jam pulang tidak valid.');
+    }
+
+    private function refreshAttendanceImportSummary(int $importId, SdmAttendanceImportModel $importModel): void
+    {
+        $records = (new SdmAttendanceRecordModel())
+            ->select('employee_key, recap_code')
+            ->where('import_id', $importId)
+            ->findAll();
+        $employees = [];
+        $counts = ['H' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
+
+        foreach ($records as $record) {
+            $employees[$record['employee_key']] = true;
+            $code = $record['recap_code'];
+            isset($counts[$code]) ? $counts[$code]++ : $counts['OTHER']++;
+        }
+
+        if ($importModel->update($importId, [
+            'employee_count'   => count($employees),
+            'row_count'        => count($records),
+            'hadir_count'      => $counts['H'],
+            'izin_count'       => $counts['I'],
+            'alpa_count'       => $counts['A'],
+            'incomplete_count' => $counts['TA'] + $counts['TAM'] + $counts['TAP'],
+            'off_count'        => $counts['OFF'],
+            'other_count'      => $counts['OTHER'],
+        ]) === false) {
+            throw new RuntimeException('Ringkasan absensi belum dapat diperbarui.');
+        }
     }
 
     public function synchronizeIncomingDocuments(): RedirectResponse

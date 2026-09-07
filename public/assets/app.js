@@ -1515,15 +1515,19 @@
     });
 
     agendaDownloadSheetButton?.addEventListener('click', async () => {
-        const url = agendaDownloadSheetButton.dataset.downloadUrl;
-        if (!url || !agendaForm) return;
+        const endpoint = agendaDownloadSheetButton.dataset.downloadUrl;
+        if (!endpoint || !agendaForm) return;
+
+        const url = new URL(endpoint, window.location.href);
+        url.protocol = window.location.protocol;
+        url.host = window.location.host;
 
         agendaErrors.hidden = true;
         agendaStatus.textContent = 'Membuat Lembar Pengendalian...';
         agendaDownloadSheetButton.disabled = true;
 
         try {
-            const response = await fetch(url, {
+            const response = await fetch(url.toString(), {
                 method: 'POST',
                 body: new FormData(agendaForm),
                 credentials: 'same-origin',
@@ -1534,10 +1538,15 @@
             updateCsrf({ name: csrfName, hash: csrfHash });
 
             if (!response.ok) {
-                const result = await response.json();
-                updateCsrf(result.csrf);
-                showAgendaErrors(result.message || 'Lembar Pengendalian belum dapat dibuat.', result.errors || []);
-                return;
+                const contentType = response.headers.get('Content-Type') || '';
+                const result = contentType.includes('application/json') ? await response.json() : null;
+                updateCsrf(result?.csrf);
+                throw new Error(result?.message || `Lembar Pengendalian belum dapat dibuat (HTTP ${response.status}).`);
+            }
+
+            const contentType = response.headers.get('Content-Type') || '';
+            if (!contentType.includes('application/pdf')) {
+                throw new Error('Respons Lembar Pengendalian bukan berupa PDF. Silakan masuk ulang lalu coba kembali.');
             }
 
             const blob = await response.blob();
@@ -1553,7 +1562,7 @@
             window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
             agendaStatus.textContent = 'Lembar Pengendalian berhasil diunduh';
         } catch (error) {
-            showAgendaErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
+            showAgendaErrors(error.message || 'Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
             agendaDownloadSheetButton.disabled = false;
             if (agendaStatus.textContent === 'Membuat Lembar Pengendalian...') agendaStatus.textContent = '';
@@ -2259,5 +2268,51 @@
     document.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
         orderMenus.forEach((menu) => menu.removeAttribute('open'));
+    });
+})();
+
+// Popup koreksi anomali dan konfirmasi penghapusan rekap SDM Jatim.
+(() => {
+    const modalConfigurations = [
+        {
+            modal: document.querySelector('#attendanceAnomalyModal'),
+            openSelector: '[data-open-attendance-anomaly]',
+            closeSelector: '[data-close-attendance-anomaly]',
+        },
+        {
+            modal: document.querySelector('#attendanceRecapDeleteModal'),
+            openSelector: '[data-open-attendance-delete]',
+            closeSelector: '[data-close-attendance-delete]',
+        },
+    ];
+
+    const closeModal = (modal) => {
+        if (!modal || !modal.classList.contains('open')) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        window.setTimeout(() => { modal.hidden = true; }, 180);
+    };
+
+    modalConfigurations.forEach(({ modal, openSelector, closeSelector }) => {
+        if (!modal) return;
+
+        document.querySelectorAll(openSelector).forEach((trigger) => {
+            trigger.addEventListener('click', () => {
+                modal.hidden = false;
+                modal.setAttribute('aria-hidden', 'false');
+                window.requestAnimationFrame(() => modal.classList.add('open'));
+                document.body.style.overflow = 'hidden';
+                window.setTimeout(() => modal.querySelector('input:not([type="hidden"]), select, button')?.focus(), 180);
+            });
+        });
+        modal.querySelectorAll(closeSelector).forEach((trigger) => {
+            trigger.addEventListener('click', () => closeModal(modal));
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        modalConfigurations.forEach(({ modal }) => closeModal(modal));
     });
 })();

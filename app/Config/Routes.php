@@ -26,6 +26,11 @@ $routes->get('sdm', 'Sdm::index', ['as' => 'sdm.index']);
 $routes->get('sdm/dokumen-masuk', 'Sdm::incomingDocuments', ['as' => 'sdm.dokumen_masuk']);
 $routes->post('sdm/dokumen-masuk/sinkronkan', 'Sdm::synchronizeIncomingDocuments', ['as' => 'sdm.dokumen_masuk.synchronize']);
 $routes->get('sdm/riwayat', 'Sdm::incomingDocumentHistory', ['as' => 'sdm.riwayat']);
+$routes->get('sdm/dashboard-kehadiran', 'Sdm::attendanceDashboard', ['as' => 'sdm.dashboard_kehadiran']);
+$routes->get('sdm/sdm-jatim', 'Sdm::sdmJatim', ['as' => 'sdm.jatim']);
+$routes->post('sdm/sdm-jatim/rekap', 'Sdm::recapSdmJatimAttendance', ['as' => 'sdm.jatim.recap']);
+$routes->post('sdm/sdm-jatim/anomali', 'Sdm::updateSdmJatimAnomalies', ['as' => 'sdm.jatim.anomaly.update']);
+$routes->post('sdm/sdm-jatim/hapus', 'Sdm::deleteSdmJatimAttendance', ['as' => 'sdm.jatim.delete']);
 $routes->post('sdm/dokumen-masuk/(:num)', 'Sdm::updateIncomingDocument/$1', ['as' => 'sdm.dokumen_masuk.update']);
 $routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);
 

@@ -58,6 +58,7 @@ abstract class BaseController extends Controller
                 'kelola-akun',
                 'data-terhapus',
                 'bagian-umum-1',
+                'sdm',
             ];
 
             if ($segments !== [] && in_array($segments[0], $allowedRoots, true)) {
