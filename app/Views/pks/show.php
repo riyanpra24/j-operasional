@@ -70,6 +70,7 @@ $isEditMode = $isEditMode ?? false;
             <div><dt>Nomor PKS</dt><dd><?= esc($record['kode_internal']) ?></dd></div>
             <div><dt>Unit Pengelola</dt><dd><?= esc($record['unit_pengelola'] ?: '-') ?></dd></div>
             <div><dt>PIC Internal</dt><dd><?= esc($record['pic_internal'] ?: '-') ?></dd></div>
+            <div class="wide"><dt>Keterangan</dt><dd><?= nl2br(esc($record['keterangan'] ?: '-')) ?></dd></div>
         </dl>
     </article>
     <article class="panel pks-overview-panel">

@@ -34,6 +34,7 @@ $picForUnit = static fn (string $unit): string => match ($unit) {
             <div class="form-group"><label for="unitPengelola">Unit Pengelola</label><select id="unitPengelola" name="unit_pengelola"><option value="">Pilih unit pengelola</option><?php foreach (['Bagian Umum 1', 'Bagian Umum 2'] as $unit): ?><option value="<?= esc($unit) ?>" <?= $value('unit_pengelola', $record) === $unit ? 'selected' : '' ?>><?= esc($unit) ?></option><?php endforeach ?></select></div>
             <div class="form-group span-2"><label for="namaKerjasama">Nama Kerja Sama <span class="required">*</span></label><input id="namaKerjasama" name="nama_kerjasama" maxlength="250" value="<?= esc($value('nama_kerjasama', $record)) ?>" placeholder="Contoh: Pengadaan Jasa Kebersihan Kantor" required></div>
             <div class="form-group"><label for="picInternal">PIC Internal</label><input id="picInternal" name="pic_internal" value="<?= esc($picForUnit($value('unit_pengelola', $record))) ?>" readonly aria-readonly="true" placeholder="Terisi otomatis sesuai unit"><small>Ditentukan otomatis berdasarkan Unit Pengelola.</small></div>
+            <div class="form-group span-2"><label for="pksKeterangan">Keterangan</label><textarea id="pksKeterangan" name="keterangan" maxlength="2000" placeholder="Tambahkan deskripsi atau keterangan kerja sama bila diperlukan"><?= esc($value('keterangan', $record)) ?></textarea><small>Opsional. Jelaskan informasi tambahan yang perlu diketahui terkait PKS.</small></div>
         </div>
     </section>
 

@@ -9,6 +9,7 @@ use App\Models\DokumenSpkModel;
 use App\Models\PksDokumenModel;
 use App\Models\PksItemModel;
 use App\Models\PksKerjasamaModel;
+use App\Models\SdmAttendanceImportModel;
 use App\Models\UserModel;
 use App\Models\VehicleDocumentModel;
 use App\Models\VehicleMaintenanceModel;
@@ -32,6 +33,7 @@ class DeletedData extends BaseController
         'kendaraan' => ['label' => 'Data Kendaraan', 'table' => 'vehicles', 'model' => VehicleModel::class, 'fields' => ['nomor_polisi', 'nama_kendaraan']],
         'servis-kendaraan' => ['label' => 'Servis dan Perawatan', 'table' => 'vehicle_maintenance', 'model' => VehicleMaintenanceModel::class, 'fields' => ['jenis_perawatan', 'tanggal_servis']],
         'dokumen-kendaraan' => ['label' => 'Dokumen Kendaraan', 'table' => 'vehicle_documents', 'model' => VehicleDocumentModel::class, 'fields' => ['jenis_dokumen', 'nomor_dokumen']],
+        'rekap-absensi-sdm' => ['label' => 'Rekap Absensi SDM Jatim', 'table' => 'sdm_attendance_imports', 'model' => SdmAttendanceImportModel::class, 'fields' => ['period_start', 'source_name']],
     ];
 
     public function index(): string|RedirectResponse

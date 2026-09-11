@@ -10,6 +10,7 @@ use RuntimeException;
 final class EssAttendanceReportParser
 {
     private const COLUMN_COUNT = 24;
+    private const LATE_AFTER = '08:00:00';
 
     /**
      * Mengubah laporan ESS berbentuk HTML-XLS menjadi rekap absensi bulanan.
@@ -151,7 +152,7 @@ final class EssAttendanceReportParser
         $seenRecords = [];
         $availableDates = [];
         $warnings = [];
-        $summary = ['H' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
+        $summary = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
         $storedRecords = [];
 
         foreach ($records as $record) {
@@ -180,7 +181,7 @@ final class EssAttendanceReportParser
                     'position'      => $record['position'],
                     'organization'  => $record['organization'],
                     'days'          => [],
-                    'totals'        => ['H' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0],
+                    'totals'        => ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0],
                 ];
             }
 
@@ -236,11 +237,11 @@ final class EssAttendanceReportParser
 
         $employeeRows = array_values($employees);
         foreach ($employeeRows as &$employee) {
-            $workDays = $employee['totals']['H'] + $employee['totals']['I']
+            $workDays = $employee['totals']['H'] + $employee['totals']['TLBT'] + $employee['totals']['I']
                 + $employee['totals']['A'] + $employee['totals']['TA']
                 + $employee['totals']['TAM'] + $employee['totals']['TAP'];
             $employee['attendance_rate'] = $workDays > 0
-                ? round(($employee['totals']['H'] / $workDays) * 100, 1)
+                ? round((($employee['totals']['H'] + $employee['totals']['TLBT']) / $workDays) * 100, 1)
                 : null;
         }
         unset($employee);
@@ -286,7 +287,11 @@ final class EssAttendanceReportParser
                 return 'TAM';
             }
 
-            return $hasActualIn && $hasActualOut && ! $hasIncompleteMarker ? 'H' : 'TA';
+            if ($hasActualIn && $hasActualOut && ! $hasIncompleteMarker) {
+                return $this->isLateCheckIn($record['actual_in']) ? 'TLBT' : 'H';
+            }
+
+            return 'TA';
         }
 
         if ($record['status'] === 'OFF' || in_array($record['day_type'], ['OFF', 'PHOFF'], true)) {
@@ -310,6 +315,19 @@ final class EssAttendanceReportParser
         }
 
         return $record['status'] !== '' ? $record['status'] : '-';
+    }
+
+    private function isLateCheckIn(string $value): bool
+    {
+        $value = trim($value);
+        foreach (['!H:i:s', '!H:i'] as $format) {
+            $time = DateTimeImmutable::createFromFormat($format, $value);
+            if ($time !== false) {
+                return $time->format('H:i:s') > self::LATE_AFTER;
+            }
+        }
+
+        return false;
     }
 
     private function normalizeText(string $value): string

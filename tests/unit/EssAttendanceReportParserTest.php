@@ -40,6 +40,7 @@ final class EssAttendanceReportParserTest extends CIUnitTestCase
         $this->assertSame(2, $report['summary']['EMPLOYEES']);
         $this->assertSame(4, $report['summary']['ROWS']);
         $this->assertSame(1, $report['summary']['H']);
+        $this->assertSame(0, $report['summary']['TLBT']);
         $this->assertSame(0, $report['summary']['TA']);
         $this->assertSame(0, $report['summary']['TAM']);
         $this->assertSame(1, $report['summary']['TAP']);
@@ -98,6 +99,24 @@ final class EssAttendanceReportParserTest extends CIUnitTestCase
         $this->assertSame('TA', $report['records'][0]['recap_code']);
         $this->assertNull($report['records'][0]['actual_in']);
         $this->assertNull($report['records'][0]['actual_out']);
+    }
+
+    public function testMarksCompleteAttendanceAfterEightAsLate(): void
+    {
+        file_put_contents($this->fixturePath, $this->reportHtml([
+            $this->row('46237', 'Tepat Waktu', '90871', 'PRS', 'FPRS,PRS', '08:00:00', '17:00:00'),
+            $this->row('46238', 'Datang Terlambat', '90872', 'PRS', 'FPRS,PRS', '08:01:00', '17:00:00'),
+        ]));
+
+        $report = (new EssAttendanceReportParser())->parse($this->fixturePath, 'attendance.xls');
+        $records = array_column($report['records'], null, 'employee_no');
+        $employees = array_column($report['employees'], null, 'employee_no');
+
+        $this->assertSame('H', $records['90871']['recap_code']);
+        $this->assertSame('TLBT', $records['90872']['recap_code']);
+        $this->assertSame(1, $report['summary']['H']);
+        $this->assertSame(1, $report['summary']['TLBT']);
+        $this->assertSame(100.0, $employees['90872']['attendance_rate']);
     }
 
     public function testRejectsAFileThatIsNotAnEssReport(): void

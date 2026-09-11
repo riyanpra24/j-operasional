@@ -406,7 +406,7 @@ class PksBarangJasa extends BaseController
 
     private function mainPayload(): array
     {
-        $fields = ['kode_internal', 'nama_kerjasama', 'unit_pengelola', 'pic_internal', 'nama_mitra', 'alamat', 'nama_kontak', 'jabatan_kontak', 'telepon', 'email'];
+        $fields = ['kode_internal', 'nama_kerjasama', 'unit_pengelola', 'pic_internal', 'keterangan', 'nama_mitra', 'alamat', 'nama_kontak', 'jabatan_kontak', 'telepon', 'email'];
         $data = [];
         foreach ($fields as $field) {
             $data[$field] = trim((string) $this->request->getPost($field));
@@ -427,6 +427,7 @@ class PksBarangJasa extends BaseController
             'nama_kerjasama' => 'required|max_length[250]',
             'unit_pengelola' => 'permit_empty|in_list[Bagian Umum 1,Bagian Umum 2]',
             'pic_internal' => 'permit_empty|in_list[Angger Wicaksono,Agil Halis Kesawa]',
+            'keterangan' => 'permit_empty|max_length[2000]',
             'nama_mitra' => 'required|max_length[200]',
             'nama_kontak' => 'permit_empty|max_length[150]',
             'jabatan_kontak' => 'permit_empty|max_length[150]',
@@ -452,7 +453,7 @@ class PksBarangJasa extends BaseController
 
     private function kerjasamaData(array $data, int $mitraId): array
     {
-        return ['mitra_id' => $mitraId] + array_intersect_key($data, array_flip(['kode_internal', 'nama_kerjasama', 'unit_pengelola', 'pic_internal']));
+        return ['mitra_id' => $mitraId] + array_intersect_key($data, array_flip(['kode_internal', 'nama_kerjasama', 'unit_pengelola', 'pic_internal', 'keterangan']));
     }
 
     private function documentPayload(int $id): array

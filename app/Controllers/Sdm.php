@@ -3,7 +3,9 @@
 namespace App\Controllers;
 
 use App\Libraries\EssAttendanceReportParser;
+use App\Libraries\IndonesianHolidayCalendar;
 use App\Models\AgendarisModel;
+use App\Models\SdmAttendanceCalendarModel;
 use App\Models\SdmAttendanceImportModel;
 use App\Models\SdmAttendanceRecordModel;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -13,6 +15,8 @@ use RuntimeException;
 
 class Sdm extends BaseController
 {
+    private const LATE_AFTER = '08:00:00';
+
     public function index(): string
     {
         return view('sdm/index', [
@@ -35,6 +39,79 @@ class Sdm extends BaseController
         return view('sdm/dashboard_kehadiran', [
             'title' => 'Dashboard Kehadiran | SDM & Teller',
         ]);
+    }
+
+    public function attendanceCalendar(): ResponseInterface|RedirectResponse
+    {
+        $year = (int) $this->request->getGet('tahun');
+        $month = (int) $this->request->getGet('bulan');
+        $year = $year >= 2020 && $year <= 2100 ? $year : 2026;
+        $month = $month >= 1 && $month <= 12 ? $month : (int) date('n');
+
+        if ($this->request->isAJAX() || $this->request->getGet('format') === 'json') {
+            $calendarData = $this->attendanceCalendarMonthData($year, $month);
+
+            return $this->response->setJSON([
+                'success'     => true,
+                'year'        => $calendarData['year'],
+                'month'       => $calendarData['month'],
+                'month_label' => $calendarData['monthLabel'],
+                'html'        => view('sdm/_calendar_month', $calendarData),
+            ]);
+        }
+
+        return redirect()->to(site_url('sdm/sdm-jatim') . '?' . http_build_query([
+            'kalender'        => 1,
+            'kalender_tahun'  => $year,
+            'kalender_bulan'  => $month,
+        ]));
+    }
+
+    public function updateAttendanceCalendar(): RedirectResponse
+    {
+        $dateValue = $this->validAttendanceDate((string) $this->request->getPost('calendar_date'));
+        $mode = (string) $this->request->getPost('mode');
+        $label = trim((string) $this->request->getPost('label'));
+
+        if ($dateValue === '' || ! in_array($mode, ['auto', 'holiday', 'workday'], true)) {
+            return redirect()->back()->with('error', 'Pengaturan tanggal belum valid.');
+        }
+
+        $date = new \DateTimeImmutable($dateValue);
+        $redirectUrl = site_url('sdm/sdm-jatim') . '?' . http_build_query([
+            'import_id'       => (int) $this->request->getPost('import_id'),
+            'kalender'        => 1,
+            'kalender_tahun'  => (int) $date->format('Y'),
+            'kalender_bulan'  => (int) $date->format('n'),
+        ]);
+        $model = new SdmAttendanceCalendarModel();
+        $existing = $model->where('calendar_date', $dateValue)->first();
+
+        if ($mode === 'auto') {
+            if ($existing !== null && ! $model->delete((int) $existing['id'])) {
+                return redirect()->to($redirectUrl)->with('error', 'Pengaturan tanggal belum dapat dikembalikan ke otomatis.');
+            }
+
+            return redirect()->to($redirectUrl)->with('success', 'Tanggal kembali mengikuti kalender otomatis.');
+        }
+
+        $data = [
+            'calendar_date'   => $dateValue,
+            'is_holiday'      => $mode === 'holiday' ? 1 : 0,
+            'label'           => $label !== '' ? mb_substr($label, 0, 150) : ($mode === 'holiday' ? 'Libur khusus' : 'Hari kerja khusus'),
+            'updated_by'      => session()->get('auth_user_id') ?: null,
+            'updated_by_name' => trim((string) session()->get('auth_display_name')) ?: null,
+            'updated_by_role' => (string) session()->get('auth_role'),
+        ];
+        $saved = $existing !== null
+            ? $model->update((int) $existing['id'], $data)
+            : $model->insert($data);
+
+        if ($saved === false) {
+            return redirect()->to($redirectUrl)->with('error', 'Pengaturan tanggal belum dapat disimpan.');
+        }
+
+        return redirect()->to($redirectUrl)->with('success', 'Kalender kehadiran berhasil diperbarui.');
     }
 
     public function sdmJatim(): string
@@ -79,6 +156,11 @@ class Sdm extends BaseController
             $existingImport = $importModel->withDeleted()->where('source_hash', $hash)->first();
             if ($existingImport !== null) {
                 if (! empty($existingImport['deleted_at'])) {
+                    if (! $this->currentRoleIsAdmin()) {
+                        return redirect()->to(site_url('sdm/sdm-jatim'))
+                            ->with('error', 'Rekap yang sama berada di Data Terhapus. Hubungi Administrator untuk memulihkannya.');
+                    }
+
                     $restored = db_connect()->table('sdm_attendance_imports')->where('id', (int) $existingImport['id'])->update([
                         'deleted_at'      => null,
                         'deleted_by_role' => null,
@@ -128,7 +210,7 @@ class Sdm extends BaseController
             ->where('import_id', $importId)
             ->whereIn('recap_code', ['A', 'TA', 'TAM', 'TAP'])
             ->findAll();
-        $allowedCodes = ['H', 'I', 'A', 'TA', 'TAM', 'TAP', 'OFF'];
+        $allowedCodes = ['H', 'TLBT', 'I', 'A', 'TA', 'TAM', 'TAP', 'OFF'];
         $db = db_connect();
         $updated = 0;
         $db->transBegin();
@@ -158,6 +240,9 @@ class Sdm extends BaseController
                     } elseif ($actualIn === null && $actualOut === null && in_array($code, ['TAM', 'TAP'], true)) {
                         $code = 'TA';
                     }
+                }
+                if ($actualIn !== null && $actualOut !== null && in_array($code, ['H', 'TLBT'], true)) {
+                    $code = $actualIn > self::LATE_AFTER ? 'TLBT' : 'H';
                 }
 
                 $payload = [
@@ -206,7 +291,9 @@ class Sdm extends BaseController
         }
 
         return redirect()->to(site_url('sdm/sdm-jatim'))
-            ->with('success', 'Rekap absensi berhasil dihapus.');
+            ->with('success', $this->currentRoleIsAdmin()
+                ? 'Rekap absensi beserta seluruh detailnya berhasil dihapus permanen.'
+                : 'Rekap absensi berhasil dipindahkan ke Data Terhapus.');
     }
 
     /**
@@ -270,6 +357,74 @@ class Sdm extends BaseController
             'attendanceImports' => $imports,
             'selectedImportId' => $selectedImport !== null ? (int) $selectedImport['id'] : null,
             'attendanceFilters' => $filters,
+            'attendanceCalendar' => $this->attendanceCalendarPopupData($selectedImport),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed>|null $selectedImport
+     * @return array<string, mixed>
+     */
+    private function attendanceCalendarPopupData(?array $selectedImport): array
+    {
+        $defaultPeriod = $selectedImport !== null
+            ? new \DateTimeImmutable($selectedImport['period_start'])
+            : new \DateTimeImmutable('2026-' . date('m') . '-01');
+        $year = (int) $this->request->getGet('kalender_tahun');
+        $month = (int) $this->request->getGet('kalender_bulan');
+        $year = $year >= 2020 && $year <= 2100 ? $year : (int) $defaultPeriod->format('Y');
+        $month = $month >= 1 && $month <= 12 ? $month : (int) $defaultPeriod->format('n');
+        $monthStart = new \DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month));
+        $calendarData = $this->attendanceCalendarMonthData($year, $month);
+
+        $baseQuery = array_filter([
+            'import_id'        => $selectedImport['id'] ?? null,
+            'kalender'         => 1,
+        ], static fn ($value): bool => $value !== null && $value !== '');
+
+        return $calendarData + [
+            'importId'    => (int) ($selectedImport['id'] ?? 0),
+            'autoOpen'    => $this->request->getGet('kalender') === '1',
+            'previousUrl' => site_url('sdm/sdm-jatim') . '?' . http_build_query($baseQuery + [
+                'kalender_tahun' => (int) $monthStart->modify('-1 month')->format('Y'),
+                'kalender_bulan' => (int) $monthStart->modify('-1 month')->format('n'),
+            ]),
+            'nextUrl'     => site_url('sdm/sdm-jatim') . '?' . http_build_query($baseQuery + [
+                'kalender_tahun' => (int) $monthStart->modify('+1 month')->format('Y'),
+                'kalender_bulan' => (int) $monthStart->modify('+1 month')->format('n'),
+            ]),
+        ];
+    }
+
+    /**
+     * @return array{year: int, month: int, monthLabel: string, days: list<array<string, mixed>>, leadingDays: int}
+     */
+    private function attendanceCalendarMonthData(int $year, int $month): array
+    {
+        $monthStart = new \DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month));
+        $monthEnd = $monthStart->modify('last day of this month');
+        $calendar = new IndonesianHolidayCalendar($this->attendanceCalendarOverrides($monthStart, $monthEnd));
+        $days = [];
+
+        for ($date = $monthStart; $date <= $monthEnd; $date = $date->modify('+1 day')) {
+            $info = $calendar->info($date);
+            $days[] = [
+                'date'           => $date->format('Y-m-d'),
+                'day'            => (int) $date->format('j'),
+                'is_non_working' => $info['is_non_working'],
+                'label'          => $info['label'],
+                'source'         => $info['source'],
+                'is_override'    => $info['is_override'],
+                'mode'           => $info['is_override'] ? ($info['is_non_working'] ? 'holiday' : 'workday') : 'auto',
+            ];
+        }
+
+        return [
+            'year'        => $year,
+            'month'       => $month,
+            'monthLabel'  => $this->attendanceMonthLabel($month) . ' ' . $year,
+            'days'        => $days,
+            'leadingDays' => (int) $monthStart->format('N') - 1,
         ];
     }
 
@@ -291,7 +446,7 @@ class Sdm extends BaseController
                 'period_end'       => $report['period_end'],
                 'employee_count'   => $report['summary']['EMPLOYEES'],
                 'row_count'        => $report['summary']['ROWS'],
-                'hadir_count'      => $report['summary']['H'],
+                'hadir_count'      => $report['summary']['H'] + $report['summary']['TLBT'],
                 'izin_count'       => $report['summary']['I'],
                 'alpa_count'       => $report['summary']['A'],
                 'incomplete_count' => $report['summary']['TA'] + $report['summary']['TAM'] + $report['summary']['TAP'],
@@ -354,7 +509,19 @@ class Sdm extends BaseController
             ->findAll();
         $employees = [];
         $anomalies = [];
-        $summary = ['H' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'BL' => 0, 'OTHER' => 0];
+        $summary = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'BL' => 0, 'OTHER' => 0];
+        $period = new \DateTimeImmutable($import['period_start']);
+        $displayStart = new \DateTimeImmutable($filters['from'] !== '' ? $filters['from'] : $import['period_start']);
+        $displayEnd = new \DateTimeImmutable($filters['to'] !== '' ? $filters['to'] : $import['period_end']);
+        $holidayCalendar = new IndonesianHolidayCalendar(
+            $this->attendanceCalendarOverrides($displayStart, $displayEnd),
+        );
+        $calendarDays = [];
+
+        for ($date = $displayStart; $date <= $displayEnd; $date = $date->modify('+1 day')) {
+            $day = (int) $date->format('j');
+            $calendarDays[$day] = $holidayCalendar->info($date);
+        }
 
         foreach ($records as $record) {
             $key = $record['employee_key'];
@@ -367,18 +534,35 @@ class Sdm extends BaseController
                     'organization'   => $record['organization'],
                     'days'           => [],
                     'day_details'    => [],
-                    'totals'         => ['H' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'BL' => 0],
+                    'totals'         => ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'BL' => 0],
                     'attendance_rate' => null,
+                    'effective_attendance' => 0.0,
+                    'punctuality_rate' => null,
+                    'discipline_index' => null,
+                    'evaluation_status' => '-',
+                    'evaluation_status_key' => 'neutral',
                 ];
             }
 
+            $recordDate = new \DateTimeImmutable($record['attendance_date']);
+            $calendarInfo = $holidayCalendar->info($recordDate);
             $code = $record['recap_code'];
-            $day = (int) date('j', strtotime($record['attendance_date']));
+            if ($calendarInfo['is_non_working']) {
+                $code = 'OFF';
+            } elseif ($calendarInfo['is_override'] && $code === 'OFF') {
+                $actualIn = $record['actual_in'];
+                $actualOut = $record['actual_out'];
+                $code = $actualIn !== null && $actualOut !== null
+                    ? ($actualIn > self::LATE_AFTER ? 'TLBT' : 'H')
+                    : ($actualIn !== null ? 'TAP' : ($actualOut !== null ? 'TAM' : 'TA'));
+            }
+            $day = (int) $recordDate->format('j');
             $employees[$key]['days'][$day] = $code;
             $employees[$key]['day_details'][$day] = [
-                'recap_code' => $code,
-                'actual_in'  => $record['actual_in'],
-                'actual_out' => $record['actual_out'],
+                'recap_code'   => $code,
+                'actual_in'    => $record['actual_in'],
+                'actual_out'   => $record['actual_out'],
+                'holiday_name' => $calendarInfo['is_non_working'] ? $calendarInfo['label'] : null,
             ];
             if (isset($employees[$key]['totals'][$code])) {
                 $employees[$key]['totals'][$code]++;
@@ -403,36 +587,116 @@ class Sdm extends BaseController
             }
         }
 
-        foreach ($employees as &$employee) {
-            $workDays = $employee['totals']['H'] + $employee['totals']['I']
-                + $employee['totals']['A'] + $employee['totals']['TA']
-                + $employee['totals']['TAM'] + $employee['totals']['TAP'];
-            $employee['attendance_rate'] = $workDays > 0
-                ? round(($employee['totals']['H'] / $workDays) * 100, 1)
-                : null;
-        }
-        unset($employee);
-
         $warnings = json_decode((string) ($import['warnings_json'] ?? '[]'), true);
         if (! is_array($warnings)) {
             $warnings = [];
         }
 
-        $period = new \DateTimeImmutable($import['period_start']);
-        $displayStart = new \DateTimeImmutable($filters['from'] !== '' ? $filters['from'] : $import['period_start']);
-        $displayEnd = new \DateTimeImmutable($filters['to'] !== '' ? $filters['to'] : $import['period_end']);
         foreach ($employees as &$employee) {
             for ($date = $displayStart; $date <= $displayEnd; $date = $date->modify('+1 day')) {
                 $day = (int) $date->format('j');
-                if (! array_key_exists($day, $employee['day_details'])) {
-                    $employee['totals']['BL']++;
-                    $summary['BL']++;
+                if (array_key_exists($day, $employee['day_details'])) {
+                    continue;
                 }
+
+                if ($holidayCalendar->isNonWorkingDay($date)) {
+                    $employee['days'][$day] = 'OFF';
+                    $employee['day_details'][$day] = [
+                        'recap_code'   => 'OFF',
+                        'actual_in'    => null,
+                        'actual_out'   => null,
+                        'holiday_name' => $holidayCalendar->label($date),
+                    ];
+                    $employee['totals']['OFF']++;
+                    $summary['OFF']++;
+
+                    continue;
+                }
+
+                $employee['totals']['BL']++;
+                $summary['BL']++;
             }
         }
         unset($employee);
+
+        $effectiveWorkDays = count(array_filter(
+            $calendarDays,
+            static fn (array $day): bool => ! (bool) ($day['is_non_working'] ?? false),
+        ));
+        $attendanceRates = [];
+        $punctualityRates = [];
+        $disciplineIndexes = [];
+        $evaluationCounts = ['excellent' => 0, 'attention' => 0, 'warning' => 0];
+        $effectiveAttendanceTotal = 0.0;
+
+        foreach ($employees as &$employee) {
+            $presenceSignals = $employee['totals']['H'] + $employee['totals']['TLBT']
+                + $employee['totals']['TA'] + $employee['totals']['TAM'] + $employee['totals']['TAP'];
+            $effectiveAttendance = $employee['totals']['H']
+                + ($employee['totals']['TLBT'] * 0.75)
+                + ($employee['totals']['TAM'] * 0.5)
+                + ($employee['totals']['TAP'] * 0.5)
+                + ($employee['totals']['TA'] * 0.25);
+            $attendanceRate = $effectiveWorkDays > 0
+                ? round(($effectiveAttendance / $effectiveWorkDays) * 100, 1)
+                : null;
+            $punctualityRate = $presenceSignals > 0
+                ? round(($employee['totals']['H'] / $presenceSignals) * 100, 1)
+                : null;
+            $disciplineIndex = $attendanceRate !== null && $punctualityRate !== null
+                ? round(($attendanceRate + $punctualityRate) / 2, 1)
+                : null;
+
+            if ($employee['totals']['A'] > 0) {
+                $evaluationStatus = 'Teguran (Alpa)';
+                $evaluationKey = 'warning';
+            } elseif (
+                $employee['totals']['TLBT'] >= 3
+                || ($attendanceRate !== null && $attendanceRate < 95)
+                || $employee['totals']['TA'] > 0
+            ) {
+                $evaluationStatus = 'Perlu Perhatian';
+                $evaluationKey = 'attention';
+            } else {
+                $evaluationStatus = 'Sangat Baik';
+                $evaluationKey = 'excellent';
+            }
+
+            $employee['effective_work_days'] = $effectiveWorkDays;
+            $employee['effective_attendance'] = round($effectiveAttendance, 2);
+            $employee['attendance_rate'] = $attendanceRate;
+            $employee['punctuality_rate'] = $punctualityRate;
+            $employee['discipline_index'] = $disciplineIndex;
+            $employee['evaluation_status'] = $evaluationStatus;
+            $employee['evaluation_status_key'] = $evaluationKey;
+            $effectiveAttendanceTotal += $effectiveAttendance;
+            $evaluationCounts[$evaluationKey]++;
+            if ($attendanceRate !== null) {
+                $attendanceRates[] = $attendanceRate;
+            }
+            if ($punctualityRate !== null) {
+                $punctualityRates[] = $punctualityRate;
+            }
+            if ($disciplineIndex !== null) {
+                $disciplineIndexes[] = $disciplineIndex;
+            }
+        }
+        unset($employee);
+
         $summary['ROWS'] = count($records);
         $summary['EMPLOYEES'] = count($employees);
+        $summary['EFFECTIVE_WORK_DAYS'] = $effectiveWorkDays;
+        $summary['EFFECTIVE_ATTENDANCE'] = round($effectiveAttendanceTotal, 2);
+        $summary['AVERAGE_ATTENDANCE_RATE'] = $attendanceRates !== []
+            ? round(array_sum($attendanceRates) / count($attendanceRates), 1)
+            : null;
+        $summary['AVERAGE_PUNCTUALITY_RATE'] = $punctualityRates !== []
+            ? round(array_sum($punctualityRates) / count($punctualityRates), 1)
+            : null;
+        $summary['AVERAGE_DISCIPLINE_INDEX'] = $disciplineIndexes !== []
+            ? round(array_sum($disciplineIndexes) / count($disciplineIndexes), 1)
+            : null;
+        $summary['EVALUATIONS'] = $evaluationCounts;
 
         return [
             'source_name'     => $import['source_name'],
@@ -442,6 +706,7 @@ class Sdm extends BaseController
             'days_in_month'   => (int) $period->format('t'),
             'display_start_day' => (int) $displayStart->format('j'),
             'display_end_day' => (int) $displayEnd->format('j'),
+            'calendar_days'    => $calendarDays,
             'employees'       => array_values($employees),
             'anomalies'       => $anomalies,
             'summary'         => $summary,
@@ -458,6 +723,25 @@ class Sdm extends BaseController
             5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
         ][$month];
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function attendanceCalendarOverrides(\DateTimeInterface $start, \DateTimeInterface $end): array
+    {
+        $rows = (new SdmAttendanceCalendarModel())
+            ->where('calendar_date >=', $start->format('Y-m-d'))
+            ->where('calendar_date <=', $end->format('Y-m-d'))
+            ->orderBy('calendar_date', 'ASC')
+            ->findAll();
+        $overrides = [];
+
+        foreach ($rows as $row) {
+            $overrides[$row['calendar_date']] = $row;
+        }
+
+        return $overrides;
     }
 
     private function validAttendanceDate(string $value): string
@@ -496,7 +780,7 @@ class Sdm extends BaseController
             ->where('import_id', $importId)
             ->findAll();
         $employees = [];
-        $counts = ['H' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
+        $counts = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
 
         foreach ($records as $record) {
             $employees[$record['employee_key']] = true;
@@ -507,7 +791,7 @@ class Sdm extends BaseController
         if ($importModel->update($importId, [
             'employee_count'   => count($employees),
             'row_count'        => count($records),
-            'hadir_count'      => $counts['H'],
+            'hadir_count'      => $counts['H'] + $counts['TLBT'],
             'izin_count'       => $counts['I'],
             'alpa_count'       => $counts['A'],
             'incomplete_count' => $counts['TA'] + $counts['TAM'] + $counts['TAP'],
@@ -704,7 +988,7 @@ class Sdm extends BaseController
             $document === null
             || (($document['progres'] ?? '') !== 'Selesai' && empty($document['sdm_processed_at']))
             || $latestStep === 0
-            || ! $this->belongsToCurrentUser($document, $latestStep)
+            || (! $this->currentRoleIsAdmin() && ! $this->belongsToCurrentUser($document, $latestStep))
         ) {
             return $this->response->setStatusCode(404)->setJSON([
                 'success' => false,
@@ -755,7 +1039,7 @@ class Sdm extends BaseController
             "disposisi_{$latestStep}_catatan" => $note !== '' ? $note : null,
         ];
 
-        if ((string) session()->get('auth_role') === 'sdm' && empty($document['sdm_processed_at'])) {
+        if (in_array((string) session()->get('auth_role'), ['sdm', 'admin'], true) && empty($document['sdm_processed_at'])) {
             $updates['sdm_processed_at'] = date('Y-m-d H:i:s');
             $updates['sdm_processed_by'] = trim((string) session()->get('auth_display_name')) ?: 'SDM & Teller';
         }

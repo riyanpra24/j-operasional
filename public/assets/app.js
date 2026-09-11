@@ -2305,7 +2305,7 @@
     });
 })();
 
-// Popup koreksi anomali dan konfirmasi penghapusan rekap SDM Jatim.
+// Popup rekap, detail harian, koreksi anomali, dan konfirmasi penghapusan SDM Jatim.
 (() => {
     const modalConfigurations = [
         {
@@ -2318,7 +2318,26 @@
             openSelector: '[data-open-attendance-delete]',
             closeSelector: '[data-close-attendance-delete]',
         },
+        {
+            modal: document.querySelector('#attendanceSummaryModal'),
+            openSelector: '[data-open-attendance-summary]',
+            closeSelector: '[data-close-attendance-summary]',
+        },
+        {
+            modal: document.querySelector('#attendanceDetailModal'),
+            openSelector: '[data-open-attendance-detail]',
+            closeSelector: '[data-close-attendance-detail]',
+        },
     ];
+
+    const openModal = (modal) => {
+        if (!modal) return;
+        modal.hidden = false;
+        modal.setAttribute('aria-hidden', 'false');
+        window.requestAnimationFrame(() => modal.classList.add('open'));
+        document.body.style.overflow = 'hidden';
+        window.setTimeout(() => modal.querySelector('input:not([type="hidden"]), select, button')?.focus(), 180);
+    };
 
     const closeModal = (modal) => {
         if (!modal || !modal.classList.contains('open')) return;
@@ -2332,13 +2351,7 @@
         if (!modal) return;
 
         document.querySelectorAll(openSelector).forEach((trigger) => {
-            trigger.addEventListener('click', () => {
-                modal.hidden = false;
-                modal.setAttribute('aria-hidden', 'false');
-                window.requestAnimationFrame(() => modal.classList.add('open'));
-                document.body.style.overflow = 'hidden';
-                window.setTimeout(() => modal.querySelector('input:not([type="hidden"]), select, button')?.focus(), 180);
-            });
+            trigger.addEventListener('click', () => openModal(modal));
         });
         modal.querySelectorAll(closeSelector).forEach((trigger) => {
             trigger.addEventListener('click', () => closeModal(modal));
@@ -2349,4 +2362,146 @@
         if (event.key !== 'Escape') return;
         modalConfigurations.forEach(({ modal }) => closeModal(modal));
     });
+
+})();
+
+// Kalender kerja SDM: buka pengaturan tanggal dari kartu kalender.
+(() => {
+    const modal = document.querySelector('#attendanceCalendarModal');
+    if (!modal) return;
+
+    const dateInput = modal.querySelector('[data-calendar-date]');
+    const dateLabel = modal.querySelector('[data-calendar-date-label]');
+    const modeInput = modal.querySelector('[data-calendar-mode]');
+    const labelInput = modal.querySelector('[data-calendar-label]');
+    const submitButton = modal.querySelector('[data-calendar-submit]');
+    const monthContent = modal.querySelector('[data-calendar-month-content]');
+    const monthTitle = modal.querySelector('[data-calendar-month-title]');
+    const monthPicker = modal.querySelector('[data-calendar-picker-form]');
+    const monthInput = modal.querySelector('#calendar_month');
+    const yearInput = modal.querySelector('#calendar_year');
+    const previousButton = modal.querySelector('[data-calendar-previous]');
+    const nextButton = modal.querySelector('[data-calendar-next]');
+    const loadError = modal.querySelector('[data-calendar-load-error]');
+
+    const updateLabelState = () => {
+        if (!modeInput || !labelInput) return;
+        const automatic = modeInput.value === 'auto';
+        labelInput.disabled = automatic;
+        labelInput.placeholder = automatic
+            ? 'Mengikuti keterangan kalender otomatis'
+            : (modeInput.value === 'holiday' ? 'Contoh: Libur kantor' : 'Contoh: Hari kerja pengganti');
+    };
+    const closeModal = () => {
+        if (!modal.classList.contains('open')) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        window.setTimeout(() => { modal.hidden = true; }, 180);
+    };
+    const openModal = () => {
+        modal.hidden = false;
+        modal.setAttribute('aria-hidden', 'false');
+        window.requestAnimationFrame(() => modal.classList.add('open'));
+        document.body.style.overflow = 'hidden';
+    };
+    const resetEditor = () => {
+        if (dateInput) dateInput.value = '';
+        if (dateLabel) dateLabel.textContent = 'Belum dipilih';
+        if (modeInput) {
+            modeInput.value = 'auto';
+            modeInput.disabled = true;
+        }
+        if (labelInput) {
+            labelInput.value = '';
+            labelInput.disabled = true;
+            labelInput.placeholder = 'Pilih tanggal terlebih dahulu';
+        }
+        if (submitButton) submitButton.disabled = true;
+    };
+    const selectDay = (trigger) => {
+        modal.querySelectorAll('[data-calendar-edit]').forEach((day) => day.classList.remove('is-selected'));
+        trigger.classList.add('is-selected');
+        if (dateInput) dateInput.value = trigger.dataset.date || '';
+        if (dateLabel) dateLabel.textContent = trigger.dataset.dateLabel || '-';
+        if (modeInput) {
+            modeInput.disabled = false;
+            modeInput.value = trigger.dataset.mode || 'auto';
+        }
+        if (labelInput) labelInput.value = trigger.dataset.mode === 'auto' ? '' : (trigger.dataset.label || '');
+        if (submitButton) submitButton.disabled = false;
+        updateLabelState();
+        window.setTimeout(() => modeInput?.focus(), 100);
+    };
+    const loadMonth = async (year, month) => {
+        if (!monthContent || !modal.dataset.calendarDataUrl) return;
+        if (!Number.isFinite(year) || !Number.isFinite(month)) {
+            if (loadError) {
+                loadError.textContent = 'Bulan dan tahun kalender harus diisi.';
+                loadError.hidden = false;
+            }
+            return;
+        }
+        const normalizedDate = new Date(year, month - 1, 1);
+        const normalizedYear = normalizedDate.getFullYear();
+        const normalizedMonth = normalizedDate.getMonth() + 1;
+        if (normalizedYear < 2020 || normalizedYear > 2100) {
+            if (loadError) {
+                loadError.textContent = 'Tahun kalender harus berada antara 2020 dan 2100.';
+                loadError.hidden = false;
+            }
+            return;
+        }
+        const url = new URL(modal.dataset.calendarDataUrl, window.location.origin);
+        url.searchParams.set('format', 'json');
+        url.searchParams.set('tahun', String(normalizedYear));
+        url.searchParams.set('bulan', String(normalizedMonth));
+        monthContent.classList.add('is-loading');
+        if (loadError) loadError.hidden = true;
+        previousButton?.setAttribute('disabled', 'disabled');
+        nextButton?.setAttribute('disabled', 'disabled');
+        try {
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.message || 'Kalender belum dapat dimuat.');
+            monthContent.innerHTML = result.html;
+            modal.dataset.calendarYear = String(result.year);
+            modal.dataset.calendarMonth = String(result.month);
+            if (monthTitle) monthTitle.textContent = result.month_label;
+            if (yearInput) yearInput.value = String(result.year);
+            if (monthInput) monthInput.value = String(result.month);
+            resetEditor();
+        } catch (error) {
+            if (loadError) {
+                loadError.textContent = error.message;
+                loadError.hidden = false;
+            }
+        } finally {
+            monthContent.classList.remove('is-loading');
+            previousButton?.removeAttribute('disabled');
+            nextButton?.removeAttribute('disabled');
+        }
+    };
+
+    document.querySelectorAll('[data-calendar-open]').forEach((trigger) => trigger.addEventListener('click', openModal));
+    modal.addEventListener('click', (event) => {
+        const trigger = event.target instanceof Element ? event.target.closest('[data-calendar-edit]') : null;
+        if (trigger && modal.contains(trigger)) selectDay(trigger);
+    });
+    monthPicker?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (!monthPicker.reportValidity()) return;
+        loadMonth(Number(yearInput?.value), Number(monthInput?.value));
+    });
+    previousButton?.addEventListener('click', () => loadMonth(Number(modal.dataset.calendarYear), Number(modal.dataset.calendarMonth) - 1));
+    nextButton?.addEventListener('click', () => loadMonth(Number(modal.dataset.calendarYear), Number(modal.dataset.calendarMonth) + 1));
+    modal.querySelectorAll('[data-calendar-close]').forEach((trigger) => trigger.addEventListener('click', closeModal));
+    modeInput?.addEventListener('change', updateLabelState);
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeModal();
+    });
+    if (modal.dataset.calendarAutoOpen === 'true') openModal();
 })();

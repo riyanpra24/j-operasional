@@ -61,7 +61,10 @@
                 <?php foreach ($documents as $document): ?>
                     <?php
                     $statusClass = ['Menunggu' => 'pending', 'Diterima' => 'received', 'Diproses' => 'active', 'Diteruskan' => 'forwarded', 'Selesai' => 'completed'][$document['status_disposisi_terakhir']] ?? 'empty';
-                    $canEditDisposition = ! ($isAdminView ?? false) && ! $historyMode && mb_strtolower(trim((string) $document['disposisi_terakhir'])) === mb_strtolower(trim($recipientName));
+                    $canEditDisposition = ! $historyMode && (
+                        ($isAdminView ?? false)
+                        || mb_strtolower(trim((string) $document['disposisi_terakhir'])) === mb_strtolower(trim($recipientName))
+                    );
                     $dispositions = [];
                     for ($step = 1; $step <= \Config\Disposition::MAX_STEPS; $step++) {
                         if (trim((string) ($document["disposisi_{$step}"] ?? '')) === '') continue;
