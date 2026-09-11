@@ -136,7 +136,6 @@ $summaryCards = [
                         <div class="form-group"><label for="popupUnitPengelola">Unit Pengelola</label><select id="popupUnitPengelola" name="unit_pengelola"><option value="">Pilih unit pengelola</option><option value="Bagian Umum 1">Bagian Umum 1</option><option value="Bagian Umum 2">Bagian Umum 2</option></select></div>
                         <div class="form-group modal-span-2"><label for="popupNamaKerjasama">Nama Kerja Sama <span class="required">*</span></label><input id="popupNamaKerjasama" name="nama_kerjasama" maxlength="250" placeholder="Contoh: Pengadaan Jasa Kebersihan Kantor" required></div>
                         <div class="form-group"><label for="popupPicInternal">PIC Internal</label><input id="popupPicInternal" name="pic_internal" readonly aria-readonly="true" placeholder="Terisi otomatis sesuai unit"><small>Ditentukan otomatis berdasarkan Unit Pengelola.</small></div>
-                        <div class="form-group modal-span-2"><label for="popupPksKeterangan">Keterangan</label><textarea id="popupPksKeterangan" name="keterangan" maxlength="2000" placeholder="Tambahkan deskripsi atau keterangan kerja sama bila diperlukan"></textarea><small>Opsional. Jelaskan informasi tambahan yang perlu diketahui terkait PKS.</small></div>
                     </div>
                 </section>
 
@@ -174,7 +173,6 @@ $summaryCards = [
                         <div><small>Unit Pengelola</small><strong data-pks-review="unit_pengelola">-</strong></div>
                         <div class="wide"><small>Nama Kerja Sama</small><strong data-pks-review="nama_kerjasama">-</strong></div>
                         <div><small>PIC Internal</small><strong data-pks-review="pic_internal">-</strong></div>
-                        <div class="wide"><small>Keterangan</small><strong data-pks-review="keterangan">-</strong></div>
                         <div><small>Nama Mitra</small><strong data-pks-review="nama_mitra">-</strong></div>
                         <div><small>Kontak Mitra</small><strong data-pks-review="kontak_mitra">-</strong></div>
                         <div><small>Telepon / Email</small><strong data-pks-review="komunikasi_mitra">-</strong></div>
@@ -262,7 +260,7 @@ $summaryCards = [
     const nextButton = modal.querySelector('[data-pks-step-next]');
     const submitButton = modal.querySelector('[data-pks-modal-submit]');
     const baseUrl = <?= json_encode(site_url('bagian-umum-1/pks-barang-jasa')) ?>;
-    const fieldNames = ['kode_internal','nama_kerjasama','unit_pengelola','pic_internal','keterangan','nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email','nomor_dokumen','tanggal_dokumen','jangka_waktu_bulan','periode_mulai','periode_selesai','nilai','link_berkas'];
+    const fieldNames = ['kode_internal','nama_kerjasama','unit_pengelola','pic_internal','nama_mitra','alamat','nama_kontak','jabatan_kontak','telepon','email','nomor_dokumen','tanggal_dokumen','jangka_waktu_bulan','periode_mulai','periode_selesai','nilai','link_berkas'];
     const unitField = form.elements.unit_pengelola;
     const picField = form.elements.pic_internal;
     const documentDateField = form.elements.tanggal_dokumen;
@@ -298,7 +296,7 @@ $summaryCards = [
         const value = name => String(form.elements[name]?.value ?? '').trim();
         const review = {
             kode_internal: value('kode_internal'), unit_pengelola: value('unit_pengelola'), nama_kerjasama: value('nama_kerjasama'),
-            pic_internal: value('pic_internal'), keterangan: value('keterangan'), nama_mitra: value('nama_mitra'),
+            pic_internal: value('pic_internal'), nama_mitra: value('nama_mitra'),
             kontak_mitra: [value('nama_kontak'), value('jabatan_kontak')].filter(Boolean).join(' · '),
             komunikasi_mitra: [value('telepon'), value('email')].filter(Boolean).join(' · '),
             nomor_dokumen: value('nomor_dokumen'), tanggal_dokumen: readableDate(value('tanggal_dokumen')),

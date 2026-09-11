@@ -70,7 +70,6 @@ $isEditMode = $isEditMode ?? false;
             <div><dt>Nomor PKS</dt><dd><?= esc($record['kode_internal']) ?></dd></div>
             <div><dt>Unit Pengelola</dt><dd><?= esc($record['unit_pengelola'] ?: '-') ?></dd></div>
             <div><dt>PIC Internal</dt><dd><?= esc($record['pic_internal'] ?: '-') ?></dd></div>
-            <div class="wide"><dt>Keterangan</dt><dd><?= nl2br(esc($record['keterangan'] ?: '-')) ?></dd></div>
         </dl>
     </article>
     <article class="panel pks-overview-panel">
@@ -180,7 +179,7 @@ $isEditMode = $isEditMode ?? false;
                 <tr><td colspan="<?= $isEditMode ? 3 : 2 ?>"><div class="empty-state compact"><span>□</span><strong>Belum ada item pekerjaan</strong><p><?= $isEditMode ? 'Tambahkan keterangan barang atau jasa yang termasuk dalam ruang lingkup PKS.' : 'Keterangan barang atau jasa belum dicatat pada PKS ini.' ?></p></div></td></tr>
             <?php else: ?>
                 <?php foreach ($items as $index => $item): ?>
-                    <tr><td><strong><?= $index + 1 ?></strong></td><td class="cell-wrap"><?= esc($item['keterangan'] ?: '-') ?></td><?php if ($isEditMode): ?><td><div class="action-buttons"><button type="button" class="icon-btn" data-pks-toggle="edit-item-<?= $item['id'] ?>" title="Ubah">✎</button><form action="<?= $baseUrl . '/item/' . $item['id'] . '/hapus' ?>" method="post" class="pks-delete-form" data-confirm="Hapus item pekerjaan ini?"><?= csrf_field() ?><button type="submit" class="icon-btn icon-btn-delete" title="Hapus">×</button></form></div></td><?php endif ?></tr>
+                    <tr><td><strong><?= $index + 1 ?></strong></td><td class="cell-wrap"><?= nl2br(esc($item['keterangan'] ?: '-')) ?></td><?php if ($isEditMode): ?><td><div class="action-buttons"><button type="button" class="icon-btn" data-pks-toggle="edit-item-<?= $item['id'] ?>" title="Ubah">✎</button><form action="<?= $baseUrl . '/item/' . $item['id'] . '/hapus' ?>" method="post" class="pks-delete-form" data-confirm="Hapus item pekerjaan ini?"><?= csrf_field() ?><button type="submit" class="icon-btn icon-btn-delete" title="Hapus">×</button></form></div></td><?php endif ?></tr>
                     <?php if ($isEditMode): ?><tr class="pks-edit-row" id="edit-item-<?= $item['id'] ?>" hidden><td colspan="3"><div class="pks-inline-form compact"><form action="<?= $baseUrl . '/item/' . $item['id'] ?>" method="post"><?= csrf_field() ?><div class="form-grid pks-item-grid"><div class="form-group span-2"><label>Keterangan <span class="required">*</span></label><textarea name="keterangan" maxlength="2000" required><?= esc($item['keterangan'] ?? '') ?></textarea></div></div><div class="pks-inline-actions"><button type="button" class="btn btn-ghost" data-pks-toggle="edit-item-<?= $item['id'] ?>">Batal</button><button type="submit" class="btn btn-primary">Simpan Perubahan</button></div></form></div></td></tr><?php endif ?>
                 <?php endforeach ?>
             <?php endif ?>

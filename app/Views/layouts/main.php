@@ -29,6 +29,7 @@ $canAccessGeneralSection = in_array($currentRole, ['admin', 'umum_1'], true);
 $canAccessGeneralSectionTwo = in_array($currentRole, ['admin', 'umum_2'], true);
 $canAccessSdm = in_array($currentRole, ['admin', 'sdm'], true);
 $canAccessAkutansi = in_array($currentRole, ['admin', 'akutansi'], true);
+$showDashboardMenu = ! in_array($currentRole, ['umum_1', 'umum_2', 'sdm'], true);
 $incomingArchive = $segment === 'dokumen-masuk';
 $incomingWorkspace = in_array($segment, ['dashboard', 'dokumen-masuk', 'distribusi-dokumen'], true);
 $roleLabel = \Config\UserRoles::label($currentRole);
@@ -136,10 +137,12 @@ if ($currentRole === 'security') {
 
             <nav class="main-nav" aria-label="Navigasi utama">
                 <p class="nav-label">MENU UTAMA</p>
+                <?php if ($showDashboardMenu): ?>
                 <a href="<?= site_url('dashboard') ?>" class="nav-link <?= $segment === 'dashboard' ? 'active' : '' ?>" title="Dashboard">
                     <span class="nav-icon icon-dashboard" aria-hidden="true"><i>◆</i></span>
                     <span class="nav-link-text">Dashboard</span>
                 </a>
+                <?php endif ?>
                 <?php if ($canAccessSecurity): ?>
                 <div class="nav-group <?= $securityActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $securityActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $securityActive ? 'true' : 'false' ?>" aria-controls="securitySubmenu" title="Security">
@@ -194,6 +197,14 @@ if ($currentRole === 'security') {
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
                     <div class="nav-submenu" id="generalSectionSubmenu" data-nav-submenu <?= $generalSectionActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('bagian-umum-1/dokumen-masuk') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'dokumen-masuk' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dokumen Masuk
+                        </a>
+                        <a href="<?= site_url('bagian-umum-1/dokumen-keluar') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'dokumen-keluar' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dokumen Keluar
+                        </a>
                         <a href="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'pks-barang-jasa' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             PKS Barang dan Jasa

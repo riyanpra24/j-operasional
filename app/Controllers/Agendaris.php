@@ -27,6 +27,13 @@ class Agendaris extends BaseController
 
     public function suratMasuk(): string
     {
+        $generalSectionView = service('uri')->getSegment(1) === 'bagian-umum-1';
+        $indexUrl = $generalSectionView
+            ? site_url('bagian-umum-1/dokumen-masuk')
+            : site_url('agendaris/surat-masuk');
+        $detailUrlPrefix = $generalSectionView
+            ? 'bagian-umum-1/dokumen-masuk'
+            : 'agendaris/surat-masuk';
         $keyword = trim((string) $this->request->getGet('q'));
         $jenis   = trim((string) $this->request->getGet('jenis'));
         $from    = trim((string) $this->request->getGet('dari'));
@@ -89,6 +96,9 @@ class Agendaris extends BaseController
             'pager'   => $this->model->pager,
             'filters' => compact('keyword', 'jenis', 'from', 'to', 'perPage', 'order'),
             'jenisOptions' => array_column($jenisOptions, 'jenis'),
+            'indexUrl' => $indexUrl,
+            'detailUrlPrefix' => $detailUrlPrefix,
+            'generalSectionView' => $generalSectionView,
         ]);
     }
 
@@ -200,6 +210,10 @@ class Agendaris extends BaseController
     public function show(int $id): ResponseInterface
     {
         $agenda = $this->findJoined($id);
+        $generalSectionView = service('uri')->getSegment(1) === 'bagian-umum-1';
+        if ($generalSectionView && ($agenda['progres'] ?? '') !== 'Selesai') {
+            throw PageNotFoundException::forPageNotFound('Dokumen Masuk belum selesai diproses dan belum tersedia di arsip Bagian Umum 1.');
+        }
 
         $dispositionData = [];
         for ($step = 1; $step <= Disposition::MAX_STEPS; $step++) {
@@ -244,8 +258,8 @@ class Agendaris extends BaseController
                 'progres'             => $agenda['progres'] ?: 'Menunggu Penyelesaian',
                 'created_at'          => date('d-m-Y H:i', strtotime($agenda['created_at'])) . ' WIB',
                 'updated_at'          => date('d-m-Y H:i', strtotime($agenda['updated_at'])) . ' WIB',
-                'update_url'          => site_url("agendaris/progres-dokumen-masuk/{$id}"),
-                'delete_url'          => site_url("agendaris/progres-dokumen-masuk/{$id}/hapus"),
+                'update_url'          => $generalSectionView ? '' : site_url("agendaris/progres-dokumen-masuk/{$id}"),
+                'delete_url'          => $generalSectionView ? '' : site_url("agendaris/progres-dokumen-masuk/{$id}/hapus"),
             ],
         ]);
     }

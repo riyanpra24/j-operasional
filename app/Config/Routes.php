@@ -36,7 +36,17 @@ $routes->post('sdm/sdm-jatim/hapus', 'Sdm::deleteSdmJatimAttendance', ['as' => '
 $routes->post('sdm/dokumen-masuk/(:num)', 'Sdm::updateIncomingDocument/$1', ['as' => 'sdm.dokumen_masuk.update']);
 $routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);
 
-// Bagian Umum 1 - Pengelolaan PKS Barang dan Jasa
+// Bagian Umum 1
+$routes->group('bagian-umum-1/dokumen-masuk', static function (RouteCollection $routes): void {
+    $routes->get('/', 'Agendaris::suratMasuk', ['as' => 'bagian_umum_1.dokumen_masuk']);
+    $routes->get('(:num)', 'Agendaris::show/$1', ['as' => 'bagian_umum_1.dokumen_masuk.show']);
+});
+
+$routes->group('bagian-umum-1/dokumen-keluar', static function (RouteCollection $routes): void {
+    $routes->get('/', 'DokumenKeluar::index', ['as' => 'bagian_umum_1.dokumen_keluar']);
+    $routes->get('(:num)', 'DokumenKeluar::show/$1', ['as' => 'bagian_umum_1.dokumen_keluar.show']);
+});
+
 $routes->group('bagian-umum-1/pks-barang-jasa', static function (RouteCollection $routes): void {
     $routes->get('/', 'PksBarangJasa::index', ['as' => 'pks.index']);
     $routes->get('tambah', 'PksBarangJasa::create', ['as' => 'pks.create']);

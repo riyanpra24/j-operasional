@@ -3,20 +3,23 @@
 /** @var array<string, mixed> $filters */
 /** @var list<string> $jenisOptions */
 /** @var \CodeIgniter\Pager\PagerInterface $pager */
+$generalSectionView = $generalSectionView ?? false;
+$indexUrl = $indexUrl ?? site_url('agendaris/surat-masuk');
+$detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
 ?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
 <section class="page-heading">
     <div>
-        <p class="eyebrow">AGENDARIS</p>
+        <p class="eyebrow"><?= $generalSectionView ? 'BAGIAN UMUM 1' : 'AGENDARIS' ?></p>
         <h1>Dokumen Masuk</h1>
-        <p>Arsip baca-saja untuk dokumen masuk yang telah diselesaikan pada menu Progres Dokumen.</p>
+        <p><?= $generalSectionView ? 'Arsip baca-saja yang bersumber dari Dokumen Masuk Agendaris.' : 'Arsip baca-saja untuk dokumen masuk yang telah diselesaikan pada menu Progres Dokumen.' ?></p>
     </div>
 </section>
 
 <section class="panel filter-panel">
-    <form method="get" action="<?= site_url('agendaris/surat-masuk') ?>" class="agendaris-filter-form">
+    <form method="get" action="<?= $indexUrl ?>" class="agendaris-filter-form">
         <div class="form-group search-group"><label for="agenda_q">Cari dokumen</label>
             <div class="input-with-icon"><span>⌕</span><input id="agenda_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor Agendaris, pengirim, perihal, penerima..."></div>
         </div>
@@ -27,7 +30,7 @@
         <div class="form-group"><label for="agenda_sampai">Sampai tanggal diterima</label><input id="agenda_sampai" type="date" name="sampai" value="<?= esc($filters['to']) ?>"></div>
         <?= view('components/list_order_filter', ['id' => 'agenda_urutan', 'value' => $filters['order']]) ?>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
-        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/surat-masuk') ?>" class="btn btn-ghost">Reset</a></div>
+        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= $indexUrl ?>" class="btn btn-ghost">Reset</a></div>
     </form>
 </section>
 
@@ -82,8 +85,8 @@
                             <?php $dispositionLocked = (string) session()->get('auth_role') === 'agendaris' && ! empty($row['sdm_processed_at']); ?>
                             <td>
                                 <div class="table-actions">
-                                    <button type="button" class="icon-btn" title="Detail" data-agendaris-view data-agendaris-url="<?= site_url('agendaris/surat-masuk/' . $row['id']) ?>">⌕</button>
-                                    <button type="button" class="icon-btn <?= $dispositionLocked ? 'is-locked' : '' ?>" title="<?= $dispositionLocked ? 'Disposisi telah diproses oleh SDM & Teller' : 'Edit dan kembalikan ke progres' ?>" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-masuk/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'] ?: 'Belum diisi', 'attr') ?>" <?= $dispositionLocked ? ' data-reopen-locked-message="Disposisi telah diproses oleh SDM &amp; Teller. Hubungi Administrator untuk tindakan selanjutnya."' : '' ?>><?= $dispositionLocked ? '🔒' : '✎' ?></button>
+                                    <button type="button" class="icon-btn" title="Detail" data-agendaris-view data-agendaris-url="<?= site_url($detailUrlPrefix . '/' . $row['id']) ?>">⌕</button>
+                                    <?php if (! $generalSectionView): ?><button type="button" class="icon-btn <?= $dispositionLocked ? 'is-locked' : '' ?>" title="<?= $dispositionLocked ? 'Disposisi telah diproses oleh SDM & Teller' : 'Edit dan kembalikan ke progres' ?>" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-masuk/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'] ?: 'Belum diisi', 'attr') ?>" <?= $dispositionLocked ? ' data-reopen-locked-message="Disposisi telah diproses oleh SDM &amp; Teller. Hubungi Administrator untuk tindakan selanjutnya."' : '' ?>><?= $dispositionLocked ? '🔒' : '✎' ?></button><?php endif ?>
                                 </div>
                             </td>
                         </tr><?php endforeach ?>
@@ -92,7 +95,7 @@
         </table>
     </div>
     <div class="table-list-footer">
-        <form method="get" action="<?= site_url('agendaris/surat-masuk') ?>" class="table-length-form">
+        <form method="get" action="<?= $indexUrl ?>" class="table-length-form">
             <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>">
             <input type="hidden" name="jenis" value="<?= esc($filters['jenis']) ?>">
             <input type="hidden" name="dari" value="<?= esc($filters['from']) ?>">
@@ -106,6 +109,6 @@
     </div>
 </section>
 
-<?= view('agendaris/detail_modal', ['readOnly' => true]) ?>
-<?= view('components/reopen_progress_modal') ?>
+<?= view('agendaris/detail_modal', ['readOnly' => true, 'contextLabel' => $generalSectionView ? 'DETAIL BAGIAN UMUM 1' : 'DETAIL AGENDARIS']) ?>
+<?php if (! $generalSectionView): ?><?= view('components/reopen_progress_modal') ?><?php endif ?>
 <?= $this->endSection() ?>

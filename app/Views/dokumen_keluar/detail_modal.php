@@ -1,11 +1,12 @@
 <?php
 /** @var bool|null $readOnly */
 /** @var bool|null $securityView */
+/** @var string|null $contextLabel */
 ?>
 <div class="agendaris-detail-modal" id="dokumenKeluarDetailModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-dokumen-keluar-detail-close aria-label="Tutup detail"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="dokumenKeluarDetailTitle">
-        <header class="modal-header"><div class="modal-title-group"><span class="modal-title-icon">⇢</span><div><p><?= ($securityView ?? false) ? 'DETAIL SECURITY' : 'DETAIL AGENDARIS' ?></p><h2 id="dokumenKeluarDetailTitle">Surat Keluar</h2></div></div><button type="button" class="modal-close" data-dokumen-keluar-detail-close aria-label="Tutup">×</button></header>
+        <header class="modal-header"><div class="modal-title-group"><span class="modal-title-icon">⇢</span><div><p><?= esc($contextLabel ?? (($securityView ?? false) ? 'DETAIL SECURITY' : 'DETAIL AGENDARIS')) ?></p><h2 id="dokumenKeluarDetailTitle">Surat Keluar</h2></div></div><button type="button" class="modal-close" data-dokumen-keluar-detail-close aria-label="Tutup">×</button></header>
         <div class="detail-loading" data-dokumen-keluar-detail-loading><span></span><strong>Memuat data pengiriman...</strong></div>
         <div class="agendaris-detail-content" data-dokumen-keluar-detail-content hidden>
             <?php if (! ($securityView ?? false)): ?>

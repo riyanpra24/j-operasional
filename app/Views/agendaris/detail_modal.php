@@ -1,5 +1,6 @@
 <?php
 /** @var bool $readOnly */
+/** @var string|null $contextLabel */
 ?>
 <div class="agendaris-detail-modal" id="agendarisDetailModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-agendaris-detail-close aria-label="Tutup detail"></button>
@@ -7,7 +8,7 @@
         <header class="modal-header">
             <div class="modal-title-group"><span class="modal-title-icon">▦</span>
                 <div>
-                    <p>DETAIL AGENDARIS</p>
+                    <p><?= esc($contextLabel ?? 'DETAIL AGENDARIS') ?></p>
                     <h2 id="agendarisDetailTitle">Surat Masuk</h2>
                 </div>
             </div><button type="button" class="modal-close" data-agendaris-detail-close aria-label="Tutup">×</button>

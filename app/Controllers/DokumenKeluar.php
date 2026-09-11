@@ -18,7 +18,13 @@ class DokumenKeluar extends BaseController
     public function index(): string
     {
         $securityView = service('uri')->getSegment(1) === 'dokumen-keluar';
-        $indexUrl     = $securityView ? site_url('dokumen-keluar') : site_url('agendaris/surat-keluar');
+        $generalSectionView = service('uri')->getSegment(1) === 'bagian-umum-1';
+        $indexUrl = $generalSectionView
+            ? site_url('bagian-umum-1/dokumen-keluar')
+            : ($securityView ? site_url('dokumen-keluar') : site_url('agendaris/surat-keluar'));
+        $detailUrlPrefix = $generalSectionView
+            ? 'bagian-umum-1/dokumen-keluar'
+            : ($securityView ? 'dokumen-keluar' : 'agendaris/surat-keluar');
         $keyword = trim((string) $this->request->getGet('q'));
         $jenis   = trim((string) $this->request->getGet('jenis'));
         $from    = trim((string) $this->request->getGet('dari'));
@@ -78,8 +84,9 @@ class DokumenKeluar extends BaseController
         return view('dokumen_keluar/index', [
             'title'        => 'Dokumen Keluar',
             'securityView' => $securityView,
+            'generalSectionView' => $generalSectionView,
             'indexUrl'     => $indexUrl,
-            'detailUrlPrefix' => $securityView ? 'dokumen-keluar' : 'agendaris/surat-keluar',
+            'detailUrlPrefix' => $detailUrlPrefix,
             'readOnly'     => true,
             'dokumen'      => $this->model->paginate($perPage, 'dokumen_keluar'),
             'pager'        => $this->model->pager,
@@ -132,6 +139,7 @@ class DokumenKeluar extends BaseController
     {
         $dokumen = $this->findDokumen($id);
         $securityView = service('uri')->getSegment(1) === 'dokumen-keluar';
+        $generalSectionView = service('uri')->getSegment(1) === 'bagian-umum-1';
         $availableInArchive = $securityView
             ? $dokumen['progres'] === 'Diambil Ekspedisi'
             : $dokumen['status_agendaris'] === 'Selesai';
@@ -182,8 +190,8 @@ class DokumenKeluar extends BaseController
                 'alamat_penerima'          => $dokumen['alamat_penerima'],
                 'dokumen_link'             => $securityView ? '' : ($dokumen['dokumen_link'] ?: ''),
                 'dokumen_link_value'       => $securityView ? '' : ($dokumen['dokumen_link'] ?: ''),
-                'update_url'               => site_url("agendaris/surat-keluar/{$id}"),
-                'delete_url'               => site_url("agendaris/surat-keluar/{$id}/hapus"),
+                'update_url'               => $generalSectionView ? '' : site_url("agendaris/surat-keluar/{$id}"),
+                'delete_url'               => $generalSectionView ? '' : site_url("agendaris/surat-keluar/{$id}/hapus"),
             ],
         ]);
     }
