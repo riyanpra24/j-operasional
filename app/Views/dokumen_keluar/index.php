@@ -1,4 +1,5 @@
 <?php
+
 /** @var string $title */
 /** @var string $indexUrl */
 /** @var string $detailUrlPrefix */
@@ -15,14 +16,22 @@ $contextLabel = $generalSectionView ? 'BAGIAN UMUM 1' : (($securityView ?? false
 <?= $this->section('content') ?>
 
 <section class="page-heading heading-actions">
-    <div><p class="eyebrow"><?= esc($contextLabel) ?></p><h1><?= esc($title) ?></h1><p><?= $generalSectionView ? 'Arsip baca-saja yang bersumber dari Dokumen Keluar Agendaris.' : 'Arsip baca-saja untuk dokumen keluar yang telah selesai diproses.' ?></p></div>
+    <div>
+        <p class="eyebrow"><?= esc($contextLabel) ?></p>
+        <h1><?= esc($title) ?></h1>
+        <p><?= $generalSectionView ? 'Arsip baca-saja yang bersumber dari Dokumen Keluar Agendaris.' : 'Arsip baca-saja untuk dokumen keluar yang telah selesai diproses.' ?></p>
+    </div>
     <?php if (! $readOnly): ?><button type="button" class="btn btn-primary" data-dokumen-keluar-add>＋ Tambah Surat Keluar</button><?php endif ?>
 </section>
 
 <section class="panel filter-panel">
     <form method="get" action="<?= $indexUrl ?>" class="agendaris-filter-form">
-        <div class="form-group search-group"><label for="keluar_q">Cari dokumen</label><div class="input-with-icon"><span>⌕</span><input id="keluar_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor surat, pemohon, pelaksana, UP, alamat..."></div></div>
-        <div class="form-group"><label for="keluar_jenis_filter">Jenis Dokumen</label><select id="keluar_jenis_filter" name="jenis"><option value="">Semua jenis</option><?php foreach ($jenisOptions as $option): ?><option value="<?= esc($option) ?>" <?= $filters['jenis'] === $option ? 'selected' : '' ?>><?= esc($option) ?></option><?php endforeach ?></select></div>
+        <div class="form-group search-group"><label for="keluar_q">Cari dokumen</label>
+            <div class="input-with-icon"><span>⌕</span><input id="keluar_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor surat, pemohon, pelaksana, UP, alamat..."></div>
+        </div>
+        <div class="form-group"><label for="keluar_jenis_filter">Jenis Dokumen</label><select id="keluar_jenis_filter" name="jenis">
+                <option value="">Semua jenis</option><?php foreach ($jenisOptions as $option): ?><option value="<?= esc($option) ?>" <?= $filters['jenis'] === $option ? 'selected' : '' ?>><?= esc($option) ?></option><?php endforeach ?>
+            </select></div>
         <div class="form-group"><label for="keluar_dari">Dari tanggal pengiriman</label><input id="keluar_dari" type="date" name="dari" value="<?= esc($filters['from']) ?>"></div>
         <div class="form-group"><label for="keluar_sampai">Sampai tanggal pengiriman</label><input id="keluar_sampai" type="date" name="sampai" value="<?= esc($filters['to']) ?>"></div>
         <?= view('components/list_order_filter', ['id' => 'keluar_urutan', 'value' => $filters['order']]) ?>
@@ -32,31 +41,58 @@ $contextLabel = $generalSectionView ? 'BAGIAN UMUM 1' : (($securityView ?? false
 </section>
 
 <section class="panel register-panel agendaris-table-panel">
-    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nomor Surat</th><th>Jenis Dokumen</th><th>Jumlah Dokumen</th><th>Nama Ekspedisi</th><th>Pemohon</th><th>Pelaksana</th><th>UP</th><th>Tanggal Pengiriman</th><th>Alamat Penerima</th><th>Aksi</th></tr></thead><tbody>
-        <?php if ($dokumen === []): ?>
-            <tr><td colspan="11"><div class="empty-state"><span>⇢</span><strong>Belum ada Dokumen Keluar selesai</strong><p>Selesaikan dokumen melalui menu Progres Dokumen agar tampil di halaman ini.</p></div></td></tr>
-        <?php else: ?>
-            <?php $rowNumber = (($pager->getCurrentPage('dokumen_keluar') - 1) * $filters['perPage']) + 1; ?>
-            <?php foreach ($dokumen as $row): ?><tr>
-                <td><strong><?= $rowNumber++ ?></strong></td>
-                <td><strong><?= esc($row['nomor_surat']) ?></strong></td>
-                <td><?= esc($row['jenis_surat']) ?></td>
-                <td><?= esc(($row['jumlah_dokumen'] ?? null) ?: '-') ?></td>
-                <td><?= esc(($row['nama_ekspedisi'] ?? null) ?: '-') ?></td>
-                <td><?= esc($row['pemohon'] ?: '-') ?></td>
-                <td><?= esc($row['pelaksana'] ?: '-') ?></td>
-                <td><?= esc($row['up'] ?: '-') ?></td>
-                <td><?= date('d-m-Y', strtotime($row['tanggal_pengiriman'])) ?></td>
-                <td class="cell-wrap"><?= esc($row['alamat_penerima']) ?></td>
-                <td><div class="table-actions">
-                    <button type="button" class="icon-btn" title="Detail" data-dokumen-keluar-view data-dokumen-keluar-url="<?= site_url($detailUrlPrefix.'/'.$row['id']) ?>">⌕</button>
-                    <?php if (! ($securityView ?? false) && ! $generalSectionView): ?><button type="button" class="icon-btn" title="Edit dan kembalikan ke progres" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-keluar/'.$row['id'].'/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'], 'attr') ?>">✎</button><?php endif ?>
-                    <?php if (! $readOnly): ?><button type="button" class="icon-btn" title="Ubah" data-dokumen-keluar-edit data-dokumen-keluar-url="<?= site_url('agendaris/surat-keluar/'.$row['id']) ?>">✎</button>
-                    <button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-dokumen-keluar-delete data-delete-url="<?= site_url('agendaris/surat-keluar/'.$row['id'].'/hapus') ?>" data-delete-label="<?= esc($row['nomor_surat'], 'attr') ?>">×</button><?php endif ?>
-                </div></td>
-            </tr><?php endforeach ?>
-        <?php endif ?>
-    </tbody></table></div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Nomor Surat</th>
+                    <th>Jenis Dokumen</th>
+                    <th>Jumlah Dokumen</th>
+                    <th>Nama Ekspedisi</th>
+                    <th>Pemohon</th>
+                    <th>Pelaksana</th>
+                    <th>UP</th>
+                    <th>Tanggal Pengiriman</th>
+                    <th>Alamat Penerima</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($dokumen === []): ?>
+                    <tr>
+                        <td colspan="11">
+                            <div class="empty-state"><span>⇢</span><strong>Belum ada Dokumen Keluar selesai</strong>
+                                <p>Selesaikan dokumen melalui menu Progres Dokumen agar tampil di halaman ini.</p>
+                            </div>
+                        </td>
+                    </tr>
+                <?php else: ?>
+                    <?php $rowNumber = (($pager->getCurrentPage('dokumen_keluar') - 1) * $filters['perPage']) + 1; ?>
+                    <?php foreach ($dokumen as $row): ?><tr>
+                            <td><strong><?= $rowNumber++ ?></strong></td>
+                            <td><strong><?= esc($row['nomor_surat']) ?></strong></td>
+                            <td><?= esc($row['jenis_surat']) ?></td>
+                            <td><?= esc(($row['jumlah_dokumen'] ?? null) ?: '-') ?></td>
+                            <td><?= esc(($row['nama_ekspedisi'] ?? null) ?: '-') ?></td>
+                            <td><?= esc($row['pemohon'] ?: '-') ?></td>
+                            <td><?= esc($row['pelaksana'] ?: '-') ?></td>
+                            <td><?= esc($row['up'] ?: '-') ?></td>
+                            <td><?= date('d-m-Y', strtotime($row['tanggal_pengiriman'])) ?></td>
+                            <td class="cell-wrap"><?= esc($row['alamat_penerima']) ?></td>
+                            <td>
+                                <div class="table-actions">
+                                    <button type="button" class="icon-btn" title="Detail" data-dokumen-keluar-view data-dokumen-keluar-url="<?= site_url($detailUrlPrefix . '/' . $row['id']) ?>">⌕</button>
+                                    <?php if (! ($securityView ?? false) && ! $generalSectionView): ?><button type="button" class="icon-btn" title="Edit dan kembalikan ke progres" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-keluar/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'], 'attr') ?>">✎</button><?php endif ?>
+                                    <?php if (! $readOnly): ?><button type="button" class="icon-btn" title="Ubah" data-dokumen-keluar-edit data-dokumen-keluar-url="<?= site_url('agendaris/surat-keluar/' . $row['id']) ?>">✎</button>
+                                        <button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-dokumen-keluar-delete data-delete-url="<?= site_url('agendaris/surat-keluar/' . $row['id'] . '/hapus') ?>" data-delete-label="<?= esc($row['nomor_surat'], 'attr') ?>">×</button><?php endif ?>
+                                </div>
+                            </td>
+                        </tr><?php endforeach ?>
+                <?php endif ?>
+            </tbody>
+        </table>
+    </div>
     <div class="table-list-footer">
         <form method="get" action="<?= $indexUrl ?>" class="table-length-form">
             <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="jenis" value="<?= esc($filters['jenis']) ?>"><input type="hidden" name="dari" value="<?= esc($filters['from']) ?>"><input type="hidden" name="sampai" value="<?= esc($filters['to']) ?>"><input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">

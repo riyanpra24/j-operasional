@@ -1,0 +1,14 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const source=fs.readFileSync('public/assets/app.js','utf8');
+const snippet=source.slice(source.indexOf('// Oracle LR deletion:'),source.indexOf('// RKA Kanwil Surabaya:'));
+const element=()=>({events:{},addEventListener(name,fn){this.events[name]=fn;}});
+const open=element(),close=element(),form=element(),button={disabled:false,textContent:''};
+const dialog=element(); dialog.open=false;
+dialog.showModal=()=>dialog.open=true;dialog.close=()=>dialog.open=false;
+dialog.querySelectorAll=()=>[close];dialog.querySelector=selector=>selector.includes('form')?form:button;
+vm.runInNewContext(snippet,{document:{querySelector:()=>dialog,querySelectorAll:()=>[open]}});
+open.events.click(); assert(dialog.open); close.events.click(); assert(!dialog.open);
+open.events.click(); dialog.events.click({target:dialog}); assert(!dialog.open);
+form.events.submit(); assert(button.disabled && button.textContent==='Menghapus…');
+vm.runInNewContext(snippet,{document:{querySelector:()=>null}});
+console.log('LR delete popup: open/cancel/backdrop, submit protection and empty-report safety OK.');

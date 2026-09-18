@@ -1,0 +1,16 @@
+const fs=require('fs'), vm=require('vm'), assert=require('assert');
+const source=fs.readFileSync('public/assets/app.js','utf8');
+const snippet=source.slice(source.indexOf('// Oracle LR:'),source.indexOf('// Oracle LR deletion:'));
+const el=()=>({events:{},addEventListener(name,callback){this.events[name]=callback;}});
+const open=el(),close=el(),file=el(),form=el(),button={disabled:false,textContent:''};
+file.files=[]; file.setCustomValidity=function(message){this.error=message;};
+form.querySelector=selector=>selector.includes('lr_excel')?file:button;
+const dialog=el(); dialog.open=false; dialog.dataset={autoOpen:'false'};
+dialog.querySelector=()=>form; dialog.querySelectorAll=()=>[close]; dialog.showModal=()=>{dialog.open=true;};dialog.close=()=>{dialog.open=false;};
+vm.runInNewContext(snippet,{document:{querySelector:()=>dialog,querySelectorAll:()=>[open]}});
+open.events.click(); assert(dialog.open); close.events.click(); assert(!dialog.open);
+file.files=[{name:'LR.xlsx',size:1024}];file.events.change();assert(!file.error);
+file.files=[{name:'LR.xls',size:1024}];file.events.change();assert(file.error);
+file.files=[{name:'LR.xlsx',size:6*1024*1024}];file.events.change();assert(file.error);
+form.events.submit();assert(button.disabled && button.textContent==='Menghitung…');
+console.log('Oracle LR upload popup: open/close, .xlsx and size validation, submit protection OK.');

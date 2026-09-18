@@ -2286,6 +2286,705 @@
     });
 })();
 
+(() => {
+    const dialog = document.querySelector('#lrMappingDetailDialog');
+    if (dialog instanceof HTMLDialogElement) {
+        document.querySelectorAll('[data-lr-mapping-detail-open]').forEach((button) => button.addEventListener('click', () => {
+            if (!dialog.open) dialog.showModal();
+        }));
+        dialog.querySelectorAll('[data-lr-mapping-detail-close]').forEach((button) => button.addEventListener('click', () => dialog.close()));
+        dialog.addEventListener('click', (event) => {
+            if (event.target === dialog) dialog.close();
+        });
+    }
+    document.querySelectorAll('form[data-mapping-delete]').forEach((form) => form.addEventListener('submit', (event) => {
+        if (!window.confirm('Hapus mapping ini? Upload berikutnya tidak akan memakai aturan tersebut.')) event.preventDefault();
+    }));
+    document.querySelectorAll('[data-mapping-search]').forEach((input) => input.addEventListener('input', () => {
+        const rows = document.querySelector('[data-mapping-search-rows]');
+        if (!rows) return;
+        const keyword = input.value.trim().toLocaleLowerCase('id-ID');
+        rows.querySelectorAll('tr').forEach((row) => {
+            row.hidden = keyword !== '' && !row.textContent.toLocaleLowerCase('id-ID').includes(keyword);
+        });
+    }));
+})();
+
+// Period-bound Oracle source adjustments: visual raw-COA formula editor with audit-safe deactivation.
+(() => {
+    const dialog = document.querySelector('#sourceAdjustmentDialog');
+    const form = dialog?.querySelector('[data-source-adjustment-form]');
+    if (!(dialog instanceof HTMLDialogElement) || !(form instanceof HTMLFormElement)) return;
+    const approvalRequired = form.dataset.approvalRequired === '1';
+    const fields = {
+        id: form.querySelector('[data-source-adjustment-id]'),
+        scope: form.querySelector('[data-source-adjustment-scope]'),
+        column: form.querySelector('[data-source-adjustment-column]'),
+        target: form.querySelector('[data-source-adjustment-target]'),
+        from: form.querySelector('[data-source-adjustment-from]'),
+        to: form.querySelector('[data-source-adjustment-to]'),
+        reason: form.querySelector('[data-source-adjustment-reason]'),
+        active: form.querySelector('[data-source-adjustment-active]'),
+        lines: form.querySelector('[data-source-adjustment-lines]'),
+        component: form.querySelector('[data-source-adjustment-component]'),
+        list: form.querySelector('[data-source-adjustment-term-list]'),
+        empty: form.querySelector('[data-source-adjustment-empty]'),
+        count: form.querySelector('[data-source-adjustment-count]'),
+        submit: form.querySelector('[data-source-adjustment-submit]'),
+        title: dialog.querySelector('[data-source-adjustment-title]'),
+        menu: form.querySelector('[data-source-description-menu]'),
+        menuToggle: form.querySelector('[data-source-description-toggle]'),
+        addDescription: form.querySelector('[data-source-adjustment-add-description]'),
+    };
+    const normalize = (value) => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('id-ID');
+    const sourceOptions = [...form.querySelectorAll('[data-source-description-option]')];
+    const sourceMap = new Map(sourceOptions.map((option) => [normalize(option.dataset.value), option.dataset.value]));
+    let terms = [];
+    const decode = (encoded) => {
+        try {
+            const bytes = Uint8Array.from(window.atob(encoded || ''), (character) => character.charCodeAt(0));
+            return new TextDecoder().decode(bytes);
+        } catch (_error) { return ''; }
+    };
+    const parse = (value) => String(value || '').split(/\r?\n/).map((line) => {
+        const match = line.trim().match(/^([+\-*\/×÷])\s*(.+)$/);
+        if (!match) return null;
+        return { operator: match[1] === '×' ? '*' : (match[1] === '÷' ? '/' : match[1]), label: match[2].trim() };
+    }).filter(Boolean);
+    const sync = () => {
+        if (!(fields.list instanceof HTMLElement) || !(fields.lines instanceof HTMLTextAreaElement)) return;
+        if (terms[0]) terms[0].operator = '+';
+        fields.list.replaceChildren();
+        terms.forEach((term, index) => {
+            if (index > 0) {
+                const connector = document.createElement('div'); connector.className = `formula-term-connector ${term.operator === '-' ? 'is-minus' : (['*', '/'].includes(term.operator) ? 'is-math' : 'is-plus')}`;
+                const connectorLabel = document.createElement('span'); connectorLabel.textContent = 'Pilih operasi';
+                const choices = document.createElement('div'); choices.className = 'formula-term-choices'; choices.setAttribute('role', 'group'); choices.setAttribute('aria-label', `Operasi sebelum ${term.label}`);
+                [['+', '+', 'Tambah'], ['-', '−', 'Kurang'], ['*', '×', 'Kali'], ['/', '÷', 'Bagi']].forEach(([value, symbol, text]) => {
+                    const choice = document.createElement('button'); choice.type = 'button'; choice.className = 'formula-term-choice';
+                    choice.classList.toggle('is-selected', term.operator === value);
+                    choice.setAttribute('aria-pressed', term.operator === value ? 'true' : 'false');
+                    choice.innerHTML = `<b>${symbol}</b><span>${text}</span>`;
+                    choice.addEventListener('click', () => { term.operator = value; sync(); });
+                    choices.append(choice);
+                });
+                connector.append(connectorLabel, choices); fields.list.append(connector);
+            }
+            const row = document.createElement('div');
+            row.className = 'formula-term-row source-formula-term';
+            const content = document.createElement('div'); content.className = 'formula-term-content';
+            const label = document.createElement('span'); label.className = 'formula-term-label'; label.textContent = term.label;
+            content.append(label);
+            const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'formula-term-remove'; remove.textContent = '×'; remove.setAttribute('aria-label', `Hapus ${term.label}`);
+            remove.addEventListener('click', () => { terms.splice(index, 1); sync(); });
+            row.append(content, remove); fields.list.append(row);
+        });
+        fields.lines.value = terms.map((term) => `${term.operator} ${term.label}`).join('\n');
+        if (fields.empty instanceof HTMLElement) fields.empty.hidden = terms.length > 0;
+        if (fields.count instanceof HTMLElement) fields.count.textContent = `${terms.length} uraian`;
+        if (fields.submit instanceof HTMLButtonElement) fields.submit.disabled = terms.length === 0;
+    };
+    const open = (button = null) => {
+        const editing = button instanceof HTMLElement && button.hasAttribute('data-source-adjustment-edit');
+        form.reset();
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        terms = editing ? parse(decode(button.dataset.lines)) : [];
+        if (fields.id instanceof HTMLInputElement) fields.id.value = editing ? button.dataset.id || '' : '';
+        if (fields.scope instanceof HTMLSelectElement) fields.scope.value = editing ? button.dataset.scope || 'all' : 'surabaya';
+        if (fields.column instanceof HTMLSelectElement) fields.column.value = editing ? button.dataset.column || 'all' : 'all';
+        if (fields.target instanceof HTMLSelectElement && editing) fields.target.value = button.dataset.target || fields.target.options[0]?.value;
+        if (fields.from instanceof HTMLInputElement) fields.from.value = editing ? button.dataset.from || currentMonth : currentMonth;
+        if (fields.to instanceof HTMLInputElement) fields.to.value = editing ? button.dataset.to || currentMonth : currentMonth;
+        if (fields.reason instanceof HTMLTextAreaElement) fields.reason.value = editing ? button.dataset.reason || '' : '';
+        if (fields.active instanceof HTMLInputElement) fields.active.checked = editing ? button.dataset.active === '1' : true;
+        if (fields.title instanceof HTMLElement) fields.title.textContent = approvalRequired
+            ? (editing ? 'Ajukan Perubahan Sumber' : 'Ajukan Penyesuaian Sumber')
+            : (editing ? 'Edit Penyesuaian Sumber' : 'Buat Penyesuaian Sumber');
+        if (fields.submit instanceof HTMLButtonElement) fields.submit.textContent = approvalRequired
+            ? 'Kirim untuk Persetujuan'
+            : (editing ? 'Simpan Perubahan' : 'Simpan Penyesuaian');
+        sync();
+        if (!dialog.open) dialog.showModal();
+    };
+    document.querySelectorAll('[data-source-adjustment-create]').forEach((button) => button.addEventListener('click', () => open()));
+    document.querySelectorAll('[data-source-adjustment-edit]').forEach((button) => button.addEventListener('click', () => open(button)));
+    dialog.querySelectorAll('[data-source-adjustment-close]').forEach((button) => button.addEventListener('click', () => dialog.close()));
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+    const closeSourceMenu = () => {
+        if (fields.menu instanceof HTMLElement) fields.menu.hidden = true;
+        if (fields.component instanceof HTMLInputElement) fields.component.setAttribute('aria-expanded', 'false');
+    };
+    const filterSourceMenu = () => {
+        if (!(fields.component instanceof HTMLInputElement) || !(fields.menu instanceof HTMLElement)) return;
+        const keyword = normalize(fields.component.value);
+        let visible = 0;
+        sourceOptions.forEach((option) => {
+            option.hidden = keyword !== '' && !normalize(option.dataset.value).includes(keyword);
+            if (!option.hidden) visible++;
+        });
+        fields.menu.hidden = false;
+        fields.component.setAttribute('aria-expanded', 'true');
+        fields.menu.dataset.empty = visible === 0 ? '1' : '0';
+    };
+    sourceOptions.forEach((option) => option.addEventListener('click', () => {
+        if (fields.component instanceof HTMLInputElement) {
+            fields.component.value = option.dataset.value || '';
+            fields.component.setCustomValidity('');
+            fields.component.focus();
+        }
+        closeSourceMenu();
+    }));
+    fields.menuToggle?.addEventListener('click', () => {
+        if (fields.menu instanceof HTMLElement && !fields.menu.hidden) closeSourceMenu();
+        else { fields.component?.focus(); filterSourceMenu(); }
+    });
+    fields.component?.addEventListener('focus', filterSourceMenu);
+    fields.component?.addEventListener('input', () => { fields.component.setCustomValidity(''); filterSourceMenu(); });
+    fields.component?.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeSourceMenu();
+        if (event.key === 'Enter') {
+            const firstVisible = sourceOptions.find((option) => !option.hidden);
+            if (firstVisible) { event.preventDefault(); firstVisible.click(); }
+        }
+    });
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.source-description-picker')) closeSourceMenu();
+    });
+    fields.addDescription?.addEventListener('click', () => {
+        if (!(fields.component instanceof HTMLInputElement)) return;
+        const key = normalize(fields.component.value);
+        const canonical = sourceMap.get(key);
+        if (!canonical) {
+            fields.component.setCustomValidity('Pilih uraian Oracle yang tersedia pada daftar. Unggah laporan Oracle terlebih dahulu jika uraian belum tersedia.');
+            fields.component.reportValidity();
+            return;
+        }
+        fields.component.setCustomValidity('');
+        const existing = terms.find((term) => normalize(term.label) === key);
+        if (!existing) terms.push({ label: canonical, operator: '+' });
+        fields.component.value = '';
+        closeSourceMenu();
+        sync();
+    });
+    form.addEventListener('submit', (event) => {
+        const message = approvalRequired
+            ? 'Kirim pengajuan ini kepada Administrator? Perhitungan belum berubah sampai pengajuan disetujui.'
+            : 'Simpan penyesuaian sumber ini? Nilai laporan pada unit, LOB, dan periode terpilih akan dihitung ulang dari Ending Balance Oracle.';
+        if (terms.length === 0 || !window.confirm(message)) event.preventDefault();
+    });
+    document.querySelectorAll('form[data-source-adjustment-deactivate]').forEach((deactivateForm) => deactivateForm.addEventListener('submit', (event) => {
+        const message = deactivateForm.dataset.approvalRequired === '1'
+            ? 'Ajukan penonaktifan kepada Administrator? Aturan tetap aktif sampai pengajuan disetujui.'
+            : 'Nonaktifkan penyesuaian ini? Sistem akan kembali memakai aturan sumber yang lebih umum atau standar.';
+        if (!window.confirm(message)) event.preventDefault();
+    }));
+    document.querySelectorAll('form[data-source-adjustment-delete]').forEach((deleteForm) => deleteForm.addEventListener('submit', (event) => {
+        const message = deleteForm.dataset.approvalRequired === '1'
+            ? 'Ajukan penghapusan kepada Administrator? Aturan nonaktif tetap tersimpan sampai pengajuan disetujui.'
+            : 'Hapus penyesuaian nonaktif ini? Aturan tidak dapat dipulihkan dari daftar, tetapi riwayat audit tetap disimpan.';
+        if (!window.confirm(message)) event.preventDefault();
+    }));
+    document.querySelectorAll('form[data-source-request-approve]').forEach((approvalForm) => approvalForm.addEventListener('submit', (event) => {
+        if (!window.confirm('Setujui pengajuan ini? Perubahan akan langsung diterapkan pada perhitungan laporan.')) event.preventDefault();
+    }));
+    document.querySelectorAll('form[data-source-request-reject]').forEach((rejectionForm) => rejectionForm.addEventListener('submit', (event) => {
+        if (!window.confirm('Tolak pengajuan ini? Perubahan tidak akan diterapkan.')) event.preventDefault();
+    }));
+})();
+
+// Laba & Rugi: buka dan tutup rincian kelompok tanpa memuat ulang halaman.
+(() => {
+    document.querySelectorAll('.lr-report-table [data-lr-expandable]').forEach((row) => {
+        const toggle = row.querySelector('[data-lr-toggle]');
+        if (!toggle) return;
+        row.addEventListener('click', () => {
+            const expanded = toggle.getAttribute('aria-expanded') !== 'true';
+            toggle.setAttribute('aria-expanded', String(expanded));
+            row.querySelectorAll('[data-rka-group-output], [data-lr-group-output]').forEach((output) => {
+                if (output.hasAttribute('data-rka-group-output')) output.dataset.rkaExpanded = String(expanded);
+                if (output.hasAttribute('data-lr-group-output')) output.dataset.lrExpanded = String(expanded);
+                output.setAttribute('aria-hidden', String(expanded));
+            });
+            row.closest('table').querySelectorAll('[data-lr-detail]').forEach((detail) => {
+                if (detail.dataset.lrDetail === toggle.dataset.lrToggle) detail.hidden = !expanded;
+            });
+        });
+    });
+})();
+
+// Oracle LR: approved expense descriptions, fixed source Kanwil, native upload popup.
+(() => {
+    const dialog = document.querySelector('#lrUploadDialog');
+    if (!dialog) return;
+    document.querySelectorAll('[data-lr-upload-open]').forEach(button => button.addEventListener('click', () => { if (!dialog.open) dialog.showModal(); }));
+    dialog.querySelectorAll('[data-lr-upload-close]').forEach(button => button.addEventListener('click', () => dialog.close()));
+    dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+    const form = dialog.querySelector('[data-lr-upload-form]');
+    const file = form.querySelector('[name="lr_excel"]');
+    file.addEventListener('change', () => {
+        const selected = file.files[0];
+        file.setCustomValidity(selected && (!/\.xlsx$/i.test(selected.name) || selected.size > 5 * 1024 * 1024) ? 'Gunakan Excel .xlsx, maksimal 5 MB.' : '');
+    });
+    form.addEventListener('submit', () => {
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true; button.textContent = 'Menghitung…';
+    });
+    if (dialog.dataset.autoOpen === 'true') dialog.showModal();
+})();
+
+// Oracle LR deletion: exact unit/month/year selected in the confirmation dialog.
+(() => {
+    const dialog=document.querySelector('#lrDeleteDialog');
+    if (!dialog) return;
+    document.querySelectorAll('[data-lr-delete-open]').forEach(button=>button.addEventListener('click',()=>{ if (!dialog.open) dialog.showModal(); }));
+    dialog.querySelectorAll('[data-lr-delete-close]').forEach(button=>button.addEventListener('click',()=>dialog.close()));
+    dialog.addEventListener('click',event=>{ if (event.target===dialog) dialog.close(); });
+    dialog.querySelector('[data-lr-delete-form]').addEventListener('submit',()=>{
+        const button=dialog.querySelector('button[type="submit"]'); button.disabled=true; button.textContent='Menghapus…';
+    });
+})();
+
+// RKA Kanwil Surabaya: pemilihan halaman pengaturan melalui dialog.
+(() => {
+    const dialog = document.querySelector('#rkaSettingsDialog');
+    if (!dialog) return;
+    const uploadDialog = document.querySelector('#rkaUploadDialog');
+    const manualDialog = document.querySelector('#rkaManualDialog');
+    dialog.querySelector('[data-rka-manual-open]')?.addEventListener('click', () => {
+        if (!manualDialog) return;
+        dialog.close();
+        if (!manualDialog.open) manualDialog.showModal();
+    });
+    manualDialog?.querySelectorAll('[data-rka-manual-close]').forEach((button) => {
+        button.addEventListener('click', () => manualDialog.close());
+    });
+    manualDialog?.querySelector('[data-rka-manual-back]')?.addEventListener('click', () => {
+        manualDialog.close();
+        if (!dialog.open) dialog.showModal();
+    });
+    manualDialog?.addEventListener('click', (event) => {
+        if (event.target === manualDialog) manualDialog.close();
+    });
+    document.querySelectorAll('[data-rka-settings-open]').forEach((button) => {
+        button.addEventListener('click', () => { if (!dialog.open) dialog.showModal(); });
+    });
+    dialog.querySelectorAll('[data-rka-settings-close]').forEach((button) => {
+        button.addEventListener('click', () => dialog.close());
+    });
+    dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+    });
+    dialog.querySelector('[data-rka-upload-open]')?.addEventListener('click', () => {
+        if (!uploadDialog) return;
+        dialog.close();
+        if (!uploadDialog.open) uploadDialog.showModal();
+    });
+    uploadDialog?.querySelectorAll('[data-rka-upload-close]').forEach((button) => {
+        button.addEventListener('click', () => uploadDialog.close());
+    });
+    uploadDialog?.querySelector('[data-rka-upload-back]')?.addEventListener('click', () => {
+        uploadDialog.close();
+        if (!dialog.open) dialog.showModal();
+    });
+    uploadDialog?.addEventListener('click', (event) => {
+        if (event.target === uploadDialog) uploadDialog.close();
+    });
+    const fileInput = uploadDialog?.querySelector('[data-rka-upload-file]');
+    const fileStatus = uploadDialog?.querySelector('[data-rka-upload-status]');
+    fileInput?.addEventListener('change', () => {
+        if (!fileStatus) return;
+        const file = fileInput.files?.[0];
+        const valid = !file || (/\.xlsx$/i.test(file.name) && file.size <= 5 * 1024 * 1024);
+        fileInput.setCustomValidity(valid ? '' : 'Pilih berkas Template RKA .xlsx, maksimal 5 MB.');
+        fileStatus.textContent = !valid ? 'Pilih berkas Template RKA .xlsx, maksimal 5 MB.'
+            : file ? `Berkas dipilih: ${file.name}` : 'Belum ada berkas dipilih.';
+        if (!valid) fileInput.reportValidity();
+    });
+    if (uploadDialog?.dataset.autoOpen === 'true') uploadDialog.showModal();
+    else if (manualDialog?.dataset.autoOpen === 'true') manualDialog.showModal();
+})();
+
+// RKA Excel: same two-step selection and explicit setting-again gate as manual.
+(() => {
+    const form = document.querySelector('[data-rka-import-form]');
+    if (!form) return;
+    const selectStage = form.querySelector('[data-rka-upload-selection]');
+    const fileStage = form.querySelector('[data-rka-upload-file-stage]');
+    const unit = form.querySelector('#rkaUploadUnit');
+    const year = form.querySelector('#rkaUploadYear');
+    const next = form.querySelector('[data-rka-upload-next]');
+    const reset = form.querySelector('[data-rka-upload-reset]');
+    const existingAlert = form.querySelector('[data-rka-upload-existing-alert]');
+    const message = form.querySelector('[data-rka-upload-selection-status]');
+    const file = form.querySelector('[data-rka-upload-file]');
+    const confirmation = form.querySelector('[name="confirm_replace"]');
+    const submit = form.querySelector('[data-rka-upload-submit]');
+    const back = form.querySelector('[data-rka-upload-step-back]');
+    const menuBack = form.querySelector('[data-rka-upload-back]');
+    const revision = form.querySelector('[data-rka-upload-revision]');
+    const resetFlag = form.querySelector('[data-rka-upload-reset-flag]');
+    const resetId = form.querySelector('[data-rka-upload-reset-id]');
+    const scope = form.querySelector('#rkaUploadScope');
+    const allSnapshots = form.querySelector('[data-rka-upload-all-snapshots]');
+    const units = JSON.parse(form.dataset.rkaUnits);
+    const deleteExisting = form.querySelector('[data-rka-upload-delete-existing]');
+    let loading = false, pending = null, active = null;
+    const matchesChoice = (data) => data && String(data.year) === year.value
+        && (scope.value === 'all' ? data.scope === 'all' : data.scope !== 'all' && data.unit === unit.value);
+    const updateScope = () => {
+        const all = scope.value === 'all';
+        unit.hidden = form.querySelector('[data-rka-upload-unit-label]').hidden = all;
+        unit.required = !all;
+        form.querySelector('[data-rka-upload-all-help]').hidden = !all;
+    };
+    const setStep = (step) => {
+        form.dataset.rkaUploadStep = step;
+        selectStage.hidden = step !== 'selection';
+        fileStage.hidden = step !== 'file';
+        back.hidden = submit.hidden = step !== 'file';
+        menuBack.hidden = step !== 'selection';
+        file.disabled = confirmation.disabled = submit.disabled = step !== 'file' || loading;
+    };
+    const enterFile = (data) => {
+        active = data;
+        pending = null;
+        file.value = '';
+        file.setCustomValidity('');
+        confirmation.checked = false;
+        revision.value = data.scope === 'all' ? '0' : String(data.revision);
+        resetFlag.value = data.has_record ? '1' : '0';
+        resetId.value = data.scope !== 'all' && data.has_record ? String(data.budget_id) : '';
+        allSnapshots.value = data.scope === 'all' ? JSON.stringify(data.records) : '';
+        existingAlert.hidden = true;
+        form.querySelector('[data-rka-upload-status]').textContent = 'Belum ada berkas dipilih.';
+        form.querySelector('[data-rka-upload-active-context]').textContent = `Tahap 2 dari 2 — upload RKA ${data.scope === 'all' ? 'seluruh unit kerja' : data.unit} tahun ${data.year}.`;
+        form.querySelector('[data-rka-upload-confirm-text]').textContent = data.scope === 'all'
+            ? 'Saya mengonfirmasi upload seluruh unit dan tahun yang dipilih. RKA yang sudah ada akan diganti sesuai sheet masing-masing setelah seluruh berkas lolos pemeriksaan.'
+            : 'Saya mengonfirmasi unit dan tahun yang dipilih. Upload akan mengganti RKA unit/tahun tersebut jika sudah ada.';
+        setStep('file');
+    };
+    const choiceChanged = () => { active = pending = null; existingAlert.hidden = true; resetFlag.value = '0'; resetId.value = ''; allSnapshots.value = ''; setStep('selection'); updateScope(); };
+    scope.addEventListener('change', choiceChanged);
+    unit.addEventListener('change', choiceChanged);
+    year.addEventListener('input', choiceChanged);
+    back.addEventListener('click', () => setStep('selection'));
+    reset.addEventListener('click', () => {
+        if (!loading && matchesChoice(pending)) enterFile(pending);
+    });
+    form.querySelector('[data-rka-upload-delete-existing]').addEventListener('click', () => {
+        if (loading || scope.value === 'all' || !matchesChoice(pending)) return;
+        document.dispatchEvent(new CustomEvent('rka:delete', {detail:{unit:pending.unit,year:pending.year,revision:pending.revision,id:pending.budget_id}}));
+    });
+    next.addEventListener('click', async () => {
+        if (loading || !scope.reportValidity() || (scope.value !== 'all' && !unit.reportValidity()) || !year.reportValidity()) return;
+        if (file.files?.length && !window.confirm('Melanjutkan akan mengosongkan pilihan berkas sebelumnya. Lanjutkan?')) return;
+        active = pending = null;
+        existingAlert.hidden = true;
+        loading = true;
+        scope.disabled = unit.disabled = year.disabled = next.disabled = true;
+        setStep('selection');
+        message.textContent = 'Memeriksa RKA sesuai unit kerja dan tahun…';
+        try {
+            const url = new URL(form.dataset.rkaDataUrl, window.location.href);
+            url.searchParams.set('unit_kerja', unit.value); url.searchParams.set('tahun', year.value);
+            if (scope.value === 'all') url.searchParams.set('scope', 'all');
+            const response = await fetch(url, {credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+            const contentType = response.headers?.get('content-type');
+            if (contentType && !contentType.includes('application/json')) throw new Error('Sesi login berakhir. Silakan masuk kembali.');
+            const data = await response.json();
+            if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Data RKA tidak dapat dimuat.');
+            if (scope.value === 'all') {
+                if (data.scope !== 'all' || String(data.year) !== year.value || !data.records || Array.isArray(data.records)
+                    || Object.keys(data.records).length !== units.length || units.some((name) => {
+                        const record = data.records[name];
+                        return !record || !Number.isSafeInteger(record.revision) || record.revision < 0 || record.revision > 999999999
+                            || !(record.id === null ? record.revision === 0 : Number.isSafeInteger(record.id) && record.id > 0 && record.revision > 0);
+                    })) throw new Error('Data RKA seluruh unit tidak sesuai pilihan.');
+                data.has_record = units.some((name) => data.records[name].id !== null);
+            } else if (data.unit !== unit.value || String(data.year) !== year.value || typeof data.has_record !== 'boolean'
+                || !Number.isSafeInteger(data.revision) || data.revision < 0
+                || (data.has_record && (!Number.isSafeInteger(data.budget_id) || data.budget_id <= 0))) throw new Error('Data RKA tidak sesuai pilihan.');
+            loading = false;
+            if (data.has_record) {
+                pending = data;
+                existingAlert.hidden = false;
+                deleteExisting.hidden = scope.value === 'all';
+                form.querySelector('[data-rka-upload-existing-message]').textContent = data.scope === 'all'
+                    ? `RKA tahun ${data.year} sudah diseting untuk: ${units.filter((name) => data.records[name].id !== null).join(', ')}. Klik Seting Ulang untuk mengganti RKA melalui sheet masing-masing. Data lama hanya diganti setelah seluruh upload berhasil disimpan.`
+                    : `RKA ${data.unit} tahun ${data.year} sudah diseting. Klik Seting Ulang untuk memilih berkas pengganti. Data lama hanya diganti setelah upload berhasil disimpan.`;
+                message.textContent = 'Konfirmasi Seting Ulang untuk melanjutkan.';
+            } else enterFile(data);
+        } catch (error) { loading = false; message.textContent = `Gagal memeriksa RKA: ${error.message}. Silakan coba kembali.`; }
+        finally { loading = false; scope.disabled = unit.disabled = year.disabled = next.disabled = false; }
+    });
+    form.addEventListener('submit', (event) => {
+        if (loading || form.dataset.rkaUploadStep !== 'file' || !matchesChoice(active)) { event.preventDefault(); return; }
+        submit.disabled = true; submit.textContent = 'Memeriksa & menyimpan…';
+    });
+    updateScope();
+    setStep('selection');
+})();
+
+// RKA deletion: always confirm an exact unit, year and revision before a POST.
+(() => {
+    const dialog = document.querySelector('#rkaDeleteDialog');
+    if (!dialog) return;
+    const form = dialog.querySelector('[data-rka-delete-form]');
+    const open = (target) => {
+        if (!target || typeof target.unit !== 'string' || !/^\d{4}$/.test(String(target.year)) || !/^\d{1,9}$/.test(String(target.revision)) || !/^[1-9]\d{0,17}$/.test(String(target.id))) return;
+        form.querySelector('[data-rka-delete-unit]').value = target.unit;
+        form.querySelector('[data-rka-delete-year]').value = String(target.year);
+        form.querySelector('[data-rka-delete-revision]').value = String(target.revision);
+        form.querySelector('[data-rka-delete-id]').value = String(target.id);
+        form.querySelector('[name="confirm_delete"]').checked = false;
+        dialog.querySelector('[data-rka-delete-description]').textContent = `Hapus RKA ${target.unit} tahun ${target.year}?`;
+        if (!dialog.open) dialog.showModal();
+    };
+    document.querySelectorAll('[data-rka-delete-open]').forEach((button) => button.addEventListener('click', () => open(button.dataset)));
+    document.addEventListener('rka:delete', (event) => open(event.detail));
+    dialog.querySelectorAll('[data-rka-delete-close]').forEach((button) => button.addEventListener('click', () => dialog.close()));
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+    form.addEventListener('submit', () => {
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        button.textContent = 'Menghapus…';
+    });
+})();
+
+// Manual RKA: calculate integer cents with BigInt, never floating-point money.
+(() => {
+    const form = document.querySelector('[data-rka-manual-form]');
+    const schemaElement = document.querySelector('#rkaManualSchema');
+    if (!form || !schemaElement) return;
+    const schema = JSON.parse(schemaElement.textContent);
+    const fields = [...form.querySelectorAll('[data-rka-input]')];
+    const outputs = [...form.querySelectorAll('[data-rka-output]')];
+    const status = form.querySelector('[data-rka-manual-status]');
+    let selectionReady = () => true;
+    const parse = (text) => {
+        let value = text.trim();
+        if (value === '') return 0n;
+        if (/^-?(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(value)) value = value.replace(/\./g, '').replace(',', '.');
+        else if (!/^-?\d+\.\d{1,2}$/.test(value)) throw new Error('Gunakan format 1.234.567,89, maksimal 2 angka desimal.');
+        const negative = value.startsWith('-');
+        const [whole, fraction = ''] = value.replace(/^-/, '').split('.');
+        if ((whole.replace(/^0+/, '') || '0').length > 22) throw new Error('Nominal maksimal 22 digit.');
+        const amount = BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0'));
+        return negative ? -amount : amount;
+    };
+    const format = (amount) => {
+        if (amount === 0n) return '';
+        const negative = amount < 0n;
+        const digits = (negative ? -amount : amount).toString().padStart(3, '0');
+        const fraction = digits.slice(-2);
+        return (negative ? '-' : '') + digits.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (fraction === '00' ? '' : ',' + fraction);
+    };
+    const update = () => {
+        const values = {};
+        let valid = true;
+        fields.forEach((field) => {
+            try { values[field.dataset.rkaInput] = parse(field.value); field.setCustomValidity(''); }
+            catch (error) { field.setCustomValidity(error.message); valid = false; }
+        });
+        let message = 'Jumlah dihitung otomatis. Periksa nominal sebelum menyimpan.';
+        if (valid) {
+            try {
+                for (const [row, definition] of Object.entries(schema.rows)) {
+                    let total = 0n;
+                    for (const column of ['C', 'D', 'E', 'F', 'G']) {
+                        const key = `${column}${row}`;
+                        if (definition.terms !== null) values[key] = definition.terms.reduce((sum, term) => sum + values[`${column}${term.row}`] * BigInt(term.coefficient), 0n);
+                        const amount = values[key];
+                        if (typeof amount !== 'bigint') throw new Error('Isian RKA tidak lengkap. Muat ulang halaman.');
+                        if ((amount < 0n ? -amount : amount).toString().padStart(3, '0').slice(0, -2).length > 22) throw new Error('Hasil perhitungan melampaui 22 digit. Kurangi nominal isian.');
+                        total += amount;
+                    }
+                    if ((total < 0n ? -total : total).toString().padStart(3, '0').slice(0, -2).length > 22) throw new Error('Jumlah melampaui 22 digit. Kurangi nominal isian.');
+                    values[`H${row}`] = total;
+                }
+            } catch (error) { valid = false; message = error.message; }
+        } else message = 'Ada nominal tidak valid. Perbaiki isian sebelum jumlah dihitung atau disimpan.';
+        outputs.forEach((output) => {
+            const formatted = valid ? format(values[output.dataset.rkaOutput]) : '';
+            if (valid && formatted.startsWith('-')) {
+                // Only exact formatted BigInt money is interpolated, never user text.
+                output.innerHTML = `<span class="lr-rka-negative-marker">*</span>${formatted.slice(1)}`;
+            } else output.textContent = valid ? (formatted || '-') : '—';
+            output.dataset.rkaEmpty = formatted === '' ? 'true' : 'false';
+        });
+        if (status) { status.textContent = message; status.classList.toggle('lr-rka-status-error', !valid); }
+        return valid;
+    };
+    const revealInvalid = (field) => {
+        const row = field.closest('[data-lr-detail]');
+        if (!row) return;
+        form.querySelectorAll('[data-lr-detail]').forEach((detail) => { if (detail.dataset.lrDetail === row.dataset.lrDetail) detail.hidden = false; });
+        form.querySelectorAll('[data-lr-toggle]').forEach((toggle) => {
+            if (toggle.dataset.lrToggle !== row.dataset.lrDetail) return;
+            toggle.setAttribute('aria-expanded', 'true');
+            toggle.closest('tr').querySelectorAll('[data-rka-group-output]').forEach((output) => {
+                output.dataset.rkaExpanded = 'true';
+                output.setAttribute('aria-hidden', 'true');
+            });
+        });
+    };
+    fields.forEach((field) => {
+        field.addEventListener('input', update);
+        field.addEventListener('focus', () => field.select());
+        field.addEventListener('blur', () => { try { field.value = format(parse(field.value)); } catch (_) { /* Keep invalid input visible. */ } });
+    });
+    form.addEventListener('invalid', (event) => revealInvalid(event.target), true);
+    form.addEventListener('submit', (event) => {
+        if (!selectionReady()) { event.preventDefault(); return; }
+        if (!update()) { event.preventDefault(); form.reportValidity(); return; }
+        const button = form.querySelector('button[type="submit"]');
+        if (button) { button.disabled = true; button.textContent = 'Menyimpan…'; }
+    });
+    update();
+    const unitChoice = form.querySelector('[data-rka-manual-unit]');
+    const yearChoice = form.querySelector('[data-rka-manual-year]');
+    const loadButton = form.querySelector('[data-rka-manual-load]');
+    if (!unitChoice || !yearChoice || !loadButton) return;
+    const unitField = form.querySelector('[name="unit_kerja"]');
+    const yearField = form.querySelector('[name="tahun"]');
+    const revisionField = form.querySelector('[name="revision"]');
+    const confirmation = form.querySelector('[name="confirm_replace"]');
+    const selectionStatus = form.querySelector('[data-rka-selection-status]');
+    const saveButton = form.querySelector('button[type="submit"]');
+    const popup = form.closest('dialog');
+    const selectionStage = form.querySelector('[data-rka-selection-stage]');
+    const inputStage = form.querySelector('[data-rka-input-stage]');
+    const existingAlert = form.querySelector('[data-rka-existing-alert]');
+    const resetButton = form.querySelector('[data-rka-manual-reset]');
+    const stepBack = form.querySelector('[data-rka-step-back]');
+    let loading = false;
+    let dirty = form.dataset.hasUnsaved === 'true';
+    let pendingExisting = null;
+    selectionReady = () => form.dataset.rkaStep === 'input' && !loading && unitChoice.value === unitField.value && yearChoice.value === yearField.value;
+    const syncSelection = () => {
+        const ready = selectionReady();
+        if (saveButton) saveButton.disabled = !ready;
+        confirmation.disabled = !ready;
+        fields.forEach((field) => { field.disabled = !ready; });
+        if (!loading && selectionStatus) selectionStatus.textContent = ready
+            ? `Isian aktif: ${unitField.value} · ${yearField.value}.`
+            : 'Klik Next untuk memeriksa RKA dan melanjutkan ke input nominal.';
+    };
+    const setStep = (step) => {
+        form.dataset.rkaStep = step;
+        popup.dataset.rkaStage = step;
+        selectionStage.hidden = step !== 'selection';
+        inputStage.hidden = step !== 'input';
+        saveButton.hidden = step !== 'input';
+        status.hidden = step !== 'input';
+        form.querySelector('[data-rka-save-confirm]').hidden = step !== 'input';
+        form.querySelector('[data-rka-manual-back]').hidden = step !== 'selection';
+        stepBack.hidden = step !== 'input';
+        syncSelection();
+    };
+    const enterInputs = (data, edit = false) => {
+        // Edit keeps exact stored amounts; setting again starts a blank draft.
+        const replacements = fields.map((field) => edit ? format(parse(data.inputs[field.dataset.rkaInput])) : '');
+        fields.forEach((field, index) => { field.value = replacements[index]; });
+        unitField.value = data.unit;
+        yearField.value = String(data.year);
+        revisionField.value = String(data.revision);
+        form.querySelector('[data-rka-manual-mode]').value = edit ? 'edit' : 'setting';
+        form.querySelector('[data-rka-manual-edit-id]').value = edit ? String(data.budget_id) : '';
+        popup.querySelector('#rkaManualTitle').textContent = edit ? 'Edit RKA' : 'Seting Manual RKA';
+        saveButton.textContent = edit ? 'Simpan Perubahan' : 'Simpan RKA';
+        confirmation.checked = false;
+        popup.querySelector('[data-rka-manual-context]').textContent = `AKUTANSI / ${data.unit} · ${data.year}`;
+        form.querySelector('#rka-manual-report-title').textContent = `RKA ${data.unit} Tahun ${data.year}`;
+        form.querySelector('.lr-report-header p').textContent = `PT JAMKRINDO KANWIL SURABAYA · ${data.unit}`;
+        form.querySelector('.lr-report-year').textContent = String(data.year);
+        form.querySelector('.lr-report-caption').textContent = `RKA ${data.unit} Tahun ${data.year}`;
+        form.querySelector('.lr-report-scroll').setAttribute('aria-label', `Tabel RKA ${data.unit}, dapat digeser ke samping`);
+        form.querySelector('[data-rka-manual-confirm-text]').textContent = `Saya mengonfirmasi RKA ${data.unit} tahun ${data.year}. Menyimpan akan mengganti data RKA unit/tahun ini jika sudah ada.`;
+        form.querySelector('[data-rka-manual-error]')?.remove();
+        existingAlert.hidden = true;
+        pendingExisting = null;
+        dirty = false;
+        update();
+        setStep('input');
+    };
+    const choiceChanged = () => { pendingExisting = null; existingAlert.hidden = true; syncSelection(); };
+    unitChoice.addEventListener('change', choiceChanged);
+    yearChoice.addEventListener('input', choiceChanged);
+    stepBack.addEventListener('click', () => { pendingExisting = null; existingAlert.hidden = true; setStep('selection'); });
+    resetButton.addEventListener('click', () => {
+        if (loading || !pendingExisting || pendingExisting.unit !== unitChoice.value || String(pendingExisting.year) !== yearChoice.value) return;
+        enterInputs(pendingExisting);
+    });
+    form.querySelector('[data-rka-edit-existing]')?.addEventListener('click', () => {
+        if (loading || !pendingExisting || pendingExisting.unit !== unitChoice.value || String(pendingExisting.year) !== yearChoice.value) return;
+        enterInputs(pendingExisting, true);
+    });
+    form.querySelector('[data-rka-delete-existing]')?.addEventListener('click', () => {
+        if (loading || !pendingExisting || pendingExisting.unit !== unitChoice.value || String(pendingExisting.year) !== yearChoice.value) return;
+        document.dispatchEvent(new CustomEvent('rka:delete', {detail:{unit:pendingExisting.unit,year:pendingExisting.year,revision:pendingExisting.revision,id:pendingExisting.budget_id}}));
+    });
+    fields.forEach((field) => field.addEventListener('input', () => { dirty = true; }));
+    const loadInputs = async (editTarget = null) => {
+        if (loading) return;
+        if (dirty && !window.confirm('Memuat unit/tahun akan mengganti isian yang belum disimpan. Lanjutkan?')) return;
+        if (editTarget) {
+            unitChoice.value = editTarget.unit;
+            yearChoice.value = String(editTarget.year);
+            setStep('selection');
+            if (!popup.open) popup.showModal();
+        }
+        if (!unitChoice.reportValidity() || !yearChoice.reportValidity()) return;
+        const requestedUnit = unitChoice.value;
+        const requestedYear = yearChoice.value;
+        pendingExisting = null;
+        existingAlert.hidden = true;
+        loading = true;
+        unitChoice.disabled = yearChoice.disabled = loadButton.disabled = true;
+        loadButton.textContent = 'Memuat…';
+        syncSelection();
+        if (selectionStatus) selectionStatus.textContent = 'Memuat isian RKA sesuai unit kerja dan tahun…';
+        try {
+            const url = new URL(form.dataset.rkaDataUrl, window.location.href);
+            url.searchParams.set('unit_kerja', requestedUnit);
+            url.searchParams.set('tahun', requestedYear);
+            const response = await fetch(url, {credentials:'same-origin', cache:'no-store', headers:{Accept:'application/json'}});
+            const contentType = response.headers?.get('content-type');
+            if (contentType && !contentType.includes('application/json')) throw new Error('Sesi login berakhir atau data belum dapat dimuat. Silakan masuk kembali.');
+            const data = await response.json();
+            if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Isian RKA tidak dapat dimuat.');
+            if (data.unit !== requestedUnit || String(data.year) !== requestedYear || !Number.isSafeInteger(data.revision) || data.revision < 0
+                || typeof data.has_record !== 'boolean' || !data.inputs || Object.keys(data.inputs).length !== fields.length
+                || (data.has_record && (!Number.isSafeInteger(data.budget_id) || data.budget_id <= 0))) throw new Error('Data RKA yang diterima tidak sesuai pilihan.');
+            if (editTarget && (!data.has_record || String(data.budget_id) !== String(editTarget.id))) throw new Error('RKA yang ingin diedit sudah dihapus atau diganti. Muat ulang halaman.');
+            fields.forEach((field) => {
+                const amount = data.inputs[field.dataset.rkaInput];
+                if (typeof amount !== 'string' || !/^-?\d{1,22}\.\d{2}$/.test(amount)) throw new Error('Nominal RKA yang diterima tidak valid.');
+                parse(amount);
+            });
+            loading = false;
+            if (editTarget) enterInputs(data, true);
+            else if (data.has_record) {
+                pendingExisting = data;
+                form.querySelector('[data-rka-existing-message]').textContent = `RKA ${data.unit} tahun ${data.year} sudah diseting. Pilih Edit RKA untuk mengubah nominal tersimpan, atau Seting Ulang untuk memulai isian kosong. Data lama hanya diganti setelah Anda menyimpan.`;
+                existingAlert.hidden = false;
+                syncSelection();
+            } else enterInputs(data);
+        } catch (error) {
+            loading = false;
+            syncSelection();
+            if (selectionStatus) selectionStatus.textContent = `Gagal memuat: ${error.message}. Isian sebelumnya tetap dipertahankan.`;
+        } finally {
+            loading = false;
+            unitChoice.disabled = yearChoice.disabled = loadButton.disabled = false;
+            loadButton.textContent = 'Next →';
+        }
+    };
+    loadButton.addEventListener('click', () => loadInputs());
+    document.querySelectorAll('[data-rka-edit-open]').forEach((button) => button.addEventListener('click', () => loadInputs(button.dataset)));
+    syncSelection();
+})();
+
 // Tutup panel urutan saat pengguna berinteraksi di luar panel.
 (() => {
     const orderMenus = [...document.querySelectorAll('.list-order-menu')];

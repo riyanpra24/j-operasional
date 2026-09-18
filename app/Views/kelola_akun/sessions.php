@@ -1,4 +1,5 @@
 <?php
+
 /** @var list<array<string, mixed>> $sessions */
 /** @var array<string, mixed> $filters */
 /** @var int $totalUsers */
@@ -52,40 +53,57 @@
     </div>
     <div class="table-wrap">
         <table>
-            <thead><tr><th>No.</th><th>Pengguna</th><th>Role</th><th>Perangkat</th><th>Alamat IP</th><th>Aktivitas Terakhir</th><th>Berakhir</th><th>Aksi</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Pengguna</th>
+                    <th>Role</th>
+                    <th>Perangkat</th>
+                    <th>Alamat IP</th>
+                    <th>Aktivitas Terakhir</th>
+                    <th>Berakhir</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
             <tbody>
-            <?php if ($sessions === []): ?>
-                <tr><td colspan="8"><div class="empty-state compact"><span>✓</span><strong>Tidak ada sesi aktif</strong><p>Tidak ada akun aktif yang sesuai dengan filter saat ini.</p></div></td></tr>
-            <?php else: ?>
-                <?php foreach ($sessions as $index => $activeSession): ?>
-                    <?php $isCurrentSession = (int) $activeSession['user_id'] === $currentUserId; ?>
+                <?php if ($sessions === []): ?>
                     <tr>
-                        <td><strong><?= $index + 1 ?></strong></td>
-                        <td>
-                            <div class="account-name-cell">
-                                <span><?= esc(strtoupper(substr($activeSession['display_name'], 0, 1))) ?></span>
-                                <div><strong><?= esc($activeSession['display_name']) ?></strong><small>@<?= esc($activeSession['username']) ?></small></div>
+                        <td colspan="8">
+                            <div class="empty-state compact"><span>✓</span><strong>Tidak ada sesi aktif</strong>
+                                <p>Tidak ada akun aktif yang sesuai dengan filter saat ini.</p>
                             </div>
                         </td>
-                        <td><span class="account-role <?= esc($activeSession['role']) ?>"><?= esc($roleLabels[$activeSession['role']] ?? ucfirst($activeSession['role'])) ?></span></td>
-                        <td><span class="session-device" title="<?= esc($activeSession['user_agent'], 'attr') ?>"><i aria-hidden="true">▣</i><?= esc($activeSession['device_label']) ?></span></td>
-                        <td><code class="session-ip"><?= esc($activeSession['ip_address'] ?: '-') ?></code></td>
-                        <td><?= date('d-m-Y H:i', strtotime($activeSession['last_seen_at'])) ?> WIB</td>
-                        <td><?= date('d-m-Y H:i', strtotime($activeSession['expires_at'])) ?> WIB</td>
-                        <td>
-                            <?php if ($isCurrentSession): ?>
-                                <span class="session-current-badge">Sesi ini</span>
-                            <?php else: ?>
-                                <button type="button" class="btn btn-danger-outline session-reset-button" data-session-reset='<?= esc(json_encode([
-                                    'url' => site_url('kelola-akun/session-account/' . $activeSession['user_id'] . '/reset'),
-                                    'name' => $activeSession['display_name'],
-                                    'username' => $activeSession['username'],
-                                ]), 'attr') ?>'>Reset Session</button>
-                            <?php endif ?>
-                        </td>
                     </tr>
-                <?php endforeach ?>
-            <?php endif ?>
+                <?php else: ?>
+                    <?php foreach ($sessions as $index => $activeSession): ?>
+                        <?php $isCurrentSession = (int) $activeSession['user_id'] === $currentUserId; ?>
+                        <tr>
+                            <td><strong><?= $index + 1 ?></strong></td>
+                            <td>
+                                <div class="account-name-cell">
+                                    <span><?= esc(strtoupper(substr($activeSession['display_name'], 0, 1))) ?></span>
+                                    <div><strong><?= esc($activeSession['display_name']) ?></strong><small>@<?= esc($activeSession['username']) ?></small></div>
+                                </div>
+                            </td>
+                            <td><span class="account-role <?= esc($activeSession['role']) ?>"><?= esc($roleLabels[$activeSession['role']] ?? ucfirst($activeSession['role'])) ?></span></td>
+                            <td><span class="session-device" title="<?= esc($activeSession['user_agent'], 'attr') ?>"><i aria-hidden="true">▣</i><?= esc($activeSession['device_label']) ?></span></td>
+                            <td><code class="session-ip"><?= esc($activeSession['ip_address'] ?: '-') ?></code></td>
+                            <td><?= date('d-m-Y H:i', strtotime($activeSession['last_seen_at'])) ?> WIB</td>
+                            <td><?= date('d-m-Y H:i', strtotime($activeSession['expires_at'])) ?> WIB</td>
+                            <td>
+                                <?php if ($isCurrentSession): ?>
+                                    <span class="session-current-badge">Sesi ini</span>
+                                <?php else: ?>
+                                    <button type="button" class="btn btn-danger-outline session-reset-button" data-session-reset='<?= esc(json_encode([
+                                                                                                                                        'url' => site_url('kelola-akun/session-account/' . $activeSession['user_id'] . '/reset'),
+                                                                                                                                        'name' => $activeSession['display_name'],
+                                                                                                                                        'username' => $activeSession['username'],
+                                                                                                                                    ]), 'attr') ?>'>Reset Session</button>
+                                <?php endif ?>
+                            </td>
+                        </tr>
+                    <?php endforeach ?>
+                <?php endif ?>
             </tbody>
         </table>
     </div>
@@ -108,27 +126,32 @@
 </div>
 
 <script>
-(() => {
-    const modal = document.getElementById('sessionResetModal');
-    if (!modal) return;
-    const form = modal.querySelector('[data-session-reset-form]');
-    const name = modal.querySelector('[data-session-reset-name]');
-    const openModal = data => {
-        form.action = data.url;
-        name.textContent = `${data.name} (@${data.username})`;
-        modal.hidden = false;
-        modal.setAttribute('aria-hidden', 'false');
-        requestAnimationFrame(() => modal.classList.add('open'));
-        document.body.classList.add('modal-open');
-    };
-    const closeModal = () => {
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden', 'true');
-        setTimeout(() => { modal.hidden = true; document.body.classList.remove('modal-open'); }, 180);
-    };
-    document.querySelectorAll('[data-session-reset]').forEach(button => button.addEventListener('click', () => openModal(JSON.parse(button.dataset.sessionReset))));
-    document.querySelectorAll('[data-session-reset-close]').forEach(button => button.addEventListener('click', closeModal));
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !modal.hidden) closeModal(); });
-})();
+    (() => {
+        const modal = document.getElementById('sessionResetModal');
+        if (!modal) return;
+        const form = modal.querySelector('[data-session-reset-form]');
+        const name = modal.querySelector('[data-session-reset-name]');
+        const openModal = data => {
+            form.action = data.url;
+            name.textContent = `${data.name} (@${data.username})`;
+            modal.hidden = false;
+            modal.setAttribute('aria-hidden', 'false');
+            requestAnimationFrame(() => modal.classList.add('open'));
+            document.body.classList.add('modal-open');
+        };
+        const closeModal = () => {
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            setTimeout(() => {
+                modal.hidden = true;
+                document.body.classList.remove('modal-open');
+            }, 180);
+        };
+        document.querySelectorAll('[data-session-reset]').forEach(button => button.addEventListener('click', () => openModal(JSON.parse(button.dataset.sessionReset))));
+        document.querySelectorAll('[data-session-reset-close]').forEach(button => button.addEventListener('click', closeModal));
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && !modal.hidden) closeModal();
+        });
+    })();
 </script>
 <?= $this->endSection() ?>

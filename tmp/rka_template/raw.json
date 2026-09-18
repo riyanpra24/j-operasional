@@ -1,0 +1,8497 @@
+{
+  "A1": {
+    "value": "PT JAMKRINDO KANWIL SURABAYA",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B1": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C1": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D1": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E1": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F1": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G1": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H1": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A2": {
+    "value": "LABA RUGI RKA TAHUN 2026",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B2": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C2": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D2": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E2": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F2": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G2": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H2": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A3": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B3": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C3": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D3": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E3": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F3": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G3": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H3": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A4": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B4": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C4": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D4": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E4": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F4": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G4": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H4": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A5": {
+    "value": "URAIAN",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B5": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C5": {
+    "value": "RKA KANCA SURABAYA",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D5": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E5": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F5": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G5": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H5": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A6": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B6": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C6": {
+    "value": "KUR",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D6": {
+    "value": "PEN",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E6": {
+    "value": "KBG/SURETYSHIP",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F6": {
+    "value": "KONSUMTIF",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G6": {
+    "value": "PRODUKTIF",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H6": {
+    "value": "TOTAL",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A7": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B7": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C7": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D7": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E7": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F7": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G7": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H7": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A8": {
+    "value": "VOLUME",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B8": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C8": {
+    "value": "9912949637720",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D8": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E8": {
+    "value": "3913532224491",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F8": {
+    "value": "974545539188",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G8": {
+    "value": "2361265957530",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H8": {
+    "value": "17162293358929",
+    "type": null,
+    "formula": "SUM(C8:G8)",
+    "formula_attributes": {}
+  },
+  "A9": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B9": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C9": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D9": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E9": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F9": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G9": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H9": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A10": {
+    "value": "PENDAPATAN PENJAMINAN",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B10": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C10": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D10": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E10": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F10": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G10": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H10": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A11": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B11": {
+    "value": "Imbal Jasa Penjaminan Bruto",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C11": {
+    "value": "358429774172",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D11": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E11": {
+    "value": "12754022487",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F11": {
+    "value": "9459354711",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G11": {
+    "value": "42658164985",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H11": {
+    "value": "423301316355",
+    "type": null,
+    "formula": "SUM(C11:G11)",
+    "formula_attributes": {}
+  },
+  "A12": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B12": {
+    "value": "Restitusi penjaminan kredit",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C12": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D12": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E12": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F12": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G12": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H12": {
+    "value": "0",
+    "type": null,
+    "formula": "SUM(C12:G12)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "H12:H13",
+      "si": "0"
+    }
+  },
+  "A13": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B13": {
+    "value": "Premi Penjaminan Ulang",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C13": {
+    "value": "32275195681",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D13": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E13": {
+    "value": "1548572196",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F13": {
+    "value": "1411596254",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G13": {
+    "value": "24666604293",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H13": {
+    "value": "59901968424",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "0"
+    }
+  },
+  "A14": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B14": {
+    "value": "IMBAL JASA PENJAMINAN BERSIH",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C14": {
+    "value": "326154578491",
+    "type": null,
+    "formula": "C11-C12-C13",
+    "formula_attributes": {}
+  },
+  "D14": {
+    "value": "0",
+    "type": null,
+    "formula": "D11-D12-D13",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "D14:H14",
+      "si": "1"
+    }
+  },
+  "E14": {
+    "value": "11205450291",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "1"
+    }
+  },
+  "F14": {
+    "value": "8047758457",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "1"
+    }
+  },
+  "G14": {
+    "value": "17991560692",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "1"
+    }
+  },
+  "H14": {
+    "value": "363399347931",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "1"
+    }
+  },
+  "A15": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B15": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C15": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D15": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E15": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F15": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G15": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H15": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A16": {
+    "value": "BEBAN KLAIM",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B16": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C16": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D16": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E16": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F16": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G16": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H16": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A17": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B17": {
+    "value": "Beban Klaim",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C17": {
+    "value": "279117753977",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D17": {
+    "value": "22334975222",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E17": {
+    "value": "5202817631",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F17": {
+    "value": "5124694714",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G17": {
+    "value": "37261618379",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H17": {
+    "value": "349041859923",
+    "type": null,
+    "formula": "SUM(C17:G17)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "H17:H20",
+      "si": "2"
+    }
+  },
+  "A18": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B18": {
+    "value": "Kenaikan (Penurunan) Cadangan Klaim",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C18": {
+    "value": "1747285621",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D18": {
+    "value": "-5867662416",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E18": {
+    "value": "17700890",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F18": {
+    "value": "264667074",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G18": {
+    "value": "8523487423",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H18": {
+    "value": "4685478592",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "2"
+    }
+  },
+  "A19": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B19": {
+    "value": "Pendapatan Subrogasi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C19": {
+    "value": "71739819407",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D19": {
+    "value": "17075082318",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E19": {
+    "value": "59056287",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F19": {
+    "value": "120506747",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G19": {
+    "value": "26509953142",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H19": {
+    "value": "115504417901",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "2"
+    }
+  },
+  "A20": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B20": {
+    "value": "Beban Komisi Netto",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C20": {
+    "value": "5093038920",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D20": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E20": {
+    "value": "269126234",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F20": {
+    "value": "215756309",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G20": {
+    "value": "3766766262",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H20": {
+    "value": "9344687725",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "2"
+    }
+  },
+  "A21": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B21": {
+    "value": "JUMLAH BEBAN KLAIM",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C21": {
+    "value": "204032181271",
+    "type": null,
+    "formula": "C17+C18-C19-C20",
+    "formula_attributes": {}
+  },
+  "D21": {
+    "value": "-607769512",
+    "type": null,
+    "formula": "D17+D18-D19-D20",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "D21:H21",
+      "si": "3"
+    }
+  },
+  "E21": {
+    "value": "4892336000",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "3"
+    }
+  },
+  "F21": {
+    "value": "5053098732",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "3"
+    }
+  },
+  "G21": {
+    "value": "15508386398",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "3"
+    }
+  },
+  "H21": {
+    "value": "228878232889",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "3"
+    }
+  },
+  "A22": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B22": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C22": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D22": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E22": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F22": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G22": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H22": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A23": {
+    "value": "PENJAMINAN BERSIH",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B23": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C23": {
+    "value": "122122397220",
+    "type": null,
+    "formula": "C14-C21",
+    "formula_attributes": {}
+  },
+  "D23": {
+    "value": "607769512",
+    "type": null,
+    "formula": "D14-D21",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "D23:H23",
+      "si": "4"
+    }
+  },
+  "E23": {
+    "value": "6313114291",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "4"
+    }
+  },
+  "F23": {
+    "value": "2994659725",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "4"
+    }
+  },
+  "G23": {
+    "value": "2483174294",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "4"
+    }
+  },
+  "H23": {
+    "value": "134521115042",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "4"
+    }
+  },
+  "A24": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B24": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C24": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D24": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E24": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F24": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G24": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H24": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A25": {
+    "value": "PENDAPATAN INVESTASI BERSIH",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B25": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C25": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D25": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E25": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F25": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G25": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H25": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A26": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B26": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C26": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D26": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E26": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F26": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G26": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H26": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A27": {
+    "value": "BEBAN USAHA",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B27": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C27": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D27": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E27": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F27": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G27": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H27": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A28": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B28": {
+    "value": "BEBAN KARYAWAN",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C28": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D28": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E28": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F28": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G28": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H28": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A29": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B29": {
+    "value": "Beban gaji karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C29": {
+    "value": "2019992538",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D29": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E29": {
+    "value": "41420923",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F29": {
+    "value": "53309818",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G29": {
+    "value": "234563696",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H29": {
+    "value": "2349286975",
+    "type": null,
+    "formula": "SUM(C29:G29)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "H29:H51",
+      "si": "5"
+    }
+  },
+  "A30": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B30": {
+    "value": "Beban lembur karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C30": {
+    "value": "80955400",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D30": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E30": {
+    "value": "1660030",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F30": {
+    "value": "2136502",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G30": {
+    "value": "9400628",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H30": {
+    "value": "94152560",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A31": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B31": {
+    "value": "Beban asuransi kesehatan karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C31": {
+    "value": "360926704",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D31": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E31": {
+    "value": "7400976",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F31": {
+    "value": "9525251",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G31": {
+    "value": "41911195",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H31": {
+    "value": "419764126",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A32": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B32": {
+    "value": "Beban asuransi jiwa karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C32": {
+    "value": "16536107",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D32": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E32": {
+    "value": "339081",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F32": {
+    "value": "436406",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G32": {
+    "value": "1920190",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H32": {
+    "value": "19231784",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A33": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B33": {
+    "value": "Beban dana pensiun",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C33": {
+    "value": "262090662",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D33": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E33": {
+    "value": "5374296",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F33": {
+    "value": "6916860",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G33": {
+    "value": "30434248",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H33": {
+    "value": "304816066",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A34": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B34": {
+    "value": "Beban kompensasi kinerja karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C34": {
+    "value": "2639551770",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D34": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E34": {
+    "value": "54125284",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F34": {
+    "value": "69660665",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G34": {
+    "value": "306507577",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H34": {
+    "value": "3069845296",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A35": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B35": {
+    "value": "Biaya jasa kini karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C35": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D35": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E35": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F35": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G35": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H35": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A36": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B36": {
+    "value": "Biaya jasa lalu karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C36": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D36": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E36": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F36": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G36": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H36": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A37": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B37": {
+    "value": "Bunga atas imbalan pasca kerja karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C37": {
+    "value": "396307733",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D37": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E37": {
+    "value": "8126482",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F37": {
+    "value": "10458996",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G37": {
+    "value": "46019678",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H37": {
+    "value": "460912889",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A38": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B38": {
+    "value": "Beban BPJS kesehatan karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C38": {
+    "value": "100583081",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D38": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E38": {
+    "value": "2062505",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F38": {
+    "value": "2654498",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G38": {
+    "value": "11679815",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H38": {
+    "value": "116979899",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A39": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B39": {
+    "value": "Beban BPJS jaminan hari tua karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C39": {
+    "value": "142687058",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D39": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E39": {
+    "value": "2925867",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F39": {
+    "value": "3765668",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G39": {
+    "value": "16568974",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H39": {
+    "value": "165947567",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A40": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B40": {
+    "value": "Beban BPJS jaminan kecelakaan kerja dan jaminan kematian karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C40": {
+    "value": "20708564",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D40": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E40": {
+    "value": "424639",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F40": {
+    "value": "546522",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G40": {
+    "value": "2404701",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H40": {
+    "value": "24084426",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A41": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B41": {
+    "value": "Beban BPJS jaminan pensiun karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C41": {
+    "value": "47983259",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D41": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E41": {
+    "value": "983920",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F41": {
+    "value": "1266331",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G41": {
+    "value": "5571867",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H41": {
+    "value": "55805377",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A42": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B42": {
+    "value": "Beban tunjangan hari raya karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C42": {
+    "value": "695650945",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D42": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E42": {
+    "value": "14264659",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F42": {
+    "value": "18358991",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G42": {
+    "value": "80779732",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H42": {
+    "value": "809054327",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A43": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B43": {
+    "value": "Beban tunjangan PPh 21 karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C43": {
+    "value": "1603647260",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D43": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E43": {
+    "value": "32883562",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F43": {
+    "value": "42322009",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G43": {
+    "value": "186217237",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H43": {
+    "value": "1865070068",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A44": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B44": {
+    "value": "Beban tunjangan transportasi karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C44": {
+    "value": "83963494",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D44": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E44": {
+    "value": "1721712",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F44": {
+    "value": "2215889",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G44": {
+    "value": "9749931",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H44": {
+    "value": "97651026",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A45": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B45": {
+    "value": "Beban tunjangan jabatan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C45": {
+    "value": "943740633",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D45": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E45": {
+    "value": "19351858",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F45": {
+    "value": "24906350",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G45": {
+    "value": "109588173",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H45": {
+    "value": "1097587014",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A46": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B46": {
+    "value": "Beban tunjangan cuti besar",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C46": {
+    "value": "32940452",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D46": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E46": {
+    "value": "675460",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F46": {
+    "value": "869335",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G46": {
+    "value": "3825081",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H46": {
+    "value": "38310328",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A47": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B47": {
+    "value": "Beban tunjangan cuti tahunan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C47": {
+    "value": "316045338",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D47": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E47": {
+    "value": "6480662",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F47": {
+    "value": "8340783",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G47": {
+    "value": "36699523",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H47": {
+    "value": "367566306",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A48": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B48": {
+    "value": "Beban tunjangan makan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C48": {
+    "value": "284009877",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D48": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E48": {
+    "value": "5823760",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F48": {
+    "value": "7495332",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G48": {
+    "value": "32979531",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H48": {
+    "value": "330308500",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A49": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B49": {
+    "value": "Beban Tunjangan Pakaian Kerja",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C49": {
+    "value": "66933169",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D49": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E49": {
+    "value": "1372497",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F49": {
+    "value": "1766440",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G49": {
+    "value": "7772351",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H49": {
+    "value": "77844457",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A50": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B50": {
+    "value": "Beban kompensasi PKWT/PKWTT",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C50": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D50": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E50": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F50": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G50": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H50": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A51": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B51": {
+    "value": "Beban tunjangan lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C51": {
+    "value": "183002512",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D51": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E51": {
+    "value": "3752555",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F51": {
+    "value": "4829637",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G51": {
+    "value": "21250448",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H51": {
+    "value": "212835152",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "5"
+    }
+  },
+  "A52": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B52": {
+    "value": "Total Beban Karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C52": {
+    "value": "10298256556",
+    "type": null,
+    "formula": "SUM(C29:C51)",
+    "formula_attributes": {}
+  },
+  "D52": {
+    "value": "0",
+    "type": null,
+    "formula": "SUM(D29:D51)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "D52:H52",
+      "si": "6"
+    }
+  },
+  "E52": {
+    "value": "211170728",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "6"
+    }
+  },
+  "F52": {
+    "value": "271782283",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "6"
+    }
+  },
+  "G52": {
+    "value": "1195844576",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "6"
+    }
+  },
+  "H52": {
+    "value": "11977054143",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "6"
+    }
+  },
+  "A53": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B53": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C53": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D53": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E53": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F53": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G53": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H53": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A54": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B54": {
+    "value": "BEBAN ADMINISTRASI & UMUM",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C54": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D54": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E54": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F54": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G54": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H54": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A55": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B55": {
+    "value": "Imbal jasa profesional - akuntan publik",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C55": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D55": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E55": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F55": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G55": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H55": {
+    "value": "0",
+    "type": null,
+    "formula": "SUM(C55:G55)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "H55:H118",
+      "si": "7"
+    }
+  },
+  "A56": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B56": {
+    "value": "Imbal jasa profesional - konsultan hukum",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C56": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D56": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E56": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F56": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G56": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H56": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A57": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B57": {
+    "value": "Imbal jasa profesional - konsultan manajemen (SDM, SOP, Akuntansi dll)",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C57": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D57": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E57": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F57": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G57": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H57": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A58": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B58": {
+    "value": "Beban imbal jasa profesional IT",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C58": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D58": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E58": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F58": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G58": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H58": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A59": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B59": {
+    "value": "Imbal jasa profesional - lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C59": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D59": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E59": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F59": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G59": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H59": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A60": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B60": {
+    "value": "Air, listrik dan utilitas - gedung",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C60": {
+    "value": "307268768",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D60": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E60": {
+    "value": "6300695",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F60": {
+    "value": "8109160",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G60": {
+    "value": "35680378",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H60": {
+    "value": "357359001",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A61": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B61": {
+    "value": "Air, listrik dan utilitas - rumah dinas",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C61": {
+    "value": "15169427",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D61": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E61": {
+    "value": "311056",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F61": {
+    "value": "400338",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G61": {
+    "value": "1761490",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H61": {
+    "value": "17642311",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A62": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B62": {
+    "value": "Pemasaran",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C62": {
+    "value": "1373615410",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D62": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E62": {
+    "value": "28166648",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F62": {
+    "value": "36251217",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G62": {
+    "value": "159505692",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H62": {
+    "value": "1597538967",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A63": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B63": {
+    "value": "Beban pelatihan manajemen",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C63": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D63": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E63": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F63": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G63": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H63": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A64": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B64": {
+    "value": "Beban pelatihan karyawan - insidentil",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C64": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D64": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E64": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F64": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G64": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H64": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A65": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B65": {
+    "value": "Beban pelatihan karyawan - leadership",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C65": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D65": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E65": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F65": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G65": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H65": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A66": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B66": {
+    "value": "Beban pelatihan karyawan - TNA",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C66": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D66": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E66": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F66": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G66": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H66": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A67": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B67": {
+    "value": "Beban sertifikasi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C67": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D67": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E67": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F67": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G67": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H67": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A68": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B68": {
+    "value": "Beban perekrutan karyawan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C68": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D68": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E68": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F68": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G68": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H68": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A69": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B69": {
+    "value": "Beban uang saku magang",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C69": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D69": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E69": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F69": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G69": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H69": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A70": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B70": {
+    "value": "Akomodasi dinas dalam negeri",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C70": {
+    "value": "100920163",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D70": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E70": {
+    "value": "2069417",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F70": {
+    "value": "2663394",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G70": {
+    "value": "11718957",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H70": {
+    "value": "117371931",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A71": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B71": {
+    "value": "Tranportasi dinas dalam negeri",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C71": {
+    "value": "9512047",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D71": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E71": {
+    "value": "195049",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F71": {
+    "value": "251033",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G71": {
+    "value": "1104549",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H71": {
+    "value": "11062678",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A72": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B72": {
+    "value": "Tunjangan perjalanan dinas dalam negeri",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C72": {
+    "value": "53561010",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D72": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E72": {
+    "value": "1098294",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F72": {
+    "value": "1413534",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G72": {
+    "value": "6219562",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H72": {
+    "value": "62292400",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A73": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B73": {
+    "value": "Akomodasi dinas luar negeri",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C73": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D73": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E73": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F73": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G73": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H73": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A74": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B74": {
+    "value": "Tranportasi dinas luar negeri",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C74": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D74": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E74": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F74": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G74": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H74": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A75": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B75": {
+    "value": "Tunjangan perjalanan dinas luar negeri",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C75": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D75": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E75": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F75": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G75": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H75": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A76": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B76": {
+    "value": "Percetakan dan inventaris kantor",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C76": {
+    "value": "301111384",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D76": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E76": {
+    "value": "6174434",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F76": {
+    "value": "7946660",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G76": {
+    "value": "34965376",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H76": {
+    "value": "350197854",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A77": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B77": {
+    "value": "Telepon, fax dan komunikasi - gedung",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C77": {
+    "value": "100260504",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D77": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E77": {
+    "value": "2055890",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F77": {
+    "value": "2645985",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G77": {
+    "value": "11642357",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H77": {
+    "value": "116604736",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A78": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B78": {
+    "value": "Telepon, fax dan komunikasi - rumah dinas",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C78": {
+    "value": "7638275",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D78": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E78": {
+    "value": "156627",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F78": {
+    "value": "201582",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G78": {
+    "value": "886965",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H78": {
+    "value": "8883449",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A79": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B79": {
+    "value": "Bensin dan parkir",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C79": {
+    "value": "95673975",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D79": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E79": {
+    "value": "1961841",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F79": {
+    "value": "2524941",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G79": {
+    "value": "11109764",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H79": {
+    "value": "111270521",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A80": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B80": {
+    "value": "Beban pemeliharaan kendaraan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C80": {
+    "value": "536668291",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D80": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E80": {
+    "value": "11004643",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F80": {
+    "value": "14163265",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G80": {
+    "value": "62318496",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H80": {
+    "value": "624154695",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A81": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B81": {
+    "value": "Beban penggunaan Data Center",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C81": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D81": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E81": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F81": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G81": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H81": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A82": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B82": {
+    "value": "Beban jaringan dan konektivitas",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C82": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D82": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E82": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F82": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G82": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H82": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A83": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B83": {
+    "value": "Beban penyewaan peralatan IT",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C83": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D83": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E83": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F83": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G83": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H83": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A84": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B84": {
+    "value": "Beban pemeliharaan peralatan IT",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C84": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D84": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E84": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F84": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G84": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H84": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A85": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B85": {
+    "value": "Beban pemeliharaan perangkat lunak IT",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C85": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D85": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E85": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F85": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G85": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H85": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A86": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B86": {
+    "value": "Beban pemeliharaan gedung",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C86": {
+    "value": "303304038",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D86": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E86": {
+    "value": "6219396",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F86": {
+    "value": "8004526",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G86": {
+    "value": "35219990",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H86": {
+    "value": "352747950",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A87": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B87": {
+    "value": "Beban pemeliharaan rumah dinas",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C87": {
+    "value": "3598029",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D87": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E87": {
+    "value": "73779",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F87": {
+    "value": "94956",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G87": {
+    "value": "417807",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H87": {
+    "value": "4184571",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A88": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B88": {
+    "value": "Beban pemeliharaan mesin dan peralatan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C88": {
+    "value": "111028233",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D88": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E88": {
+    "value": "2276688",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F88": {
+    "value": "2930157",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G88": {
+    "value": "12892717",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H88": {
+    "value": "129127795",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A89": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B89": {
+    "value": "Beban pemeliharaan renovasi dan instalasi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C89": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D89": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E89": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F89": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G89": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H89": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A90": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B90": {
+    "value": "Beban aset bernilai rendah",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C90": {
+    "value": "17626893",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D90": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E90": {
+    "value": "361448",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F90": {
+    "value": "465193",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G90": {
+    "value": "2046854",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H90": {
+    "value": "20500388",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A91": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B91": {
+    "value": "Beban pemeliharaan lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C91": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D91": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E91": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F91": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G91": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H91": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A92": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B92": {
+    "value": "Beban pemeliharaan gedung sewa",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C92": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D92": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E92": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F92": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G92": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H92": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A93": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B93": {
+    "value": "Beban pemeliharaan gudang sewa",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C93": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D93": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E93": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F93": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G93": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H93": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A94": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B94": {
+    "value": "Beban pemeliharaan rumah dinas sewa",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C94": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D94": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E94": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F94": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G94": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H94": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A95": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B95": {
+    "value": "Beban pemeliharaan peralatan sewa",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C95": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D95": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E95": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F95": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G95": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H95": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A96": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B96": {
+    "value": "Beban pemeliharaan aset sewa lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C96": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D96": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E96": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F96": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G96": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H96": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A97": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B97": {
+    "value": "Sewa kantor",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C97": {
+    "value": "490991527",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D97": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E97": {
+    "value": "10068018",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F97": {
+    "value": "12957805",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G97": {
+    "value": "57014462",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H97": {
+    "value": "571031812",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A98": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B98": {
+    "value": "Sewa gudang",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C98": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D98": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E98": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F98": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G98": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H98": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A99": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B99": {
+    "value": "Sewa kendaraan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C99": {
+    "value": "74386902",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D99": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E99": {
+    "value": "1525339",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F99": {
+    "value": "1963152",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G99": {
+    "value": "8637887",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H99": {
+    "value": "86513280",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A100": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B100": {
+    "value": "Beban pemeliharaan kendaraan sewa",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C100": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D100": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E100": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F100": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G100": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H100": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A101": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B101": {
+    "value": "Sewa peralatan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C101": {
+    "value": "236963439",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D101": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E101": {
+    "value": "4859050",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F101": {
+    "value": "6253725",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G101": {
+    "value": "27516448",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H101": {
+    "value": "275592662",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A102": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B102": {
+    "value": "Sewa rumah dinas",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C102": {
+    "value": "21347985",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D102": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E102": {
+    "value": "437751",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F102": {
+    "value": "563397",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G102": {
+    "value": "2478951",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H102": {
+    "value": "24828084",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A103": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B103": {
+    "value": "Biaya service charge",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C103": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D103": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E103": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F103": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G103": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H103": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A104": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B104": {
+    "value": "Sewa lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C104": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D104": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E104": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F104": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G104": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H104": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A105": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B105": {
+    "value": "Beban CKPN",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C105": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D105": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E105": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F105": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G105": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H105": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A106": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B106": {
+    "value": "Beban pengumpulan informasi dan pengelolaan data",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C106": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D106": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E106": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F106": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G106": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H106": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A107": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B107": {
+    "value": "Beban pengelolaan dana dan investasi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C107": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D107": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E107": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F107": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G107": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H107": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A108": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B108": {
+    "value": "Beban penelitian dan pengembangan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C108": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D108": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E108": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F108": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G108": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H108": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A109": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B109": {
+    "value": "Beban sosialisasi dan rekonsiliasi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C109": {
+    "value": "57226203",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D109": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E109": {
+    "value": "1173451",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F109": {
+    "value": "1510262",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G109": {
+    "value": "6645168",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H109": {
+    "value": "66555084",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A110": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B110": {
+    "value": "Beban eksploitasi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C110": {
+    "value": "2344135474",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D110": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E110": {
+    "value": "48067630",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F110": {
+    "value": "61864305",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G110": {
+    "value": "272203521",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H110": {
+    "value": "2726270930",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A111": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B111": {
+    "value": "Beban asuransi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C111": {
+    "value": "11794848",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D111": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E111": {
+    "value": "241859",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F111": {
+    "value": "311279",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G111": {
+    "value": "1369630",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H111": {
+    "value": "13717616",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A112": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B112": {
+    "value": "Beban iuran keanggotaan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C112": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D112": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E112": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F112": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G112": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H112": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A113": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B113": {
+    "value": "Beban pajak lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C113": {
+    "value": "19354902",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D113": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E113": {
+    "value": "396882",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F113": {
+    "value": "510797",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G113": {
+    "value": "2247512",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H113": {
+    "value": "22510093",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A114": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B114": {
+    "value": "Denda pajak",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C114": {
+    "value": "1356265",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D114": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E114": {
+    "value": "27811",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F114": {
+    "value": "35793",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G114": {
+    "value": "157491",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H114": {
+    "value": "1577360",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A115": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B115": {
+    "value": "PPN masukan yang dibebankan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C115": {
+    "value": "699271",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D115": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E115": {
+    "value": "14339",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F115": {
+    "value": "18455",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G115": {
+    "value": "81200",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H115": {
+    "value": "813265",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A116": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B116": {
+    "value": "Pungutan OJK",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C116": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D116": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E116": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F116": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G116": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H116": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A117": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B117": {
+    "value": "Pajak bumi dan bangunan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C117": {
+    "value": "14195747",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D117": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E117": {
+    "value": "291091",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F117": {
+    "value": "374641",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G117": {
+    "value": "1648425",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H117": {
+    "value": "16509904",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A118": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B118": {
+    "value": "Beban TJSL - Pilar Sosial",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C118": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D118": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E118": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F118": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G118": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H118": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "7"
+    }
+  },
+  "A119": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B119": {
+    "value": "Beban TJSL - Pilar Lingkungan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C119": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D119": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E119": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F119": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G119": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H119": {
+    "value": "0",
+    "type": null,
+    "formula": "SUM(C119:G119)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "H119:H141",
+      "si": "8"
+    }
+  },
+  "A120": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B120": {
+    "value": "Beban TJSL - Pilar Ekonomi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C120": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D120": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E120": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F120": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G120": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H120": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A121": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B121": {
+    "value": "Beban TJSL - Pilar Hukum dan Tata Kelola",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C121": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D121": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E121": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F121": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G121": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H121": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A122": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B122": {
+    "value": "Beban sponsorship event",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C122": {
+    "value": "59795613",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D122": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E122": {
+    "value": "1226138",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F122": {
+    "value": "1578072",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G122": {
+    "value": "6943531",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H122": {
+    "value": "69543354",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A123": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B123": {
+    "value": "Beban sumbangan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C123": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D123": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E123": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F123": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G123": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H123": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A124": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B124": {
+    "value": "Beban akomodasi rapat",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C124": {
+    "value": "22765427",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D124": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E124": {
+    "value": "466816",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F124": {
+    "value": "600805",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G124": {
+    "value": "2643546",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H124": {
+    "value": "26476594",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A125": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B125": {
+    "value": "Beban konsumsi rapat",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C125": {
+    "value": "47135474",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D125": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E125": {
+    "value": "966536",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F125": {
+    "value": "1243957",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G125": {
+    "value": "5473422",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H125": {
+    "value": "54819389",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A126": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B126": {
+    "value": "Beban honorarium peserta rapat",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C126": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D126": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E126": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F126": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G126": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H126": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A127": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B127": {
+    "value": "Beban jasa pelaksanaan rapat",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C127": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D127": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E127": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F127": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G127": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H127": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A128": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B128": {
+    "value": "Beban representasi manajemen",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C128": {
+    "value": "123925703",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D128": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E128": {
+    "value": "2541156",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F128": {
+    "value": "3270535",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G128": {
+    "value": "14390385",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H128": {
+    "value": "144127779",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A129": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B129": {
+    "value": "Beban representasi perusahaan lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C129": {
+    "value": "40221692",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D129": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E129": {
+    "value": "824765",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F129": {
+    "value": "1061495",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G129": {
+    "value": "4670586",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H129": {
+    "value": "46778538",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A130": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B130": {
+    "value": "Biaya admin bank",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C130": {
+    "value": "11452931",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D130": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E130": {
+    "value": "234848",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F130": {
+    "value": "302255",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G130": {
+    "value": "1329927",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H130": {
+    "value": "13319961",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A131": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B131": {
+    "value": "Biaya transfer",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C131": {
+    "value": "1598895",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D131": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E131": {
+    "value": "32786",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F131": {
+    "value": "42197",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G131": {
+    "value": "185665",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H131": {
+    "value": "1859543",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A132": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B132": {
+    "value": "Retribusi keamanan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C132": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D132": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E132": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F132": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G132": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H132": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A133": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B133": {
+    "value": "Retribusi kebersihan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C133": {
+    "value": "402127",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D133": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E133": {
+    "value": "8246",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F133": {
+    "value": "10613",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G133": {
+    "value": "46695",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H133": {
+    "value": "467681",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A134": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B134": {
+    "value": "Beban pajak dan retribusi daerah",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C134": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D134": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E134": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F134": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G134": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H134": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A135": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B135": {
+    "value": "Beban umum dan administrasi lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C135": {
+    "value": "352382957",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D135": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E135": {
+    "value": "7225783",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F135": {
+    "value": "9299773",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G135": {
+    "value": "40919086",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H135": {
+    "value": "409827599",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A136": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B136": {
+    "value": "Beban lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C136": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D136": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E136": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F136": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G136": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H136": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A137": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B137": {
+    "value": "Biaya kegiatan internal",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C137": {
+    "value": "108379092",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D137": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E137": {
+    "value": "2222366",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F137": {
+    "value": "2860243",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G137": {
+    "value": "12585096",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H137": {
+    "value": "126046797",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A138": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B138": {
+    "value": "Biaya komunitas",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C138": {
+    "value": "69301",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D138": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E138": {
+    "value": "1421",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F138": {
+    "value": "1829",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G138": {
+    "value": "8047",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H138": {
+    "value": "80598",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A139": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B139": {
+    "value": "Biaya komunikasi dan kampanye",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C139": {
+    "value": "371039",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D139": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E139": {
+    "value": "7608",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F139": {
+    "value": "9792",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G139": {
+    "value": "43085",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H139": {
+    "value": "431524",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A140": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B140": {
+    "value": "Selisih biaya invoice",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C140": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D140": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E140": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F140": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G140": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H140": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A141": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B141": {
+    "value": "Beban retribusi dan kontribusi lainnya",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C141": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D141": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E141": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F141": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G141": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H141": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "8"
+    }
+  },
+  "A142": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B142": {
+    "value": "Total Beban Administrasi & Umum",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C142": {
+    "value": "7377909261",
+    "type": null,
+    "formula": "SUM(C55:C141)",
+    "formula_attributes": {}
+  },
+  "D142": {
+    "value": "0",
+    "type": null,
+    "formula": "SUM(D55:D141)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "D142:H142",
+      "si": "9"
+    }
+  },
+  "E142": {
+    "value": "151287595",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "9"
+    }
+  },
+  "F142": {
+    "value": "194711118",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "9"
+    }
+  },
+  "G142": {
+    "value": "856730720",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "9"
+    }
+  },
+  "H142": {
+    "value": "8580638694",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "9"
+    }
+  },
+  "A143": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B143": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C143": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D143": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E143": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F143": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G143": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H143": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A144": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B144": {
+    "value": "BEBAN PENYUSUTAN & AMORTISASI",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C144": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D144": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E144": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F144": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G144": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H144": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A145": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B145": {
+    "value": "Beban penyusutan aset tetap - gedung",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C145": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D145": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E145": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F145": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G145": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H145": {
+    "value": "0",
+    "type": null,
+    "formula": "SUM(C145:G145)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "H145:H159",
+      "si": "10"
+    }
+  },
+  "A146": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B146": {
+    "value": "Beban penyusutan aset tetap - rumah dinas",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C146": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D146": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E146": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F146": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G146": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H146": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A147": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B147": {
+    "value": "Beban penyusutan aset tetap - kendaraan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C147": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D147": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E147": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F147": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G147": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H147": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A148": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B148": {
+    "value": "Beban penyusutan aset tetap - mesin dan peralatan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C148": {
+    "value": "220363974",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D148": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E148": {
+    "value": "4518670",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F148": {
+    "value": "5815647",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G148": {
+    "value": "25588901",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H148": {
+    "value": "256287192",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A149": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B149": {
+    "value": "Beban penyusutan aset tetap - renovasi dan instalasi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C149": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D149": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E149": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F149": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G149": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H149": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A150": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B150": {
+    "value": "Beban bunga liabilitas sewa - gedung",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C150": {
+    "value": "148408",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D150": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E150": {
+    "value": "3043",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F150": {
+    "value": "3917",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G150": {
+    "value": "17233",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H150": {
+    "value": "172601",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A151": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B151": {
+    "value": "Beban bunga liabilitas sewa - rumah dinas",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C151": {
+    "value": "52518038",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D151": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E151": {
+    "value": "1076908",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F151": {
+    "value": "1386009",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G151": {
+    "value": "6098451",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H151": {
+    "value": "61079406",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A152": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B152": {
+    "value": "Beban bunga liabilitas sewa - kendaraan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C152": {
+    "value": "37374150",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D152": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E152": {
+    "value": "766375",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F152": {
+    "value": "986345",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G152": {
+    "value": "4339926",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H152": {
+    "value": "43466796",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A153": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B153": {
+    "value": "Beban bunga liabilitas sewa - peralatan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C153": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D153": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E153": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F153": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G153": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H153": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A154": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B154": {
+    "value": "Beban penyusutan hak guna sewa - gedung",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C154": {
+    "value": "1704042949",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D154": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E154": {
+    "value": "34942224",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F154": {
+    "value": "44971562",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G154": {
+    "value": "197875292",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H154": {
+    "value": "1981832027",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A155": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B155": {
+    "value": "Beban penyusutan hak guna sewa - rumah dinas",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C155": {
+    "value": "55342736",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D155": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E155": {
+    "value": "1134830",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F155": {
+    "value": "1460555",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G155": {
+    "value": "6426458",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H155": {
+    "value": "64364579",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A156": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B156": {
+    "value": "Beban penyusutan hak guna sewa - kendaraan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C156": {
+    "value": "312326836",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D156": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E156": {
+    "value": "6404413",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F156": {
+    "value": "8242648",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G156": {
+    "value": "36267727",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H156": {
+    "value": "363241624",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A157": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B157": {
+    "value": "Beban penyusutan hak guna sewa - peralatan",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C157": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D157": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E157": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F157": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G157": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H157": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A158": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B158": {
+    "value": "Beban penyusutan hak guna sewa - gudang",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C158": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D158": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E158": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F158": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G158": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H158": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A159": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B159": {
+    "value": "Beban amortisasi aset tidak berwujud - perangkat lunak",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C159": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D159": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E159": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F159": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G159": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H159": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "10"
+    }
+  },
+  "A160": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B160": {
+    "value": "Total Beban Penyusutan & Amortisasi",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C160": {
+    "value": "2382117091",
+    "type": null,
+    "formula": "SUM(C145:C159)",
+    "formula_attributes": {}
+  },
+  "D160": {
+    "value": "0",
+    "type": null,
+    "formula": "SUM(D145:D159)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "D160:H160",
+      "si": "11"
+    }
+  },
+  "E160": {
+    "value": "48846463",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "11"
+    }
+  },
+  "F160": {
+    "value": "62866683",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "11"
+    }
+  },
+  "G160": {
+    "value": "276613988",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "11"
+    }
+  },
+  "H160": {
+    "value": "2770444225",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "11"
+    }
+  },
+  "A161": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B161": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C161": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D161": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E161": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F161": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G161": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H161": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A162": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B162": {
+    "value": "TOTAL BEBAN USAHA",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C162": {
+    "value": "20058282908",
+    "type": null,
+    "formula": "SUM(C52,C142,C160)",
+    "formula_attributes": {}
+  },
+  "D162": {
+    "value": "0",
+    "type": null,
+    "formula": "SUM(D52,D142,D160)",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "D162:H162",
+      "si": "12"
+    }
+  },
+  "E162": {
+    "value": "411304786",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "12"
+    }
+  },
+  "F162": {
+    "value": "529360084",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "12"
+    }
+  },
+  "G162": {
+    "value": "2329189284",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "12"
+    }
+  },
+  "H162": {
+    "value": "23328137062",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "12"
+    }
+  },
+  "A163": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B163": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C163": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D163": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E163": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F163": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G163": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H163": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A164": {
+    "value": "PENDAPATAN (BEBAN) LAIN-LAIN BERSIH",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B164": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C164": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D164": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E164": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F164": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G164": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H164": {
+    "value": "0",
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A165": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B165": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C165": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "D165": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "E165": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "F165": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "G165": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "H165": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "A166": {
+    "value": "LABA SEBELUM PAJAK",
+    "type": "s",
+    "formula": null,
+    "formula_attributes": null
+  },
+  "B166": {
+    "value": null,
+    "type": null,
+    "formula": null,
+    "formula_attributes": null
+  },
+  "C166": {
+    "value": "102064114312",
+    "type": null,
+    "formula": "C23+C25-C162+C164",
+    "formula_attributes": {}
+  },
+  "D166": {
+    "value": "607769512",
+    "type": null,
+    "formula": "D23+D25-D162+D164",
+    "formula_attributes": {
+      "t": "shared",
+      "ref": "D166:H166",
+      "si": "13"
+    }
+  },
+  "E166": {
+    "value": "5901809505",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "13"
+    }
+  },
+  "F166": {
+    "value": "2465299641",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "13"
+    }
+  },
+  "G166": {
+    "value": "153985010",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "13"
+    }
+  },
+  "H166": {
+    "value": "111192977980",
+    "type": null,
+    "formula": null,
+    "formula_attributes": {
+      "t": "shared",
+      "si": "13"
+    }
+  }
+}

@@ -1,0 +1,1693 @@
+{
+  "version": "rka-2026-v1",
+  "source": "Template RKA.xlsx",
+  "sheet": "Sheet1",
+  "input_rows": [
+    8,
+    11,
+    12,
+    13,
+    17,
+    18,
+    19,
+    20,
+    25,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152,
+    153,
+    154,
+    155,
+    156,
+    157,
+    158,
+    159,
+    164
+  ],
+  "rows": {
+    "8": {
+      "label": "VOLUME",
+      "terms": null
+    },
+    "11": {
+      "label": "Imbal Jasa Penjaminan Bruto",
+      "terms": null
+    },
+    "12": {
+      "label": "Restitusi penjaminan kredit",
+      "terms": null
+    },
+    "13": {
+      "label": "Premi Penjaminan Ulang",
+      "terms": null
+    },
+    "14": {
+      "label": "IMBAL JASA PENJAMINAN BERSIH",
+      "terms": [
+        {
+          "row": 11,
+          "coefficient": 1
+        },
+        {
+          "row": 12,
+          "coefficient": -1
+        },
+        {
+          "row": 13,
+          "coefficient": -1
+        }
+      ]
+    },
+    "17": {
+      "label": "Beban Klaim",
+      "terms": null
+    },
+    "18": {
+      "label": "Kenaikan (Penurunan) Cadangan Klaim",
+      "terms": null
+    },
+    "19": {
+      "label": "Pendapatan Subrogasi",
+      "terms": null
+    },
+    "20": {
+      "label": "Beban Komisi Netto",
+      "terms": null
+    },
+    "21": {
+      "label": "JUMLAH BEBAN KLAIM",
+      "terms": [
+        {
+          "row": 17,
+          "coefficient": 1
+        },
+        {
+          "row": 18,
+          "coefficient": 1
+        },
+        {
+          "row": 19,
+          "coefficient": -1
+        },
+        {
+          "row": 20,
+          "coefficient": -1
+        }
+      ]
+    },
+    "23": {
+      "label": "PENJAMINAN BERSIH",
+      "terms": [
+        {
+          "row": 14,
+          "coefficient": 1
+        },
+        {
+          "row": 21,
+          "coefficient": -1
+        }
+      ]
+    },
+    "25": {
+      "label": "PENDAPATAN INVESTASI BERSIH",
+      "terms": null
+    },
+    "29": {
+      "label": "Beban gaji karyawan",
+      "terms": null
+    },
+    "30": {
+      "label": "Beban lembur karyawan",
+      "terms": null
+    },
+    "31": {
+      "label": "Beban asuransi kesehatan karyawan",
+      "terms": null
+    },
+    "32": {
+      "label": "Beban asuransi jiwa karyawan",
+      "terms": null
+    },
+    "33": {
+      "label": "Beban dana pensiun",
+      "terms": null
+    },
+    "34": {
+      "label": "Beban kompensasi kinerja karyawan",
+      "terms": null
+    },
+    "35": {
+      "label": "Biaya jasa kini karyawan",
+      "terms": null
+    },
+    "36": {
+      "label": "Biaya jasa lalu karyawan",
+      "terms": null
+    },
+    "37": {
+      "label": "Bunga atas imbalan pasca kerja karyawan",
+      "terms": null
+    },
+    "38": {
+      "label": "Beban BPJS kesehatan karyawan",
+      "terms": null
+    },
+    "39": {
+      "label": "Beban BPJS jaminan hari tua karyawan",
+      "terms": null
+    },
+    "40": {
+      "label": "Beban BPJS jaminan kecelakaan kerja dan jaminan kematian karyawan",
+      "terms": null
+    },
+    "41": {
+      "label": "Beban BPJS jaminan pensiun karyawan",
+      "terms": null
+    },
+    "42": {
+      "label": "Beban tunjangan hari raya karyawan",
+      "terms": null
+    },
+    "43": {
+      "label": "Beban tunjangan PPh 21 karyawan",
+      "terms": null
+    },
+    "44": {
+      "label": "Beban tunjangan transportasi karyawan",
+      "terms": null
+    },
+    "45": {
+      "label": "Beban tunjangan jabatan",
+      "terms": null
+    },
+    "46": {
+      "label": "Beban tunjangan cuti besar",
+      "terms": null
+    },
+    "47": {
+      "label": "Beban tunjangan cuti tahunan",
+      "terms": null
+    },
+    "48": {
+      "label": "Beban tunjangan makan",
+      "terms": null
+    },
+    "49": {
+      "label": "Beban Tunjangan Pakaian Kerja",
+      "terms": null
+    },
+    "50": {
+      "label": "Beban kompensasi PKWT/PKWTT",
+      "terms": null
+    },
+    "51": {
+      "label": "Beban tunjangan lainnya",
+      "terms": null
+    },
+    "52": {
+      "label": "Total Beban Karyawan",
+      "terms": [
+        {
+          "row": 29,
+          "coefficient": 1
+        },
+        {
+          "row": 30,
+          "coefficient": 1
+        },
+        {
+          "row": 31,
+          "coefficient": 1
+        },
+        {
+          "row": 32,
+          "coefficient": 1
+        },
+        {
+          "row": 33,
+          "coefficient": 1
+        },
+        {
+          "row": 34,
+          "coefficient": 1
+        },
+        {
+          "row": 35,
+          "coefficient": 1
+        },
+        {
+          "row": 36,
+          "coefficient": 1
+        },
+        {
+          "row": 37,
+          "coefficient": 1
+        },
+        {
+          "row": 38,
+          "coefficient": 1
+        },
+        {
+          "row": 39,
+          "coefficient": 1
+        },
+        {
+          "row": 40,
+          "coefficient": 1
+        },
+        {
+          "row": 41,
+          "coefficient": 1
+        },
+        {
+          "row": 42,
+          "coefficient": 1
+        },
+        {
+          "row": 43,
+          "coefficient": 1
+        },
+        {
+          "row": 44,
+          "coefficient": 1
+        },
+        {
+          "row": 45,
+          "coefficient": 1
+        },
+        {
+          "row": 46,
+          "coefficient": 1
+        },
+        {
+          "row": 47,
+          "coefficient": 1
+        },
+        {
+          "row": 48,
+          "coefficient": 1
+        },
+        {
+          "row": 49,
+          "coefficient": 1
+        },
+        {
+          "row": 50,
+          "coefficient": 1
+        },
+        {
+          "row": 51,
+          "coefficient": 1
+        }
+      ]
+    },
+    "55": {
+      "label": "Imbal jasa profesional - akuntan publik",
+      "terms": null
+    },
+    "56": {
+      "label": "Imbal jasa profesional - konsultan hukum",
+      "terms": null
+    },
+    "57": {
+      "label": "Imbal jasa profesional - konsultan manajemen (SDM, SOP, Akuntansi dll)",
+      "terms": null
+    },
+    "58": {
+      "label": "Beban imbal jasa profesional IT",
+      "terms": null
+    },
+    "59": {
+      "label": "Imbal jasa profesional - lainnya",
+      "terms": null
+    },
+    "60": {
+      "label": "Air, listrik dan utilitas - gedung",
+      "terms": null
+    },
+    "61": {
+      "label": "Air, listrik dan utilitas - rumah dinas",
+      "terms": null
+    },
+    "62": {
+      "label": "Pemasaran",
+      "terms": null
+    },
+    "63": {
+      "label": "Beban pelatihan manajemen",
+      "terms": null
+    },
+    "64": {
+      "label": "Beban pelatihan karyawan - insidentil",
+      "terms": null
+    },
+    "65": {
+      "label": "Beban pelatihan karyawan - leadership",
+      "terms": null
+    },
+    "66": {
+      "label": "Beban pelatihan karyawan - TNA",
+      "terms": null
+    },
+    "67": {
+      "label": "Beban sertifikasi",
+      "terms": null
+    },
+    "68": {
+      "label": "Beban perekrutan karyawan",
+      "terms": null
+    },
+    "69": {
+      "label": "Beban uang saku magang",
+      "terms": null
+    },
+    "70": {
+      "label": "Akomodasi dinas dalam negeri",
+      "terms": null
+    },
+    "71": {
+      "label": "Tranportasi dinas dalam negeri",
+      "terms": null
+    },
+    "72": {
+      "label": "Tunjangan perjalanan dinas dalam negeri",
+      "terms": null
+    },
+    "73": {
+      "label": "Akomodasi dinas luar negeri",
+      "terms": null
+    },
+    "74": {
+      "label": "Tranportasi dinas luar negeri",
+      "terms": null
+    },
+    "75": {
+      "label": "Tunjangan perjalanan dinas luar negeri",
+      "terms": null
+    },
+    "76": {
+      "label": "Percetakan dan inventaris kantor",
+      "terms": null
+    },
+    "77": {
+      "label": "Telepon, fax dan komunikasi - gedung",
+      "terms": null
+    },
+    "78": {
+      "label": "Telepon, fax dan komunikasi - rumah dinas",
+      "terms": null
+    },
+    "79": {
+      "label": "Bensin dan parkir",
+      "terms": null
+    },
+    "80": {
+      "label": "Beban pemeliharaan kendaraan",
+      "terms": null
+    },
+    "81": {
+      "label": "Beban penggunaan Data Center",
+      "terms": null
+    },
+    "82": {
+      "label": "Beban jaringan dan konektivitas",
+      "terms": null
+    },
+    "83": {
+      "label": "Beban penyewaan peralatan IT",
+      "terms": null
+    },
+    "84": {
+      "label": "Beban pemeliharaan peralatan IT",
+      "terms": null
+    },
+    "85": {
+      "label": "Beban pemeliharaan perangkat lunak IT",
+      "terms": null
+    },
+    "86": {
+      "label": "Beban pemeliharaan gedung",
+      "terms": null
+    },
+    "87": {
+      "label": "Beban pemeliharaan rumah dinas",
+      "terms": null
+    },
+    "88": {
+      "label": "Beban pemeliharaan mesin dan peralatan",
+      "terms": null
+    },
+    "89": {
+      "label": "Beban pemeliharaan renovasi dan instalasi",
+      "terms": null
+    },
+    "90": {
+      "label": "Beban aset bernilai rendah",
+      "terms": null
+    },
+    "91": {
+      "label": "Beban pemeliharaan lainnya",
+      "terms": null
+    },
+    "92": {
+      "label": "Beban pemeliharaan gedung sewa",
+      "terms": null
+    },
+    "93": {
+      "label": "Beban pemeliharaan gudang sewa",
+      "terms": null
+    },
+    "94": {
+      "label": "Beban pemeliharaan rumah dinas sewa",
+      "terms": null
+    },
+    "95": {
+      "label": "Beban pemeliharaan peralatan sewa",
+      "terms": null
+    },
+    "96": {
+      "label": "Beban pemeliharaan aset sewa lainnya",
+      "terms": null
+    },
+    "97": {
+      "label": "Sewa kantor",
+      "terms": null
+    },
+    "98": {
+      "label": "Sewa gudang",
+      "terms": null
+    },
+    "99": {
+      "label": "Sewa kendaraan",
+      "terms": null
+    },
+    "100": {
+      "label": "Beban pemeliharaan kendaraan sewa",
+      "terms": null
+    },
+    "101": {
+      "label": "Sewa peralatan",
+      "terms": null
+    },
+    "102": {
+      "label": "Sewa rumah dinas",
+      "terms": null
+    },
+    "103": {
+      "label": "Biaya service charge",
+      "terms": null
+    },
+    "104": {
+      "label": "Sewa lainnya",
+      "terms": null
+    },
+    "105": {
+      "label": "Beban CKPN",
+      "terms": null
+    },
+    "106": {
+      "label": "Beban pengumpulan informasi dan pengelolaan data",
+      "terms": null
+    },
+    "107": {
+      "label": "Beban pengelolaan dana dan investasi",
+      "terms": null
+    },
+    "108": {
+      "label": "Beban penelitian dan pengembangan",
+      "terms": null
+    },
+    "109": {
+      "label": "Beban sosialisasi dan rekonsiliasi",
+      "terms": null
+    },
+    "110": {
+      "label": "Beban eksploitasi",
+      "terms": null
+    },
+    "111": {
+      "label": "Beban asuransi",
+      "terms": null
+    },
+    "112": {
+      "label": "Beban iuran keanggotaan",
+      "terms": null
+    },
+    "113": {
+      "label": "Beban pajak lainnya",
+      "terms": null
+    },
+    "114": {
+      "label": "Denda pajak",
+      "terms": null
+    },
+    "115": {
+      "label": "PPN masukan yang dibebankan",
+      "terms": null
+    },
+    "116": {
+      "label": "Pungutan OJK",
+      "terms": null
+    },
+    "117": {
+      "label": "Pajak bumi dan bangunan",
+      "terms": null
+    },
+    "118": {
+      "label": "Beban TJSL - Pilar Sosial",
+      "terms": null
+    },
+    "119": {
+      "label": "Beban TJSL - Pilar Lingkungan",
+      "terms": null
+    },
+    "120": {
+      "label": "Beban TJSL - Pilar Ekonomi",
+      "terms": null
+    },
+    "121": {
+      "label": "Beban TJSL - Pilar Hukum dan Tata Kelola",
+      "terms": null
+    },
+    "122": {
+      "label": "Beban sponsorship event",
+      "terms": null
+    },
+    "123": {
+      "label": "Beban sumbangan",
+      "terms": null
+    },
+    "124": {
+      "label": "Beban akomodasi rapat",
+      "terms": null
+    },
+    "125": {
+      "label": "Beban konsumsi rapat",
+      "terms": null
+    },
+    "126": {
+      "label": "Beban honorarium peserta rapat",
+      "terms": null
+    },
+    "127": {
+      "label": "Beban jasa pelaksanaan rapat",
+      "terms": null
+    },
+    "128": {
+      "label": "Beban representasi manajemen",
+      "terms": null
+    },
+    "129": {
+      "label": "Beban representasi perusahaan lainnya",
+      "terms": null
+    },
+    "130": {
+      "label": "Biaya admin bank",
+      "terms": null
+    },
+    "131": {
+      "label": "Biaya transfer",
+      "terms": null
+    },
+    "132": {
+      "label": "Retribusi keamanan",
+      "terms": null
+    },
+    "133": {
+      "label": "Retribusi kebersihan",
+      "terms": null
+    },
+    "134": {
+      "label": "Beban pajak dan retribusi daerah",
+      "terms": null
+    },
+    "135": {
+      "label": "Beban umum dan administrasi lainnya",
+      "terms": null
+    },
+    "136": {
+      "label": "Beban lainnya",
+      "terms": null
+    },
+    "137": {
+      "label": "Biaya kegiatan internal",
+      "terms": null
+    },
+    "138": {
+      "label": "Biaya komunitas",
+      "terms": null
+    },
+    "139": {
+      "label": "Biaya komunikasi dan kampanye",
+      "terms": null
+    },
+    "140": {
+      "label": "Selisih biaya invoice",
+      "terms": null
+    },
+    "141": {
+      "label": "Beban retribusi dan kontribusi lainnya",
+      "terms": null
+    },
+    "142": {
+      "label": "Total Beban Administrasi & Umum",
+      "terms": [
+        {
+          "row": 55,
+          "coefficient": 1
+        },
+        {
+          "row": 56,
+          "coefficient": 1
+        },
+        {
+          "row": 57,
+          "coefficient": 1
+        },
+        {
+          "row": 58,
+          "coefficient": 1
+        },
+        {
+          "row": 59,
+          "coefficient": 1
+        },
+        {
+          "row": 60,
+          "coefficient": 1
+        },
+        {
+          "row": 61,
+          "coefficient": 1
+        },
+        {
+          "row": 62,
+          "coefficient": 1
+        },
+        {
+          "row": 63,
+          "coefficient": 1
+        },
+        {
+          "row": 64,
+          "coefficient": 1
+        },
+        {
+          "row": 65,
+          "coefficient": 1
+        },
+        {
+          "row": 66,
+          "coefficient": 1
+        },
+        {
+          "row": 67,
+          "coefficient": 1
+        },
+        {
+          "row": 68,
+          "coefficient": 1
+        },
+        {
+          "row": 69,
+          "coefficient": 1
+        },
+        {
+          "row": 70,
+          "coefficient": 1
+        },
+        {
+          "row": 71,
+          "coefficient": 1
+        },
+        {
+          "row": 72,
+          "coefficient": 1
+        },
+        {
+          "row": 73,
+          "coefficient": 1
+        },
+        {
+          "row": 74,
+          "coefficient": 1
+        },
+        {
+          "row": 75,
+          "coefficient": 1
+        },
+        {
+          "row": 76,
+          "coefficient": 1
+        },
+        {
+          "row": 77,
+          "coefficient": 1
+        },
+        {
+          "row": 78,
+          "coefficient": 1
+        },
+        {
+          "row": 79,
+          "coefficient": 1
+        },
+        {
+          "row": 80,
+          "coefficient": 1
+        },
+        {
+          "row": 81,
+          "coefficient": 1
+        },
+        {
+          "row": 82,
+          "coefficient": 1
+        },
+        {
+          "row": 83,
+          "coefficient": 1
+        },
+        {
+          "row": 84,
+          "coefficient": 1
+        },
+        {
+          "row": 85,
+          "coefficient": 1
+        },
+        {
+          "row": 86,
+          "coefficient": 1
+        },
+        {
+          "row": 87,
+          "coefficient": 1
+        },
+        {
+          "row": 88,
+          "coefficient": 1
+        },
+        {
+          "row": 89,
+          "coefficient": 1
+        },
+        {
+          "row": 90,
+          "coefficient": 1
+        },
+        {
+          "row": 91,
+          "coefficient": 1
+        },
+        {
+          "row": 92,
+          "coefficient": 1
+        },
+        {
+          "row": 93,
+          "coefficient": 1
+        },
+        {
+          "row": 94,
+          "coefficient": 1
+        },
+        {
+          "row": 95,
+          "coefficient": 1
+        },
+        {
+          "row": 96,
+          "coefficient": 1
+        },
+        {
+          "row": 97,
+          "coefficient": 1
+        },
+        {
+          "row": 98,
+          "coefficient": 1
+        },
+        {
+          "row": 99,
+          "coefficient": 1
+        },
+        {
+          "row": 100,
+          "coefficient": 1
+        },
+        {
+          "row": 101,
+          "coefficient": 1
+        },
+        {
+          "row": 102,
+          "coefficient": 1
+        },
+        {
+          "row": 103,
+          "coefficient": 1
+        },
+        {
+          "row": 104,
+          "coefficient": 1
+        },
+        {
+          "row": 105,
+          "coefficient": 1
+        },
+        {
+          "row": 106,
+          "coefficient": 1
+        },
+        {
+          "row": 107,
+          "coefficient": 1
+        },
+        {
+          "row": 108,
+          "coefficient": 1
+        },
+        {
+          "row": 109,
+          "coefficient": 1
+        },
+        {
+          "row": 110,
+          "coefficient": 1
+        },
+        {
+          "row": 111,
+          "coefficient": 1
+        },
+        {
+          "row": 112,
+          "coefficient": 1
+        },
+        {
+          "row": 113,
+          "coefficient": 1
+        },
+        {
+          "row": 114,
+          "coefficient": 1
+        },
+        {
+          "row": 115,
+          "coefficient": 1
+        },
+        {
+          "row": 116,
+          "coefficient": 1
+        },
+        {
+          "row": 117,
+          "coefficient": 1
+        },
+        {
+          "row": 118,
+          "coefficient": 1
+        },
+        {
+          "row": 119,
+          "coefficient": 1
+        },
+        {
+          "row": 120,
+          "coefficient": 1
+        },
+        {
+          "row": 121,
+          "coefficient": 1
+        },
+        {
+          "row": 122,
+          "coefficient": 1
+        },
+        {
+          "row": 123,
+          "coefficient": 1
+        },
+        {
+          "row": 124,
+          "coefficient": 1
+        },
+        {
+          "row": 125,
+          "coefficient": 1
+        },
+        {
+          "row": 126,
+          "coefficient": 1
+        },
+        {
+          "row": 127,
+          "coefficient": 1
+        },
+        {
+          "row": 128,
+          "coefficient": 1
+        },
+        {
+          "row": 129,
+          "coefficient": 1
+        },
+        {
+          "row": 130,
+          "coefficient": 1
+        },
+        {
+          "row": 131,
+          "coefficient": 1
+        },
+        {
+          "row": 132,
+          "coefficient": 1
+        },
+        {
+          "row": 133,
+          "coefficient": 1
+        },
+        {
+          "row": 134,
+          "coefficient": 1
+        },
+        {
+          "row": 135,
+          "coefficient": 1
+        },
+        {
+          "row": 136,
+          "coefficient": 1
+        },
+        {
+          "row": 137,
+          "coefficient": 1
+        },
+        {
+          "row": 138,
+          "coefficient": 1
+        },
+        {
+          "row": 139,
+          "coefficient": 1
+        },
+        {
+          "row": 140,
+          "coefficient": 1
+        },
+        {
+          "row": 141,
+          "coefficient": 1
+        }
+      ]
+    },
+    "145": {
+      "label": "Beban penyusutan aset tetap - gedung",
+      "terms": null
+    },
+    "146": {
+      "label": "Beban penyusutan aset tetap - rumah dinas",
+      "terms": null
+    },
+    "147": {
+      "label": "Beban penyusutan aset tetap - kendaraan",
+      "terms": null
+    },
+    "148": {
+      "label": "Beban penyusutan aset tetap - mesin dan peralatan",
+      "terms": null
+    },
+    "149": {
+      "label": "Beban penyusutan aset tetap - renovasi dan instalasi",
+      "terms": null
+    },
+    "150": {
+      "label": "Beban bunga liabilitas sewa - gedung",
+      "terms": null
+    },
+    "151": {
+      "label": "Beban bunga liabilitas sewa - rumah dinas",
+      "terms": null
+    },
+    "152": {
+      "label": "Beban bunga liabilitas sewa - kendaraan",
+      "terms": null
+    },
+    "153": {
+      "label": "Beban bunga liabilitas sewa - peralatan",
+      "terms": null
+    },
+    "154": {
+      "label": "Beban penyusutan hak guna sewa - gedung",
+      "terms": null
+    },
+    "155": {
+      "label": "Beban penyusutan hak guna sewa - rumah dinas",
+      "terms": null
+    },
+    "156": {
+      "label": "Beban penyusutan hak guna sewa - kendaraan",
+      "terms": null
+    },
+    "157": {
+      "label": "Beban penyusutan hak guna sewa - peralatan",
+      "terms": null
+    },
+    "158": {
+      "label": "Beban penyusutan hak guna sewa - gudang",
+      "terms": null
+    },
+    "159": {
+      "label": "Beban amortisasi aset tidak berwujud - perangkat lunak",
+      "terms": null
+    },
+    "160": {
+      "label": "Total Beban Penyusutan & Amortisasi",
+      "terms": [
+        {
+          "row": 145,
+          "coefficient": 1
+        },
+        {
+          "row": 146,
+          "coefficient": 1
+        },
+        {
+          "row": 147,
+          "coefficient": 1
+        },
+        {
+          "row": 148,
+          "coefficient": 1
+        },
+        {
+          "row": 149,
+          "coefficient": 1
+        },
+        {
+          "row": 150,
+          "coefficient": 1
+        },
+        {
+          "row": 151,
+          "coefficient": 1
+        },
+        {
+          "row": 152,
+          "coefficient": 1
+        },
+        {
+          "row": 153,
+          "coefficient": 1
+        },
+        {
+          "row": 154,
+          "coefficient": 1
+        },
+        {
+          "row": 155,
+          "coefficient": 1
+        },
+        {
+          "row": 156,
+          "coefficient": 1
+        },
+        {
+          "row": 157,
+          "coefficient": 1
+        },
+        {
+          "row": 158,
+          "coefficient": 1
+        },
+        {
+          "row": 159,
+          "coefficient": 1
+        }
+      ]
+    },
+    "162": {
+      "label": "TOTAL BEBAN USAHA",
+      "terms": [
+        {
+          "row": 52,
+          "coefficient": 1
+        },
+        {
+          "row": 142,
+          "coefficient": 1
+        },
+        {
+          "row": 160,
+          "coefficient": 1
+        }
+      ]
+    },
+    "164": {
+      "label": "PENDAPATAN (BEBAN) LAIN-LAIN BERSIH",
+      "terms": null
+    },
+    "166": {
+      "label": "LABA SEBELUM PAJAK",
+      "terms": [
+        {
+          "row": 23,
+          "coefficient": 1
+        },
+        {
+          "row": 25,
+          "coefficient": 1
+        },
+        {
+          "row": 162,
+          "coefficient": -1
+        },
+        {
+          "row": 164,
+          "coefficient": 1
+        }
+      ]
+    }
+  },
+  "formulas": {
+    "H8": "SUM(C8:G8)",
+    "H11": "SUM(C11:G11)",
+    "H12": "SUM(C12:G12)",
+    "H13": "SUM(C13:G13)",
+    "C14": "C11-C12-C13",
+    "D14": "D11-D12-D13",
+    "E14": "E11-E12-E13",
+    "F14": "F11-F12-F13",
+    "G14": "G11-G12-G13",
+    "H14": "H11-H12-H13",
+    "H17": "SUM(C17:G17)",
+    "H18": "SUM(C18:G18)",
+    "H19": "SUM(C19:G19)",
+    "H20": "SUM(C20:G20)",
+    "C21": "C17+C18-C19-C20",
+    "D21": "D17+D18-D19-D20",
+    "E21": "E17+E18-E19-E20",
+    "F21": "F17+F18-F19-F20",
+    "G21": "G17+G18-G19-G20",
+    "H21": "H17+H18-H19-H20",
+    "C23": "C14-C21",
+    "D23": "D14-D21",
+    "E23": "E14-E21",
+    "F23": "F14-F21",
+    "G23": "G14-G21",
+    "H23": "H14-H21",
+    "H29": "SUM(C29:G29)",
+    "H30": "SUM(C30:G30)",
+    "H31": "SUM(C31:G31)",
+    "H32": "SUM(C32:G32)",
+    "H33": "SUM(C33:G33)",
+    "H34": "SUM(C34:G34)",
+    "H35": "SUM(C35:G35)",
+    "H36": "SUM(C36:G36)",
+    "H37": "SUM(C37:G37)",
+    "H38": "SUM(C38:G38)",
+    "H39": "SUM(C39:G39)",
+    "H40": "SUM(C40:G40)",
+    "H41": "SUM(C41:G41)",
+    "H42": "SUM(C42:G42)",
+    "H43": "SUM(C43:G43)",
+    "H44": "SUM(C44:G44)",
+    "H45": "SUM(C45:G45)",
+    "H46": "SUM(C46:G46)",
+    "H47": "SUM(C47:G47)",
+    "H48": "SUM(C48:G48)",
+    "H49": "SUM(C49:G49)",
+    "H50": "SUM(C50:G50)",
+    "H51": "SUM(C51:G51)",
+    "C52": "SUM(C29:C51)",
+    "D52": "SUM(D29:D51)",
+    "E52": "SUM(E29:E51)",
+    "F52": "SUM(F29:F51)",
+    "G52": "SUM(G29:G51)",
+    "H52": "SUM(H29:H51)",
+    "H55": "SUM(C55:G55)",
+    "H56": "SUM(C56:G56)",
+    "H57": "SUM(C57:G57)",
+    "H58": "SUM(C58:G58)",
+    "H59": "SUM(C59:G59)",
+    "H60": "SUM(C60:G60)",
+    "H61": "SUM(C61:G61)",
+    "H62": "SUM(C62:G62)",
+    "H63": "SUM(C63:G63)",
+    "H64": "SUM(C64:G64)",
+    "H65": "SUM(C65:G65)",
+    "H66": "SUM(C66:G66)",
+    "H67": "SUM(C67:G67)",
+    "H68": "SUM(C68:G68)",
+    "H69": "SUM(C69:G69)",
+    "H70": "SUM(C70:G70)",
+    "H71": "SUM(C71:G71)",
+    "H72": "SUM(C72:G72)",
+    "H73": "SUM(C73:G73)",
+    "H74": "SUM(C74:G74)",
+    "H75": "SUM(C75:G75)",
+    "H76": "SUM(C76:G76)",
+    "H77": "SUM(C77:G77)",
+    "H78": "SUM(C78:G78)",
+    "H79": "SUM(C79:G79)",
+    "H80": "SUM(C80:G80)",
+    "H81": "SUM(C81:G81)",
+    "H82": "SUM(C82:G82)",
+    "H83": "SUM(C83:G83)",
+    "H84": "SUM(C84:G84)",
+    "H85": "SUM(C85:G85)",
+    "H86": "SUM(C86:G86)",
+    "H87": "SUM(C87:G87)",
+    "H88": "SUM(C88:G88)",
+    "H89": "SUM(C89:G89)",
+    "H90": "SUM(C90:G90)",
+    "H91": "SUM(C91:G91)",
+    "H92": "SUM(C92:G92)",
+    "H93": "SUM(C93:G93)",
+    "H94": "SUM(C94:G94)",
+    "H95": "SUM(C95:G95)",
+    "H96": "SUM(C96:G96)",
+    "H97": "SUM(C97:G97)",
+    "H98": "SUM(C98:G98)",
+    "H99": "SUM(C99:G99)",
+    "H100": "SUM(C100:G100)",
+    "H101": "SUM(C101:G101)",
+    "H102": "SUM(C102:G102)",
+    "H103": "SUM(C103:G103)",
+    "H104": "SUM(C104:G104)",
+    "H105": "SUM(C105:G105)",
+    "H106": "SUM(C106:G106)",
+    "H107": "SUM(C107:G107)",
+    "H108": "SUM(C108:G108)",
+    "H109": "SUM(C109:G109)",
+    "H110": "SUM(C110:G110)",
+    "H111": "SUM(C111:G111)",
+    "H112": "SUM(C112:G112)",
+    "H113": "SUM(C113:G113)",
+    "H114": "SUM(C114:G114)",
+    "H115": "SUM(C115:G115)",
+    "H116": "SUM(C116:G116)",
+    "H117": "SUM(C117:G117)",
+    "H118": "SUM(C118:G118)",
+    "H119": "SUM(C119:G119)",
+    "H120": "SUM(C120:G120)",
+    "H121": "SUM(C121:G121)",
+    "H122": "SUM(C122:G122)",
+    "H123": "SUM(C123:G123)",
+    "H124": "SUM(C124:G124)",
+    "H125": "SUM(C125:G125)",
+    "H126": "SUM(C126:G126)",
+    "H127": "SUM(C127:G127)",
+    "H128": "SUM(C128:G128)",
+    "H129": "SUM(C129:G129)",
+    "H130": "SUM(C130:G130)",
+    "H131": "SUM(C131:G131)",
+    "H132": "SUM(C132:G132)",
+    "H133": "SUM(C133:G133)",
+    "H134": "SUM(C134:G134)",
+    "H135": "SUM(C135:G135)",
+    "H136": "SUM(C136:G136)",
+    "H137": "SUM(C137:G137)",
+    "H138": "SUM(C138:G138)",
+    "H139": "SUM(C139:G139)",
+    "H140": "SUM(C140:G140)",
+    "H141": "SUM(C141:G141)",
+    "C142": "SUM(C55:C141)",
+    "D142": "SUM(D55:D141)",
+    "E142": "SUM(E55:E141)",
+    "F142": "SUM(F55:F141)",
+    "G142": "SUM(G55:G141)",
+    "H142": "SUM(H55:H141)",
+    "H145": "SUM(C145:G145)",
+    "H146": "SUM(C146:G146)",
+    "H147": "SUM(C147:G147)",
+    "H148": "SUM(C148:G148)",
+    "H149": "SUM(C149:G149)",
+    "H150": "SUM(C150:G150)",
+    "H151": "SUM(C151:G151)",
+    "H152": "SUM(C152:G152)",
+    "H153": "SUM(C153:G153)",
+    "H154": "SUM(C154:G154)",
+    "H155": "SUM(C155:G155)",
+    "H156": "SUM(C156:G156)",
+    "H157": "SUM(C157:G157)",
+    "H158": "SUM(C158:G158)",
+    "H159": "SUM(C159:G159)",
+    "C160": "SUM(C145:C159)",
+    "D160": "SUM(D145:D159)",
+    "E160": "SUM(E145:E159)",
+    "F160": "SUM(F145:F159)",
+    "G160": "SUM(G145:G159)",
+    "H160": "SUM(H145:H159)",
+    "C162": "SUM(C52,C142,C160)",
+    "D162": "SUM(D52,D142,D160)",
+    "E162": "SUM(E52,E142,E160)",
+    "F162": "SUM(F52,F142,F160)",
+    "G162": "SUM(G52,G142,G160)",
+    "H162": "SUM(H52,H142,H160)",
+    "C166": "C23+C25-C162+C164",
+    "D166": "D23+D25-D162+D164",
+    "E166": "E23+E25-E162+E164",
+    "F166": "F23+F25-F162+F164",
+    "G166": "G23+G25-G162+G164",
+    "H166": "H23+H25-H162+H164"
+  },
+  "columns": {
+    "C": "KUR",
+    "D": "PEN",
+    "E": "KBG/SURETYSHIP",
+    "F": "KONSUMTIF",
+    "G": "PRODUKTIF",
+    "H": "TOTAL"
+  },
+  "groups": [
+    {
+      "row": 8,
+      "type": "major"
+    },
+    {
+      "row": 10,
+      "label": "PENDAPATAN PENJAMINAN",
+      "value_row": 14,
+      "type": "group",
+      "key": "pendapatan-penjaminan",
+      "details": [
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "row": 16,
+      "label": "BEBAN KLAIM",
+      "value_row": 21,
+      "type": "group",
+      "key": "beban-klaim",
+      "details": [
+        17,
+        18,
+        19,
+        20,
+        21
+      ]
+    },
+    {
+      "row": 23,
+      "type": "major"
+    },
+    {
+      "row": 25,
+      "type": "major"
+    },
+    {
+      "row": 27,
+      "label": "BEBAN USAHA",
+      "value_row": 162,
+      "type": "major"
+    },
+    {
+      "row": 28,
+      "label": "BEBAN KARYAWAN",
+      "value_row": 52,
+      "type": "subgroup",
+      "key": "beban-karyawan",
+      "details": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52
+      ]
+    },
+    {
+      "row": 54,
+      "label": "BEBAN ADMINISTRASI & UMUM",
+      "value_row": 142,
+      "type": "subgroup",
+      "key": "beban-administrasi-umum",
+      "details": [
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142
+      ]
+    },
+    {
+      "row": 144,
+      "label": "BEBAN PENYUSUTAN & AMORTISASI",
+      "value_row": 160,
+      "type": "subgroup",
+      "key": "beban-penyusutan-amortisasi",
+      "details": [
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160
+      ]
+    },
+    {
+      "row": 162,
+      "type": "subtotal"
+    },
+    {
+      "row": 164,
+      "type": "major"
+    },
+    {
+      "row": 166,
+      "type": "profit"
+    }
+  ]
+}

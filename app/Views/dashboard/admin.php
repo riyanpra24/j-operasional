@@ -1,4 +1,5 @@
 <?php
+
 /** @var array<string, int|float|string> $overview */
 /** @var list<array<string, mixed>> $modules */
 /** @var list<array{label: string, period: string, total: int|string}> $activityTrend */

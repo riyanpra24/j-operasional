@@ -1,4 +1,5 @@
 <?php
+
 /** @var string $activeTab */
 ?>
 <nav class="progress-document-tabs" role="tablist" aria-label="Jenis distribusi dokumen">

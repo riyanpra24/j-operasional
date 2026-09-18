@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\AgendarisModel;
+use App\Models\AccountingRkaBudgetModel;
+use App\Libraries\RkaBudgetService;
 use App\Models\DokumenKeluarModel;
 use App\Models\DokumenMasukModel;
 use App\Models\DokumenSpkModel;
@@ -22,6 +24,8 @@ class DeletedData extends BaseController
 {
     /** @var array<string, array{label:string, table:string, model:class-string<Model>, fields:list<string>}> */
     private const RESOURCES = [
+        'laporan-laba-rugi' => ['label' => 'Laporan Laba & Rugi', 'table' => 'accounting_lr_imports', 'model' => \App\Models\AccountingLrImportModel::class, 'fields' => ['unit_name', 'report_month', 'report_year', 'source_name']],
+        'rka-kanwil-surabaya' => ['label' => 'RKA Kanwil Surabaya', 'table' => 'accounting_rka_budgets', 'model' => AccountingRkaBudgetModel::class, 'fields' => ['unit_name', 'budget_year']],
         'dokumen-masuk' => ['label' => 'Dokumen Masuk', 'table' => 'dokumen_masuk', 'model' => DokumenMasukModel::class, 'fields' => ['nomor_surat', 'pengirim', 'perihal']],
         'agendaris' => ['label' => 'Agendaris', 'table' => 'agendaris', 'model' => AgendarisModel::class, 'fields' => ['nomor_surat', 'pengirim', 'perihal_surat']],
         'dokumen-keluar' => ['label' => 'Dokumen Keluar', 'table' => 'dokumen_keluar', 'model' => DokumenKeluarModel::class, 'fields' => ['nomor_surat', 'jenis_surat', 'penerima']],
@@ -106,6 +110,17 @@ class DeletedData extends BaseController
         $record = $model->withDeleted()->find($id);
         if ($record === null || empty($record['deleted_at'])) {
             return redirect()->to(site_url('data-terhapus'))->with('error', 'Data terhapus tidak ditemukan atau sudah dipulihkan.');
+        }
+
+        if ($type === 'rka-kanwil-surabaya') {
+            try {
+                (new RkaBudgetService())->restore($id);
+                return redirect()->to(site_url('data-terhapus'))->with('success', 'RKA berhasil dipulihkan.');
+            } catch (\Throwable $exception) {
+                log_message('warning', 'Pulihkan RKA gagal: {message}', ['message' => $exception->getMessage()]);
+                $message = get_class($exception) === \RuntimeException::class ? $exception->getMessage() : 'RKA belum dapat dipulihkan. Silakan coba kembali.';
+                return redirect()->to(site_url('data-terhapus'))->with('error', $message);
+            }
         }
 
         $restored = db_connect()->table($resource['table'])

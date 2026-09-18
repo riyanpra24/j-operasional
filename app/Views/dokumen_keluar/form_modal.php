@@ -1,12 +1,21 @@
 <div class="agendaris-form-modal" id="dokumenKeluarFormModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-dokumen-keluar-form-close aria-label="Tutup form"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="dokumenKeluarFormTitle">
-        <header class="modal-header"><div class="modal-title-group"><span class="modal-title-icon">＋</span><div><p>AGENDARIS</p><h2 id="dokumenKeluarFormTitle" data-dokumen-keluar-form-title>Tambah Surat Keluar</h2></div></div><button type="button" class="modal-close" data-dokumen-keluar-form-close aria-label="Tutup">×</button></header>
+        <header class="modal-header">
+            <div class="modal-title-group"><span class="modal-title-icon">＋</span>
+                <div>
+                    <p>AGENDARIS</p>
+                    <h2 id="dokumenKeluarFormTitle" data-dokumen-keluar-form-title>Tambah Surat Keluar</h2>
+                </div>
+            </div><button type="button" class="modal-close" data-dokumen-keluar-form-close aria-label="Tutup">×</button>
+        </header>
         <form action="<?= site_url('agendaris/surat-keluar') ?>" method="post" data-dokumen-keluar-form>
             <?= csrf_field() ?>
             <div class="modal-alert" data-dokumen-keluar-errors hidden role="alert"></div>
             <div class="modal-body agendaris-modal-body">
-                <div class="modal-section-heading"><span>01</span><div><strong>Data pengiriman</strong><small>Lengkapi informasi dokumen yang dikirim</small></div></div>
+                <div class="modal-section-heading"><span>01</span>
+                    <div><strong>Data pengiriman</strong><small>Lengkapi informasi dokumen yang dikirim</small></div>
+                </div>
                 <div class="modal-form-grid agendaris-form-grid">
                     <div class="form-group"><label for="keluar_nomor_surat">Nomor Surat <span class="required">*</span></label><input id="keluar_nomor_surat" name="nomor_surat" maxlength="150" placeholder="Nomor surat" required></div>
                     <div class="form-group"><label for="keluar_jenis_surat">Jenis Dokumen <span class="required">*</span></label><input id="keluar_jenis_surat" name="jenis_surat" maxlength="100" placeholder="Jenis dokumen" required></div>

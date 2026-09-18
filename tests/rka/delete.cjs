@@ -1,0 +1,20 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const source=fs.readFileSync('public/assets/app.js','utf8');
+const snippet=source.slice(source.indexOf('// RKA deletion:'),source.indexOf('// Manual RKA:'));
+const field=()=>({value:'',checked:true});
+const unit=field(),year=field(),revision=field(),id=field(),confirmation=field(),description={textContent:''},submit={disabled:false,textContent:''};
+const mapping={'[data-rka-delete-unit]':unit,'[data-rka-delete-year]':year,'[data-rka-delete-revision]':revision,'[data-rka-delete-id]':id,'[name="confirm_delete"]':confirmation,'button[type="submit"]':submit};
+const form={events:{},querySelector(key){return mapping[key];},addEventListener(name,handler){this.events[name]=handler;}};
+const close={events:{},addEventListener(name,handler){this.events[name]=handler;}};
+const dialog={open:false,events:{},showModal(){this.open=true;},close(){this.open=false;},
+ querySelector(key){return key==='[data-rka-delete-form]'?form:description;},querySelectorAll(){return [close];},addEventListener(name,handler){this.events[name]=handler;}};
+const button={dataset:{unit:'Surabaya',year:'2026',revision:'2',id:'123'},events:{},addEventListener(name,handler){this.events[name]=handler;}};
+const document={events:{},querySelector(){return dialog;},querySelectorAll(){return [button];},addEventListener(name,handler){this.events[name]=handler;}};
+vm.runInNewContext(snippet,{document});
+button.events.click();
+assert(dialog.open && !confirmation.checked);assert.strictEqual(unit.value,'Surabaya');assert.strictEqual(id.value,'123');assert(description.textContent.includes('2026'));
+close.events.click();assert(!dialog.open);
+document.events['rka:delete']({detail:{unit:'Kanwil',year:2027,revision:4,id:124}});
+assert(dialog.open);assert.strictEqual(unit.value,'Kanwil');assert.strictEqual(year.value,'2027');assert.strictEqual(revision.value,'4');assert.strictEqual(id.value,'124');
+close.events.click();document.events['rka:delete']({detail:{unit:'Kanwil',year:2027,revision:4}});assert(!dialog.open,'Delete must require exact record identity');
+console.log('RKA delete confirmation: exact unit/year/id/revision targeting, cancellation, popup targets and missing identity rejection OK.');

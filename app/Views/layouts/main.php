@@ -19,6 +19,7 @@ $generalSectionTwoActive = $segment === 'bagian-umum-2';
 $sdmActive = $segment === 'sdm';
 $sdmPage = $sdmActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : '';
 $akutansiActive = $segment === 'akutansi';
+$akutansiPage = $akutansiActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : '';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
 $currentRole = (string) session()->get('auth_role');
 $displayName = (string) session()->get('auth_display_name');
@@ -29,7 +30,7 @@ $canAccessGeneralSection = in_array($currentRole, ['admin', 'umum_1'], true);
 $canAccessGeneralSectionTwo = in_array($currentRole, ['admin', 'umum_2'], true);
 $canAccessSdm = in_array($currentRole, ['admin', 'sdm'], true);
 $canAccessAkutansi = in_array($currentRole, ['admin', 'akutansi'], true);
-$showDashboardMenu = ! in_array($currentRole, ['umum_1', 'umum_2', 'sdm'], true);
+$showDashboardMenu = ! in_array($currentRole, ['umum_1', 'umum_2', 'sdm', 'akutansi'], true);
 $incomingArchive = $segment === 'dokumen-masuk';
 $incomingWorkspace = in_array($segment, ['dashboard', 'dokumen-masuk', 'distribusi-dokumen'], true);
 $roleLabel = \Config\UserRoles::label($currentRole);
@@ -71,7 +72,7 @@ $deletedDataCount = 0;
 if ($currentRole === 'admin') {
     try {
         $db = db_connect();
-        $deletedTables = ['dokumen_masuk', 'agendaris', 'dokumen_keluar', 'dokumen_spk', 'pks_kerjasama', 'pks_dokumen_kerjasama', 'pks_item_kerjasama', 'users', 'vehicles', 'vehicle_maintenance', 'vehicle_documents'];
+        $deletedTables = ['dokumen_masuk', 'agendaris', 'dokumen_keluar', 'dokumen_spk', 'pks_kerjasama', 'pks_dokumen_kerjasama', 'pks_item_kerjasama', 'users', 'vehicles', 'vehicle_maintenance', 'vehicle_documents', 'sdm_attendance_imports'];
         $deletedCountQueries = array_map(
             static fn (string $table): string => 'SELECT COUNT(*) AS total FROM ' . $db->protectIdentifiers($table) . ' WHERE deleted_at IS NOT NULL',
             $deletedTables
@@ -263,10 +264,33 @@ if ($currentRole === 'security') {
                 </div>
                 <?php endif ?>
                 <?php if ($canAccessAkutansi): ?>
-                <a href="<?= site_url('akutansi') ?>" class="nav-link <?= $akutansiActive ? 'active' : '' ?>" title="Akutansi">
-                    <span class="nav-icon image-nav-icon accounting-nav-icon" aria-hidden="true"></span>
-                    <span class="nav-link-text">Akutansi</span>
-                </a>
+                <div class="nav-group <?= $akutansiActive ? 'open' : '' ?>" data-nav-group>
+                    <button type="button" class="nav-link nav-parent <?= $akutansiActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $akutansiActive ? 'true' : 'false' ?>" aria-controls="akutansiSubmenu" title="Akutansi">
+                        <span class="nav-icon image-nav-icon accounting-nav-icon" aria-hidden="true"></span>
+                        <span class="nav-link-text">Akutansi</span>
+                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                    </button>
+                    <div class="nav-submenu" id="akutansiSubmenu" data-nav-submenu <?= $akutansiActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('akutansi/laba-rugi') ?>" class="nav-sublink <?= $akutansiPage === 'laba-rugi' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Laporan Laba &amp; Rugi
+                        </a>
+                        <a href="<?= site_url('akutansi/rka-kanwil-surabaya') ?>" class="nav-sublink <?= $akutansiPage === 'rka-kanwil-surabaya' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            RKA Kanwil
+                        </a>
+                        <a href="<?= site_url('akutansi/seting-rumus') ?>" class="nav-sublink <?= $akutansiPage === 'seting-rumus' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Penyesuaian Sumber Oracle
+                        </a>
+                        <?php if ($currentRole === 'admin'): ?>
+                        <a href="<?= site_url('akutansi/pengaturan-mapping-oracle') ?>" class="nav-sublink <?= $akutansiPage === 'pengaturan-mapping-oracle' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Pengaturan Mapping Oracle
+                        </a>
+                        <?php endif ?>
+                    </div>
+                </div>
                 <?php endif ?>
                 <?php if ($currentRole === 'admin'): ?>
                 <div class="nav-group <?= $accountManagementActive ? 'open' : '' ?>" data-nav-group>

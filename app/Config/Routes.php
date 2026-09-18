@@ -35,6 +35,26 @@ $routes->post('sdm/sdm-jatim/anomali', 'Sdm::updateSdmJatimAnomalies', ['as' => 
 $routes->post('sdm/sdm-jatim/hapus', 'Sdm::deleteSdmJatimAttendance', ['as' => 'sdm.jatim.delete']);
 $routes->post('sdm/dokumen-masuk/(:num)', 'Sdm::updateIncomingDocument/$1', ['as' => 'sdm.dokumen_masuk.update']);
 $routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);
+$routes->get('akutansi/laba-rugi', 'Akutansi::labaRugi', ['as' => 'akutansi.laba_rugi']);
+$routes->post('akutansi/laba-rugi/upload-excel', 'Akutansi::importLabaRugi', ['as' => 'akutansi.laba_rugi.import']);
+$routes->post('akutansi/laba-rugi/hapus', 'Akutansi::deleteLabaRugi', ['as' => 'akutansi.laba_rugi.delete']);
+$routes->get('akutansi/pengaturan-mapping-oracle', 'Akutansi::oracleMappings', ['as' => 'akutansi.oracle_mappings']);
+$routes->post('akutansi/pengaturan-mapping-oracle/coa', 'Akutansi::saveOracleAccountMapping', ['as' => 'akutansi.oracle_mappings.account.save']);
+$routes->post('akutansi/pengaturan-mapping-oracle/coa/hapus', 'Akutansi::deleteOracleAccountMapping', ['as' => 'akutansi.oracle_mappings.account.delete']);
+$routes->get('akutansi/seting-rumus', 'Akutansi::formulaSettings', ['as' => 'akutansi.formula_settings']);
+$routes->post('akutansi/seting-rumus/sumber/simpan', 'Akutansi::saveSourceAdjustmentRule', ['as' => 'akutansi.formula_settings.source.save']);
+$routes->post('akutansi/seting-rumus/sumber/nonaktifkan', 'Akutansi::deactivateSourceAdjustmentRule', ['as' => 'akutansi.formula_settings.source.deactivate']);
+$routes->post('akutansi/seting-rumus/sumber/hapus', 'Akutansi::deleteSourceAdjustmentRule', ['as' => 'akutansi.formula_settings.source.delete']);
+$routes->post('akutansi/seting-rumus/pengajuan/setujui', 'Akutansi::approveSourceAdjustmentRequest', ['as' => 'akutansi.formula_settings.request.approve']);
+$routes->post('akutansi/seting-rumus/pengajuan/tolak', 'Akutansi::rejectSourceAdjustmentRequest', ['as' => 'akutansi.formula_settings.request.reject']);
+$routes->get('akutansi/rka-kanwil-surabaya', 'Akutansi::rkaKanwilSurabaya', ['as' => 'akutansi.rka_kanwil_surabaya']);
+$routes->get('akutansi/rka-kanwil-surabaya/upload-excel', 'Akutansi::rkaUpload', ['as' => 'akutansi.rka_upload']);
+$routes->get('akutansi/rka-kanwil-surabaya/seting-manual', 'Akutansi::rkaManual', ['as' => 'akutansi.rka_manual']);
+$routes->get('akutansi/rka-kanwil-surabaya/template', 'Akutansi::downloadRkaTemplate', ['as' => 'akutansi.rka_template']);
+$routes->get('akutansi/rka-kanwil-surabaya/manual-data', 'Akutansi::rkaManualData', ['as' => 'akutansi.rka_manual.data']);
+$routes->post('akutansi/rka-kanwil-surabaya/upload-excel', 'Akutansi::importRka', ['as' => 'akutansi.rka_import']);
+$routes->post('akutansi/rka-kanwil-surabaya/seting-manual', 'Akutansi::saveRkaManual', ['as' => 'akutansi.rka_manual.save']);
+$routes->post('akutansi/rka-kanwil-surabaya/hapus', 'Akutansi::deleteRka', ['as' => 'akutansi.rka_delete']);
 
 // Bagian Umum 1
 $routes->group('bagian-umum-1/dokumen-masuk', static function (RouteCollection $routes): void {
