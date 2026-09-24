@@ -11,12 +11,16 @@ $resolveOptimizedAsset = static function (string $source, string $optimized): st
             ? $optimized
             : $source;
 };
+$assetVersion = static function (string $asset): string {
+    $path = FCPATH . $asset;
+    return is_file($path) ? (md5_file($path) ?: '1') : '1';
+};
 $landingCssAsset = $resolveOptimizedAsset('assets/app.css', 'assets/app.min.css');
 $requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
 $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
-$landingCssVersion = is_file(FCPATH . $landingCssAsset) ? (string) filemtime(FCPATH . $landingCssAsset) : '1';
-$requiredMarkersVersion = is_file(FCPATH . $requiredMarkersAsset) ? (string) filemtime(FCPATH . $requiredMarkersAsset) : '1';
-$urlMaskVersion = is_file(FCPATH . $urlMaskAsset) ? (string) filemtime(FCPATH . $urlMaskAsset) : '1';
+$landingCssVersion = $assetVersion($landingCssAsset);
+$requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
+$urlMaskVersion = $assetVersion($urlMaskAsset);
 $loginError        = session()->getFlashdata('login_error');
 $logoutSuccess     = session()->getFlashdata('logout_success');
 $openAdminTakeover = (bool) session()->getFlashdata('open_admin_takeover_modal');

@@ -50,15 +50,19 @@ $resolveOptimizedAsset = static function (string $source, string $optimized): st
             ? $optimized
             : $source;
 };
+$assetVersion = static function (string $asset): string {
+    $path = FCPATH . $asset;
+    return is_file($path) ? (md5_file($path) ?: '1') : '1';
+};
 $appCssAsset = $resolveOptimizedAsset('assets/app.css', 'assets/app.min.css');
 $appJsAsset = $resolveOptimizedAsset('assets/app.js', 'assets/app.min.js');
 $requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
 $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
-$appCssVersion = is_file(FCPATH . $appCssAsset) ? (string) filemtime(FCPATH . $appCssAsset) : '1';
-$welcomeMotionVersion = is_file(FCPATH . 'assets/welcome-motion.css') ? (string) filemtime(FCPATH . 'assets/welcome-motion.css') : '1';
-$appJsVersion = is_file(FCPATH . $appJsAsset) ? (string) filemtime(FCPATH . $appJsAsset) : '1';
-$requiredMarkersVersion = is_file(FCPATH . $requiredMarkersAsset) ? (string) filemtime(FCPATH . $requiredMarkersAsset) : '1';
-$urlMaskVersion = is_file(FCPATH . $urlMaskAsset) ? (string) filemtime(FCPATH . $urlMaskAsset) : '1';
+$appCssVersion = $assetVersion($appCssAsset);
+$welcomeMotionVersion = $assetVersion('assets/welcome-motion.css');
+$appJsVersion = $assetVersion($appJsAsset);
+$requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
+$urlMaskVersion = $assetVersion($urlMaskAsset);
 $authExpiresAt = (int) session()->get('auth_expires_at');
 $roleNotifications = [
     'total' => 0,

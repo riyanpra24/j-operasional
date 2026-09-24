@@ -12,12 +12,16 @@ $resolveOptimizedAsset = static function (string $source, string $optimized): st
         ? $optimized
         : $source;
 };
+$assetVersion = static function (string $asset): string {
+    $path = FCPATH . $asset;
+    return is_file($path) ? (md5_file($path) ?: '1') : '1';
+};
 $loginCssAsset = $resolveOptimizedAsset('assets/app.css', 'assets/app.min.css');
 $requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
 $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
-$loginCssVersion = is_file(FCPATH . $loginCssAsset) ? (string) filemtime(FCPATH . $loginCssAsset) : '1';
-$requiredMarkersVersion = is_file(FCPATH . $requiredMarkersAsset) ? (string) filemtime(FCPATH . $requiredMarkersAsset) : '1';
-$urlMaskVersion = is_file(FCPATH . $urlMaskAsset) ? (string) filemtime(FCPATH . $urlMaskAsset) : '1';
+$loginCssVersion = $assetVersion($loginCssAsset);
+$requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
+$urlMaskVersion = $assetVersion($urlMaskAsset);
 ?>
 <!DOCTYPE html>
 <html lang="id">
