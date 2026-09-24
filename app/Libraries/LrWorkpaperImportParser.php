@@ -23,7 +23,10 @@ final class LrWorkpaperImportParser
         'Madiun' => 'MADIUN',
         'Banyuwangi' => 'BANYUWANGI',
     ];
-    private const COLUMNS = ['L' => 'KUR', 'M' => 'PEN', 'N' => 'NON KUR', 'O' => 'KBG/SURETYSHIP', 'P' => 'KONSUMTIF', 'Q' => 'PRODUKTIF', 'R' => 'TOTAL'];
+    // L–Q are the source LOB figures. They are copied as their stored numbers,
+    // while the summary Total in R must remain a workpaper formula result.
+    private const LOB_COLUMNS = ['L' => 'KUR', 'M' => 'PEN', 'N' => 'NON KUR', 'O' => 'KBG/SURETYSHIP', 'P' => 'KONSUMTIF', 'Q' => 'PRODUKTIF'];
+    private const COLUMNS = self::LOB_COLUMNS + ['R' => 'TOTAL'];
     // S–X is the "% Pencapaian" table. X is its TOTAL value; S–W are kept so
     // the Corporate view can reveal the same LOB detail as the workpaper.
     private const PERCENTAGE_COLUMNS = ['S' => 'KUR', 'T' => 'PEN', 'U' => 'KBG/SURETYSHIP', 'V' => 'KONSUMTIF', 'W' => 'PRODUKTIF', 'X' => 'TOTAL'];
@@ -65,7 +68,7 @@ final class LrWorkpaperImportParser
         }
 
         $values = [];
-        $formulaCount = 0;
+        $totalFormulaCount = 0;
         $cachedFormulaCount = 0;
         $totalPercentageFormulaCount = 0;
         foreach ($cells as $address => $cell) {
@@ -83,8 +86,11 @@ final class LrWorkpaperImportParser
             foreach (self::COLUMNS as $column => $name) {
                 $number = $cells[$column.$row] ?? null;
                 if ($number === null) continue;
+                if ($name === 'TOTAL' && !$number['formula']) {
+                    throw new RuntimeException($sheet.'!'.$column.$row.' harus memakai rumus Total dari Kertas Kerja.');
+                }
                 if ($number['formula']) {
-                    $formulaCount++;
+                    if ($name === 'TOTAL') $totalFormulaCount++;
                     if ($number['value'] !== '') $cachedFormulaCount++;
                 }
                 // A generated workpaper can legitimately contain a formula whose
@@ -114,7 +120,10 @@ final class LrWorkpaperImportParser
                 foreach (self::PERCENTAGE_COLUMNS as $column => $name) {
                     $number = $cells[$column.$row] ?? null;
                     if ($number === null) continue;
-                    if ($name === 'TOTAL' && $number['formula']) {
+                    if ($name === 'TOTAL') {
+                        if (!$number['formula']) {
+                            throw new RuntimeException($sheet.'!'.$column.$row.' harus memakai rumus Persentase Total dari Kertas Kerja.');
+                        }
                         $totalPercentageFormulaCount++;
                     }
                     if ($number['formula'] && ($number['value'] === '' || $number['type'] === 'e' || in_array(trim((string) $number['value']), ['-', '—'], true))) {
@@ -144,8 +153,11 @@ final class LrWorkpaperImportParser
             if ($percentageDetails !== []) $rowValues['percentage_details'] = $percentageDetails;
             if ($rowValues) $values[$key] = $rowValues;
         }
-        if ($formulaCount < 20 || !$values) {
-            throw new RuntimeException('Rumus pada sheet '.$sheet.' tidak lengkap atau hasil Kertas Kerja tidak dapat dibaca. Buat ulang hasil Simulasi Hitung sebelum di-upload.');
+        if ($totalFormulaCount < 20 || !$values) {
+            throw new RuntimeException('Rumus Total pada sheet '.$sheet.' tidak lengkap atau hasil Kertas Kerja tidak dapat dibaca. Buat ulang hasil Simulasi Hitung sebelum di-upload.');
+        }
+        if ($unit === 'Korporat Kanwil' && $totalPercentageFormulaCount < 20) {
+            throw new RuntimeException('Rumus Persentase Total pada sheet '.$sheet.' tidak lengkap. Buat ulang hasil Simulasi Hitung sebelum di-upload.');
         }
         $hasTotalPercentage = $totalPercentageFormulaCount >= 20;
         return [

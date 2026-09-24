@@ -2333,7 +2333,11 @@
     const emblem = scene.querySelector('[data-welcome-emblem]');
     const status = scene.querySelector('[data-welcome-status]');
     const depthElements = scene.querySelectorAll('[data-welcome-depth]');
+    const dragTargets = scene.querySelectorAll('[data-welcome-drag]');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let activeDrag = null;
+    let draggedUntil = 0;
+    const returnTimers = new WeakMap();
 
     if (particleLayer && !reduceMotion) {
         Array.from({ length: 16 }).forEach((_, index) => {
@@ -2356,16 +2360,73 @@
             card.style.transform = `perspective(1200px) translate3d(${x * 5}px, ${y * 4}px, 0) rotateX(${y * -2.2}deg) rotateY(${x * 2.8}deg)`;
             depthElements.forEach((element) => {
                 const depth = Number(element.dataset.welcomeDepth || 1);
-                element.style.transform = `translate3d(${x * depth * 8}px, ${y * depth * 6}px, 0)`;
+                element.style.setProperty('--welcome-parallax-x', `${x * depth * 8}px`);
+                element.style.setProperty('--welcome-parallax-y', `${y * depth * 6}px`);
             });
         });
         scene.addEventListener('pointerleave', () => {
             card.style.transform = '';
             depthElements.forEach((element) => {
-                element.style.transform = '';
+                element.style.setProperty('--welcome-parallax-x', '0px');
+                element.style.setProperty('--welcome-parallax-y', '0px');
             });
         });
     }
+
+    dragTargets.forEach((target) => {
+        const releaseDrag = () => {
+            target.classList.remove('is-dragging');
+        };
+
+        target.addEventListener('dragstart', (event) => event.preventDefault());
+
+        target.addEventListener('pointerdown', (event) => {
+            if (reduceMotion || event.button > 0) return;
+            event.preventDefault();
+            window.clearTimeout(returnTimers.get(target));
+            target.classList.remove('is-returning');
+            activeDrag = {
+                target,
+                startX: event.clientX,
+                startY: event.clientY,
+                baseX: Number(target.dataset.welcomeDragX || 0),
+                baseY: Number(target.dataset.welcomeDragY || 0),
+                moved: false,
+            };
+            target.setPointerCapture?.(event.pointerId);
+            target.classList.add('is-dragging');
+        });
+
+        target.addEventListener('pointermove', (event) => {
+            if (!activeDrag || activeDrag.target !== target) return;
+            event.preventDefault();
+            const x = activeDrag.baseX + event.clientX - activeDrag.startX;
+            const y = activeDrag.baseY + event.clientY - activeDrag.startY;
+            activeDrag.moved ||= Math.abs(x - activeDrag.baseX) > 5 || Math.abs(y - activeDrag.baseY) > 5;
+            target.dataset.welcomeDragX = String(x);
+            target.dataset.welcomeDragY = String(y);
+            target.style.setProperty('--welcome-drag-x', `${x}px`);
+            target.style.setProperty('--welcome-drag-y', `${y}px`);
+        });
+
+        const finishDrag = () => {
+            if (!activeDrag || activeDrag.target !== target) return;
+            if (activeDrag.moved) draggedUntil = Date.now() + 180;
+            releaseDrag();
+            if (activeDrag.moved && target.hasAttribute('data-welcome-return')) {
+                returnTimers.set(target, window.setTimeout(() => {
+                    target.classList.add('is-returning');
+                    target.dataset.welcomeDragX = '0';
+                    target.dataset.welcomeDragY = '0';
+                    target.style.setProperty('--welcome-drag-x', '0px');
+                    target.style.setProperty('--welcome-drag-y', '0px');
+                }, 280));
+            }
+            activeDrag = null;
+        };
+        target.addEventListener('pointerup', finishDrag);
+        target.addEventListener('pointercancel', finishDrag);
+    });
 
     const messages = ['Menyiapkan ruang kerja Anda', 'Menyelaraskan menu sesuai akses Anda', 'Semua siap untuk hari ini'];
     let messageIndex = 0;
@@ -2385,6 +2446,7 @@
     }
 
     emblem?.addEventListener('click', () => {
+        if (Date.now() < draggedUntil) return;
         if (!reduceMotion) {
             emblem.classList.remove('is-celebrating');
             void emblem.offsetWidth;

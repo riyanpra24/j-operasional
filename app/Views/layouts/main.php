@@ -297,9 +297,9 @@ if ($currentRole === 'security') {
                 <?php endif ?>
                 <?php if ($canAccessAkutansi): ?>
                 <div class="nav-group <?= $akutansiActive ? 'open' : '' ?>" data-nav-group>
-                    <button type="button" class="nav-link nav-parent <?= $akutansiActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $akutansiActive ? 'true' : 'false' ?>" aria-controls="akutansiSubmenu" title="Akutansi">
+                    <button type="button" class="nav-link nav-parent <?= $akutansiActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $akutansiActive ? 'true' : 'false' ?>" aria-controls="akutansiSubmenu" title="Akuntansi">
                         <span class="nav-icon image-nav-icon accounting-nav-icon" aria-hidden="true"></span>
-                        <span class="nav-link-text">Akutansi</span>
+                        <span class="nav-link-text">Akuntansi</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
                     <div class="nav-submenu" id="akutansiSubmenu" data-nav-submenu <?= $akutansiActive ? '' : 'hidden' ?>>

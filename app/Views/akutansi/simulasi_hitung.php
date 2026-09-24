@@ -13,7 +13,7 @@
     </div>
 </section>
 
-<section class="panel simulation-history">
+<section class="panel simulation-history" style="width:100%;max-width:none;margin-inline:0">
     <header class="simulation-history-heading">
         <div>
             <p class="eyebrow">HASIL PENGISIAN</p>

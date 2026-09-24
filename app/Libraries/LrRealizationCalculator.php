@@ -35,7 +35,10 @@ final class LrRealizationCalculator
             foreach (RkaCalculator::UNITS as $unit) {
                 $result = $resultsByUnit[$unit] ?? null;
                 if (!is_array($result) || ($result['rule'] ?? '') !== self::WORKPAPER_RULE || !is_array($result['values'] ?? null)) {
-                    throw new RuntimeException('Hasil Simulasi Hitung belum lengkap untuk seluruh unit kerja pada periode ini.');
+                    // A report may be uploaded progressively. Keep every valid unit
+                    // available instead of failing the entire Laba/Rugi page because
+                    // another unit has not been uploaded for the selected period.
+                    continue;
                 }
                 $values = $result['values'];
                 // Corporate total % is the X-column value under "% Pencapaian"
