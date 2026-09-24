@@ -79,4 +79,16 @@ $assert($get('LABA SEBELUM PAJAK', 'TOTAL') !== null, 'Pre-tax profit must be ca
 $assert($get('Imbal Jasa Penjaminan Bruto', 'PEN') === null, 'A missing PEN source must remain empty, not fabricated as zero.');
 $assert(($valuesByUnit['Korporat Kanwil'][OracleLrSalaryParser::normalizeLabel('LABA SEBELUM PAJAK')]['TOTAL'] ?? null) === $get('LABA SEBELUM PAJAK', 'TOTAL'), 'Corporate result must consolidate the available source units.');
 
+$workpaperKey = OracleLrSalaryParser::normalizeLabel('Beban gaji karyawan');
+$workpaperResults = [];
+foreach (App\Libraries\RkaCalculator::UNITS as $unit) {
+    $workpaperResults[$unit] = [
+        'rule' => LrRealizationCalculator::WORKPAPER_RULE,
+        'values' => [$workpaperKey => ['KUR' => '12.34', 'TOTAL' => '12.34', '%' => '0.1234']],
+    ];
+}
+$workpaperValues = (new LrRealizationCalculator())->calculate($workpaperResults);
+$assert(($workpaperValues['Korporat Kanwil'][$workpaperKey]['KUR'] ?? null) === '12.34'
+    && ($workpaperValues['Korporat Kanwil'][$workpaperKey]['%'] ?? null) === '0.1234', 'Simulasi workpaper values must be displayed without a second calculation.');
+
 echo "Realization formula engine: {$checks} exact checks OK; sources, products, subtotals, profit, percentages, consolidation and missing values are automatic.\n";

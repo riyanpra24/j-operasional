@@ -19,6 +19,7 @@ $options = [
     'GrabExpress',
     'Paxel',
     'KAI Logistik',
+    'KGP',
 ];
 $choice = $current === '' ? '' : (in_array($current, $options, true) ? $current : 'Lainnya');
 ?>

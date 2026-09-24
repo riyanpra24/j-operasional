@@ -10,15 +10,18 @@ $db=db_connect(); $year=2097; $model=new App\Models\AccountingLrImportModel();
 if ($model->where('report_year',$year)->countAllResults()!==0) throw new RuntimeException('Unused test period 2097 already contains data.');
 $request=Config\Services::incomingrequest(new Config\App(),false); Config\Services::injectMock('request',$request);
 $controller=new App\Controllers\Akutansi(); $controller->initController($request,Config\Services::response(null,false),Config\Services::logger());
-$makeRecord=static function(string $amount,int $month,string $unit='Kanwil') use($model,$year): string {
+$makeRecord=static function(string $amount,int $month,string $unit='Kanwil',string $basis='YTD') use($model,$year): string {
     $result=['rule'=>App\Libraries\OracleLrSalaryParser::RULE,'unit'=>$unit,'sheet'=>strtoupper($unit),'year'=>$year,'month'=>$month,'period'=>'Periode : AGUSTUS-'.$year,
         'total'=>'999999.99','matches'=>[['row'=>23,'lob'=>'KUR','account'=>'6270201000000','description'=>'Beban gaji karyawan','report_label'=>'Beban gaji karyawan','source_amount'=>$amount,'amount'=>$amount]],'residue_count'=>0];
-    if ($model->insert(['unit_name'=>$unit,'report_year'=>$year,'report_month'=>$month,'rule_version'=>App\Libraries\OracleLrSalaryParser::RULE,
+    if ($model->insert(['unit_name'=>$unit,'report_year'=>$year,'report_month'=>$month,'report_basis'=>$basis,'rule_version'=>App\Libraries\OracleLrSalaryParser::RULE,
         'result_json'=>json_encode($result,JSON_THROW_ON_ERROR),'source_name'=>'Test LR.xlsx','source_hash'=>str_repeat('0',64),'source_path'=>'test-only-no-file.xlsx','created_at'=>date('Y-m-d H:i:s')])===false) throw new RuntimeException('Test insert failed.');
     return (string)$model->getInsertID();
 };
-$render=static function(string $unit) use($controller,$request,$year): array {
-    $request->setGlobal('get',['unit_kerja'=>$unit,'tahun'=>(string)$year]);
+$render=static function(string $unit,string $basis='YTD',?int $month=null,?array $lobs=null) use($controller,$request,$year): array {
+    $query=['unit_kerja'=>$unit,'tahun'=>(string)$year,'jenis_laporan'=>$basis];
+    if ($month!==null) $query['bulan']=(string)$month;
+    if ($lobs!==null) $query['lob']=$lobs;
+    $request->setGlobal('get',$query);
     $html=$controller->labaRugi(); $dom=new DOMDocument(); @$dom->loadHTML('<?xml encoding="UTF-8">'.$html); $xpath=new DOMXPath($dom);
     $values=$xpath->query('//table[contains(@class,"lr-profitloss-table")]//span[@class="lr-lr-value"]');
     $salary=$xpath->query('//th[normalize-space(.)="Beban gaji karyawan"]/following-sibling::td[1]');
@@ -26,12 +29,19 @@ $render=static function(string $unit) use($controller,$request,$year): array {
 };
 $db->transBegin();
 try {
-    $oldId=$makeRecord('100.01',8); $latestId=$makeRecord('-25.02',8); $makeRecord('555.55',7);
+    $oldId=$makeRecord('100.01',8); $latestId=$makeRecord('-25.02',8); $makeRecord('555.55',7); $ptdId=$makeRecord('888.88',8,'Kanwil','PTD');
     [$html,$xpath,$values,$salary]=$render('Kanwil');
     if ($values->length<4 || trim($salary->item(0)->textContent)!=='*25'
         || $xpath->query('//span[@class="lr-lr-value"]/span[@class="lr-rka-negative-marker"]')->length<1) throw new RuntimeException('Latest YTD source, exact sign or formula calculation failed.');
     if ($xpath->query('//span[@class="lr-lr-value" and @data-lr-exact="-25.02"]')->length<1) throw new RuntimeException('Rounded presentation must retain the exact underlying amount.');
     if (!str_contains($html,'Lihat sumber perhitungan') || !str_contains($html,'6270201000000')) throw new RuntimeException('Source audit missing.');
+    [$julyHtml,,,$julySalary]=$render('Kanwil','YTD',7);
+    if (trim($julySalary->item(0)->textContent)!=='556' || !str_contains($julyHtml,'Laba / Rugi (YTD) Juli '.$year)) throw new RuntimeException('The month filter must load the exact selected YTD period.');
+    [, $lobXpath]=$render('Kanwil','YTD',8,['KUR','PEN']);
+    $lobHeadings=[]; foreach ($lobXpath->query('//table[contains(@class,"lr-profitloss-table")]/thead/tr/th[position()>1]') as $heading) $lobHeadings[]=trim($heading->textContent);
+    if ($lobHeadings!==['KUR','PEN','TOTAL','%']) throw new RuntimeException('The multi-LOB filter must hide unselected report columns without changing source calculations.');
+    [,,$ptdValues,$ptdSalary]=$render('Kanwil','PTD');
+    if ($ptdValues->length<4 || trim($ptdSalary->item(0)->textContent)!=='889') throw new RuntimeException('PTD source must remain isolated from YTD for the same unit and period.');
     if ($xpath->query('//button[@data-lr-mapping-detail-open]')->length!==1 || $xpath->query('//dialog[@id="lrMappingDetailDialog"]')->length!==1) throw new RuntimeException('Mapping detail audit dialog missing.');
     if ($xpath->query('//button[@data-lr-toggle="beban-karyawan" and @aria-expanded="true"]')->length!==1) throw new RuntimeException('Imported salary details should be visible for verification.');
     [,,$corporate,$corporateSalary]=$render('Korporat Kanwil'); if ($corporate->length<4 || trim($corporateSalary->item(0)->textContent)!=='*25') throw new RuntimeException('Corporate view must consolidate current unit results.');
@@ -54,9 +64,9 @@ try {
         $directory=__DIR__.'/../../tmp/rka_template/ui'; if (!is_dir($directory)) mkdir($directory,0777,true);
         file_put_contents($directory.'/laba_rugi.html',$html);
     }
-    $latest=$model->where('unit_name','Kanwil')->where('report_year',$year)->orderBy('report_month','DESC')->orderBy('id','DESC')->first();
+    $latest=$model->where('unit_name','Kanwil')->where('report_year',$year)->where('report_basis','YTD')->orderBy('report_month','DESC')->orderBy('id','DESC')->first();
     $latestId=(string)$latest['id'];
-    $request->setGlobal('post',['unit_kerja'=>'Kanwil','tahun'=>(string)$year,'bulan'=>'8']);
+    $request->setGlobal('post',['unit_kerja'=>'Kanwil','tahun'=>(string)$year,'bulan'=>'8','jenis_laporan'=>'YTD']);
     $controller->deleteLabaRugi();
     if ($model->where('unit_name','Kanwil')->where('report_year',$year)->countAllResults()===0) throw new RuntimeException('Missing confirmation must not delete reports.');
     $service=new App\Libraries\OracleLrImportService();
@@ -66,17 +76,25 @@ try {
     [$branchHtml,,,$branchSalary]=$render('Surabaya');
     if (trim($branchSalary->item(0)->textContent)!=='10' || !str_contains($branchHtml,'Sheet SURABAYA')) throw new RuntimeException('Branch result must render from its own selected sheet.');
     $count=$service->delete('Kanwil',$year,8,'admin','LR Test');
-    if ($count<2 || $model->where('unit_name','Kanwil')->where('report_year',$year)->where('report_month',8)->countAllResults()!==0
+    if ($count<2 || $model->where('unit_name','Kanwil')->where('report_year',$year)->where('report_month',8)->where('report_basis','YTD')->countAllResults()!==0
         || $model->where('unit_name','Kanwil')->where('report_year',$year)->where('report_month',7)->countAllResults()!==1) throw new RuntimeException('Deletion must hide only revisions in the selected month and year.');
-    if ($model->find($otherId)===null || $model->onlyDeleted()->where('unit_name','Kanwil')->where('report_year',$year)->where('report_month',8)->countAllResults()!==$count) throw new RuntimeException('Deletion leaked months or units, or lost recoverable history.');
+    if ($model->find($ptdId)===null || $model->find($otherId)===null || $model->onlyDeleted()->where('unit_name','Kanwil')->where('report_year',$year)->where('report_month',8)->where('report_basis','YTD')->countAllResults()!==$count) throw new RuntimeException('Deletion leaked report basis, months or units, or lost recoverable history.');
     [,,$deletedValues,$fallbackSalary]=$render('Kanwil');
     if ($deletedValues->length<4 || trim($fallbackSalary->item(0)->textContent)!=='556') throw new RuntimeException('Deleting August must leave the July report available.');
     session()->set('auth_role','admin');
     $deletedController=new App\Controllers\DeletedData(); $deletedController->initController($request,Config\Services::response(null,false),Config\Services::logger());
     $deletedController->restore('laporan-laba-rugi',(int)$latestId);
     if ($model->find($latestId)===null) throw new RuntimeException('Administrator restoration failed.');
+    $allKanwilId=$makeRecord('11.11',9,'Kanwil'); $allSurabayaId=$makeRecord('22.22',9,'Surabaya');
+    $request->setGlobal('post',['unit_kerja'=>App\Libraries\OracleLrImportService::ALL_UNITS,'tahun'=>(string)$year,'bulan'=>'9','jenis_laporan'=>'YTD','confirm_delete'=>'1']);
+    $controller->deleteLabaRugi();
+    if ($model->find($allKanwilId)!==null || $model->find($allSurabayaId)!==null
+        || $model->onlyDeleted()->where('report_year',$year)->where('report_month',9)->countAllResults()!==2
+        || $model->where('unit_name','Kanwil')->where('report_year',$year)->where('report_month',7)->countAllResults()!==1) {
+        throw new RuntimeException('All-unit deletion must remove every source unit only in the chosen month and year.');
+    }
     session()->remove('auth_role');
-    echo "Oracle LR deletion: mandatory confirmation, exact month/year scope, revision history, isolation and administrator recovery OK.\n";
-    echo "Oracle LR DB/render: persisted source rows, exact recomputation, no duplicate-upload summation, latest YTD period, isolated units and red negative marker OK.\n";
+    echo "Oracle LR deletion: mandatory confirmation, exact basis/month/year scope, all-unit option, revision history, isolation and administrator recovery OK.\n";
+    echo "Oracle LR DB/render: isolated YTD/PTD sources, persisted source rows, exact recomputation, no duplicate-upload summation, latest period, isolated units and red negative marker OK.\n";
 } finally { $db->transRollback(); }
 if ($model->where('report_year',$year)->countAllResults()!==0) throw new RuntimeException('Test records retained.');

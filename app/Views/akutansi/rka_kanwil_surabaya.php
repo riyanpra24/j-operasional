@@ -1,5 +1,9 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
+<?php
+$rkaLobs = $rkaLobs ?? array_values(array_filter($schema['columns'], static fn (string $label): bool => $label !== 'TOTAL'));
+$selectedLobs = $selectedLobs ?? $rkaLobs;
+?>
 
 <section class="page-heading lr-page-heading lr-rka-heading">
     <div>
@@ -14,8 +18,8 @@
     </div>
 </section>
 
-<?= view('akutansi/partials/rka_filter', compact('rkaUnits', 'selectedUnit', 'selectedYear', 'record', 'revision') + ['filterAction' => site_url('akutansi/rka-kanwil-surabaya')]) ?>
-<?= view('akutansi/partials/rka_table', compact('schema', 'selectedUnit', 'selectedYear', 'inputs', 'calculated') + ['editable' => false, 'idPrefix' => 'lr']) ?>
+<?= view('akutansi/partials/rka_filter', compact('rkaUnits', 'selectedUnit', 'selectedYear', 'record', 'revision', 'rkaLobs', 'selectedLobs') + ['filterAction' => site_url('akutansi/rka-kanwil-surabaya')]) ?>
+<?= view('akutansi/partials/rka_table', compact('schema', 'selectedUnit', 'selectedYear', 'inputs', 'calculated', 'selectedLobs') + ['editable' => false, 'idPrefix' => 'lr']) ?>
 
 <dialog id="rkaSettingsDialog" class="lr-settings-dialog" aria-labelledby="rkaSettingsTitle" aria-describedby="rkaSettingsDescription">
     <section>

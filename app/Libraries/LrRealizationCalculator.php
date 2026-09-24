@@ -7,6 +7,7 @@ use RuntimeException;
 /** Formula engine translated from the supplied realization workpaper. */
 final class LrRealizationCalculator
 {
+    public const WORKPAPER_RULE = 'simulasi_kertas_kerja_v1';
     public const SOURCE_COLUMNS = ['KUR', 'PEN', 'NON KUR'];
     public const PRODUCT_COLUMNS = ['KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF'];
     public const VALUE_COLUMNS = ['KUR', 'PEN', 'NON KUR', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF', 'TOTAL'];
@@ -26,6 +27,26 @@ final class LrRealizationCalculator
     public function calculate(array $resultsByUnit, array $rkaCalculatedByUnit = [], array $periodByUnit = []): array
     {
         if (!extension_loaded('bcmath')) throw new RuntimeException('BCMath diperlukan untuk menghitung realisasi secara presisi.');
+
+        // Simulasi Hitung has already applied the approved workbook formulas.  Do not
+        // derive, allocate, or recompute those figures again when showing Laba/Rugi.
+        if ($this->containsWorkpaperResult($resultsByUnit)) {
+            $valuesByUnit = [];
+            foreach (RkaCalculator::UNITS as $unit) {
+                $result = $resultsByUnit[$unit] ?? null;
+                if (!is_array($result) || ($result['rule'] ?? '') !== self::WORKPAPER_RULE || !is_array($result['values'] ?? null)) {
+                    throw new RuntimeException('Hasil Simulasi Hitung belum lengkap untuk seluruh unit kerja pada periode ini.');
+                }
+                $values = $result['values'];
+                // Corporate total % is the X-column value under "% Pencapaian"
+                // in the workpaper. Older uploads did not persist that cache, so
+                // only those records retain the safe R/K fallback.
+                $valuesByUnit[$unit] = $unit === 'Korporat Kanwil' && ($result['percentage_column'] ?? null) === 'X'
+                    ? $values
+                    : $this->applyPercentages($values, $rkaCalculatedByUnit[$unit] ?? null);
+            }
+            return $valuesByUnit;
+        }
 
         $states = [];
         foreach (RkaCalculator::SOURCE_UNITS as $unit) {
@@ -71,6 +92,12 @@ final class LrRealizationCalculator
             $valuesByUnit[$unit] = $this->applyPercentages($values, $rkaCalculatedByUnit[$unit] ?? null);
         }
         return $valuesByUnit;
+    }
+
+    private function containsWorkpaperResult(array $resultsByUnit): bool
+    {
+        foreach ($resultsByUnit as $result) if (($result['rule'] ?? '') === self::WORKPAPER_RULE) return true;
+        return false;
     }
 
     private function sourceState(array $result, string $unit, int $year = 0, int $month = 0): array
@@ -220,16 +247,34 @@ final class LrRealizationCalculator
         if ($rkaCalculated === null) return $values;
         $budgetByLabel = [];
         foreach (RkaCalculator::schema()['rows'] as $row => $definition) {
-            $cell = 'H'.$row;
-            if (!isset($rkaCalculated[$cell])) continue;
-            $budgetByLabel[$this->canonical((string) $definition['label'])] = (string) $rkaCalculated[$cell];
+            $budgetCell = 'H'.$row;
+            if (!isset($rkaCalculated[$budgetCell])) continue;
+            $budgetByLabel[$this->canonical((string) $definition['label'])] = [
+                'KUR' => (string) ($rkaCalculated['C'.$row] ?? '0.00'),
+                'PEN' => (string) ($rkaCalculated['D'.$row] ?? '0.00'),
+                'KBG/SURETYSHIP' => (string) ($rkaCalculated['E'.$row] ?? '0.00'),
+                'KONSUMTIF' => (string) ($rkaCalculated['F'.$row] ?? '0.00'),
+                'PRODUKTIF' => (string) ($rkaCalculated['G'.$row] ?? '0.00'),
+                'TOTAL' => (string) $rkaCalculated[$budgetCell],
+            ];
         }
-        $budgetByLabel[$this->canonical('BEBAN USAHA')] = $budgetByLabel[$this->canonical('TOTAL BEBAN USAHA')] ?? '0.00';
+        $budgetByLabel[$this->canonical('BEBAN USAHA')] = $budgetByLabel[$this->canonical('TOTAL BEBAN USAHA')] ?? [
+            'KUR' => '0.00', 'PEN' => '0.00', 'KBG/SURETYSHIP' => '0.00',
+            'KONSUMTIF' => '0.00', 'PRODUKTIF' => '0.00', 'TOTAL' => '0.00',
+        ];
         foreach ($values as $key => $columns) {
             if (!isset($columns['TOTAL'])) continue;
-            $budget = $budgetByLabel[$this->canonical($key)] ?? null;
-            if ($budget === null) continue;
-            $values[$key]['%'] = LrMoney::isZero($budget) ? '0.00' : (LrMoney::divide($columns['TOTAL'], $budget, 18) ?? '0.00');
+            $budgets = $budgetByLabel[$this->canonical($key)] ?? null;
+            if (!is_array($budgets)) continue;
+            $values[$key]['%'] = LrMoney::isZero($budgets['TOTAL']) ? '0.00' : (LrMoney::divide($columns['TOTAL'], $budgets['TOTAL'], 18) ?? '0.00');
+            $percentageDetails = [];
+            foreach (['KUR', 'PEN', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF'] as $column) {
+                $actual = (string) ($columns[$column] ?? '0.00');
+                $budget = $budgets[$column];
+                $percentageDetails[$column] = LrMoney::isZero($budget) ? '0.00' : (LrMoney::divide($actual, $budget, 18) ?? '0.00');
+            }
+            $percentageDetails['TOTAL'] = $values[$key]['%'];
+            $values[$key]['percentage_details'] = $percentageDetails;
         }
         return $values;
     }

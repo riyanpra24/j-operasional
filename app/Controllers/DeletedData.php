@@ -8,6 +8,7 @@ use App\Libraries\RkaBudgetService;
 use App\Models\DokumenKeluarModel;
 use App\Models\DokumenMasukModel;
 use App\Models\DokumenSpkModel;
+use App\Models\MagangModel;
 use App\Models\PksDokumenModel;
 use App\Models\PksItemModel;
 use App\Models\PksKerjasamaModel;
@@ -24,12 +25,13 @@ class DeletedData extends BaseController
 {
     /** @var array<string, array{label:string, table:string, model:class-string<Model>, fields:list<string>}> */
     private const RESOURCES = [
-        'laporan-laba-rugi' => ['label' => 'Laporan Laba & Rugi', 'table' => 'accounting_lr_imports', 'model' => \App\Models\AccountingLrImportModel::class, 'fields' => ['unit_name', 'report_month', 'report_year', 'source_name']],
+        'laporan-laba-rugi' => ['label' => 'Laporan Laba / Rugi', 'table' => 'accounting_lr_imports', 'model' => \App\Models\AccountingLrImportModel::class, 'fields' => ['report_basis', 'unit_name', 'report_month', 'report_year', 'source_name']],
         'rka-kanwil-surabaya' => ['label' => 'RKA Kanwil Surabaya', 'table' => 'accounting_rka_budgets', 'model' => AccountingRkaBudgetModel::class, 'fields' => ['unit_name', 'budget_year']],
         'dokumen-masuk' => ['label' => 'Dokumen Masuk', 'table' => 'dokumen_masuk', 'model' => DokumenMasukModel::class, 'fields' => ['nomor_surat', 'pengirim', 'perihal']],
         'agendaris' => ['label' => 'Agendaris', 'table' => 'agendaris', 'model' => AgendarisModel::class, 'fields' => ['nomor_surat', 'pengirim', 'perihal_surat']],
         'dokumen-keluar' => ['label' => 'Dokumen Keluar', 'table' => 'dokumen_keluar', 'model' => DokumenKeluarModel::class, 'fields' => ['nomor_surat', 'jenis_surat', 'penerima']],
         'dokumen-spk' => ['label' => 'Dokumen SPK', 'table' => 'dokumen_spk', 'model' => DokumenSpkModel::class, 'fields' => ['nomor_dokumen', 'perihal']],
+        'data-magang' => ['label' => 'Data Magang', 'table' => 'sdm_magang', 'model' => MagangModel::class, 'fields' => ['nama_magang', 'nomor_kontrak_kerja', 'unit_kerja']],
         'pks' => ['label' => 'PKS Barang dan Jasa', 'table' => 'pks_kerjasama', 'model' => PksKerjasamaModel::class, 'fields' => ['kode_internal', 'nama_kerjasama']],
         'dokumen-pks' => ['label' => 'Riwayat Dokumen PKS', 'table' => 'pks_dokumen_kerjasama', 'model' => PksDokumenModel::class, 'fields' => ['jenis_dokumen', 'nomor_dokumen']],
         'item-pks' => ['label' => 'Item Pekerjaan PKS', 'table' => 'pks_item_kerjasama', 'model' => PksItemModel::class, 'fields' => ['keterangan']],
@@ -164,6 +166,51 @@ class DeletedData extends BaseController
         return redirect()->to(site_url('data-terhapus'))->with('success', $resource['label'] . ' berhasil dihapus permanen.');
     }
 
+    public function destroyAll(): RedirectResponse
+    {
+        if (! $this->isAdministrator()) {
+            return redirect()->to(site_url('dashboard'))->with('error', 'Penghapusan permanen hanya dapat dilakukan oleh Administrator.');
+        }
+
+        $selectedType = trim((string) $this->request->getPost('jenis'));
+        if ($selectedType !== '' && ! isset(self::RESOURCES[$selectedType])) {
+            return redirect()->to(site_url('data-terhapus'))->with('error', 'Jenis data terhapus tidak dikenali.');
+        }
+
+        $types = $selectedType === '' ? array_keys(self::RESOURCES) : [$selectedType];
+        $database = db_connect();
+        $deletedCount = 0;
+
+        $database->transBegin();
+        try {
+            foreach ($types as $type) {
+                $resource = self::RESOURCES[$type];
+                /** @var Model $model */
+                $model = new $resource['model']();
+                $records = $model->onlyDeleted()->select('id')->findAll();
+
+                foreach ($records as $record) {
+                    if (! $model->delete((int) $record['id'], true)) {
+                        throw new \RuntimeException('Sebagian data belum dapat dihapus permanen.');
+                    }
+                    $deletedCount++;
+                }
+            }
+            $database->transCommit();
+        } catch (\Throwable $exception) {
+            $database->transRollback();
+            log_message('error', 'Hapus seluruh data terhapus gagal: {message}', ['message' => $exception->getMessage()]);
+            return redirect()->to($this->deletedDataListUrl($selectedType))->with('error', 'Data belum dapat dihapus seluruhnya. Tidak ada data yang dihapus.');
+        }
+
+        if ($deletedCount === 0) {
+            return redirect()->to($this->deletedDataListUrl($selectedType))->with('error', 'Tidak ada data terhapus untuk dihapus permanen.');
+        }
+
+        $scope = $selectedType === '' ? 'seluruh jenis data' : self::RESOURCES[$selectedType]['label'];
+        return redirect()->to($this->deletedDataListUrl($selectedType))->with('success', $deletedCount . ' data ' . $scope . ' berhasil dihapus permanen.');
+    }
+
     /** @param list<string> $fields */
     private function recordLabel(array $record, array $fields): string
     {
@@ -181,5 +228,14 @@ class DeletedData extends BaseController
     private function isAdministrator(): bool
     {
         return (string) session()->get('auth_role') === 'admin';
+    }
+
+    private function deletedDataListUrl(string $selectedType): string
+    {
+        if ($selectedType === '') {
+            return site_url('data-terhapus');
+        }
+
+        return site_url('data-terhapus') . '?jenis=' . rawurlencode($selectedType);
     }
 }

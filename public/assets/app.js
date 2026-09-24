@@ -220,7 +220,45 @@
         window.setInterval(updateSystemClock, 1000);
     }
 
+    // Simpan posisi halaman untuk aksi yang memuat ulang halaman (simpan, ubah, hapus, atau unggah).
+    // Kunci per tab menjaga posisi dari halaman lain tidak ikut terbawa.
+    const scrollRestorePrefix = 'j-operasional-scroll:';
+    const currentScrollRestoreKey = () => `${scrollRestorePrefix}${window.location.pathname}${window.location.search}`;
+    const rememberPageScroll = () => {
+        try {
+            sessionStorage.setItem(currentScrollRestoreKey(), JSON.stringify({ x: window.scrollX, y: window.scrollY }));
+        } catch (error) {
+            // Penyimpanan browser tidak tersedia; proses data tetap berjalan seperti biasa.
+        }
+    };
+    const restorePageScroll = () => {
+        try {
+            const key = currentScrollRestoreKey();
+            const savedPosition = sessionStorage.getItem(key);
+            if (!savedPosition) return;
+            sessionStorage.removeItem(key);
+            const { x = 0, y = 0 } = JSON.parse(savedPosition);
+            requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(x, y)));
+        } catch (error) {
+            // Abaikan posisi lama yang tidak lagi valid.
+        }
+    };
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target instanceof HTMLFormElement ? event.target : null;
+        if (!form || event.defaultPrevented) return;
+
+        const method = (form.getAttribute('method') || 'get').toLowerCase();
+        const target = (form.getAttribute('target') || '_self').toLowerCase();
+        if (!['post', 'put', 'patch', 'delete'].includes(method) || target !== '_self') return;
+
+        rememberPageScroll();
+    });
+
+    restorePageScroll();
+
     const reloadOperationalPage = () => {
+        rememberPageScroll();
         if (typeof window.__operationalRouteUrl === 'string' && window.__operationalRouteUrl !== '') {
             window.location.replace(window.__operationalRouteUrl);
             return;
@@ -2287,6 +2325,113 @@
 })();
 
 (() => {
+    const scene = document.querySelector('[data-welcome-scene]');
+    if (!scene) return;
+
+    const card = scene.querySelector('[data-welcome-card]');
+    const particleLayer = scene.querySelector('[data-welcome-particles]');
+    const emblem = scene.querySelector('[data-welcome-emblem]');
+    const status = scene.querySelector('[data-welcome-status]');
+    const depthElements = scene.querySelectorAll('[data-welcome-depth]');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (particleLayer && !reduceMotion) {
+        Array.from({ length: 16 }).forEach((_, index) => {
+            const particle = document.createElement('i');
+            particle.className = 'welcome-particle';
+            particle.style.setProperty('--x', `${6 + ((index * 37) % 88)}%`);
+            particle.style.setProperty('--y', `${8 + ((index * 53) % 78)}%`);
+            particle.style.setProperty('--size', `${4 + ((index * 7) % 8)}px`);
+            particle.style.setProperty('--delay', `${(index % 8) * -0.65}s`);
+            particle.style.setProperty('--duration', `${5.5 + ((index * 11) % 32) / 10}s`);
+            particleLayer.appendChild(particle);
+        });
+    }
+
+    if (card && !reduceMotion && window.matchMedia('(pointer: fine)').matches) {
+        scene.addEventListener('pointermove', (event) => {
+            const bounds = scene.getBoundingClientRect();
+            const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - 0.5) * 2));
+            const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - 0.5) * 2));
+            card.style.transform = `perspective(1200px) translate3d(${x * 5}px, ${y * 4}px, 0) rotateX(${y * -2.2}deg) rotateY(${x * 2.8}deg)`;
+            depthElements.forEach((element) => {
+                const depth = Number(element.dataset.welcomeDepth || 1);
+                element.style.transform = `translate3d(${x * depth * 8}px, ${y * depth * 6}px, 0)`;
+            });
+        });
+        scene.addEventListener('pointerleave', () => {
+            card.style.transform = '';
+            depthElements.forEach((element) => {
+                element.style.transform = '';
+            });
+        });
+    }
+
+    const messages = ['Menyiapkan ruang kerja Anda', 'Menyelaraskan menu sesuai akses Anda', 'Semua siap untuk hari ini'];
+    let messageIndex = 0;
+    const setStatus = (message) => {
+        if (!status) return;
+        status.classList.remove('is-changing');
+        void status.offsetWidth;
+        status.textContent = message;
+        status.classList.add('is-changing');
+    };
+
+    if (status && !reduceMotion) {
+        window.setInterval(() => {
+            messageIndex = (messageIndex + 1) % messages.length;
+            setStatus(messages[messageIndex]);
+        }, 3600);
+    }
+
+    emblem?.addEventListener('click', () => {
+        if (!reduceMotion) {
+            emblem.classList.remove('is-celebrating');
+            void emblem.offsetWidth;
+            emblem.classList.add('is-celebrating');
+        }
+        setStatus('Sistem siap digunakan');
+    });
+})();
+
+// Export Dokumen Akuntansi: pilihan unit kerja tetap ringkas dan mudah diperiksa.
+(() => {
+    const form = document.querySelector('[data-export-document-form]');
+    if (!form) return;
+    const units = [...form.querySelectorAll('[data-export-unit]')];
+    const count = form.querySelector('[data-export-unit-count]');
+    const error = form.querySelector('[data-export-unit-error]');
+    const submit = form.querySelector('[data-export-submit]');
+    const sync = () => {
+        const selected = units.filter((unit) => unit.checked).length;
+        if (count) count.textContent = `${selected} unit dipilih`;
+        if (error) error.hidden = selected > 0;
+        return selected;
+    };
+    form.querySelector('[data-export-select-all]')?.addEventListener('click', () => {
+        units.forEach((unit) => { unit.checked = true; });
+        sync();
+    });
+    form.querySelector('[data-export-clear-all]')?.addEventListener('click', () => {
+        units.forEach((unit) => { unit.checked = false; });
+        sync();
+    });
+    units.forEach((unit) => unit.addEventListener('change', sync));
+    form.addEventListener('submit', (event) => {
+        if (sync() === 0) {
+            event.preventDefault();
+            units[0]?.focus();
+            return;
+        }
+        if (!submit) return;
+        const label = submit.textContent;
+        submit.textContent = 'Menyiapkan Excel…';
+        window.setTimeout(() => { submit.textContent = label; }, 2500);
+    });
+    sync();
+})();
+
+(() => {
     const dialog = document.querySelector('#lrMappingDetailDialog');
     if (dialog instanceof HTMLDialogElement) {
         document.querySelectorAll('[data-lr-mapping-detail-open]').forEach((button) => button.addEventListener('click', () => {
@@ -2484,12 +2629,40 @@
             : 'Hapus penyesuaian nonaktif ini? Aturan tidak dapat dipulihkan dari daftar, tetapi riwayat audit tetap disimpan.';
         if (!window.confirm(message)) event.preventDefault();
     }));
+    document.querySelectorAll('form[data-simulation-delete]').forEach((deleteForm) => deleteForm.addEventListener('submit', (event) => {
+        if (!window.confirm('Hapus hasil simulasi ini? Berkas kertas kerja tidak dapat diunduh lagi setelah dihapus.')) event.preventDefault();
+    }));
     document.querySelectorAll('form[data-source-request-approve]').forEach((approvalForm) => approvalForm.addEventListener('submit', (event) => {
         if (!window.confirm('Setujui pengajuan ini? Perubahan akan langsung diterapkan pada perhitungan laporan.')) event.preventDefault();
     }));
     document.querySelectorAll('form[data-source-request-reject]').forEach((rejectionForm) => rejectionForm.addEventListener('submit', (event) => {
         if (!window.confirm('Tolak pengajuan ini? Perubahan tidak akan diterapkan.')) event.preventDefault();
     }));
+})();
+
+// Laba / Rugi: multi-pilih kolom LOB, minimal satu pilihan.
+(() => {
+    document.querySelectorAll('.lr-lob-picker').forEach((picker) => {
+        const summary = picker.querySelector('summary');
+        const fields = [...picker.querySelectorAll('input[name="lob[]"]')];
+        if (!summary || fields.length === 0) return;
+        const refresh = (changed) => {
+            let checked = fields.filter((field) => field.checked);
+            if (checked.length === 0 && changed) {
+                changed.checked = true;
+                checked = [changed];
+            }
+            const labels = checked.map((field) => field.value);
+            summary.textContent = checked.length === fields.length ? 'Semua LOB' : (checked.length <= 2 ? labels.join(', ') : `${checked.length} LOB dipilih`);
+        };
+        fields.forEach((field) => field.addEventListener('change', () => refresh(field)));
+        refresh(null);
+    });
+    document.addEventListener('click', (event) => {
+        document.querySelectorAll('.lr-lob-picker[open]').forEach((picker) => {
+            if (!picker.contains(event.target)) picker.removeAttribute('open');
+        });
+    });
 })();
 
 // Laba & Rugi: buka dan tutup rincian kelompok tanpa memuat ulang halaman.
@@ -2505,9 +2678,36 @@
                 if (output.hasAttribute('data-lr-group-output')) output.dataset.lrExpanded = String(expanded);
                 output.setAttribute('aria-hidden', String(expanded));
             });
-            row.closest('table').querySelectorAll('[data-lr-detail]').forEach((detail) => {
-                if (detail.dataset.lrDetail === toggle.dataset.lrToggle) detail.hidden = !expanded;
+            row.querySelectorAll('[data-lr-percent-toggle]').forEach((percentageToggle) => {
+                const detailId = percentageToggle.getAttribute('aria-controls');
+                const percentageDetail = detailId ? document.getElementById(detailId) : null;
+                percentageToggle.setAttribute('aria-expanded', 'false');
+                if (percentageDetail) percentageDetail.hidden = true;
             });
+            row.closest('table').querySelectorAll('[data-lr-detail]').forEach((detail) => {
+                if (detail.dataset.lrDetail !== toggle.dataset.lrToggle) return;
+                const percentageDetail = detail.hasAttribute('data-lr-percent-detail');
+                detail.hidden = !expanded || percentageDetail;
+                if (percentageDetail) {
+                    const percentageToggle = row.closest('table').querySelector(`[data-lr-percent-toggle][aria-controls="${detail.id}"]`);
+                    percentageToggle?.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    });
+})();
+
+// Laba & Rugi: tampilkan rincian % Pencapaian per LOB untuk Korporat Kanwil.
+(() => {
+    document.querySelectorAll('[data-lr-percent-toggle]').forEach((toggle) => {
+        toggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const targetId = toggle.getAttribute('aria-controls');
+            const detail = targetId ? document.getElementById(targetId) : null;
+            if (!detail) return;
+            const expanded = toggle.getAttribute('aria-expanded') !== 'true';
+            toggle.setAttribute('aria-expanded', String(expanded));
+            detail.hidden = !expanded;
         });
     });
 })();
@@ -2530,6 +2730,23 @@
         button.disabled = true; button.textContent = 'Menghitung…';
     });
     if (dialog.dataset.autoOpen === 'true') dialog.showModal();
+})();
+
+// Simulasi Hitung: formulir pengisian berada dalam pop-up agar daftar hasil tetap ringkas.
+(() => {
+    const dialog = document.querySelector('#simulationUploadDialog');
+    if (!(dialog instanceof HTMLDialogElement)) return;
+    document.querySelectorAll('[data-simulation-upload-open]').forEach((button) => button.addEventListener('click', () => {
+        if (!dialog.open) dialog.showModal();
+    }));
+    dialog.querySelectorAll('[data-simulation-upload-close]').forEach((button) => button.addEventListener('click', () => dialog.close()));
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+    const form = dialog.querySelector('[data-simulation-upload-form]');
+    form?.addEventListener('submit', () => {
+        const button = form.querySelector('button[type="submit"]');
+        if (button instanceof HTMLButtonElement) { button.disabled = true; button.textContent = 'Memproses…'; }
+    });
+    if (dialog.dataset.autoOpen === 'true' && !dialog.open) dialog.showModal();
 })();
 
 // Oracle LR deletion: exact unit/month/year selected in the confirmation dialog.

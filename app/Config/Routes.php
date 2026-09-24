@@ -19,25 +19,42 @@ $routes->group('', static function (RouteCollection $routes): void {
 
 // Halaman publik dan dashboard internal
 $routes->get('/', 'Landing::index', ['as' => 'landing']);
+$routes->get('welcome', 'Welcome::index', ['as' => 'welcome']);
 $routes->get('dashboard', 'Dashboard::index', ['as' => 'dashboard']);
 
 // Halaman awal modul SDM & Teller dan Akutansi
 $routes->get('sdm', 'Sdm::index', ['as' => 'sdm.index']);
+$routes->get('sdm/data-magang', 'Magang::index', ['as' => 'sdm.data_magang']);
+$routes->post('sdm/data-magang', 'Magang::store', ['as' => 'sdm.data_magang.store']);
+$routes->post('sdm/data-magang/import', 'Magang::import', ['as' => 'sdm.data_magang.import']);
+$routes->post('sdm/data-magang/(:num)', 'Magang::update/$1', ['as' => 'sdm.data_magang.update']);
+$routes->post('sdm/data-magang/(:num)/hapus', 'Magang::destroy/$1', ['as' => 'sdm.data_magang.delete']);
 $routes->get('sdm/dokumen-masuk', 'Sdm::incomingDocuments', ['as' => 'sdm.dokumen_masuk']);
+$routes->get('sdm/arsip-dokumen-masuk', 'Agendaris::suratMasuk', ['as' => 'sdm.arsip_dokumen_masuk']);
+$routes->get('sdm/arsip-dokumen-masuk/(:num)', 'Agendaris::show/$1', ['as' => 'sdm.arsip_dokumen_masuk.show']);
+$routes->get('sdm/arsip-dokumen-keluar', 'DokumenKeluar::index', ['as' => 'sdm.arsip_dokumen_keluar']);
+$routes->get('sdm/arsip-dokumen-keluar/(:num)', 'DokumenKeluar::show/$1', ['as' => 'sdm.arsip_dokumen_keluar.show']);
 $routes->post('sdm/dokumen-masuk/sinkronkan', 'Sdm::synchronizeIncomingDocuments', ['as' => 'sdm.dokumen_masuk.synchronize']);
 $routes->get('sdm/riwayat', 'Sdm::incomingDocumentHistory', ['as' => 'sdm.riwayat']);
 $routes->get('sdm/dashboard-kehadiran', 'Sdm::attendanceDashboard', ['as' => 'sdm.dashboard_kehadiran']);
 $routes->get('sdm/kalender', 'Sdm::attendanceCalendar', ['as' => 'sdm.calendar']);
 $routes->post('sdm/kalender', 'Sdm::updateAttendanceCalendar', ['as' => 'sdm.calendar.update']);
+$routes->get('sdm/data-kehadiran', 'Sdm::attendanceRecords', ['as' => 'sdm.attendance_records']);
+$routes->post('sdm/data-kehadiran/rekap', 'Sdm::recapSdmJatimAttendance', ['as' => 'sdm.attendance_records.recap']);
+$routes->post('sdm/data-kehadiran/anomali', 'Sdm::updateSdmJatimAnomalies', ['as' => 'sdm.attendance_records.anomaly.update']);
+$routes->post('sdm/data-kehadiran/hapus', 'Sdm::deleteSdmJatimAttendance', ['as' => 'sdm.attendance_records.delete']);
 $routes->get('sdm/sdm-jatim', 'Sdm::sdmJatim', ['as' => 'sdm.jatim']);
-$routes->post('sdm/sdm-jatim/rekap', 'Sdm::recapSdmJatimAttendance', ['as' => 'sdm.jatim.recap']);
-$routes->post('sdm/sdm-jatim/anomali', 'Sdm::updateSdmJatimAnomalies', ['as' => 'sdm.jatim.anomaly.update']);
-$routes->post('sdm/sdm-jatim/hapus', 'Sdm::deleteSdmJatimAttendance', ['as' => 'sdm.jatim.delete']);
 $routes->post('sdm/dokumen-masuk/(:num)', 'Sdm::updateIncomingDocument/$1', ['as' => 'sdm.dokumen_masuk.update']);
 $routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);
 $routes->get('akutansi/laba-rugi', 'Akutansi::labaRugi', ['as' => 'akutansi.laba_rugi']);
 $routes->post('akutansi/laba-rugi/upload-excel', 'Akutansi::importLabaRugi', ['as' => 'akutansi.laba_rugi.import']);
 $routes->post('akutansi/laba-rugi/hapus', 'Akutansi::deleteLabaRugi', ['as' => 'akutansi.laba_rugi.delete']);
+$routes->get('akutansi/simulasi-hitung', 'Akutansi::simulasiHitung', ['as' => 'akutansi.simulasi_hitung']);
+$routes->post('akutansi/simulasi-hitung', 'Akutansi::uploadSimulasiHitung', ['as' => 'akutansi.simulasi_hitung.upload']);
+$routes->get('akutansi/simulasi-hitung/unduh/(:segment)', 'Akutansi::downloadSimulasiHitung/$1', ['as' => 'akutansi.simulasi_hitung.download']);
+$routes->post('akutansi/simulasi-hitung/hapus/(:segment)', 'Akutansi::deleteSimulasiHitung/$1', ['as' => 'akutansi.simulasi_hitung.delete']);
+$routes->get('akutansi/export-dokumen', 'Akutansi::exportDokumen', ['as' => 'akutansi.export_dokumen']);
+$routes->post('akutansi/export-dokumen', 'Akutansi::downloadExportDokumen', ['as' => 'akutansi.export_dokumen.download']);
 $routes->get('akutansi/pengaturan-mapping-oracle', 'Akutansi::oracleMappings', ['as' => 'akutansi.oracle_mappings']);
 $routes->post('akutansi/pengaturan-mapping-oracle/coa', 'Akutansi::saveOracleAccountMapping', ['as' => 'akutansi.oracle_mappings.account.save']);
 $routes->post('akutansi/pengaturan-mapping-oracle/coa/hapus', 'Akutansi::deleteOracleAccountMapping', ['as' => 'akutansi.oracle_mappings.account.delete']);
@@ -110,6 +127,16 @@ $routes->get(
     ['as' => 'bagian_umum_2.index'],
 );
 
+$routes->group('bagian-umum-2/dokumen-masuk', static function (RouteCollection $routes): void {
+    $routes->get('/', 'Agendaris::suratMasuk', ['as' => 'bagian_umum_2.dokumen_masuk']);
+    $routes->get('(:num)', 'Agendaris::show/$1', ['as' => 'bagian_umum_2.dokumen_masuk.show']);
+});
+
+$routes->group('bagian-umum-2/dokumen-keluar', static function (RouteCollection $routes): void {
+    $routes->get('/', 'DokumenKeluar::index', ['as' => 'bagian_umum_2.dokumen_keluar']);
+    $routes->get('(:num)', 'DokumenKeluar::show/$1', ['as' => 'bagian_umum_2.dokumen_keluar.show']);
+});
+
 $routes->group('bagian-umum-2/monitoring-kendaraan', static function (RouteCollection $routes): void {
     $routes->get('/', 'MonitoringKendaraan::index', ['as' => 'monitoring_kendaraan.index']);
     $routes->get('data-kendaraan', 'MonitoringKendaraan::vehicles', ['as' => 'monitoring_kendaraan.vehicles']);
@@ -141,6 +168,7 @@ $routes->group('kelola-akun', static function (RouteCollection $routes): void {
 
 // Pusat pemulihan data (khusus administrator)
 $routes->get('data-terhapus', 'DeletedData::index', ['as' => 'deleted_data.index']);
+$routes->post('data-terhapus/hapus-semua-permanen', 'DeletedData::destroyAll', ['as' => 'deleted_data.destroy_all']);
 $routes->post('data-terhapus/(:segment)/(:num)/pulihkan', 'DeletedData::restore/$1/$2', ['as' => 'deleted_data.restore']);
 $routes->post('data-terhapus/(:segment)/(:num)/hapus-permanen', 'DeletedData::destroy/$1/$2', ['as' => 'deleted_data.destroy']);
 

@@ -150,7 +150,7 @@ final class OracleLrMappingService
         $mode = strtolower(trim((string) ($input['sign_mode'] ?? '')));
         if (!in_array($scope, self::UNIT_SCOPES, true)) throw new RuntimeException('Cakupan unit tidak valid.');
         if ($source === '' || mb_strlen($source) > 255) throw new RuntimeException('Description COA sumber wajib diisi, maksimal 255 karakter.');
-        if (!in_array($label, LrReportRows::mappableLabels(), true)) throw new RuntimeException('Uraian tujuan tidak termasuk rincian Laba & Rugi.');
+        if (!in_array($label, LrReportRows::mappableLabels(), true)) throw new RuntimeException('Uraian tujuan tidak termasuk rincian Laba / Rugi.');
         if (!in_array($mode, self::SIGN_MODES, true)) throw new RuntimeException('Perlakuan tanda nominal tidak valid.');
         $normalized = OracleLrSalaryParser::normalizeLabel($source);
         $duplicate = $db->table(self::ACCOUNT_TABLE)->select('id')->where('unit_scope', $scope)

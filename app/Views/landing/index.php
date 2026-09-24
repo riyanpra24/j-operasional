@@ -329,6 +329,7 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
             });
             if (takeoverModal?.dataset.openOnLoad === 'true') openTakeover();
         })();
+
     </script>
 </body>
 

@@ -71,7 +71,7 @@ $assert($xpath->query('//dialog[@id="sourceAdjustmentDialog"]')->length === 1
 session()->set('auth_role', 'akutansi');
 $accountingIndex = $controller->index();
 $assert(is_string($accountingIndex)
-    && str_contains($accountingIndex, 'Laporan Laba Rugi')
+    && str_contains($accountingIndex, 'Laporan Laba / Rugi')
     && str_contains($accountingIndex, 'RKA Kanwil')
     && str_contains($accountingIndex, 'Penyesuaian Sumber Oracle')
     && !str_contains($accountingIndex, 'Menu Akutansi siap dikembangkan'),

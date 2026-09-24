@@ -28,12 +28,12 @@ class Agendaris extends BaseController
     public function suratMasuk(): string
     {
         $generalSectionView = service('uri')->getSegment(1) === 'bagian-umum-1';
-        $indexUrl = $generalSectionView
-            ? site_url('bagian-umum-1/dokumen-masuk')
-            : site_url('agendaris/surat-masuk');
-        $detailUrlPrefix = $generalSectionView
-            ? 'bagian-umum-1/dokumen-masuk'
-            : 'agendaris/surat-masuk';
+        $generalSectionTwoView = service('uri')->getSegment(1) === 'bagian-umum-2';
+        $tellerArchiveView = service('uri')->getSegment(1) === 'sdm' && service('uri')->getSegment(2) === 'arsip-dokumen-masuk';
+        $indexUrl = $generalSectionView ? site_url('bagian-umum-1/dokumen-masuk')
+            : ($generalSectionTwoView ? site_url('bagian-umum-2/dokumen-masuk') : ($tellerArchiveView ? site_url('sdm/arsip-dokumen-masuk') : site_url('agendaris/surat-masuk')));
+        $detailUrlPrefix = $generalSectionView ? 'bagian-umum-1/dokumen-masuk'
+            : ($generalSectionTwoView ? 'bagian-umum-2/dokumen-masuk' : ($tellerArchiveView ? 'sdm/arsip-dokumen-masuk' : 'agendaris/surat-masuk'));
         $keyword = trim((string) $this->request->getGet('q'));
         $jenis   = trim((string) $this->request->getGet('jenis'));
         $from    = trim((string) $this->request->getGet('dari'));
@@ -99,6 +99,8 @@ class Agendaris extends BaseController
             'indexUrl' => $indexUrl,
             'detailUrlPrefix' => $detailUrlPrefix,
             'generalSectionView' => $generalSectionView,
+            'generalSectionTwoView' => $generalSectionTwoView,
+            'tellerArchiveView' => $tellerArchiveView,
         ]);
     }
 
@@ -211,8 +213,10 @@ class Agendaris extends BaseController
     {
         $agenda = $this->findJoined($id);
         $generalSectionView = service('uri')->getSegment(1) === 'bagian-umum-1';
-        if ($generalSectionView && ($agenda['progres'] ?? '') !== 'Selesai') {
-            throw PageNotFoundException::forPageNotFound('Dokumen Masuk belum selesai diproses dan belum tersedia di arsip Bagian Umum 1.');
+        $generalSectionTwoView = service('uri')->getSegment(1) === 'bagian-umum-2';
+        $tellerArchiveView = service('uri')->getSegment(1) === 'sdm' && service('uri')->getSegment(2) === 'arsip-dokumen-masuk';
+        if (($generalSectionView || $generalSectionTwoView || $tellerArchiveView) && ($agenda['progres'] ?? '') !== 'Selesai') {
+            throw PageNotFoundException::forPageNotFound('Dokumen Masuk belum selesai diproses dan belum tersedia di arsip.');
         }
 
         $dispositionData = [];
@@ -258,8 +262,8 @@ class Agendaris extends BaseController
                 'progres'             => $agenda['progres'] ?: 'Menunggu Penyelesaian',
                 'created_at'          => date('d-m-Y H:i', strtotime($agenda['created_at'])) . ' WIB',
                 'updated_at'          => date('d-m-Y H:i', strtotime($agenda['updated_at'])) . ' WIB',
-                'update_url'          => $generalSectionView ? '' : site_url("agendaris/progres-dokumen-masuk/{$id}"),
-                'delete_url'          => $generalSectionView ? '' : site_url("agendaris/progres-dokumen-masuk/{$id}/hapus"),
+                'update_url'          => ($generalSectionView || $generalSectionTwoView || $tellerArchiveView) ? '' : site_url("agendaris/progres-dokumen-masuk/{$id}"),
+                'delete_url'          => ($generalSectionView || $generalSectionTwoView || $tellerArchiveView) ? '' : site_url("agendaris/progres-dokumen-masuk/{$id}/hapus"),
             ],
         ]);
     }

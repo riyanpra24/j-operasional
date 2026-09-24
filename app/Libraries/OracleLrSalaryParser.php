@@ -44,7 +44,7 @@ final class OracleLrSalaryParser
         foreach ($result['matches'] as $match) {
             if ($result['rule']===self::RULE) {
                 $reportLabel=(string)($match['report_label']??'');
-                if (!in_array($reportLabel,LrReportRows::mappableLabels(),true)) throw new RuntimeException('Tujuan mapping pada riwayat impor tidak termasuk rincian Laba & Rugi.');
+                if (!in_array($reportLabel,LrReportRows::mappableLabels(),true)) throw new RuntimeException('Tujuan mapping pada riwayat impor tidak termasuk rincian Laba / Rugi.');
             } else {
                 $description=$result['rule']===self::LEGACY_RULE ? 'beban gaji karyawan' : self::normalizeLabel($match['description']??'');
                 if (!isset($map[$description])) throw new RuntimeException('Akun pada riwayat impor tidak termasuk rincian beban yang disetujui.');
@@ -74,7 +74,7 @@ final class OracleLrSalaryParser
         return LrMoney::decimal($raw);
     }
 
-    public function parse(string $path,string $unit='Kanwil'): array
+    public function parse(string $path,string $unit='Kanwil',bool $includeHelperRows=false): array
     {
         if (!isset(self::UNIT_SHEETS[$unit])) throw new RuntimeException('Unit laporan tidak didukung.');
         $sheetName=self::UNIT_SHEETS[$unit];
@@ -126,37 +126,45 @@ final class OracleLrSalaryParser
                 }
             }
             $cells=$this->sheetCells($zip,$sheetPath,$strings);
-            foreach (['B7'=>'LOB (Segment 1)','D7'=>'Description COA','H7'=>'Ending Balance'] as $address=>$label) {
-                if (self::normalizeLabel($cells[$address]['value']??'')!==self::normalizeLabel($label)) throw new RuntimeException('Header '.$address.' harus "'.$label.'".');
-            }
+            $layout=$this->sheetLayout($cells,$sheetName);
             $months=['januari'=>1,'februari'=>2,'maret'=>3,'april'=>4,'mei'=>5,'juni'=>6,'juli'=>7,'agustus'=>8,'september'=>9,'oktober'=>10,'november'=>11,'desember'=>12];
-            $period=self::normalizeLabel($cells['A5']['value']??'');
-            if (!preg_match('/^periode\s*:\s*([a-z]+)\s*-\s*(\d{4}|\d{2})$/D',$period,$parts) || !isset($months[$parts[1]])) throw new RuntimeException('Periode laporan pada A5 tidak dapat dibaca.');
+            $periodAddress=$layout['period'].'5';
+            $period=self::normalizeLabel($cells[$periodAddress]['value']??'');
+            if (!preg_match('/^periode\s*:\s*([a-z]+)\s*-\s*(\d{4}|\d{2})$/D',$period,$parts) || !isset($months[$parts[1]])) throw new RuntimeException('Periode laporan pada '.$periodAddress.' tidak dapat dibaca.');
             $year=strlen($parts[2])===2 ? 2000+(int)$parts[2] : (int)$parts[2];
             if ($year<2000 || $year>2100) throw new RuntimeException('Tahun laporan harus 2000–2100.');
             $matches=[]; $unmapped=[]; $sourceTotal='0.00'; $calculationTotal='0.00';
+            $helperRows=['KUR'=>[],'NON KUR'=>[],'PEN'=>[]];
             $mappingService=$this->mappingService ??= new OracleLrMappingService();
             $sourceMap=$mappingService->accountMap($unit);
             $sourceLabels=$mappingService->reportLabels($unit);
             $segmentCounts=array_fill_keys(OracleLrMappingService::TARGET_COLUMNS,0);
             $dateStyles=$this->dateStyles($zip);
             foreach ($cells as $address=>$lob) {
-                if (!preg_match('/^B(\d+)$/D',$address,$row) || (int)$row[1]<=7) continue;
+                if (!preg_match('/^'.preg_quote($layout['lob'],'/').'(\d+)$/D',$address,$row) || (int)$row[1]<=7) continue;
                 if (self::normalizeLabel((string)$lob['value'])==='') continue;
-                $r=(int)$row[1]; $description=$cells['D'.$r]??null; $descriptionLob=$cells['F'.$r]['value']??'';
+                $r=(int)$row[1]; $description=$cells[$layout['description'].$r]??null; $descriptionLob=$cells[$layout['description_lob'].$r]['value']??'';
                 $descriptionKey=self::normalizeLabel($description['value']??'');
-                $amount=$cells['H'.$r]??null;
+                $amountAddress=$layout['amount'].$r; $amount=$cells[$amountAddress]??null;
                 $lobMapping=$mappingService->classify((string) $lob['value'],(string) $descriptionLob);
                 $formulaSegments=$unit==='Kanwil' ? null : LrReportRows::branchFormulaSourceSegments($descriptionKey);
                 $formulaSegmentAllowed=$formulaSegments===null || ($lobMapping!==null && in_array($lobMapping['target_column'],$formulaSegments,true));
                 if ($amount===null || $amount['value']==='') {
-                    if ($lobMapping!==null && isset($sourceMap[$descriptionKey])) throw new RuntimeException('Nominal H'.$r.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
+                    if ($lobMapping!==null && isset($sourceMap[$descriptionKey])) throw new RuntimeException('Nominal '.$amountAddress.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
                     continue;
                 }
                 if ($lob['formula'] || ($description['formula']??false) || $amount['formula']
-                    || !in_array($amount['type'],['','n'],true) || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal H'.$r.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
+                    || !in_array($amount['type'],['','n'],true) || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal '.$amountAddress.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
                 try { $normalized=self::money($amount['value']); }
-                catch (\InvalidArgumentException $e) { throw new RuntimeException('H'.$r.': '.$e->getMessage()); }
+                catch (\InvalidArgumentException $e) { throw new RuntimeException($amountAddress.': '.$e->getMessage()); }
+                if ($includeHelperRows && $lobMapping!==null) {
+                    $helperRows[$lobMapping['target_column']][]=[
+                        'row'=>$r,
+                        'description'=>trim((string)preg_replace('/[\s\x{00a0}]+/u',' ',(string)($description['value']??''))),
+                        'description_lob'=>trim((string)preg_replace('/[\s\x{00a0}]+/u',' ',(string)$descriptionLob)),
+                        'amount'=>$normalized,
+                    ];
+                }
                 if ($lobMapping===null || !isset($sourceMap[$descriptionKey]) || !$formulaSegmentAllowed) {
                     $unmapped[]=[
                         'row'=>$r,'source_lob'=>trim((string)$lob['value']),'description_lob'=>trim((string)$descriptionLob),
@@ -167,12 +175,12 @@ final class OracleLrSalaryParser
                 }
                 $column=$lobMapping['target_column']; $accountMapping=$sourceMap[$descriptionKey];
                 if ($lob['formula'] || $description['formula'] || $amount===null || $amount['formula']
-                    || !in_array($amount['type'],['','n'],true) || $amount['value']==='' || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal H'.$r.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
+                    || !in_array($amount['type'],['','n'],true) || $amount['value']==='' || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal '.$amountAddress.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
                 $calculation=$mappingService->calculationValue($accountMapping['sign_mode'],$normalized,$sheetName);
                 $sourceTotal=LrMoney::add($sourceTotal,$normalized); $calculationTotal=LrMoney::add($calculationTotal,$calculation);
                 $segmentCounts[$column]++;
                 $matches[]=['row'=>$r,'lob'=>$column,'source_lob'=>trim((string)$lob['value']),'description_lob'=>trim((string)$descriptionLob),
-                    'account'=>$cells['C'.$r]['value']??'','description'=>trim($description['value']),
+                    'account'=>$cells[$layout['account'].$r]['value']??'','description'=>trim($description['value']),
                     'report_label'=>$accountMapping['report_label'],'source_amount'=>$amount['value'],'amount'=>$normalized,'calculation_amount'=>$calculation,
                     'lob_mapping_id'=>$lobMapping['id'],'account_mapping_id'=>$accountMapping['id'],'sign_mode'=>$accountMapping['sign_mode'],
                     'sign_inverted'=>$calculation!==$normalized];
@@ -181,9 +189,9 @@ final class OracleLrSalaryParser
             $signRuleInputs=[];
             if ($unit==='Kanwil') {
                 foreach ($cells as $address=>$description) {
-                    if (!preg_match('/^D(\d+)$/D',$address,$row) || self::normalizeLabel($description['value'])!=='laba sebelum pajak') continue;
-                    $r=(int)$row[1]; $amount=$cells['H'.$r]??null;
-                    if ($description['formula'] || $amount===null || $amount['formula'] || !in_array($amount['type'],['','n'],true) || $amount['value']==='' || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal H'.$r.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
+                    if (!preg_match('/^'.preg_quote($layout['description'],'/').'(\d+)$/D',$address,$row) || self::normalizeLabel($description['value'])!=='laba sebelum pajak') continue;
+                    $r=(int)$row[1]; $amountAddress=$layout['amount'].$r; $amount=$cells[$amountAddress]??null;
+                    if ($description['formula'] || $amount===null || $amount['formula'] || !in_array($amount['type'],['','n'],true) || $amount['value']==='' || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal '.$amountAddress.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
                     $normalized=self::money($amount['value']);
                     $signRuleInputs[]=['row'=>$r,'description'=>'LABA SEBELUM PAJAK','source_amount'=>$amount['value'],
                         'calculation_amount'=>LrSignRules::calculationValue('laba sebelum pajak',$normalized),'sign_inverted'=>true];
@@ -192,29 +200,46 @@ final class OracleLrSalaryParser
             }
             $allSheetSignInputs=[];
             foreach ($sheetEntries as $sheetEntry) {
+                if (!in_array(mb_strtoupper($sheetEntry['name']),array_values(self::UNIT_SHEETS),true)) continue;
                 if (!isset($sheetPaths[$sheetEntry['id']])) throw new RuntimeException('Isi sheet '.$sheetEntry['name'].' tidak ditemukan.');
                 $sheetCells=mb_strtolower($sheetEntry['name'])===mb_strtolower($sheetName) ? $cells : $this->sheetCells($zip,$sheetPaths[$sheetEntry['id']],$strings);
+                $sheetLayout=mb_strtolower($sheetEntry['name'])===mb_strtolower($sheetName) ? $layout : $this->sheetLayout($sheetCells,$sheetEntry['name']);
                 $seen=[];
                 foreach ($sheetCells as $address=>$description) {
-                    if (!preg_match('/^D(\d+)$/D',$address,$row) || !LrSignRules::isAllSheets($description['value'])) continue;
+                    if (!preg_match('/^'.preg_quote($sheetLayout['description'],'/').'(\d+)$/D',$address,$row) || !LrSignRules::isAllSheets($description['value'])) continue;
                     $r=(int)$row[1]; $label=self::normalizeLabel($description['value']);
                     if (isset($seen[$label])) throw new RuntimeException('Uraian '.$description['value'].' duplikat pada sheet '.$sheetEntry['name'].'.');
-                    $seen[$label]=true; $amount=$sheetCells['H'.$r]??null;
-                    if ($description['formula'] || $amount===null || $amount['formula'] || !in_array($amount['type'],['','n'],true) || $amount['value']==='' || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal '.$sheetEntry['name'].'!H'.$r.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
+                    $seen[$label]=true; $amountAddress=$sheetLayout['amount'].$r; $amount=$sheetCells[$amountAddress]??null;
+                    if ($description['formula'] || $amount===null || $amount['formula'] || !in_array($amount['type'],['','n'],true) || $amount['value']==='' || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal '.$sheetEntry['name'].'!'.$amountAddress.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
                     $normalized=self::money($amount['value']);
                     $allSheetSignInputs[]=['sheet'=>$sheetEntry['name'],'row'=>$r,'description'=>trim($description['value']),'source_amount'=>$amount['value'],
                         'calculation_amount'=>LrSignRules::calculationValue($description['value'],$normalized,$sheetEntry['name']),'sign_inverted'=>true];
                 }
             }
-            $result=['rule'=>self::RULE,'unit'=>$unit,'sheet'=>$sheetName,'year'=>$year,'month'=>$months[$parts[1]],'period'=>trim($cells['A5']['value']),
+            $result=['rule'=>self::RULE,'unit'=>$unit,'sheet'=>$sheetName,'year'=>$year,'month'=>$months[$parts[1]],'period'=>trim($cells[$periodAddress]['value']),
                 'source_total'=>$sourceTotal,'calculation_total'=>$calculationTotal,'matches'=>$matches,'sign_rule_inputs'=>$signRuleInputs,'all_sheet_sign_rule_inputs'=>$allSheetSignInputs,
                 'precision'=>'source_exact_display_half_up','segment_counts'=>$segmentCounts,'unmapped'=>$unmapped,
                 'mapping_version'=>$mappingService->version()];
+            if ($includeHelperRows) $result['helper_rows']=$helperRows;
             $values=self::reportValues($result);
             foreach (OracleLrMappingService::TARGET_COLUMNS as $segment) $result['missing_labels_by_segment'][$segment]=array_values(array_filter($sourceLabels,static fn($label)=>!isset($values[self::normalizeLabel($label)][$segment])));
             $result['missing_labels']=$result['missing_labels_by_segment']['KUR'];
             return $result;
         } finally { $zip->close(); }
+    }
+
+    /** All Oracle unit sheets must use the same A–G source layout. */
+    private function sheetLayout(array $cells,string $sheetName): array
+    {
+        foreach (['B7'=>'LOB (Segment 1)','D7'=>'Description COA','G7'=>'Ending Balance'] as $address=>$expected) {
+            $actual=self::normalizeLabel((string)($cells[$address]['value']??''));
+            $expectedNormalized=self::normalizeLabel($expected);
+            if ($actual!==$expectedNormalized && !str_contains($actual,$expectedNormalized)) {
+                $actualLabel=$actual==='' ? 'kosong' : '"'.mb_substr((string)($cells[$address]['value']??''),0,80).'"';
+                throw new RuntimeException('Sheet '.$sheetName.': Header '.$address.' harus memuat "'.$expected.'" (terbaca '.$actualLabel.'). Semua sheet Oracle harus memakai format A–G yang sama.');
+            }
+        }
+        return ['period'=>'A','lob'=>'B','account'=>'C','description'=>'D','description_lob'=>'E','amount'=>'G'];
     }
 
     private function sheetCells(ZipArchive $zip,string $path,array $strings): array

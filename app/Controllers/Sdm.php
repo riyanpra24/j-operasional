@@ -60,7 +60,7 @@ class Sdm extends BaseController
             ]);
         }
 
-        return redirect()->to(site_url('sdm/sdm-jatim') . '?' . http_build_query([
+        return redirect()->to(site_url('sdm/data-kehadiran') . '?' . http_build_query([
             'kalender'        => 1,
             'kalender_tahun'  => $year,
             'kalender_bulan'  => $month,
@@ -78,7 +78,7 @@ class Sdm extends BaseController
         }
 
         $date = new \DateTimeImmutable($dateValue);
-        $redirectUrl = site_url('sdm/sdm-jatim') . '?' . http_build_query([
+        $redirectUrl = site_url('sdm/data-kehadiran') . '?' . http_build_query([
             'import_id'       => (int) $this->request->getPost('import_id'),
             'kalender'        => 1,
             'kalender_tahun'  => (int) $date->format('Y'),
@@ -114,11 +114,61 @@ class Sdm extends BaseController
         return redirect()->to($redirectUrl)->with('success', 'Kalender kehadiran berhasil diperbarui.');
     }
 
-    public function sdmJatim(): string
+    public function attendanceRecords(): string
     {
         return view('sdm/sdm_jatim', $this->attendancePageData(
             (int) $this->request->getGet('import_id'),
         ));
+    }
+
+    public function sdmJatim(): string
+    {
+        $keyword = trim((string) $this->request->getGet('q'));
+        $selectedImportId = (int) $this->request->getGet('import_id');
+        $perPage = (int) $this->request->getGet('per_page');
+        $perPage = in_array($perPage, [10, 20, 50, 100], true) ? $perPage : 10;
+
+        $imports = (new SdmAttendanceImportModel())
+            ->orderBy('period_start', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->findAll(24);
+        foreach ($imports as &$import) {
+            $period = new \DateTimeImmutable($import['period_start']);
+            $import['period_label'] = $this->attendanceMonthLabel((int) $period->format('n')) . ' ' . $period->format('Y');
+        }
+        unset($import);
+
+        if ($selectedImportId <= 0 && $imports !== []) {
+            $selectedImportId = (int) $imports[0]['id'];
+        }
+
+        $employees = new SdmAttendanceRecordModel();
+        if ($selectedImportId > 0) {
+            $employees->where('import_id', $selectedImportId);
+        } else {
+            $employees->where('id', 0);
+        }
+        if ($keyword !== '') {
+            $employees->groupStart()
+                ->like('employee_name', $keyword)
+                ->orLike('employee_no', $keyword)
+                ->orLike('position', $keyword)
+                ->orLike('organization', $keyword)
+                ->groupEnd();
+        }
+
+        $employees->select('employee_key, MAX(employee_no) AS employee_no, MAX(employee_name) AS employee_name, MAX(position) AS position, MAX(organization) AS organization', false)
+            ->groupBy('employee_key')
+            ->orderBy('employee_name', 'ASC');
+
+        return view('sdm/sdm_jatim_list', [
+            'title' => 'SDM Jatim | SDM & Teller',
+            'employees' => $employees->paginate($perPage, 'sdm_jatim_list'),
+            'pager' => $employees->pager,
+            'imports' => $imports,
+            'selectedImportId' => $selectedImportId > 0 ? $selectedImportId : null,
+            'filters' => compact('keyword', 'perPage'),
+        ]);
     }
 
     public function recapSdmJatimAttendance(): string|RedirectResponse
@@ -157,7 +207,7 @@ class Sdm extends BaseController
             if ($existingImport !== null) {
                 if (! empty($existingImport['deleted_at'])) {
                     if (! $this->currentRoleIsAdmin()) {
-                        return redirect()->to(site_url('sdm/sdm-jatim'))
+                        return redirect()->to(site_url('sdm/data-kehadiran'))
                             ->with('error', 'Rekap yang sama berada di Data Terhapus. Hubungi Administrator untuk memulihkannya.');
                     }
 
@@ -171,11 +221,11 @@ class Sdm extends BaseController
                         throw new RuntimeException('Rekap yang pernah dihapus belum dapat dipulihkan.');
                     }
 
-                    return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $existingImport['id']))
+                    return redirect()->to(site_url('sdm/data-kehadiran?import_id=' . $existingImport['id']))
                         ->with('success', 'Rekap yang pernah dihapus berhasil dipulihkan dan ditampilkan kembali.');
                 }
 
-                return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $existingImport['id']))
+                return redirect()->to(site_url('sdm/data-kehadiran?import_id=' . $existingImport['id']))
                     ->with('success', 'File yang sama sudah pernah disimpan. Rekap tersimpan ditampilkan kembali.');
             }
 
@@ -185,7 +235,7 @@ class Sdm extends BaseController
             );
             $importId = $this->saveAttendanceReport($report, $hash);
 
-            return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $importId))
+            return redirect()->to(site_url('sdm/data-kehadiran?import_id=' . $importId))
                 ->with('success', 'Rekap absensi berhasil dibuat dan disimpan otomatis.');
         } catch (\Throwable $exception) {
             log_message('warning', 'Import rekap ESS gagal: {message}', ['message' => $exception->getMessage()]);
@@ -198,7 +248,7 @@ class Sdm extends BaseController
     {
         $importId = (int) $this->request->getPost('import_id');
         $submittedRecords = $this->request->getPost('records');
-        $redirectUrl = site_url('sdm/sdm-jatim?import_id=' . $importId);
+        $redirectUrl = site_url('sdm/data-kehadiran?import_id=' . $importId);
 
         $importModel = new SdmAttendanceImportModel();
         if ($importId <= 0 || $importModel->find($importId) === null || ! is_array($submittedRecords)) {
@@ -270,7 +320,7 @@ class Sdm extends BaseController
             return redirect()->to($redirectUrl)->with('error', $exception->getMessage());
         }
 
-        return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $importId))
+        return redirect()->to(site_url('sdm/data-kehadiran?import_id=' . $importId))
             ->with('success', $updated . ' data anomali berhasil diperbarui.');
     }
 
@@ -281,16 +331,16 @@ class Sdm extends BaseController
         $import = $importId > 0 ? $importModel->find($importId) : null;
 
         if ($import === null) {
-            return redirect()->to(site_url('sdm/sdm-jatim'))
+            return redirect()->to(site_url('sdm/data-kehadiran'))
                 ->with('error', 'Rekap absensi tidak ditemukan atau sudah dihapus.');
         }
 
         if (! $this->deleteRecord($importModel, 'sdm_attendance_imports', $importId)) {
-            return redirect()->to(site_url('sdm/sdm-jatim?import_id=' . $importId))
+            return redirect()->to(site_url('sdm/data-kehadiran?import_id=' . $importId))
                 ->with('error', 'Rekap absensi belum dapat dihapus.');
         }
 
-        return redirect()->to(site_url('sdm/sdm-jatim'))
+        return redirect()->to(site_url('sdm/data-kehadiran'))
             ->with('success', $this->currentRoleIsAdmin()
                 ? 'Rekap absensi beserta seluruh detailnya berhasil dihapus permanen.'
                 : 'Rekap absensi berhasil dipindahkan ke Data Terhapus.');
@@ -351,7 +401,7 @@ class Sdm extends BaseController
         }
 
         return [
-            'title'            => 'SDM Jatim | SDM & Teller',
+            'title'            => 'Data Kehadiran | SDM & Teller',
             'report'           => $selectedImport !== null ? $this->storedAttendanceReport($selectedImport, $filters) : null,
             'importError'      => $error,
             'attendanceImports' => $imports,
@@ -385,11 +435,11 @@ class Sdm extends BaseController
         return $calendarData + [
             'importId'    => (int) ($selectedImport['id'] ?? 0),
             'autoOpen'    => $this->request->getGet('kalender') === '1',
-            'previousUrl' => site_url('sdm/sdm-jatim') . '?' . http_build_query($baseQuery + [
+            'previousUrl' => site_url('sdm/data-kehadiran') . '?' . http_build_query($baseQuery + [
                 'kalender_tahun' => (int) $monthStart->modify('-1 month')->format('Y'),
                 'kalender_bulan' => (int) $monthStart->modify('-1 month')->format('n'),
             ]),
-            'nextUrl'     => site_url('sdm/sdm-jatim') . '?' . http_build_query($baseQuery + [
+            'nextUrl'     => site_url('sdm/data-kehadiran') . '?' . http_build_query($baseQuery + [
                 'kalender_tahun' => (int) $monthStart->modify('+1 month')->format('Y'),
                 'kalender_bulan' => (int) $monthStart->modify('+1 month')->format('n'),
             ]),

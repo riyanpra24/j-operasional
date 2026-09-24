@@ -11,9 +11,8 @@
 
 <section class="page-heading heading-actions distribution-heading">
     <div>
-        <p class="eyebrow">ALUR DOKUMEN</p>
+        <p class="eyebrow">PENGELOLAAN DOKUMEN</p>
         <h1>Distribusi Dokumen</h1>
-        <p>Kelola data masuk dan proses distribusi hingga selesai dari halaman ini.</p>
     </div>
     <?php if ($filters['tab'] === 'masuk'): ?><button type="button" class="btn btn-primary" data-open-input-modal>＋ Tambah Dokumen Masuk</button><?php endif ?>
 </section>

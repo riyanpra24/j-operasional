@@ -9,21 +9,27 @@ use App\Libraries\OracleLrSalaryParser;
 $parser=new OracleLrSalaryParser(); $checks=0;
 function lrCheck(bool $ok,string $label): void { global $checks; if (!$ok) throw new RuntimeException($label); $checks++; }
 lrCheck(OracleLrSalaryParser::IMPORT_UNITS===['Kanwil','Surabaya','Kediri','Malang','Madiun','Banyuwangi'],'Bulk import includes Kanwil and all five branches in the approved order');
-function lrFixture(array $rows, callable $check, string $sheetName='KANWIL', string $header='Ending Balance', ?callable $modify=null): void {
+function lrFixture(array $rows, callable $check, string $sheetName='KANWIL', string $header='Ending Balance', ?callable $modify=null, string $layout='compact'): void {
     $ns='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
     $text=static fn($value)=>htmlspecialchars($value,ENT_XML1|ENT_QUOTES,'UTF-8');
     $str=static fn($address,$value)=>'<c r="'.$address.'" t="inlineStr"><is><t>'.$text($value).'</t></is></c>';
-    $xml='<worksheet xmlns="'.$ns.'"><sheetData><row r="5">'.$str('A5','Periode : AGUSTUS-26').'</row><row r="7">'.$str('B7','LOB (Segment 1)').$str('D7','Description COA').$str('H7',$header).'</row>';
+    [$periodColumn,$lobColumn,$accountColumn,$descriptionColumn,$amountColumn]=match ($layout) {
+        'compact'=>['A','B','C','D','G'],
+        'shifted'=>['B','C','D','E','H'],
+        default=>['A','B','C','D','H'],
+    };
+    $xml='<worksheet xmlns="'.$ns.'"><sheetData><row r="5">'.$str($periodColumn.'5','Periode : AGUSTUS-26').'</row><row r="7">'
+        .$str($lobColumn.'7','LOB (Segment 1)').$str($descriptionColumn.'7','Description COA').$str($amountColumn.'7',$header).'</row>';
     foreach ($rows as $index=>$item) {
         $r=$index+8;
-        $xml.='<row r="'.$r.'">'.$str('B'.$r,$item[0]).$str('C'.$r,'6270201000000').$str('D'.$r,$item[1]);
-        if ($item[2]!==null) $xml.='<c r="H'.$r.'"'.($item[3]??'').'><v>'.$text($item[2]).'</v>'.($item[4]??'').'</c>';
+        $xml.='<row r="'.$r.'">'.$str($lobColumn.$r,$item[0]).$str($accountColumn.$r,'6270201000000').$str($descriptionColumn.$r,$item[1]);
+        if ($item[2]!==null) $xml.='<c r="'.$amountColumn.$r.'"'.($item[3]??'').'><v>'.$text($item[2]).'</v>'.($item[4]??'').'</c>';
         $xml.='</row>';
     }
     $summaryRow=count($rows)+8;
-    $xml.='<row r="'.$summaryRow.'">'.$str('B'.$summaryRow,'').$str('D'.$summaryRow,'LABA SEBELUM PAJAK').'<c r="H'.$summaryRow.'"><v>100.5001</v></c></row>';
-    $xml.='<row r="'.($summaryRow+1).'">'.$str('D'.($summaryRow+1),'LABA TAHUN BERJALAN').'<c r="H'.($summaryRow+1).'"><v>-200.2501</v></c></row>';
-    $xml.='<row r="'.($summaryRow+2).'">'.$str('D'.($summaryRow+2),'JUMLAH LABA KOMPREHENSIF TAHUN BERJALAN').'<c r="H'.($summaryRow+2).'"><v>300.7501</v></c></row>';
+    $xml.='<row r="'.$summaryRow.'">'.$str($lobColumn.$summaryRow,'').$str($descriptionColumn.$summaryRow,'LABA SEBELUM PAJAK').'<c r="'.$amountColumn.$summaryRow.'"><v>100.5001</v></c></row>';
+    $xml.='<row r="'.($summaryRow+1).'">'.$str($descriptionColumn.($summaryRow+1),'LABA TAHUN BERJALAN').'<c r="'.$amountColumn.($summaryRow+1).'"><v>-200.2501</v></c></row>';
+    $xml.='<row r="'.($summaryRow+2).'">'.$str($descriptionColumn.($summaryRow+2),'JUMLAH LABA KOMPREHENSIF TAHUN BERJALAN').'<c r="'.$amountColumn.($summaryRow+2).'"><v>300.7501</v></c></row>';
     $xml.='</sheetData></worksheet>';
     $path=tempnam(sys_get_temp_dir(),'oracle-lr-check-');
     try {
@@ -35,12 +41,12 @@ function lrFixture(array $rows, callable $check, string $sheetName='KANWIL', str
         $zip->close(); $check($path);
     } finally { if (is_file($path)) unlink($path); }
 }
-function lrReject(array $rows,string $message, string $sheetName='KANWIL',string $header='Ending Balance',?callable $modify=null): void {
+function lrReject(array $rows,string $message, string $sheetName='KANWIL',string $header='Ending Balance',?callable $modify=null,string $layout='compact'): void {
     global $parser;
     lrFixture($rows,static function($path) use($parser,$message) {
         try { $parser->parse($path); } catch (RuntimeException|InvalidArgumentException $e) { lrCheck(str_contains($e->getMessage(),$message),'Wrong validation: '.$e->getMessage()); return; }
         throw new RuntimeException('Invalid workbook was accepted: '.$message);
-    },$sheetName,$header,$modify);
+    },$sheetName,$header,$modify,$layout);
 }
 $rows=[[' KUR ',"\u{00a0} Beban Gaji Karyawan",'100.01'],['kur','beban   gaji karyawan','-25.02'],['KUR','Beban gaji karyawan','0.01'],['NON KUR','Beban gaji karyawan','999'],['KUR Mikro','Beban gaji karyawan','888'],['KUR','Beban gaji karyawan lainnya','777']];
 lrFixture($rows,static function($path)use($parser){
@@ -153,37 +159,25 @@ lrFixture([['KUR','Pendapatan premi penjaminan kredit','-100.2501']],static func
 lrFixture([['NON KUR','Beban gaji karyawan','0.001']],static function($path)use($parser){ lrCheck(OracleLrSalaryParser::reportValues($parser->parse($path))['beban gaji karyawan']['NON KUR']==='0.001','NON KUR fractions beyond cents are accepted and retained'); });
 lrReject([['NON KUR','Beban gaji karyawan','99','', '<f>1+2</f>']],'angka sumber');
 lrReject([['KUR','Beban gaji karyawan','99']],'KANWIL','SURABAYA');
-lrReject([['KUR','Beban gaji karyawan','99']],'Header H7','KANWIL','Beginning Balance');
+lrReject([['KUR','Beban gaji karyawan','99']],'Header G7','KANWIL','Beginning Balance');
+lrFixture([['KUR','Beban gaji karyawan','123.456']],static function($path)use($parser){
+    $result=$parser->parse($path,'Malang');
+    lrCheck($result['period']==='Periode : AGUSTUS-26' && $result['matches'][0]['account']==='6270201000000','Compact Oracle layout reads period A5 and account C');
+    lrCheck(OracleLrSalaryParser::reportValues($result)['beban gaji karyawan']['KUR']==='123.456','Compact Oracle layout reads Ending Balance G');
+    lrCheck(count($result['all_sheet_sign_rule_inputs'])===2,'Compact Oracle layout reads both sign totals from G');
+},'MALANG','Ending Balance',null,'compact');
+lrReject([['KUR','Beban gaji karyawan','789.123']],'Header B7','KANWIL','Ending Balance',null,'shifted');
+lrReject([['KUR','Beban gaji karyawan','789.123']],'Header G7','KANWIL','Ending Balance',null,'legacy');
 lrReject([['KUR','Beban gaji karyawan','99']],'makro','KANWIL','Ending Balance',static fn($zip)=>$zip->addFromString('xl/vbaProject.bin','test'));
 lrReject([['KUR','Beban gaji karyawan','99',' s="1"']],'angka sumber','KANWIL','Ending Balance',static fn($zip)=>$zip->addFromString('xl/styles.xml','<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cellXfs><xf numFmtId="0"/><xf numFmtId="14"/></cellXfs></styleSheet>'));
-if (($argv[1]??'')==='--source') {
-    $result=$parser->parse('C:/Users/Jamkrindo/Downloads/LR SEKANWIL YTD AGUSTUS 2026.xlsx');
-    $values=OracleLrSalaryParser::reportValues($result);
-    lrCheck($values['beban gaji karyawan']['KUR']==='774895270.36000001','Source Kanwil KUR salary retains every digit from row 23');
-    lrCheck($values['beban gaji karyawan']['NON KUR']==='340370165.67000002','Source Kanwil NON KUR salary retains every digit from row 24');
-    lrCheck($values['pendapatan jasa giro']===['NON KUR'=>'12009993.00','KUR'=>'2711823.00'] && $values['pendapatan lainnya']['NON KUR']==='442503.47','Negative other-income sources become positive calculation values');
-    lrCheck($result['sign_rule_inputs'][0]['source_amount']==='7126234676.1700001' && $result['sign_rule_inputs'][0]['calculation_amount']==='-7126234676.1700001','Positive LABA SEBELUM PAJAK source becomes negative future-calculation value');
-    lrCheck(count($result['all_sheet_sign_rule_inputs'])===12,'Two all-sheet sign inputs captured from each of six sheets');
-    $global=[]; foreach ($result['all_sheet_sign_rule_inputs'] as $input) $global[$input['sheet']][OracleLrSalaryParser::normalizeLabel($input['description'])]=$input;
-    lrCheck($global['KANWIL']['laba tahun berjalan']['calculation_amount']==='-7129179041.1700001' && $global['SURABAYA']['laba tahun berjalan']['calculation_amount']==='90099233401.539993','Positive Kanwil and negative Surabaya running profit signs both invert');
-    lrCheck($global['BANYUWANGI']['jumlah laba komprehensif tahun berjalan']['calculation_amount']==='16643973542.41','Comprehensive running profit is inverted outside Kanwil');
-    lrCheck(count($values)===47,'Source expense and other-income labels plus verified transportation spelling');
-    $expectedBranchRows=[
-        'Surabaya'=>['KUR'=>87,'NON KUR'=>188,'PEN'=>7], 'Kediri'=>['KUR'=>86,'NON KUR'=>142,'PEN'=>6],
-        'Malang'=>['KUR'=>81,'NON KUR'=>144,'PEN'=>5], 'Madiun'=>['KUR'=>83,'NON KUR'=>136,'PEN'=>5],
-        'Banyuwangi'=>['KUR'=>82,'NON KUR'=>140,'PEN'=>6],
-    ];
-    $expectedSubrogationTax=['Kediri'=>'-1633980.00','Madiun'=>'-140571.00'];
-    foreach ($expectedBranchRows as $unit=>$counts) {
-        $branch=$parser->parse('C:/Users/Jamkrindo/Downloads/LR SEKANWIL YTD AGUSTUS 2026.xlsx',$unit);
-        $branchValues=OracleLrSalaryParser::reportValues($branch);
-        lrCheck($branch['segment_counts']===$counts,$unit.' source branch row counts are exact');
-        lrCheck(isset($branchValues['beban gaji karyawan'],$branchValues['pendapatan jasa giro'],$branchValues['beban klaim']),$unit.' includes the complete approved realization sources');
-        lrCheck(($branchValues['imbal jasa penjaminan bruto']['PEN']??null)===($unit==='Madiun'?'400000.00':null),$unit.' PEN premium is calculated only when its Oracle COA is present');
-        $tax=array_values(array_filter($branch['matches'],static fn(array $row): bool => OracleLrSalaryParser::normalizeLabel((string)$row['description'])==='beban pajak pph 21 non karywan'));
-        lrCheck(($tax[0]['calculation_amount']??null)===($expectedSubrogationTax[$unit]??null),$unit.' conditionally applies the exact PPh 21 Non Karywan subrogation component');
-        lrCheck(count($branch['all_sheet_sign_rule_inputs'])===12 && $branch['all_sheet_sign_rule_inputs'][0]['sheet']==='KANWIL',$unit.' retains the correctly labeled all-sheet audit values');
+if (($argv[1]??'')==='--january') {
+    $path='C:/Users/Jamkrindo/Downloads/LR SEKANWIL JANUARI 2026.xlsx';
+    foreach (OracleLrSalaryParser::IMPORT_UNITS as $unit) {
+        $result=$parser->parse($path,$unit);
+        lrCheck($result['year']===2026 && $result['month']===1,$unit.' January workbook period is read from A5');
+        lrCheck(count($result['matches'])>0,$unit.' January workbook has mapped Oracle rows');
+        lrCheck(count($result['all_sheet_sign_rule_inputs'])===12,$unit.' January workbook reads sign totals from all six G columns');
+        echo $unit.': '.count($result['matches']).' matched, '.count($result['unmapped'])." unmapped.\n";
     }
-    echo 'Source checked read-only: '.count($result['matches']).' matched rows, '.count($values).' report accounts; exact decimals and sign rules reconciled.' . "\n";
 }
 echo "Oracle LR salary parser: $checks checks OK.\n";

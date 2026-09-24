@@ -55,6 +55,7 @@ $appJsAsset = $resolveOptimizedAsset('assets/app.js', 'assets/app.min.js');
 $requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
 $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
 $appCssVersion = is_file(FCPATH . $appCssAsset) ? (string) filemtime(FCPATH . $appCssAsset) : '1';
+$welcomeMotionVersion = is_file(FCPATH . 'assets/welcome-motion.css') ? (string) filemtime(FCPATH . 'assets/welcome-motion.css') : '1';
 $appJsVersion = is_file(FCPATH . $appJsAsset) ? (string) filemtime(FCPATH . $appJsAsset) : '1';
 $requiredMarkersVersion = is_file(FCPATH . $requiredMarkersAsset) ? (string) filemtime(FCPATH . $requiredMarkersAsset) : '1';
 $urlMaskVersion = is_file(FCPATH . $urlMaskAsset) ? (string) filemtime(FCPATH . $urlMaskAsset) : '1';
@@ -72,7 +73,7 @@ $deletedDataCount = 0;
 if ($currentRole === 'admin') {
     try {
         $db = db_connect();
-        $deletedTables = ['dokumen_masuk', 'agendaris', 'dokumen_keluar', 'dokumen_spk', 'pks_kerjasama', 'pks_dokumen_kerjasama', 'pks_item_kerjasama', 'users', 'vehicles', 'vehicle_maintenance', 'vehicle_documents', 'sdm_attendance_imports'];
+        $deletedTables = ['dokumen_masuk', 'agendaris', 'dokumen_keluar', 'dokumen_spk', 'sdm_magang', 'pks_kerjasama', 'pks_dokumen_kerjasama', 'pks_item_kerjasama', 'users', 'vehicles', 'vehicle_maintenance', 'vehicle_documents', 'sdm_attendance_imports'];
         $deletedCountQueries = array_map(
             static fn (string $table): string => 'SELECT COUNT(*) AS total FROM ' . $db->protectIdentifiers($table) . ' WHERE deleted_at IS NOT NULL',
             $deletedTables
@@ -102,6 +103,9 @@ if ($currentRole === 'security') {
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
     <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
     <link rel="stylesheet" href="<?= base_url($appCssAsset) ?>?v=<?= esc($appCssVersion, 'attr') ?>">
+    <?php if ($segment === 'welcome'): ?>
+        <link rel="stylesheet" href="<?= base_url('assets/welcome-motion.css') ?>?v=<?= esc($welcomeMotionVersion, 'attr') ?>">
+    <?php endif; ?>
     <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>
     <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
     <script>
@@ -229,6 +233,14 @@ if ($currentRole === 'security') {
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
                     <div class="nav-submenu" id="generalSectionTwoSubmenu" data-nav-submenu <?= $generalSectionTwoActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('bagian-umum-2/dokumen-masuk') ?>" class="nav-sublink <?= $generalSectionTwoActive && $uri->getSegment(2) === 'dokumen-masuk' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dokumen Masuk
+                        </a>
+                        <a href="<?= site_url('bagian-umum-2/dokumen-keluar') ?>" class="nav-sublink <?= $generalSectionTwoActive && $uri->getSegment(2) === 'dokumen-keluar' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dokumen Keluar
+                        </a>
                         <a href="<?= site_url('bagian-umum-2/monitoring-kendaraan/data-kendaraan') ?>" class="nav-sublink <?= $generalSectionTwoActive && $uri->getSegment(2) === 'monitoring-kendaraan' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Monitoring Kendaraan
@@ -246,19 +258,35 @@ if ($currentRole === 'security') {
                     <div class="nav-submenu" id="sdmSubmenu" data-nav-submenu <?= $sdmActive ? '' : 'hidden' ?>>
                         <a href="<?= site_url('sdm/dokumen-masuk') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'dokumen-masuk' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
-                            Dokumen Masuk
+                            Dispo Dokumen
                         </a>
                         <a href="<?= site_url('sdm/riwayat') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'riwayat' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
-                            Riwayat Dokumen
+                            Riwayat Dispo
                         </a>
-                        <a href="<?= site_url('sdm/dashboard-kehadiran') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'dashboard-kehadiran' ? 'active' : '' ?>">
+                        <a href="<?= site_url('sdm/arsip-dokumen-masuk') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'arsip-dokumen-masuk' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
-                            Dashboard Kehadiran
+                            Dokumen Masuk
+                        </a>
+                        <a href="<?= site_url('sdm/arsip-dokumen-keluar') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'arsip-dokumen-keluar' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dokumen Keluar
+                        </a>
+                        <a href="<?= site_url('sdm/data-kehadiran') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'data-kehadiran' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Data Kehadiran
                         </a>
                         <a href="<?= site_url('sdm/sdm-jatim') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'sdm-jatim' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             SDM Jatim
+                        </a>
+                        <a href="<?= site_url('sdm/data-magang') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'data-magang' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Data Magang
+                        </a>
+                        <a href="<?= site_url('sdm/dashboard-kehadiran') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'dashboard-kehadiran' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dashboard Kehadiran
                         </a>
                     </div>
                 </div>
@@ -271,24 +299,26 @@ if ($currentRole === 'security') {
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
                     <div class="nav-submenu" id="akutansiSubmenu" data-nav-submenu <?= $akutansiActive ? '' : 'hidden' ?>>
-                        <a href="<?= site_url('akutansi/laba-rugi') ?>" class="nav-sublink <?= $akutansiPage === 'laba-rugi' ? 'active' : '' ?>">
-                            <span aria-hidden="true">●</span>
-                            Laporan Laba &amp; Rugi
-                        </a>
                         <a href="<?= site_url('akutansi/rka-kanwil-surabaya') ?>" class="nav-sublink <?= $akutansiPage === 'rka-kanwil-surabaya' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             RKA Kanwil
+                        </a>
+                        <a href="<?= site_url('akutansi/simulasi-hitung') ?>" class="nav-sublink <?= $akutansiPage === 'simulasi-hitung' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Simulasi Hitung
+                        </a>
+                        <a href="<?= site_url('akutansi/laba-rugi') ?>" class="nav-sublink <?= $akutansiPage === 'laba-rugi' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Laporan Laba / Rugi
+                        </a>
+                        <a href="<?= site_url('akutansi/export-dokumen') ?>" class="nav-sublink <?= $akutansiPage === 'export-dokumen' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Export Dokumen
                         </a>
                         <a href="<?= site_url('akutansi/seting-rumus') ?>" class="nav-sublink <?= $akutansiPage === 'seting-rumus' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Penyesuaian Sumber Oracle
                         </a>
-                        <?php if ($currentRole === 'admin'): ?>
-                        <a href="<?= site_url('akutansi/pengaturan-mapping-oracle') ?>" class="nav-sublink <?= $akutansiPage === 'pengaturan-mapping-oracle' ? 'active' : '' ?>">
-                            <span aria-hidden="true">●</span>
-                            Pengaturan Mapping Oracle
-                        </a>
-                        <?php endif ?>
                     </div>
                 </div>
                 <?php endif ?>

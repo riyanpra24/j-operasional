@@ -6,9 +6,9 @@
     <meta name="description" content="Sistem register dokumen masuk operasional">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
     <link rel="icon" type="image/png" href="/assets/images/jaksa-favicon.png?v=1">
-    <link rel="stylesheet" href="/assets/app.min.css?v=1789524881">
-    <script src="/assets/url-mask.min.js?v=1789402573"></script>
-    <script src="/assets/required-markers.min.js?v=1789402570" defer></script>
+    <link rel="stylesheet" href="/assets/app.min.css?v=1789956805">
+    <script src="/assets/url-mask.min.js?v=1789576938"></script>
+    <script src="/assets/required-markers.min.js?v=1789576936" defer></script>
     <script>
         try {
             if (window.innerWidth > 900 && localStorage.getItem('j-operasional-sidebar') === 'collapsed') {
@@ -24,7 +24,7 @@
     data-logout-url="http&#x3A;&#x2F;&#x2F;localhost&#x3A;8080&#x2F;logout"
     data-session-heartbeat-url="http&#x3A;&#x2F;&#x2F;localhost&#x3A;8080&#x2F;session&#x2F;heartbeat"
     data-csrf-name="csrf_test_name"
-    data-csrf-hash="490c22167f9fcb4e526334951a82613f">
+    data-csrf-hash="96452e6632af412225860a6b17be3161">
         <div class="app-shell">
         <aside class="sidebar" id="sidebar">
             <a href="/dashboard" class="brand brand-jaksa" aria-label="Dashboard JAKSA — Jamkrindo Kanwil Surabaya Operasional">
@@ -57,8 +57,8 @@
             <header class="topbar">
                 <button class="menu-toggle" type="button" data-sidebar-toggle aria-label="Tutup menu" aria-controls="sidebar" aria-expanded="true"><span aria-hidden="true">☰</span></button>
                 <div class="topbar-title">
-                    <span>OPERASIONAL / LAPORAN LABA &AMP; RUGI</span>
-                    <strong>Laporan Laba &amp; Rugi</strong>
+                    <span>OPERASIONAL / LAPORAN LABA / RUGI (YTD)</span>
+                    <strong>Laporan Laba / Rugi (YTD)</strong>
                 </div>
                 <div class="topbar-meta">
                                         <button class="topbar-icon" type="button" aria-label="Notifikasi belum tersedia untuk role ini">
@@ -68,9 +68,9 @@
                         </svg>
                     </button>
                                         <span class="date-pill" aria-label="Tanggal dan waktu sistem Asia Jakarta">
-                        <span class="date-pill-date" data-system-date>16 Sep 2026</span>
-                        <time class="date-pill-time" datetime="2026-09-16T04:27:29+02:00">
-                            <span data-system-time>04:27:29</span>
+                        <span class="date-pill-date" data-system-date>21 Sep 2026</span>
+                        <time class="date-pill-time" datetime="2026-09-21T04:14:15+02:00">
+                            <span data-system-time>04:14:15</span>
                             <small>WIB</small>
                         </time>
                     </span>
@@ -97,7 +97,7 @@
                                 <div><dt>Hak akses</dt><dd></dd></div>
                             </dl>
                             <form action="#" method="post">
-                                <input type="hidden" name="csrf_test_name" value="490c22167f9fcb4e526334951a82613f">                                <button class="topbar-logout" type="submit">
+                                <input type="hidden" name="csrf_test_name" value="96452e6632af412225860a6b17be3161">                                <button class="topbar-logout" type="submit">
                                     <span aria-hidden="true">↪</span>
                                     Keluar dari Sistem
                                 </button>
@@ -115,14 +115,29 @@
 <section class="page-heading lr-page-heading">
     <div>
         <p class="eyebrow">AKUTANSI</p>
-        <h1>Laporan Laba &amp; Rugi</h1>
-        <p>Laporan laba rugi tahun 2097. Rincian beban KUR dibaca dari sheet KANWIL.</p>
+        <h1>Laporan Laba / Rugi</h1>
+        <p>Data Oracle dikelompokkan otomatis berdasarkan mapping LOB dan Description COA.</p>
     </div>
-    <button type="button" class="btn btn-primary" data-lr-upload-open aria-haspopup="dialog" aria-controls="lrUploadDialog">Upload Excel LR</button>
+    <div class="lr-heading-actions">
+        <button type="button" class="btn btn-primary" data-lr-upload-open aria-haspopup="dialog" aria-controls="lrUploadDialog">Upload Excel LR</button>
+        <button type="button" class="btn btn-danger-outline" data-lr-delete-open aria-haspopup="dialog" aria-controls="lrDeleteDialog">Hapus Laporan</button>
+    </div>
 </section>
+
+<nav class="lr-report-tabs" aria-label="Jenis laporan laba rugi">
+                    <a class="lr-report-tab is-active" href="/akutansi/laba-rugi?jenis_laporan=YTD&unit_kerja=Kanwil&tahun=2097" aria-current="page">
+            <span class="lr-report-tab-badge">YTD</span>
+            <span><strong>Laporan Laba / Rugi (YTD)</strong><small>Akumulasi dari awal tahun sampai periode terpilih</small></span>
+        </a>
+                    <a class="lr-report-tab " href="/akutansi/laba-rugi?jenis_laporan=PTD&unit_kerja=Kanwil&tahun=2097" >
+            <span class="lr-report-tab-badge">PTD</span>
+            <span><strong>Laporan Laba / Rugi (PTD)</strong><small>Nilai khusus pada periode terpilih</small></span>
+        </a>
+    </nav>
 
 <section class="panel lr-rka-filter-panel">
     <form method="get" action="#" class="lr-rka-filter">
+        <input type="hidden" name="jenis_laporan" value="YTD">
         <div>
             <label class="lr-upload-label" for="lrFilterUnit">Unit Kerja</label>
             <select class="lr-upload-select" id="lrFilterUnit" name="unit_kerja">
@@ -140,31 +155,32 @@
             <input class="lr-upload-select" id="lrFilterYear" type="number" name="tahun" min="2000" max="2100" step="1" value="2097" required>
         </div>
         <button type="submit" class="btn btn-secondary">Terapkan</button>
-        <button type="button" class="btn btn-danger-outline" data-lr-delete-open aria-haspopup="dialog" aria-controls="lrDeleteDialog" >Hapus Laporan</button>
     </form>
 </section>
 
-    <section class="panel lr-rka-filter-panel">
-        <p class="lr-rka-help">Sumber: Test LR.xlsx · Periode : AGUSTUS-2097 · Sheet KANWIL · 1 baris cocok. Nominal dalam Rupiah (Rp), tanda sumber tidak dibalik.</p>
+        <section class="panel lr-rka-filter-panel">
+        <p class="lr-rka-help">Sumber YTD: Test LR.xlsx · Periode : AGUSTUS-2097 · Sheet KANWIL · 1 baris terpetakan · 0 baris belum terpetakan. Nominal dalam Rupiah (Rp).</p>
+        <div class="lr-audit-actions"><button type="button" class="btn btn-secondary" data-lr-mapping-detail-open aria-haspopup="dialog" aria-controls="lrMappingDetailDialog">Detail Pengelompokan</button></div>
         <details class="lr-source-audit">
-            <summary>Lihat rincian penjumlahan</summary>
-            <p>Kolom B = KUR dan kolom D sesuai nama rincian beban, lalu jumlahkan Ending Balance (H) per akun. Upload ulang memakai satu hasil terbaru per periode, bukan ditambahkan ke upload sebelumnya.</p>
-            <ul><li>Beban gaji karyawan — baris 23, akun 6270201000000: Rp 774.895.270,36</li></ul>
-                    </details>
-                    </section>
+            <summary>Lihat sumber perhitungan</summary>
+            <p>Kolom B menentukan kelompok KUR, NON KUR, atau PEN. Kolom D dipasangkan dengan uraian laporan dan Ending Balance pada kolom H dijumlahkan per uraian serta kelompok. Untuk rincian yang mengikuti pembagian produk, kolom F mengelompokkan NON KUR menjadi KBG/Suretyship, Konsumtif, dan Produktif sesuai rumus kertas kerja.</p>
+            <ul><li>KUR · Beban gaji karyawan — baris 23, akun 6270201000000: sumber <span title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">Rp 774.895.270</span></li></ul>
+                                    <p>Seluruh desimal sumber disimpan dan dijumlahkan tanpa pemotongan. Pembulatan ke rupiah penuh hanya untuk tampilan; arahkan kursor ke nominal untuk melihat nilai asli.</p>
+        </details>
+                                    </section>
 
 
 <section class="panel lr-report-panel" aria-labelledby="lr-report-title">
     <header class="lr-report-header">
         <div>
             <p>PT JAMKRINDO KANWIL SURABAYA · Kanwil</p>
-            <h2 id="lr-report-title">Laba Rugi Tahun 2097</h2>
+            <h2 id="lr-report-title">Laba / Rugi (YTD) Tahun 2097</h2>
         </div>
         <span class="lr-report-year">2097</span>
     </header>
-    <div class="lr-report-scroll" tabindex="0" role="region" aria-label="Laba&#x20;Rugi&#x20;Tahun&#x20;2097,&#x20;dapat&#x20;digeser&#x20;ke&#x20;samping">
+    <div class="lr-report-scroll" tabindex="0" role="region" aria-label="Laba&#x20;&#x2F;&#x20;Rugi&#x20;&#x28;YTD&#x29;&#x20;Tahun&#x20;2097,&#x20;dapat&#x20;digeser&#x20;ke&#x20;samping">
         <table class="lr-report-table lr-profitloss-table">
-            <caption class="lr-report-caption">Laba Rugi Tahun 2097 — PT Jamkrindo Kanwil Surabaya</caption>
+            <caption class="lr-report-caption">Laba / Rugi (YTD) Tahun 2097 — PT Jamkrindo Kanwil Surabaya</caption>
             <colgroup>
                 <col class="lr-description-column">
                                     <col class="lr-number-column">
@@ -190,7 +206,7 @@
                                     </tr>
             </thead>
             <tbody>
-                                                        <tr class="lr-row-major" >
+                                                                            <tr class="lr-row-major" >
                         <th scope="row">
                                                             VOLUME                                                    </th>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
@@ -202,21 +218,21 @@
                                                     <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                             </tr>
-                                                                            <tr class="lr-row-group" data-lr-expandable>
+                                                                                                <tr class="lr-row-group" data-lr-expandable>
                         <th scope="row">
                                                             <button type="button" class="lr-group-toggle" data-lr-toggle="pendapatan-penjaminan" aria-expanded="false" aria-controls="lr-pendapatan-penjaminan-0&#x20;lr-pendapatan-penjaminan-1&#x20;lr-pendapatan-penjaminan-2&#x20;lr-pendapatan-penjaminan-3">
                                     <span class="lr-group-chevron" aria-hidden="true">›</span>
                                     <span>PENDAPATAN PENJAMINAN</span>
                                 </button>
                                                     </th>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td data-lr-total><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
                                             </tr>
                                             <tr id="lr-pendapatan-penjaminan-0" class="lr-row-detail" data-lr-detail="pendapatan-penjaminan" hidden>
                             <th scope="row">Imbal Jasa Penjaminan Bruto</th>
@@ -262,21 +278,21 @@
                                                             <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     </tr>
-                                                                            <tr class="lr-row-group" data-lr-expandable>
+                                                                                                <tr class="lr-row-group" data-lr-expandable>
                         <th scope="row">
                                                             <button type="button" class="lr-group-toggle" data-lr-toggle="beban-klaim" aria-expanded="false" aria-controls="lr-beban-klaim-0&#x20;lr-beban-klaim-1&#x20;lr-beban-klaim-2&#x20;lr-beban-klaim-3&#x20;lr-beban-klaim-4">
                                     <span class="lr-group-chevron" aria-hidden="true">›</span>
                                     <span>BEBAN KLAIM</span>
                                 </button>
                                                     </th>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td data-lr-total><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
                                             </tr>
                                             <tr id="lr-beban-klaim-0" class="lr-row-detail" data-lr-detail="beban-klaim" hidden>
                             <th scope="row">Beban Klaim</th>
@@ -333,7 +349,7 @@
                                                             <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     </tr>
-                                                                            <tr class="lr-row-major" >
+                                                                                                <tr class="lr-row-major" >
                         <th scope="row">
                                                             PENJAMINAN BERSIH                                                    </th>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
@@ -345,7 +361,7 @@
                                                     <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                             </tr>
-                                                                            <tr class="lr-row-major" >
+                                                                                                <tr class="lr-row-major" >
                         <th scope="row">
                                                             PENDAPATAN INVESTASI BERSIH                                                    </th>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
@@ -357,43 +373,43 @@
                                                     <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                             </tr>
-                                                                            <tr class="lr-row-major" >
+                                                                                                <tr class="lr-row-major" >
                         <th scope="row">
                                                             BEBAN USAHA                                                    </th>
+                                                    <td ><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    <td data-lr-total><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                             </tr>
-                                                                            <tr class="lr-row-subgroup" data-lr-expandable>
+                                                                                                <tr class="lr-row-subgroup" data-lr-expandable>
                         <th scope="row">
                                                             <button type="button" class="lr-group-toggle" data-lr-toggle="beban-karyawan" aria-expanded="true" aria-controls="lr-beban-karyawan-0&#x20;lr-beban-karyawan-1&#x20;lr-beban-karyawan-2&#x20;lr-beban-karyawan-3&#x20;lr-beban-karyawan-4&#x20;lr-beban-karyawan-5&#x20;lr-beban-karyawan-6&#x20;lr-beban-karyawan-7&#x20;lr-beban-karyawan-8&#x20;lr-beban-karyawan-9&#x20;lr-beban-karyawan-10&#x20;lr-beban-karyawan-11&#x20;lr-beban-karyawan-12&#x20;lr-beban-karyawan-13&#x20;lr-beban-karyawan-14&#x20;lr-beban-karyawan-15&#x20;lr-beban-karyawan-16&#x20;lr-beban-karyawan-17&#x20;lr-beban-karyawan-18&#x20;lr-beban-karyawan-19&#x20;lr-beban-karyawan-20&#x20;lr-beban-karyawan-21&#x20;lr-beban-karyawan-22&#x20;lr-beban-karyawan-23">
                                     <span class="lr-group-chevron" aria-hidden="true">›</span>
                                     <span>BEBAN KARYAWAN</span>
                                 </button>
                                                     </th>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="true" aria-hidden="true"><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="true" aria-hidden="true"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="true" aria-hidden="true"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="true" aria-hidden="true"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="true" aria-hidden="true"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="true" aria-hidden="true"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td data-lr-total><span data-lr-group-output data-lr-expanded="true" aria-hidden="true"><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="true" aria-hidden="true"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
                                             </tr>
                                             <tr id="lr-beban-karyawan-0" class="lr-row-detail" data-lr-detail="beban-karyawan" >
                             <th scope="row">Beban gaji karyawan</th>
-                                                            <td ><span class="lr-lr-value">774.895.270,36</span></td>
+                                                            <td ><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                            <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td data-lr-total><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     </tr>
                                             <tr id="lr-beban-karyawan-1" class="lr-row-detail" data-lr-detail="beban-karyawan" >
@@ -640,30 +656,30 @@
                                                     </tr>
                                             <tr id="lr-beban-karyawan-23" class="lr-row-detail-total" data-lr-detail="beban-karyawan" >
                             <th scope="row">Total Beban Karyawan</th>
+                                                            <td ><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                            <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td data-lr-total><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     </tr>
-                                                                            <tr class="lr-row-subgroup" data-lr-expandable>
+                                                                                                <tr class="lr-row-subgroup" data-lr-expandable>
                         <th scope="row">
                                                             <button type="button" class="lr-group-toggle" data-lr-toggle="beban-administrasi-umum" aria-expanded="false" aria-controls="lr-beban-administrasi-umum-0&#x20;lr-beban-administrasi-umum-1&#x20;lr-beban-administrasi-umum-2&#x20;lr-beban-administrasi-umum-3&#x20;lr-beban-administrasi-umum-4&#x20;lr-beban-administrasi-umum-5&#x20;lr-beban-administrasi-umum-6&#x20;lr-beban-administrasi-umum-7&#x20;lr-beban-administrasi-umum-8&#x20;lr-beban-administrasi-umum-9&#x20;lr-beban-administrasi-umum-10&#x20;lr-beban-administrasi-umum-11&#x20;lr-beban-administrasi-umum-12&#x20;lr-beban-administrasi-umum-13&#x20;lr-beban-administrasi-umum-14&#x20;lr-beban-administrasi-umum-15&#x20;lr-beban-administrasi-umum-16&#x20;lr-beban-administrasi-umum-17&#x20;lr-beban-administrasi-umum-18&#x20;lr-beban-administrasi-umum-19&#x20;lr-beban-administrasi-umum-20&#x20;lr-beban-administrasi-umum-21&#x20;lr-beban-administrasi-umum-22&#x20;lr-beban-administrasi-umum-23&#x20;lr-beban-administrasi-umum-24&#x20;lr-beban-administrasi-umum-25&#x20;lr-beban-administrasi-umum-26&#x20;lr-beban-administrasi-umum-27&#x20;lr-beban-administrasi-umum-28&#x20;lr-beban-administrasi-umum-29&#x20;lr-beban-administrasi-umum-30&#x20;lr-beban-administrasi-umum-31&#x20;lr-beban-administrasi-umum-32&#x20;lr-beban-administrasi-umum-33&#x20;lr-beban-administrasi-umum-34&#x20;lr-beban-administrasi-umum-35&#x20;lr-beban-administrasi-umum-36&#x20;lr-beban-administrasi-umum-37&#x20;lr-beban-administrasi-umum-38&#x20;lr-beban-administrasi-umum-39&#x20;lr-beban-administrasi-umum-40&#x20;lr-beban-administrasi-umum-41&#x20;lr-beban-administrasi-umum-42&#x20;lr-beban-administrasi-umum-43&#x20;lr-beban-administrasi-umum-44&#x20;lr-beban-administrasi-umum-45&#x20;lr-beban-administrasi-umum-46&#x20;lr-beban-administrasi-umum-47&#x20;lr-beban-administrasi-umum-48&#x20;lr-beban-administrasi-umum-49&#x20;lr-beban-administrasi-umum-50&#x20;lr-beban-administrasi-umum-51&#x20;lr-beban-administrasi-umum-52&#x20;lr-beban-administrasi-umum-53&#x20;lr-beban-administrasi-umum-54&#x20;lr-beban-administrasi-umum-55&#x20;lr-beban-administrasi-umum-56&#x20;lr-beban-administrasi-umum-57&#x20;lr-beban-administrasi-umum-58&#x20;lr-beban-administrasi-umum-59&#x20;lr-beban-administrasi-umum-60&#x20;lr-beban-administrasi-umum-61&#x20;lr-beban-administrasi-umum-62&#x20;lr-beban-administrasi-umum-63&#x20;lr-beban-administrasi-umum-64&#x20;lr-beban-administrasi-umum-65&#x20;lr-beban-administrasi-umum-66&#x20;lr-beban-administrasi-umum-67&#x20;lr-beban-administrasi-umum-68&#x20;lr-beban-administrasi-umum-69&#x20;lr-beban-administrasi-umum-70&#x20;lr-beban-administrasi-umum-71&#x20;lr-beban-administrasi-umum-72&#x20;lr-beban-administrasi-umum-73&#x20;lr-beban-administrasi-umum-74&#x20;lr-beban-administrasi-umum-75&#x20;lr-beban-administrasi-umum-76&#x20;lr-beban-administrasi-umum-77&#x20;lr-beban-administrasi-umum-78&#x20;lr-beban-administrasi-umum-79&#x20;lr-beban-administrasi-umum-80&#x20;lr-beban-administrasi-umum-81&#x20;lr-beban-administrasi-umum-82&#x20;lr-beban-administrasi-umum-83&#x20;lr-beban-administrasi-umum-84&#x20;lr-beban-administrasi-umum-85&#x20;lr-beban-administrasi-umum-86&#x20;lr-beban-administrasi-umum-87">
                                     <span class="lr-group-chevron" aria-hidden="true">›</span>
                                     <span>BEBAN ADMINISTRASI &amp; UMUM</span>
                                 </button>
                                                     </th>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td data-lr-total><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
                                             </tr>
                                             <tr id="lr-beban-administrasi-umum-0" class="lr-row-detail" data-lr-detail="beban-administrasi-umum" hidden>
                             <th scope="row">Imbal jasa profesional - akuntan publik</th>
@@ -1633,21 +1649,21 @@
                                                             <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     </tr>
-                                                                            <tr class="lr-row-subgroup" data-lr-expandable>
+                                                                                                <tr class="lr-row-subgroup" data-lr-expandable>
                         <th scope="row">
                                                             <button type="button" class="lr-group-toggle" data-lr-toggle="beban-penyusutan-amortisasi" aria-expanded="false" aria-controls="lr-beban-penyusutan-amortisasi-0&#x20;lr-beban-penyusutan-amortisasi-1&#x20;lr-beban-penyusutan-amortisasi-2&#x20;lr-beban-penyusutan-amortisasi-3&#x20;lr-beban-penyusutan-amortisasi-4&#x20;lr-beban-penyusutan-amortisasi-5&#x20;lr-beban-penyusutan-amortisasi-6&#x20;lr-beban-penyusutan-amortisasi-7&#x20;lr-beban-penyusutan-amortisasi-8&#x20;lr-beban-penyusutan-amortisasi-9&#x20;lr-beban-penyusutan-amortisasi-10&#x20;lr-beban-penyusutan-amortisasi-11&#x20;lr-beban-penyusutan-amortisasi-12&#x20;lr-beban-penyusutan-amortisasi-13&#x20;lr-beban-penyusutan-amortisasi-14&#x20;lr-beban-penyusutan-amortisasi-15">
                                     <span class="lr-group-chevron" aria-hidden="true">›</span>
                                     <span>BEBAN PENYUSUTAN &amp; AMORTISASI</span>
                                 </button>
                                                     </th>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td data-lr-total><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
                                             </tr>
                                             <tr id="lr-beban-penyusutan-amortisasi-0" class="lr-row-detail" data-lr-detail="beban-penyusutan-amortisasi" hidden>
                             <th scope="row">Beban penyusutan aset tetap - gedung</th>
@@ -1825,61 +1841,104 @@
                                                             <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                             <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     </tr>
-                                                                            <tr class="lr-row-subtotal" >
+                                                                                                <tr class="lr-row-subtotal" >
                         <th scope="row">
                                                             TOTAL BEBAN USAHA                                                    </th>
+                                                    <td ><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    <td data-lr-total><span class="lr-lr-value" data-lr-exact="774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;774.895.270,36">774.895.270</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                             </tr>
-                                                                            <tr class="lr-row-major" >
+                                                                                                <tr class="lr-row-group" data-lr-expandable>
                         <th scope="row">
-                                                            PENDAPATAN (BEBAN) LAIN-LAIN BERSIH                                                    </th>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <button type="button" class="lr-group-toggle" data-lr-toggle="pendapatan-beban-lain" aria-expanded="false" aria-controls="lr-pendapatan-beban-lain-0&#x20;lr-pendapatan-beban-lain-1">
+                                    <span class="lr-group-chevron" aria-hidden="true">›</span>
+                                    <span>PENDAPATAN (BEBAN) LAIN-LAIN BERSIH</span>
+                                </button>
+                                                    </th>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td data-lr-total><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
+                                                    <td ><span data-lr-group-output data-lr-expanded="false" aria-hidden="false"><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></span></td>
                                             </tr>
-                                                                            <tr class="lr-row-profit" >
+                                            <tr id="lr-pendapatan-beban-lain-0" class="lr-row-detail" data-lr-detail="pendapatan-beban-lain" hidden>
+                            <th scope="row">Pendapatan jasa giro</th>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    </tr>
+                                            <tr id="lr-pendapatan-beban-lain-1" class="lr-row-detail" data-lr-detail="pendapatan-beban-lain" hidden>
+                            <th scope="row">Pendapatan lainnya</th>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                            <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    </tr>
+                                                                                                <tr class="lr-row-profit" >
                         <th scope="row">
                                                             LABA SEBELUM PAJAK                                                    </th>
+                                                    <td ><span class="lr-lr-value" data-lr-exact="-774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;-774.895.270,36"><span class="lr-rka-negative-marker">*</span>774.895.270</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
-                                                    <td data-lr-total><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
+                                                    <td data-lr-total><span class="lr-lr-value" data-lr-exact="-774895270.36" title="Nilai&#x20;asli&#x3A;&#x20;Rp&#x20;-774.895.270,36"><span class="lr-rka-negative-marker">*</span>774.895.270</span></td>
                                                     <td ><span class="lr-empty-value" aria-label="Belum ada nilai">—</span></td>
                                             </tr>
                                                 </tbody>
         </table>
     </div>
-    <footer class="lr-report-footer">Nominal dalam Rupiah (Rp). Tanda * merah di depan angka berarti negatif. Rincian beban KUR dijumlahkan per Description COA. Kolom lain dan rumus total menunggu aturan berikutnya.</footer>
+    <footer class="lr-report-footer">Nominal dalam Rupiah (Rp), tampilan dibulatkan ke rupiah penuh. Semua desimal sumber tetap dipakai dalam perhitungan. KBG/Suretyship, Konsumtif, Produktif, total, subtotal, laba, dan persentase dihitung otomatis mengikuti kertas kerja. Tanda * merah berarti negatif. Persentase membandingkan total realisasi dengan total RKA unit dan tahun yang sama; RKA nol ditampilkan 0%.</footer>
 </section>
 
 <dialog id="lrUploadDialog" class="lr-settings-dialog" aria-labelledby="lrUploadTitle" data-auto-open="false">
     <header class="lr-settings-header">
-        <div><p class="eyebrow">AKUTANSI / LAPORAN LABA &amp; RUGI</p><h2 id="lrUploadTitle">Upload Excel LR SEKANWIL</h2></div>
+        <div><p class="eyebrow">AKUTANSI / LAPORAN LABA / RUGI</p><h2 id="lrUploadTitle">Upload Excel LR SEKANWIL (YTD)</h2></div>
         <button type="button" class="icon-btn" data-lr-upload-close aria-label="Tutup upload Excel LR">×</button>
     </header>
     <form method="post" action="#" enctype="multipart/form-data" data-lr-upload-form>
-        <input type="hidden" name="csrf_test_name" value="490c22167f9fcb4e526334951a82613f">        <div class="lr-settings-body">
-                        <p>Sistem membaca sheet KANWIL dan mengisi kolom KUR pada rincian Beban Klaim, Beban Karyawan, Beban Administrasi &amp; Umum, serta Beban Penyusutan &amp; Amortisasi. Kolom lain dan rumus total belum dihitung.</p>
+        <input type="hidden" name="csrf_test_name" value="96452e6632af412225860a6b17be3161">        <div class="lr-settings-body">
+                        <p>Upload ini membaca sheet KANWIL, SURABAYA, KEDIRI, MALANG, MADIUN, dan BANYUWANGI sekaligus. Setiap sheet disimpan sebagai unit kerja terpisah dan dikelompokkan mengikuti Excel menjadi KUR, NON KUR, dan PEN.</p>
+            <input type="hidden" name="unit_kerja" value="Kanwil">
+            <input type="hidden" name="jenis_laporan" value="YTD">
             <label class="lr-upload-label" for="lrUploadYear">Tahun Laporan</label>
             <input class="lr-upload-select" id="lrUploadYear" type="number" name="tahun" min="2000" max="2100" step="1" value="2097" required>
+            <label class="lr-upload-label" for="lrUploadMonth">Bulan Laporan</label>
+            <select class="lr-upload-select" id="lrUploadMonth" name="bulan" required>
+                                    <option value="1" >Januari</option>
+                                    <option value="2" >Februari</option>
+                                    <option value="3" >Maret</option>
+                                    <option value="4" >April</option>
+                                    <option value="5" >Mei</option>
+                                    <option value="6" >Juni</option>
+                                    <option value="7" >Juli</option>
+                                    <option value="8" >Agustus</option>
+                                    <option value="9" selected>September</option>
+                                    <option value="10" >Oktober</option>
+                                    <option value="11" >November</option>
+                                    <option value="12" >Desember</option>
+                            </select>
             <label class="lr-upload-label" for="lrUploadFile">Berkas Excel (.xlsx, maksimal 5 MB)</label>
             <input class="lr-upload-input" id="lrUploadFile" type="file" name="lr_excel" accept=".xlsx" required>
-            <p class="lr-upload-note">B: LOB (Segment 1) = KUR. D: Description COA sesuai nama rincian beban di tabel. Jumlahkan nominal H: Ending Balance per akun. Tahun harus sesuai periode pada A5. Tanda positif/negatif sumber dipertahankan.</p>
+            <p class="lr-upload-note">Bulan dan tahun yang dipilih harus sama dengan periode pada seluruh sheet. Baris yang belum memiliki mapping akan dipisahkan dan tidak ikut perhitungan; seluruh desimal sumber tetap disimpan tanpa pemotongan.</p>
         </div>
         <footer class="lr-settings-footer lr-upload-footer">
             <button type="button" class="btn btn-secondary" data-lr-upload-close>Batal</button>
@@ -1888,13 +1947,42 @@
     </form>
 </dialog>
 
+<dialog id="lrMappingDetailDialog" class="lr-settings-dialog lr-mapping-detail-dialog" aria-labelledby="lrMappingDetailTitle">
+    <header class="lr-settings-header"><div><p class="eyebrow">AUDIT DATA ORACLE</p><h2 id="lrMappingDetailTitle">Detail Pengelompokan Kanwil</h2></div><button type="button" class="icon-btn" data-lr-mapping-detail-close aria-label="Tutup detail pengelompokan">×</button></header>
+    <div class="lr-settings-body lr-mapping-detail-body">
+        <p>Versi mapping saat upload: <strong>aturan lama</strong>. Rumus baku dan alias sumber yang sudah diverifikasi diterapkan setiap kali laporan dibuka; perubahan mapping khusus oleh Administrator digunakan pada upload berikutnya.</p>
+        <div class="lr-mapping-summary">
+            <article><span>KUR</span><strong>0</strong><small>baris terpetakan</small></article><article><span>NON KUR</span><strong>0</strong><small>baris terpetakan</small></article><article><span>PEN</span><strong>0</strong><small>baris terpetakan</small></article>        </div>
+        <section class="lr-unmapped-section"><h3>Data belum terpetakan</h3>
+            <p class="lr-upload-note">Tidak ada baris LOB bernominal yang tertinggal dari mapping aktif.</p>
+                    </section>
+    </div>
+    <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-lr-mapping-detail-close>Tutup</button></footer>
+</dialog>
+
 <dialog id="lrDeleteDialog" class="lr-settings-dialog" aria-labelledby="lrDeleteTitle">
-    <header class="lr-settings-header"><div><p class="eyebrow">LAPORAN LABA &amp; RUGI</p><h2 id="lrDeleteTitle">Konfirmasi Hapus Laporan</h2></div><button type="button" class="icon-btn" data-lr-delete-close aria-label="Tutup konfirmasi hapus">×</button></header>
+    <header class="lr-settings-header"><div><p class="eyebrow">LAPORAN LABA / RUGI</p><h2 id="lrDeleteTitle">Konfirmasi Hapus Laporan</h2></div><button type="button" class="icon-btn" data-lr-delete-close aria-label="Tutup konfirmasi hapus">×</button></header>
     <form method="post" action="#" data-lr-delete-form>
-        <input type="hidden" name="csrf_test_name" value="490c22167f9fcb4e526334951a82613f">        <input type="hidden" name="unit_kerja" value="Kanwil">
-        <input type="hidden" name="tahun" value="2097">
-        <input type="hidden" name="lr_import_id" value="14">
-        <div class="lr-settings-body"><p>Seluruh data upload laporan Kanwil tahun 2097 yang Anda pilih akan dihapus dari tampilan, termasuk upload sebelumnya.</p><p>Data dan berkas sumber tidak dihapus permanen. Administrator dapat memulihkannya melalui Data Terhapus. RKA dan unit/tahun lainnya tidak terpengaruh.</p><label class="lr-rka-confirm"><input type="checkbox" name="confirm_delete" value="1" required><span>Saya mengonfirmasi penghapusan laporan unit dan tahun tersebut.</span></label></div>
+        <input type="hidden" name="csrf_test_name" value="96452e6632af412225860a6b17be3161">        <input type="hidden" name="jenis_laporan" value="YTD">
+        <div class="lr-settings-body">
+            <p>Pilih unit kerja dan periode laporan YTD yang akan dihapus. Seluruh revisi upload pada pilihan tersebut akan dipindahkan ke Data Terhapus.</p>
+            <label class="lr-upload-label" for="lrDeleteUnit">Unit Kerja</label>
+            <select class="lr-upload-select" id="lrDeleteUnit" name="unit_kerja" required>
+                <option value="all">Seluruh Unit Kerja</option>
+                                    <option value="Kanwil" selected>Kanwil</option>
+                                    <option value="Surabaya" >Surabaya</option>
+                                    <option value="Kediri" >Kediri</option>
+                                    <option value="Malang" >Malang</option>
+                                    <option value="Madiun" >Madiun</option>
+                                    <option value="Banyuwangi" >Banyuwangi</option>
+                            </select>
+            <label class="lr-upload-label" for="lrDeleteMonth">Bulan Laporan</label>
+            <select class="lr-upload-select" id="lrDeleteMonth" name="bulan" required><option value="1" >Januari</option><option value="2" >Februari</option><option value="3" >Maret</option><option value="4" >April</option><option value="5" >Mei</option><option value="6" >Juni</option><option value="7" >Juli</option><option value="8" selected>Agustus</option><option value="9" >September</option><option value="10" >Oktober</option><option value="11" >November</option><option value="12" >Desember</option></select>
+            <label class="lr-upload-label" for="lrDeleteYear">Tahun Laporan</label>
+            <input class="lr-upload-select" id="lrDeleteYear" type="number" name="tahun" min="2000" max="2100" step="1" value="2097" required>
+            <p class="lr-upload-note">Jika memilih Seluruh Unit Kerja, semua laporan sumber pada bulan dan tahun tersebut akan dihapus. Data bulan lain dan RKA tidak terpengaruh. Administrator tetap dapat memulihkan data melalui Data Terhapus.</p>
+            <label class="lr-rka-confirm"><input type="checkbox" name="confirm_delete" value="1" required><span>Saya mengonfirmasi penghapusan laporan unit, bulan, dan tahun yang dipilih.</span></label>
+        </div>
         <footer class="lr-settings-footer lr-upload-footer"><button type="button" class="btn btn-secondary" data-lr-delete-close>Batal</button><button type="submit" class="btn btn-danger-outline">Hapus Laporan</button></footer>
     </form>
 </dialog>
@@ -1907,6 +1995,6 @@
             </footer>
         </div>
     </div>
-        <script src="/assets/app.js?v=1789525501"></script>
+        <script src="/assets/app.min.js?v=1789953421"></script>
 </body>
 </html>

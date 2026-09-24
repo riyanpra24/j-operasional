@@ -9,13 +9,9 @@
     </div>
 </section>
 
-<section class="panel register-panel">
-    <div class="empty-state">
-        <span aria-hidden="true">▦</span>
-        <strong>Dashboard Kehadiran siap dikembangkan</strong>
-        <p>Data dashboard nantinya dapat dirangkum dari rekap absensi yang tersimpan di SDM Jatim.</p>
-        <a href="<?= site_url('sdm/sdm-jatim') ?>" class="btn btn-secondary btn-sm">Buka SDM Jatim</a>
-    </div>
-</section>
+<?= view('components/under_construction', [
+    'module' => 'Dashboard Kehadiran',
+    'message' => 'Ringkasan dan pemantauan kehadiran dari Data Kehadiran sedang disiapkan.',
+]) ?>
 
 <?= $this->endSection() ?>

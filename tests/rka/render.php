@@ -103,6 +103,20 @@ foreach (['rkaManualUnit','rkaUploadUnit'] as $id) {
         || $corporateXpath->query('//select[@id="'.$id.'"]/option[@value="Kanwil" and @selected]')->length !== 1) throw new RuntimeException('Corporate settings must default to an editable source unit.');
 }
 echo 'Corporate UI: source-unit settings, automatic aggregate note and protected actions OK.' . PHP_EOL;
+$filteredData = $data;
+$filteredData['rkaLobs'] = ['KUR', 'PEN', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF'];
+$filteredData['selectedLobs'] = ['KUR', 'PEN'];
+$filteredHtml = view('akutansi/rka_kanwil_surabaya', $filteredData);
+$filteredDom = new DOMDocument(); @$filteredDom->loadHTML($filteredHtml); $filteredXpath = new DOMXPath($filteredDom);
+$filteredColumns = [];
+foreach ($filteredXpath->query('//table[contains(@class,"lr-rka-table") and not(contains(@class,"lr-rka-editable"))]/thead/tr/th') as $heading) $filteredColumns[] = trim($heading->textContent);
+if ($filteredXpath->query('//form[contains(@class,"lr-rka-filter")]//input[@name="lob[]"]')->length !== 5
+    || $filteredXpath->query('//form[contains(@class,"lr-rka-filter")]//input[@name="lob[]" and @checked]')->length !== 2
+    || $filteredColumns !== ['URAIAN', 'KUR', 'PEN', 'TOTAL']
+    || $filteredXpath->query('//form[contains(@class,"lr-rka-filter")]//a[contains(@class,"btn-ghost") and normalize-space(.)="Reset"]')->length !== 1) {
+    throw new RuntimeException('Filter RKA harus mendukung pilihan beberapa LOB dan Reset seperti Laba/Rugi.');
+}
+echo 'RKA filters: unit, annual year, multi-LOB columns, total penuh, and reset OK.' . PHP_EOL;
 $negativeData = $data;
 $negativeData['inputs']['C11'] = '-5867662416.00';
 $negativeData['calculated'] = $calculator->calculate($negativeData['inputs']);

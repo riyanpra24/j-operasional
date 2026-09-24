@@ -9,12 +9,9 @@
     </div>
 </section>
 
-<section class="panel register-panel">
-    <div class="empty-state">
-        <span aria-hidden="true">◆</span>
-        <strong>Belum ada data non-belanja modal</strong>
-        <p>Data non-belanja modal akan ditampilkan pada halaman ini.</p>
-    </div>
-</section>
+<?= view('components/under_construction', [
+    'module' => 'Non Belanja Modal',
+    'message' => 'Pengelolaan data dan dokumen non-belanja modal sedang disiapkan pada halaman ini.',
+]) ?>
 
 <?= $this->endSection() ?>

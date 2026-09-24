@@ -10,7 +10,10 @@
 /** @var bool $readOnly */
 /** @var bool|null $securityView */
 $generalSectionView = $generalSectionView ?? false;
-$contextLabel = $generalSectionView ? 'BAGIAN UMUM 1' : (($securityView ?? false) ? 'SECURITY' : 'AGENDARIS');
+$generalSectionTwoView = $generalSectionTwoView ?? false;
+$tellerArchiveView = $tellerArchiveView ?? false;
+$archiveView = $generalSectionView || $generalSectionTwoView || $tellerArchiveView;
+$contextLabel = $tellerArchiveView ? 'SDM & TELLER' : ($generalSectionView ? 'BAGIAN UMUM 1' : ($generalSectionTwoView ? 'BAGIAN UMUM 2' : (($securityView ?? false) ? 'SECURITY' : 'AGENDARIS')));
 ?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
@@ -19,7 +22,7 @@ $contextLabel = $generalSectionView ? 'BAGIAN UMUM 1' : (($securityView ?? false
     <div>
         <p class="eyebrow"><?= esc($contextLabel) ?></p>
         <h1><?= esc($title) ?></h1>
-        <p><?= $generalSectionView ? 'Arsip baca-saja yang bersumber dari Dokumen Keluar Agendaris.' : 'Arsip baca-saja untuk dokumen keluar yang telah selesai diproses.' ?></p>
+        <p><?= $archiveView ? 'Arsip baca-saja yang bersumber dari Dokumen Keluar Agendaris.' : 'Arsip baca-saja untuk dokumen keluar yang telah selesai diproses.' ?></p>
     </div>
     <?php if (! $readOnly): ?><button type="button" class="btn btn-primary" data-dokumen-keluar-add>＋ Tambah Surat Keluar</button><?php endif ?>
 </section>
@@ -83,7 +86,7 @@ $contextLabel = $generalSectionView ? 'BAGIAN UMUM 1' : (($securityView ?? false
                             <td>
                                 <div class="table-actions">
                                     <button type="button" class="icon-btn" title="Detail" data-dokumen-keluar-view data-dokumen-keluar-url="<?= site_url($detailUrlPrefix . '/' . $row['id']) ?>">⌕</button>
-                                    <?php if (! ($securityView ?? false) && ! $generalSectionView): ?><button type="button" class="icon-btn" title="Edit dan kembalikan ke progres" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-keluar/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'], 'attr') ?>">✎</button><?php endif ?>
+                                    <?php if (! ($securityView ?? false) && ! $archiveView): ?><button type="button" class="icon-btn" title="Edit dan kembalikan ke progres" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-keluar/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'], 'attr') ?>">✎</button><?php endif ?>
                                     <?php if (! $readOnly): ?><button type="button" class="icon-btn" title="Ubah" data-dokumen-keluar-edit data-dokumen-keluar-url="<?= site_url('agendaris/surat-keluar/' . $row['id']) ?>">✎</button>
                                         <button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-dokumen-keluar-delete data-delete-url="<?= site_url('agendaris/surat-keluar/' . $row['id'] . '/hapus') ?>" data-delete-label="<?= esc($row['nomor_surat'], 'attr') ?>">×</button><?php endif ?>
                                 </div>
@@ -105,5 +108,5 @@ $contextLabel = $generalSectionView ? 'BAGIAN UMUM 1' : (($securityView ?? false
 <?php if (! $readOnly): ?><?= view('dokumen_keluar/form_modal') ?><?php endif ?>
 <?= view('dokumen_keluar/detail_modal', ['readOnly' => $readOnly, 'securityView' => $securityView ?? false, 'contextLabel' => 'DETAIL ' . $contextLabel]) ?>
 <?php if (! $readOnly): ?><?= view('dokumen_keluar/delete_modal') ?><?php endif ?>
-<?php if (! ($securityView ?? false) && ! $generalSectionView): ?><?= view('components/reopen_progress_modal') ?><?php endif ?>
+<?php if (! ($securityView ?? false) && ! $archiveView): ?><?= view('components/reopen_progress_modal') ?><?php endif ?>
 <?= $this->endSection() ?>

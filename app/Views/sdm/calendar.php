@@ -95,7 +95,7 @@ $monthNames = [
                         <label for="calendar_label">Keterangan</label>
                         <input id="calendar_label" type="text" name="label" maxlength="150" placeholder="Pilih tanggal terlebih dahulu" data-calendar-label disabled>
                     </div>
-                    <div class="attendance-calendar-impact-note">Perubahan langsung memengaruhi kode <strong>OFF</strong> dan <strong>BL</strong> pada Detail Absensi Harian.</div>
+                    <div class="attendance-calendar-impact-note">Perubahan langsung memengaruhi kode <strong>OFF</strong> dan <strong>BL</strong> pada Data Kehadiran.</div>
                     <button type="submit" class="btn btn-primary" data-calendar-submit disabled>Simpan Pengaturan</button>
                 </form>
             </aside>

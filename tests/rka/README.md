@@ -2,7 +2,7 @@
 
 ## Oracle LR: complete workpaper realization rules
 
-The LR importer is separate from the RKA calculator. One atomic upload reads KANWIL, SURABAYA, KEDIRI, MALANG, MADIUN and BANYUWANGI. It requires the B7/D7/H7 headers and retains H (Ending Balance) exactly. Administrator-managed mappings classify the three Excel helper groups KUR, NON KUR and PEN. The realization engine then applies the audited workpaper formulas: direct Description LOB product sums for guarantee/claim rows, premium-mix allocation for ordinary NON KUR rows, formula-derived subtotals and profit, six-unit corporate consolidation, and actual/RKA percentages. Description COA matching is exact after case/whitespace normalization. Unknown numeric rows remain in the unmapped audit. The two verified Oracle spellings, Tranportasi dinas dalam negeri and Tranportasi dinas luar negeri, map to their report labels while retaining the source spelling for audit. Missing accounts stay absent/dashes, explicit numeric zero stays zero, and an RKA denominator of zero displays 0%. Existing stored uploads are recalculated with current built-in formula mappings, including verified aliases, without requiring the same workbook to be uploaded again.
+The LR importer is separate from the RKA calculator. YTD and PTD are independent report bases: each has its own uploads, latest period, report view, and deletion scope while sharing the same mapping and calculation engine. Existing records default to YTD. One atomic upload reads KANWIL, SURABAYA, KEDIRI, MALANG, MADIUN and BANYUWANGI. It requires the same A–G layout in every sheet: A5 period, B7 LOB, D7 Description COA, E7 Description LOB, and G7 Ending Balance. Source decimals are retained exactly. Administrator-managed mappings classify the three Excel helper groups KUR, NON KUR and PEN. The realization engine then applies the audited workpaper formulas: direct Description LOB product sums for guarantee/claim rows, premium-mix allocation for ordinary NON KUR rows, formula-derived subtotals and profit, six-unit corporate consolidation, and actual/RKA percentages. Description COA matching is exact after case/whitespace normalization. Unknown numeric rows remain in the unmapped audit. The two verified Oracle spellings, Tranportasi dinas dalam negeri and Tranportasi dinas luar negeri, map to their report labels while retaining the source spelling for audit. Missing accounts stay absent/dashes, explicit numeric zero stays zero, and an RKA denominator of zero displays 0%. Existing stored uploads are recalculated with current built-in formula mappings, including verified aliases, without requiring the same workbook to be uploaded again.
 
 The nine audited result-row formulas are owned by the realization calculation engine and are not editable from Seting Rumus. Subtotals, net guarantee income, operating expenses and profit before tax are therefore calculated consistently for every unit and LOB. Previously stored `accounting_lr_formula_rules` overrides are ignored by the calculation engine; Korporat Kanwil remains the consolidation of the six calculated source units.
 
@@ -18,7 +18,7 @@ V4 records persist both the original numeric string and a full-precision canonic
 
 V5 introduced the Kanwil sign audit. The current realization engine applies the workpaper sign to Pendapatan jasa giro and Pendapatan lainnya in every report unit: negative becomes positive, positive becomes negative and zero remains zero. The raw source string stays unchanged. The single unsegmented Oracle LABA SEBELUM PAJAK row remains an audit input; the displayed profit is always recalculated from its approved upstream rows.
 
-V6 retains V5's Kanwil-only policy and adds two exact-label rules across every worksheet: LABA TAHUN BERJALAN and JUMLAH LABA KOMPREHENSIF TAHUN BERJALAN. Every matching numeric source H value is stored with sheet, row, source_amount and the sign-inverted calculation_amount in all_sheet_sign_rule_inputs. The importer resolves worksheets by relationship ID rather than workbook order, scans each safely, rejects duplicate target labels within one sheet, and never changes the source workbook. Sheets that do not contain a target are permitted. The supplied workbook reconciles two targets in each of its six sheets (12 audited values). These are future calculation inputs, not product-segment output cells.
+V6 retains V5's Kanwil-only policy and adds two exact-label rules across every worksheet: LABA TAHUN BERJALAN and JUMLAH LABA KOMPREHENSIF TAHUN BERJALAN. Every matching numeric source G value is stored with sheet, row, source_amount and the sign-inverted calculation_amount in all_sheet_sign_rule_inputs. The importer resolves worksheets by relationship ID rather than workbook order, scans each safely, rejects duplicate target labels within one sheet, and never changes the source workbook. Sheets that do not contain a target are permitted. The supplied workbook reconciles two targets in each of its six sheets (12 audited values). These are future calculation inputs, not product-segment output cells.
 
 LR report and source-audit presentation use nearest whole Rupiah with halves away from zero. Only the final display is rounded, never the operands or persisted values. Negative reports keep the leading red asterisk, including negative source fractions that display as *0. Exact amounts are available in the table's data-lr-exact attribute and native hover title; missing values remain dashes. Financial tests reconcile every raw source decimal and every display result independently using Python Decimal, and exercise fractional summation across a rounding threshold.
 
@@ -26,13 +26,14 @@ Uploads require an explicit month and year, both of which must match the period 
 
 ```text
 php spark migrate
-php tests/rka/oracle_lr_salary.php --source
+php tests/rka/oracle_lr_salary.php --january
 php tests/rka/oracle_lr_database.php
 node tests/rka/oracle_lr_upload.cjs
 node tests/rka/oracle_lr_delete.cjs
 python tests/rka/oracle_lr_reconcile.py
 python tests/rka/oracle_lr_global_sign_reconcile.py
 php tests/rka/laba_rugi_filter.php
+php tests/rka/export_document.php
 php tests/rka/oracle_lr_mapping.php
 php tests/rka/lr_formula_settings.php
 php tests/rka/oracle_lr_realization.php
@@ -40,7 +41,7 @@ python tests/rka/oracle_lr_branch_reconcile.py
 python tests/rka/oracle_lr_realization_reconcile.py
 ```
 
-The source test is read-only against the supplied LR workbook. The database test uses guarded, unused year 2097 and rolls back all test records. `--write-preview` additionally produces a synthetic, non-submitting browser fixture; it does not upload the user's workbook or retain report data.
+The January source test is read-only against the six-sheet A–G LR workbook. The database test uses guarded, unused year 2097 and rolls back all test records. `--write-preview` additionally produces a synthetic, non-submitting browser fixture; it does not upload the user's workbook or retain report data.
 
 Deletion requires server-side confirmation and an exact unit/month/year selection. One locked transaction soft-deletes every upload revision for that period; other months, units, years, and RKA are unchanged. Source files are retained, and the existing administrator Data Terhapus screen supports restoration. Tests exercise missing confirmation, period validation, revision history, isolation, and administrator recovery.
 
@@ -91,3 +92,5 @@ Single-unit upload requires one Sheet1 or one sheet matching the selected source
 Corporate F:J input formulas must reference the same cell in each of the six source units exactly once. They are validated, never executed; corporate results are recomputed from parsed unit inputs rather than Excel caches. Corporate is not a seventh additive source. The corporate view always consolidates current active records for the selected year in one source query; unit edits, soft deletion and administrator restoration are reflected on the next view load without a separate corporate upload. Corporate manual/single-unit overrides and deletion are blocked. All-unit import persists the consolidated corporate snapshot, but that snapshot never overrides the live aggregate.
 
 Worksheet order never determines the target unit. Unknown, duplicate or missing names produce an alert listing the problem; no unit is saved until all sheets validate. Persistence is one atomic transaction with per-unit stored identity/revision snapshots and explicit replacement confirmation. Bulk tests use unused year 2098; failed last-unit writes must really roll back, and successful test batches run inside a transaction that is rolled back. Database tests also verify automatic corporate updates, deletion/restoration and exact cents without retaining any test records.
+
+`php tests/rka/simulasi_hitung.php` checks the Simulasi Hitung upload/download page and fills a temporary copy of the original seven-sheet workpaper from the January Oracle fixture. It verifies that every original formula remains identical, helper balances come from Oracle, old volume is removed, and RKA comes from the supplied system values. The temporary workbook is deleted after the test. Set `SIMULATION_PRODUCTION_READS=1` to also check RKA and adjustment reads against the configured database without saving an output. Excel recalculates the unchanged formulas when the downloaded file is opened.

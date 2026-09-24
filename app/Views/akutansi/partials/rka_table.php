@@ -6,6 +6,9 @@ $editable = $editable ?? false;
 $rawInputs = $rawInputs ?? null;
 $values = $calculated ?? [];
 $idPrefix = $idPrefix ?? 'lr';
+$allLobs = array_values(array_filter($schema['columns'], static fn (string $label): bool => $label !== 'TOTAL'));
+$selectedLobs = $editable ? $allLobs : ($selectedLobs ?? $allLobs);
+$visibleColumns = array_filter($schema['columns'], static fn (string $label, string $column): bool => $column === 'H' || in_array($label, $selectedLobs, true), ARRAY_FILTER_USE_BOTH);
 $formatAmount = static fn (string $amount): string => RkaMoney::decimal($amount) === '0.00' ? '' : RkaMoney::display($amount);
 if ($editable) {
     try {
@@ -41,12 +44,12 @@ foreach ($schema['groups'] as $group) {
     <div class="lr-report-scroll" tabindex="0" role="region" aria-label="Tabel RKA <?= esc($selectedUnit, 'attr') ?>, dapat digeser ke samping">
         <table class="lr-report-table lr-rka-table <?= $editable ? 'lr-rka-editable' : '' ?>">
             <caption class="lr-report-caption">RKA <?= esc($selectedUnit) ?> Tahun <?= $selectedYear ?></caption>
-            <colgroup><col class="lr-description-column"><?php foreach ($schema['columns'] as $column): ?><col class="lr-rka-number-column"><?php endforeach ?></colgroup>
-            <thead><tr><th scope="col">URAIAN</th><?php foreach ($schema['columns'] as $column): ?><th scope="col"><?= esc($column) ?></th><?php endforeach ?></tr></thead>
+            <colgroup><col class="lr-description-column"><?php foreach ($visibleColumns as $column): ?><col class="lr-rka-number-column"><?php endforeach ?></colgroup>
+            <thead><tr><th scope="col">URAIAN</th><?php foreach ($visibleColumns as $column): ?><th scope="col"><?= esc($column) ?></th><?php endforeach ?></tr></thead>
             <tbody>
                 <?php foreach ($displayRows as $row): ?>
                     <?php if ($row['row'] === 25): ?>
-                        <tr class="lr-row-section lr-rka-title-row"><th colspan="<?= count($schema['columns']) + 1 ?>" scope="row"><?= esc($row['label']) ?></th></tr>
+                        <tr class="lr-row-section lr-rka-title-row"><th colspan="<?= count($visibleColumns) + 1 ?>" scope="row"><?= esc($row['label']) ?></th></tr>
                         <?php continue; ?>
                     <?php endif ?>
                     <tr class="lr-row-<?= esc($row['type'], 'attr') ?>" <?php if ($row['hidden']): ?>id="<?= esc($idPrefix, 'attr') ?>-<?= esc($row['parent'], 'attr') ?>-<?= $row['row'] ?>" data-lr-detail="<?= esc($row['parent'], 'attr') ?>" hidden<?php elseif (isset($row['details'])): ?>data-lr-expandable<?php endif ?>>
@@ -55,7 +58,7 @@ foreach ($schema['groups'] as $group) {
                                 <button type="button" class="lr-group-toggle" data-lr-toggle="<?= esc($row['key'], 'attr') ?>" aria-expanded="false" aria-controls="<?= esc(implode(' ', array_map(static fn ($number) => $idPrefix . '-' . $row['key'] . '-' . $number, $row['details'])), 'attr') ?>"><span class="lr-group-chevron" aria-hidden="true">›</span><span><?= esc($row['label']) ?></span></button>
                             <?php else: ?><?= esc($row['label']) ?><?php endif ?>
                         </th>
-                        <?php foreach ($schema['columns'] as $column => $columnLabel): ?>
+                        <?php foreach ($visibleColumns as $column => $columnLabel): ?>
                             <?php $cell = $column . $row['value_row']; $calculatedCell = $column === 'H' || ($schema['rows'][$row['value_row']]['terms'] ?? null) !== null; $inputCell = $editable && !$calculatedCell && in_array($row['row'], $schema['input_rows'], true); $emptyAmount = !isset($values[$cell]) || $formatAmount($values[$cell]) === ''; $displayAmount = $emptyAmount ? '-' : RkaMoney::reportDisplay($values[$cell]); $negativeAmount = !$emptyAmount && str_starts_with($displayAmount, '*'); $formulaTitle = ($editable && $calculatedCell ? 'Dihitung otomatis, tidak dapat diedit. Rumus: ' : '') . ($schema['formulas'][$cell] ?? 'SUM(C' . $row['value_row'] . ':G' . $row['value_row'] . ')'); ?>
                             <td <?= $editable && $calculatedCell ? 'data-rka-calculated="true"' : '' ?>>
                                 <?php if ($inputCell): ?>

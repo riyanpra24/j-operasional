@@ -5,7 +5,7 @@
     <div>
         <p class="eyebrow">AKUTANSI / ADMINISTRATOR</p>
         <h1>Pengaturan Mapping Oracle</h1>
-        <p>Periksa aturan kelompok LOB dan atur pasangan Description COA untuk upload Laporan Laba &amp; Rugi berikutnya.</p>
+        <p>Periksa aturan kelompok LOB dan atur pasangan Description COA untuk upload Laporan Laba / Rugi berikutnya.</p>
     </div>
     <a class="btn btn-secondary" href="<?= site_url('akutansi/laba-rugi') ?>">Kembali ke Laporan</a>
 </section>
@@ -16,7 +16,7 @@
 
 <section class="panel oracle-mapping-guide">
     <div><strong>1. Kelompok LOB</strong><span>KUR, NON KUR, dan PEN mengikuti blok Excel serta dikunci agar tidak terpecah.</span></div>
-    <div><strong>2. Mapping Description COA</strong><span>Menentukan baris uraian Laba &amp; Rugi dan perlakuan tanda nominal.</span></div>
+    <div><strong>2. Mapping Description COA</strong><span>Menentukan baris uraian Laba / Rugi dan perlakuan tanda nominal.</span></div>
     <div><strong>3. Pemeriksaan upload</strong><span>Baris tanpa pasangan ditampilkan sebagai “Belum terpetakan” dan tidak ikut perhitungan.</span></div>
 </section>
 

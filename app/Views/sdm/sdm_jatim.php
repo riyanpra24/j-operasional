@@ -25,7 +25,7 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
 <section class="page-heading sdm-daily-heading">
     <div>
         <p class="eyebrow">SDM &amp; TELLER</p>
-        <h1>Detail Absensi Harian</h1>
+        <h1>Data Kehadiran</h1>
         <p>Status serta jam masuk dan pulang seluruh karyawan dalam satu periode.</p>
     </div>
     <?php if ($report !== null): ?>
@@ -43,7 +43,7 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
 
 <?php if ($attendanceImports !== []): ?>
     <section class="panel filter-panel sdm-daily-filter-panel">
-        <form method="get" action="<?= site_url('sdm/sdm-jatim') ?>" class="sdm-daily-filter-form">
+        <form method="get" action="<?= site_url('sdm/data-kehadiran') ?>" class="sdm-daily-filter-form">
             <div class="form-group">
                 <label for="attendance_import_id">Periode rekap</label>
                 <select id="attendance_import_id" name="import_id">
@@ -66,7 +66,7 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
             </div>
             <div class="sdm-daily-filter-actions">
                 <button type="submit" class="btn btn-primary">Tampilkan</button>
-                <a href="<?= site_url('sdm/sdm-jatim' . ($selectedImportId !== null ? '?import_id=' . (int) $selectedImportId : '')) ?>" class="btn btn-ghost">Reset</a>
+                <a href="<?= site_url('sdm/data-kehadiran' . ($selectedImportId !== null ? '?import_id=' . (int) $selectedImportId : '')) ?>" class="btn btn-ghost">Reset</a>
             </div>
         </form>
     </section>
@@ -82,7 +82,7 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
     <section class="panel sdm-daily-panel">
         <header class="sdm-daily-panel-header">
             <div>
-                <h2>Detail Absensi Harian Karyawan</h2>
+                <h2>Data Kehadiran Karyawan</h2>
                 <p><?= date('d-m-Y', strtotime($report['period_start'])) ?> sampai <?= date('d-m-Y', strtotime($report['period_end'])) ?></p>
             </div>
             <div class="sdm-daily-time-key"><span>↑ Jam masuk</span><span>↓ Jam pulang</span></div>

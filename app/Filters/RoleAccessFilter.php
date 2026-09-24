@@ -20,7 +20,7 @@ class RoleAccessFilter implements FilterInterface
         $path = trim($request->getUri()->getPath(), '/');
         $path = preg_replace('#^index\.php/?#', '', $path) ?? $path;
 
-        if ($path === '' || $path === 'dashboard' || $path === 'logout' || $path === 'session/heartbeat') {
+        if ($path === '' || $path === 'welcome' || $path === 'dashboard' || $path === 'logout' || $path === 'session/heartbeat') {
             return null;
         }
 

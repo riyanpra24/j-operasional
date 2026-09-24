@@ -158,6 +158,19 @@
     let currentStep = 1;
     let currentDocument = null;
 
+    const currentDocumentListUrl = () => {
+        const url = new URL(window.location.href);
+        const filterForm = document.querySelector('.sdm-list-filter-form');
+        if (!filterForm) return url.toString();
+
+        for (const field of Array.from(filterForm.elements)) {
+            if (!(field instanceof HTMLInputElement || field instanceof HTMLSelectElement) || field.disabled || field.name === '') continue;
+            url.searchParams.set(field.name, field.value);
+        }
+
+        return url.toString();
+    };
+
     const parseData = (button, attribute) => {
         try { return JSON.parse(button.getAttribute(attribute) || '{}'); } catch (error) { return {}; }
     };
@@ -339,7 +352,7 @@
                 if (csrfField) csrfField.value = result.csrf.hash;
             }
             if (!response.ok || !result.success) throw result;
-            window.location.reload();
+            window.location.assign(currentDocumentListUrl());
         } catch (error) {
             const errors = Array.isArray(error.errors) ? error.errors : [error.message || 'Perubahan disposisi belum berhasil disimpan.'];
             errorBox.replaceChildren();

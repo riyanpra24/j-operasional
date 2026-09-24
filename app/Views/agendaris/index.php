@@ -4,6 +4,10 @@
 /** @var list<string> $jenisOptions */
 /** @var \CodeIgniter\Pager\PagerInterface $pager */
 $generalSectionView = $generalSectionView ?? false;
+$generalSectionTwoView = $generalSectionTwoView ?? false;
+$tellerArchiveView = $tellerArchiveView ?? false;
+$archiveView = $generalSectionView || $generalSectionTwoView || $tellerArchiveView;
+$contextLabel = $tellerArchiveView ? 'SDM & TELLER' : ($generalSectionView ? 'BAGIAN UMUM 1' : ($generalSectionTwoView ? 'BAGIAN UMUM 2' : 'AGENDARIS'));
 $indexUrl = $indexUrl ?? site_url('agendaris/surat-masuk');
 $detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
 ?>
@@ -12,9 +16,9 @@ $detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
 
 <section class="page-heading">
     <div>
-        <p class="eyebrow"><?= $generalSectionView ? 'BAGIAN UMUM 1' : 'AGENDARIS' ?></p>
+        <p class="eyebrow"><?= esc($contextLabel) ?></p>
         <h1>Dokumen Masuk</h1>
-        <p><?= $generalSectionView ? 'Arsip baca-saja yang bersumber dari Dokumen Masuk Agendaris.' : 'Arsip baca-saja untuk dokumen masuk yang telah diselesaikan pada menu Progres Dokumen.' ?></p>
+        <p><?= $archiveView ? 'Arsip baca-saja yang bersumber dari Dokumen Masuk Agendaris.' : 'Arsip baca-saja untuk dokumen masuk yang telah diselesaikan pada menu Progres Dokumen.' ?></p>
     </div>
 </section>
 
@@ -86,7 +90,7 @@ $detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
                             <td>
                                 <div class="table-actions">
                                     <button type="button" class="icon-btn" title="Detail" data-agendaris-view data-agendaris-url="<?= site_url($detailUrlPrefix . '/' . $row['id']) ?>">⌕</button>
-                                    <?php if (! $generalSectionView): ?><button type="button" class="icon-btn <?= $dispositionLocked ? 'is-locked' : '' ?>" title="<?= $dispositionLocked ? 'Disposisi telah diproses oleh SDM & Teller' : 'Edit dan kembalikan ke progres' ?>" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-masuk/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'] ?: 'Belum diisi', 'attr') ?>" <?= $dispositionLocked ? ' data-reopen-locked-message="Disposisi telah diproses oleh SDM &amp; Teller. Hubungi Administrator untuk tindakan selanjutnya."' : '' ?>><?= $dispositionLocked ? '🔒' : '✎' ?></button><?php endif ?>
+                                    <?php if (! $archiveView): ?><button type="button" class="icon-btn <?= $dispositionLocked ? 'is-locked' : '' ?>" title="<?= $dispositionLocked ? 'Disposisi telah diproses oleh SDM & Teller' : 'Edit dan kembalikan ke progres' ?>" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-masuk/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'] ?: 'Belum diisi', 'attr') ?>" <?= $dispositionLocked ? ' data-reopen-locked-message="Disposisi telah diproses oleh SDM &amp; Teller. Hubungi Administrator untuk tindakan selanjutnya."' : '' ?>><?= $dispositionLocked ? '🔒' : '✎' ?></button><?php endif ?>
                                 </div>
                             </td>
                         </tr><?php endforeach ?>
@@ -109,6 +113,6 @@ $detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
     </div>
 </section>
 
-<?= view('agendaris/detail_modal', ['readOnly' => true, 'contextLabel' => $generalSectionView ? 'DETAIL BAGIAN UMUM 1' : 'DETAIL AGENDARIS']) ?>
-<?php if (! $generalSectionView): ?><?= view('components/reopen_progress_modal') ?><?php endif ?>
+<?= view('agendaris/detail_modal', ['readOnly' => true, 'contextLabel' => 'DETAIL ' . $contextLabel]) ?>
+<?php if (! $archiveView): ?><?= view('components/reopen_progress_modal') ?><?php endif ?>
 <?= $this->endSection() ?>

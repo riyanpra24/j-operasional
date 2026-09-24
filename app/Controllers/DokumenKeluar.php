@@ -19,12 +19,14 @@ class DokumenKeluar extends BaseController
     {
         $securityView = service('uri')->getSegment(1) === 'dokumen-keluar';
         $generalSectionView = service('uri')->getSegment(1) === 'bagian-umum-1';
+        $generalSectionTwoView = service('uri')->getSegment(1) === 'bagian-umum-2';
+        $tellerArchiveView = service('uri')->getSegment(1) === 'sdm' && service('uri')->getSegment(2) === 'arsip-dokumen-keluar';
         $indexUrl = $generalSectionView
             ? site_url('bagian-umum-1/dokumen-keluar')
-            : ($securityView ? site_url('dokumen-keluar') : site_url('agendaris/surat-keluar'));
+            : ($generalSectionTwoView ? site_url('bagian-umum-2/dokumen-keluar') : ($tellerArchiveView ? site_url('sdm/arsip-dokumen-keluar') : ($securityView ? site_url('dokumen-keluar') : site_url('agendaris/surat-keluar'))));
         $detailUrlPrefix = $generalSectionView
             ? 'bagian-umum-1/dokumen-keluar'
-            : ($securityView ? 'dokumen-keluar' : 'agendaris/surat-keluar');
+            : ($generalSectionTwoView ? 'bagian-umum-2/dokumen-keluar' : ($tellerArchiveView ? 'sdm/arsip-dokumen-keluar' : ($securityView ? 'dokumen-keluar' : 'agendaris/surat-keluar')));
         $keyword = trim((string) $this->request->getGet('q'));
         $jenis   = trim((string) $this->request->getGet('jenis'));
         $from    = trim((string) $this->request->getGet('dari'));
@@ -85,6 +87,8 @@ class DokumenKeluar extends BaseController
             'title'        => 'Dokumen Keluar',
             'securityView' => $securityView,
             'generalSectionView' => $generalSectionView,
+            'generalSectionTwoView' => $generalSectionTwoView,
+            'tellerArchiveView' => $tellerArchiveView,
             'indexUrl'     => $indexUrl,
             'detailUrlPrefix' => $detailUrlPrefix,
             'readOnly'     => true,
@@ -140,6 +144,8 @@ class DokumenKeluar extends BaseController
         $dokumen = $this->findDokumen($id);
         $securityView = service('uri')->getSegment(1) === 'dokumen-keluar';
         $generalSectionView = service('uri')->getSegment(1) === 'bagian-umum-1';
+        $generalSectionTwoView = service('uri')->getSegment(1) === 'bagian-umum-2';
+        $tellerArchiveView = service('uri')->getSegment(1) === 'sdm' && service('uri')->getSegment(2) === 'arsip-dokumen-keluar';
         $availableInArchive = $securityView
             ? $dokumen['progres'] === 'Diambil Ekspedisi'
             : $dokumen['status_agendaris'] === 'Selesai';
@@ -190,8 +196,8 @@ class DokumenKeluar extends BaseController
                 'alamat_penerima'          => $dokumen['alamat_penerima'],
                 'dokumen_link'             => $securityView ? '' : ($dokumen['dokumen_link'] ?: ''),
                 'dokumen_link_value'       => $securityView ? '' : ($dokumen['dokumen_link'] ?: ''),
-                'update_url'               => $generalSectionView ? '' : site_url("agendaris/surat-keluar/{$id}"),
-                'delete_url'               => $generalSectionView ? '' : site_url("agendaris/surat-keluar/{$id}/hapus"),
+                'update_url'               => ($generalSectionView || $generalSectionTwoView || $tellerArchiveView) ? '' : site_url("agendaris/surat-keluar/{$id}"),
+                'delete_url'               => ($generalSectionView || $generalSectionTwoView || $tellerArchiveView) ? '' : site_url("agendaris/surat-keluar/{$id}/hapus"),
             ],
         ]);
     }

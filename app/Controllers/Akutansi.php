@@ -6,11 +6,15 @@ use App\Libraries\RkaBudgetService;
 use App\Libraries\RkaCalculator;
 use App\Libraries\RkaWorkbookParser;
 use App\Libraries\OracleLrSalaryParser;
+use App\Libraries\OracleLrImportService;
 use App\Libraries\OracleLrMappingService;
 use App\Libraries\LrReportRows;
 use App\Libraries\LrRealizationService;
 use App\Libraries\LrFormulaService;
 use App\Libraries\LrSourceAdjustmentService;
+use App\Libraries\LrDocumentExportService;
+use App\Libraries\LrWorkpaperSimulationService;
+use App\Libraries\LrWorkpaperImportParser;
 use App\Models\AccountingLrImportModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -26,15 +30,20 @@ class Akutansi extends BaseController
         $year = $this->request->getGet('tahun');
         $year = is_string($year) && preg_match('/^\d{4}$/D', $year) && (int)$year >= 2000 && (int)$year <= 2100
             ? (int)$year : 2026;
-        $report=(new LrRealizationService())->view($unit,$year);
+        $basis=$this->request->getGet('jenis_laporan');
+        $basis=is_string($basis) && in_array(strtoupper($basis),LrRealizationService::BASES,true) ? strtoupper($basis) : 'YTD';
+        $requestedMonth=$this->request->getGet('bulan');
+        $requestedMonth=is_string($requestedMonth) && preg_match('/^(?:[1-9]|1[0-2])$/D',$requestedMonth) ? (int)$requestedMonth : null;
+        $selectedLobs=self::reportLobs($this->request->getGet('lob'));
+        $report=(new LrRealizationService())->view($unit,$year,$basis,$requestedMonth);
         $import=$report['import']; $result=$report['result']; $reportValues=$report['values'];
         $flashedUploadMonth=session()->getFlashdata('lr_upload_month');
         $uploadMonth=is_int($flashedUploadMonth) && $flashedUploadMonth>=1 && $flashedUploadMonth<=12
-            ? $flashedUploadMonth : (int)date('n');
+            ? $flashedUploadMonth : (int)$report['month'];
         return view('akutansi/laba_rugi', [
-            'title' => 'Laporan Laba & Rugi',
+            'title' => 'Laporan Laba / Rugi ('.$basis.')',
             'reportUnits' => RkaCalculator::UNITS, 'selectedUnit' => $unit,
-            'selectedYear' => $year,
+            'selectedYear' => $year, 'selectedBasis'=>$basis, 'selectedMonth'=>(int)$report['month'], 'selectedLobs'=>$selectedLobs,
             'lrUploadMonth'=>$uploadMonth,
             'lrImport'=>$import,'lrResult'=>$result,'reportValues'=>$reportValues,
             'lrUploadError'=>session()->getFlashdata('lr_upload_error'),
@@ -44,7 +53,7 @@ class Akutansi extends BaseController
 
     public function importLabaRugi(): RedirectResponse
     {
-        $year=2026; $month=(int)date('n'); $storedPath=null; $redirectUnit='Kanwil';
+        $year=2026; $month=(int)date('n'); $basis='YTD'; $storedPath=null; $redirectUnit='Kanwil'; $selectedLobs=self::reportLobs($this->request->getPost('lob'));
         try {
             $postedUnit=$this->request->getPost('unit_kerja');
             if (is_string($postedUnit) && in_array($postedUnit,OracleLrSalaryParser::IMPORT_UNITS,true)) $redirectUnit=$postedUnit;
@@ -54,15 +63,12 @@ class Akutansi extends BaseController
             $postedMonth=$this->request->getPost('bulan');
             if (!is_string($postedMonth) || !preg_match('/^(?:[1-9]|1[0-2])$/D',$postedMonth)) throw new RuntimeException('Pilih bulan laporan yang valid.');
             $month=(int)$postedMonth;
+            $postedBasis=$this->request->getPost('jenis_laporan');
+            if (!is_string($postedBasis) || !in_array(strtoupper($postedBasis),LrRealizationService::BASES,true)) throw new RuntimeException('Pilih jenis laporan YTD atau PTD yang valid.');
+            $basis=strtoupper($postedBasis);
             $file=$this->request->getFile('lr_excel');
             if ($file===null || !$file->isValid() || $file->hasMoved() || strtolower($file->getClientExtension())!=='xlsx' || $file->getSize()>5*1024*1024) throw new RuntimeException('Pilih Excel .xlsx yang valid, maksimal 5 MB.');
-            $parser=new OracleLrSalaryParser(); $parsedByUnit=[];
-            foreach (OracleLrSalaryParser::IMPORT_UNITS as $unit) {
-                $parsed=$parser->parse($file->getTempName(),$unit);
-                if ($parsed['year']!==$year) throw new RuntimeException('Tahun pada periode sheet '.$parsed['sheet'].' ('.$parsed['year'].') berbeda dengan tahun yang dipilih ('.$year.').');
-                if ($parsed['month']!==$month) throw new RuntimeException('Bulan pada periode sheet '.$parsed['sheet'].' ('.self::monthName((int)$parsed['month']).') berbeda dengan bulan yang dipilih ('.self::monthName($month).').');
-                $parsedByUnit[$unit]=$parsed;
-            }
+            $parsedByUnit=(new LrWorkpaperImportParser())->parse($file->getTempName(),$year,$month,$basis);
             $hash=hash_file('sha256',$file->getTempName());
             $name=mb_substr(basename($file->getClientName()),0,255);
             $relative='uploads/laba_rugi/'.bin2hex(random_bytes(16)).'.xlsx';
@@ -74,8 +80,8 @@ class Akutansi extends BaseController
                 $createdAt=date('Y-m-d H:i:s');
                 foreach ($parsedByUnit as $unit=>$parsed) {
                     $ok=$db->table('accounting_lr_imports')->insert([
-                        'unit_name'=>$unit,'report_year'=>$year,'report_month'=>$month,
-                        'rule_version'=>OracleLrSalaryParser::RULE,'result_json'=>json_encode($parsed,JSON_THROW_ON_ERROR),
+                        'unit_name'=>$unit,'report_year'=>$year,'report_month'=>$month,'report_basis'=>$basis,
+                        'rule_version'=>LrWorkpaperImportParser::RULE,'result_json'=>json_encode($parsed,JSON_THROW_ON_ERROR),
                         'source_name'=>$name,'source_hash'=>$hash,'source_path'=>$relative,
                         'created_by_name'=>session()->get('auth_display_name') ?: null,'created_at'=>$createdAt,
                     ]);
@@ -85,21 +91,15 @@ class Akutansi extends BaseController
             } catch (Throwable $exception) {
                 $db->transRollback(); throw $exception;
             }
-            $groupCounts=array_fill_keys(OracleLrMappingService::TARGET_COLUMNS,0); $unmapped=0;
-            foreach ($parsedByUnit as $parsed) {
-                foreach ($groupCounts as $column=>$count) $groupCounts[$column]+=(int)($parsed['segment_counts'][$column]??0);
-                $unmapped+=count($parsed['unmapped']??[]);
-            }
-            $summary=[]; foreach ($groupCounts as $column=>$count) if ($count>0) $summary[]=$column.' '.$count.' baris';
             $storedPath=null; // Successfully persisted source must remain even if redirect fails.
-            return redirect()->to(site_url('akutansi/laba-rugi?unit_kerja='.rawurlencode($redirectUnit).'&tahun='.$year))
-                ->with('success','Excel periode '.self::monthName($month).' '.$year.' berhasil dikelompokkan untuk Kanwil dan 5 cabang: '.implode(', ',$summary).'. '.($unmapped>0 ? $unmapped.' baris belum terpetakan dan tersedia pada Detail Pengelompokan.' : 'Semua baris LOB yang terbaca telah terpetakan.'));
+            return redirect()->to(self::labaRugiUrl($redirectUnit,$year,$month,$basis,$selectedLobs))
+                ->with('success','Hasil Simulasi Hitung '.$basis.' periode '.self::monthName($month).' '.$year.' berhasil disalin ke Laporan Laba / Rugi untuk Korporat Kanwil dan enam unit kerja. Angka hasil Kertas Kerja dipakai apa adanya.');
         } catch (Throwable $exception) {
             // Only the new randomized private upload is removed on failed insert.
             if ($storedPath!==null && is_file($storedPath)) unlink($storedPath);
             log_message('warning','Upload laporan laba rugi gagal: {message}',['message'=>$exception->getMessage()]);
             $known=$exception instanceof \InvalidArgumentException || get_class($exception)===RuntimeException::class;
-            return redirect()->to(site_url('akutansi/laba-rugi?unit_kerja='.rawurlencode($redirectUnit).'&tahun='.$year))
+            return redirect()->to(self::labaRugiUrl($redirectUnit,$year,$month,$basis,$selectedLobs))
                 ->with('lr_upload_error',$known ? $exception->getMessage() : 'Upload belum berhasil. Data sebelumnya tidak diubah.')
                 ->with('lr_upload_month',$month);
         }
@@ -111,21 +111,54 @@ class Akutansi extends BaseController
             7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'][$month] ?? 'Tidak valid';
     }
 
+    /** @return list<string> */
+    private static function reportLobs(mixed $value): array
+    {
+        if (is_string($value)) $value=[$value];
+        if (!is_array($value)) return LrRealizationService::LOB_COLUMNS;
+        $selected=[];
+        foreach (LrRealizationService::LOB_COLUMNS as $lob) if (in_array($lob,$value,true)) $selected[]=$lob;
+        return $selected ?: LrRealizationService::LOB_COLUMNS;
+    }
+
+    /** @return list<string> */
+    private static function rkaReportLobs(mixed $value): array
+    {
+        $all=array_values(array_filter(RkaCalculator::schema()['columns'],static fn (string $label): bool=>$label!=='TOTAL'));
+        if (is_string($value)) $value=[$value];
+        if (!is_array($value)) return $all;
+        $selected=[];
+        foreach ($all as $lob) if (in_array($lob,$value,true)) $selected[]=$lob;
+        return $selected ?: $all;
+    }
+
+    /** @param list<string> $lobs */
+    private static function labaRugiUrl(string $unit,int $year,int $month,string $basis,array $lobs): string
+    {
+        return site_url('akutansi/laba-rugi?'.http_build_query(['jenis_laporan'=>$basis,'unit_kerja'=>$unit,'bulan'=>$month,'tahun'=>$year,'lob'=>$lobs]));
+    }
+
     public function deleteLabaRugi(): RedirectResponse
     {
-        $unit='Kanwil'; $year=2026; $month=(int)date('n');
+        $unit='Kanwil'; $year=2026; $month=(int)date('n'); $basis='YTD'; $selectedLobs=self::reportLobs($this->request->getPost('lob'));
         try {
-            $postedUnit=$this->request->getPost('unit_kerja'); $postedYear=$this->request->getPost('tahun'); $postedMonth=$this->request->getPost('bulan');
-            if (!is_string($postedUnit) || !in_array($postedUnit,OracleLrSalaryParser::IMPORT_UNITS,true)
+            $postedUnit=$this->request->getPost('unit_kerja'); $postedYear=$this->request->getPost('tahun'); $postedMonth=$this->request->getPost('bulan'); $postedBasis=$this->request->getPost('jenis_laporan');
+            if (!is_string($postedUnit) || (!in_array($postedUnit,OracleLrSalaryParser::IMPORT_UNITS,true) && $postedUnit!==OracleLrImportService::ALL_UNITS)
                 || !is_string($postedYear) || !preg_match('/^\d{4}$/D',$postedYear) || (int)$postedYear<2000 || (int)$postedYear>2100
-                || !is_string($postedMonth) || !preg_match('/^(?:[1-9]|1[0-2])$/D',$postedMonth)) throw new RuntimeException('Pilihan unit, bulan, dan tahun tidak valid.');
-            $unit=$postedUnit; $year=(int)$postedYear; $month=(int)$postedMonth;
+                || !is_string($postedMonth) || !preg_match('/^(?:[1-9]|1[0-2])$/D',$postedMonth)
+                || !is_string($postedBasis) || !in_array(strtoupper($postedBasis),LrRealizationService::BASES,true)) throw new RuntimeException('Pilihan jenis laporan, unit, bulan, dan tahun tidak valid.');
+            $unit=$postedUnit; $year=(int)$postedYear; $month=(int)$postedMonth; $basis=strtoupper($postedBasis);
             if ($this->request->getPost('confirm_delete')!=='1') throw new RuntimeException('Konfirmasi penghapusan laporan terlebih dahulu.');
-            (new \App\Libraries\OracleLrImportService())->delete($unit,$year,$month,(string)session()->get('auth_role'),(string)session()->get('auth_display_name'));
-            return redirect()->to(site_url('akutansi/laba-rugi?unit_kerja='.rawurlencode($unit).'&tahun='.$year))->with('success','Data laporan '. $unit.' periode '.self::monthName($month).' '.$year.' dipindahkan ke Data Terhapus.');
+            $service=new OracleLrImportService();
+            if ($unit===OracleLrImportService::ALL_UNITS) $service->deleteAll($year,$month,(string)session()->get('auth_role'),(string)session()->get('auth_display_name'),$basis);
+            else $service->delete($unit,$year,$month,(string)session()->get('auth_role'),(string)session()->get('auth_display_name'),$basis);
+            $redirectUnit=$unit===OracleLrImportService::ALL_UNITS?'Korporat Kanwil':$unit;
+            $unitLabel=$unit===OracleLrImportService::ALL_UNITS?'seluruh unit kerja':$unit;
+            return redirect()->to(self::labaRugiUrl($redirectUnit,$year,$month,$basis,$selectedLobs))->with('success','Data laporan '.$basis.' '.$unitLabel.' periode '.self::monthName($month).' '.$year.' dipindahkan ke Data Terhapus.');
         } catch (Throwable $e) {
             log_message('warning','Hapus laporan laba rugi gagal: {message}',['message'=>$e->getMessage()]);
-            return redirect()->to(site_url('akutansi/laba-rugi?unit_kerja='.rawurlencode($unit).'&tahun='.$year))->with('error',get_class($e)===RuntimeException::class ? $e->getMessage() : 'Laporan belum berhasil dihapus.');
+            $redirectUnit=$unit===OracleLrImportService::ALL_UNITS?'Korporat Kanwil':$unit;
+            return redirect()->to(self::labaRugiUrl($redirectUnit,$year,$month,$basis,$selectedLobs))->with('error',get_class($e)===RuntimeException::class ? $e->getMessage() : 'Laporan belum berhasil dihapus.');
         }
     }
 
@@ -276,6 +309,8 @@ class Akutansi extends BaseController
     {
         [$unit, $year] = $this->selection();
         $data = $this->rkaData($unit, $year);
+        $data['rkaLobs'] = self::rkaReportLobs(null);
+        $data['selectedLobs'] = self::rkaReportLobs($this->request->getGet('lob'));
         $data['uploadError'] = session()->getFlashdata('rka_upload_error');
         $data['uploadMode'] = session()->getFlashdata('rka_upload_mode') === 'all' ? 'all' : 'single';
         $data['uploadAutoOpen'] = $data['uploadError'] !== null || $this->request->getGet('upload') === '1';
@@ -288,6 +323,139 @@ class Akutansi extends BaseController
         return view('akutansi/index', [
             'title' => 'Akutansi',
         ]);
+    }
+
+    public function exportDokumen(): string
+    {
+        return view('akutansi/export_dokumen', [
+            'title' => 'Export Dokumen',
+            'exportUnits' => RkaCalculator::UNITS,
+            'exportBases' => LrRealizationService::BASES,
+            'selectedYear' => 2026,
+            'selectedMonth' => (int) date('n'),
+        ]);
+    }
+
+    public function simulasiHitung(): string
+    {
+        return view('akutansi/simulasi_hitung', [
+            'title' => 'Simulasi Hitung',
+            'simulations' => (new LrWorkpaperSimulationService())->history((int) session()->get('auth_user_id'), $this->currentRoleIsAdmin()),
+            'selectedMonth' => (int) date('n'),
+            'uploadError' => session()->getFlashdata('simulation_upload_error'),
+        ]);
+    }
+
+    public function uploadSimulasiHitung(): RedirectResponse
+    {
+        try {
+            $rawYear = $this->request->getPost('tahun');
+            $rawMonth = $this->request->getPost('bulan');
+            $rawBasis = $this->request->getPost('jenis_laporan');
+            if (!is_string($rawYear) || !preg_match('/^\d{4}$/D', $rawYear)
+                || !is_string($rawMonth) || !preg_match('/^(?:[1-9]|1[0-2])$/D', $rawMonth)
+                || !is_string($rawBasis)) throw new RuntimeException('Lengkapi jenis laporan, bulan, dan tahun.');
+            $file = $this->request->getFile('oracle_excel');
+            if ($file === null || !$file->isValid() || $file->hasMoved()
+                || strtolower($file->getClientExtension()) !== 'xlsx' || $file->getSize() > 5 * 1024 * 1024) {
+                throw new RuntimeException('Pilih berkas LR Oracle .xlsx yang valid, maksimal 5 MB.');
+            }
+            $created = (new LrWorkpaperSimulationService())->create(
+                $file->getTempName(), $file->getClientName(), (int) $rawYear, (int) $rawMonth,
+                strtoupper($rawBasis), (int) session()->get('auth_user_id'), (string) session()->get('auth_display_name')
+            );
+            $message = 'Kertas kerja ' . $created['report_basis'] . ' ' . self::monthName((int) $created['report_month']) . ' ' . $created['report_year']
+                . ' siap diunduh. ' . $created['helper_rows'] . ' baris Oracle sudah diisi ke tabel bantu; rumus asli dihitung ulang saat Excel dibuka.';
+            if ($created['missing_rka']) $message .= ' RKA belum tersedia untuk ' . implode(', ', $created['missing_rka']) . ' dan diisi nol.';
+            if ($created['unmapped_accounts']) $message .= ' ' . $created['unmapped_accounts'] . ' baris belum cocok dengan mapping akun/segmen; baris tetap ada di tabel bantu, tetapi periksa apakah rumus Excel menjangkaunya.';
+            return redirect()->to(site_url('akutansi/simulasi-hitung'))->with('success', $message);
+        } catch (Throwable $exception) {
+            log_message('warning', 'Simulasi kertas kerja gagal: {message}', ['message' => $exception->getMessage()]);
+            $known = $exception instanceof \InvalidArgumentException || get_class($exception) === RuntimeException::class;
+            return redirect()->to(site_url('akutansi/simulasi-hitung'))->with('simulation_upload_error',
+                $known ? $exception->getMessage() : 'Simulasi belum berhasil. Tidak ada hasil yang disimpan.');
+        }
+    }
+
+    public function downloadSimulasiHitung(string $id): ResponseInterface|RedirectResponse
+    {
+        try {
+            $file = (new LrWorkpaperSimulationService())->download($id, (int) session()->get('auth_user_id'), $this->currentRoleIsAdmin());
+            return $this->response->download($file['path'], null)->setFileName($file['filename'])
+                ->setHeader('Cache-Control', 'private, no-store, max-age=0')
+                ->setHeader('X-Content-Type-Options', 'nosniff');
+        } catch (Throwable $exception) {
+            $known = get_class($exception) === RuntimeException::class;
+            return redirect()->to(site_url('akutansi/simulasi-hitung'))->with('simulation_upload_error',
+                $known ? $exception->getMessage() : 'Berkas simulasi belum dapat diunduh.');
+        }
+    }
+
+    public function deleteSimulasiHitung(string $id): RedirectResponse
+    {
+        try {
+            if ($this->request->getPost('confirm_delete') !== '1') {
+                throw new RuntimeException('Konfirmasi penghapusan hasil simulasi terlebih dahulu.');
+            }
+            (new LrWorkpaperSimulationService())->delete(
+                $id,
+                (int) session()->get('auth_user_id'),
+                $this->currentRoleIsAdmin()
+            );
+            return redirect()->to(site_url('akutansi/simulasi-hitung'))
+                ->with('success', 'Hasil simulasi telah dihapus. Berkas Excel tidak lagi tersedia untuk diunduh.');
+        } catch (Throwable $exception) {
+            $known = get_class($exception) === RuntimeException::class;
+            return redirect()->to(site_url('akutansi/simulasi-hitung'))->with(
+                'simulation_upload_error',
+                $known ? $exception->getMessage() : 'Hasil simulasi belum berhasil dihapus.'
+            );
+        }
+    }
+
+    public function downloadExportDokumen(): ResponseInterface|RedirectResponse
+    {
+        try {
+            $rawUnits = $this->request->getPost('unit_kerja');
+            $rawYear = $this->request->getPost('tahun');
+            $rawMonth = $this->request->getPost('bulan');
+            $rawBasis = $this->request->getPost('jenis_laporan');
+            if (!is_array($rawUnits) || !is_string($rawYear) || !preg_match('/^\d{4}$/D', $rawYear)
+                || !is_string($rawMonth) || !preg_match('/^(?:[1-9]|1[0-2])$/D', $rawMonth)
+                || !is_string($rawBasis)) {
+                throw new RuntimeException('Lengkapi jenis laporan, unit kerja, bulan, dan tahun export.');
+            }
+            $units = [];
+            foreach ($rawUnits as $unit) {
+                if (!is_string($unit) || !in_array($unit, RkaCalculator::UNITS, true)) {
+                    throw new RuntimeException('Pilihan unit kerja export tidak valid.');
+                }
+                if (!in_array($unit, $units, true)) $units[] = $unit;
+            }
+            $basis = strtoupper($rawBasis);
+            if (!in_array($basis, LrRealizationService::BASES, true)) {
+                throw new RuntimeException('Pilih jenis laporan YTD atau PTD yang valid.');
+            }
+
+            $export = (new LrDocumentExportService())->create($units, (int) $rawYear, (int) $rawMonth, $basis);
+            $contents = file_get_contents($export['path']);
+            if ($contents === false) throw new RuntimeException('Dokumen hasil export belum dapat dibaca.');
+            unlink($export['path']);
+
+            return $this->response
+                ->setHeader('Cache-Control', 'private, no-store, max-age=0')
+                ->setHeader('X-Content-Type-Options', 'nosniff')
+                ->setHeader('Content-Disposition', 'attachment; filename="' . $export['filename'] . '"')
+                ->setContentType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                ->setBody($contents);
+        } catch (Throwable $exception) {
+            log_message('warning', 'Export dokumen laba rugi gagal: {message}', ['message' => $exception->getMessage()]);
+            $known = $exception instanceof \InvalidArgumentException || get_class($exception) === RuntimeException::class;
+            return redirect()->to(site_url('akutansi/export-dokumen'))->with(
+                'error',
+                $known ? $exception->getMessage() : 'Dokumen belum dapat diexport. Silakan coba kembali.'
+            );
+        }
     }
 
     public function rkaUpload(): RedirectResponse

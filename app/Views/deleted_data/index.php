@@ -16,6 +16,13 @@
         <h1>Data Terhapus</h1>
         <p>Data yang dihapus oleh role lain dapat dipulihkan atau dihapus permanen oleh Administrator.</p>
     </div>
+    <?php if ($records !== []): ?>
+        <form method="post" action="<?= site_url('data-terhapus/hapus-semua-permanen') ?>" onsubmit="return confirm('Hapus permanen seluruh <?= number_format(count($records), 0, ',', '.') ?> data yang sedang ditampilkan? Data tidak dapat dipulihkan kembali.')">
+            <?= csrf_field() ?>
+            <input type="hidden" name="jenis" value="<?= esc($selectedType, 'attr') ?>">
+            <button type="submit" class="btn btn-delete">Hapus semua permanen</button>
+        </form>
+    <?php endif ?>
 </section>
 
 <section class="account-stat-grid" aria-label="Ringkasan data terhapus">

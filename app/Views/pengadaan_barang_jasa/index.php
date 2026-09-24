@@ -9,12 +9,9 @@
     </div>
 </section>
 
-<section class="panel register-panel">
-    <div class="empty-state">
-        <span aria-hidden="true">◆</span>
-        <strong>Belum ada data pengadaan</strong>
-        <p>Data pengadaan barang dan jasa akan ditampilkan pada halaman ini.</p>
-    </div>
-</section>
+<?= view('components/under_construction', [
+    'module' => 'Pengadaan Barang Jasa',
+    'message' => 'Pengelolaan proses dan dokumen pengadaan sedang disiapkan pada halaman ini.',
+]) ?>
 
 <?= $this->endSection() ?>
