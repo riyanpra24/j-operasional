@@ -96,8 +96,8 @@ body.jaksa-bg .brand-jaksa-wordmark {
     transform-origin: center;
 }
 body.jaksa-bg .brand.brand-jaksa { position: relative !important; }
-body.jaksa-bg .brand-jaksa-expansion { color: rgba(241,249,255,.86) !important; font-size: 5.8px !important; }
-body.jaksa-bg .brand-jaksa-expansion b { color: #fff !important; -webkit-text-fill-color: #fff !important; }
+/* Compatibility for pages rendered from an older cached layout. */
+body.jaksa-bg .brand-jaksa-expansion { display: none !important; }
 body.jaksa-bg .main-nav {
     padding-right: 2px !important;
     -ms-overflow-style: none;

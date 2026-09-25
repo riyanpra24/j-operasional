@@ -74,6 +74,7 @@ $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.mi
 $appCssVersion = $assetVersion($appCssAsset);
 $flowuiThemeVersion = $assetVersion('assets/flowui-theme.css');
 $jaksaBackgroundVersion = $assetVersion('assets/jaksa-background.css');
+$sidebarLogoVersion = $assetVersion('assets/images/jaksa-sidebar-logo-photoroom.png');
 $welcomeMotionVersion = $assetVersion('assets/welcome-motion.css');
 $appJsVersion = $assetVersion($appJsAsset);
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
@@ -161,10 +162,7 @@ if ($currentRole === 'security') {
     <div class="app-shell">
         <aside class="sidebar" id="sidebar">
             <a href="<?= site_url('dashboard') ?>" class="brand brand-jaksa" aria-label="Dashboard JAKSA — Jamkrindo Kanwil Surabaya Operasional">
-        <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-sidebar-logo-photoroom.png') ?>" width="2172" height="724" alt="JAKSA" decoding="async">
-                <span class="brand-jaksa-expansion" aria-label="Jamkrindo Kanwil Surabaya Operasional">
-                    <b>JA</b>mkrindo <i>·</i> <b>K</b>anwil <i>·</i> <b>S</b>urabaya <i>·</i> oper<b>A</b>sional
-                </span>
+                <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-sidebar-logo-photoroom.png') ?>?v=<?= esc($sidebarLogoVersion, 'attr') ?>" width="2172" height="724" alt="JAKSA" decoding="async">
             </a>
 
             <nav class="main-nav" aria-label="Navigasi utama">
