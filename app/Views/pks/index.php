@@ -44,7 +44,7 @@ $summaryCards = [
         $cardUrl = site_url('bagian-umum-1/pks-barang-jasa') . ($cardQuery === [] ? '' : '?' . http_build_query($cardQuery));
         $isActiveCard = $filters['status'] === $statusKey;
         ?>
-        <a class="pks-summary-card <?= $isActiveCard ? 'is-active' : '' ?>" href="<?= esc($cardUrl) ?>" <?= $isActiveCard ? 'aria-current="page"' : '' ?>>
+        <a class="pks-summary-card pks-summary-card-<?= esc($card['class'], 'attr') ?> <?= $isActiveCard ? 'is-active' : '' ?>" href="<?= esc($cardUrl) ?>" <?= $isActiveCard ? 'aria-current="page"' : '' ?>>
             <span class="pks-summary-icon <?= esc($card['class']) ?>"><?= esc($card['icon']) ?></span>
             <div><small><?= esc($card['label']) ?></small><strong><?= number_format($card['count'], 0, ',', '.') ?></strong></div>
         </a>

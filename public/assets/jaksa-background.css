@@ -1,0 +1,926 @@
+:root {
+    --navy: #263b5e;
+    --blue: #3f72af;
+    --teal: #5ab9a8;
+    --amber: #f2b84b;
+    --cloud: #f4f6f8;
+    --white: #fff;
+}
+
+/* Main page background from the supplied JAKSA background stylesheet. */
+.jaksa-bg {
+    position: relative;
+    min-height: 100vh;
+    background: #f6f8fb;
+}
+.jaksa-bg::before {
+    display: none;
+}
+.jaksa-bg::after {
+    display: none;
+}
+.jaksa-bg > * { position: relative; z-index: 1; }
+.jaksa-bg-ornaments {
+    position: fixed;
+    inset: 0;
+    z-index: 0 !important;
+    display: none;
+    pointer-events: none;
+}
+.jaksa-bg-ornaments .arc-left-bottom {
+    position: absolute;
+    bottom: -230px;
+    left: -180px;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, rgba(90,185,168,.22) 0 34%, transparent 35% 100%);
+    box-shadow: 0 0 0 42px rgba(63,114,175,.08), 0 0 0 88px rgba(90,185,168,.055);
+}
+.jaksa-bg-ornaments .arc-right-mid {
+    position: absolute;
+    top: 280px;
+    right: -240px;
+    width: 520px;
+    height: 520px;
+    border: 56px solid rgba(90,185,168,.08);
+    border-radius: 50%;
+    box-shadow: 0 0 0 52px rgba(63,114,175,.05);
+}
+.jaksa-sidebar {
+    background: linear-gradient(180deg, #143f71 0%, #155b87 48%, #0e7f99 100%);
+}
+.jaksa-gradient { background: linear-gradient(90deg, #2f7ed8 0%, #27a8cb 43%, #5ab9a8 69%, #f2b84b 100%); }
+.jaksa-table-gradient { background: linear-gradient(90deg, #164c91 0%, #1886b1 36%, #2ba9b2 52%, #77b791 74%, #f2c64b 100%); }
+
+/* Integration with the existing application shell. */
+/* Match the specificity of legacy page styles so every menu reveals this backdrop. */
+body.jaksa-bg:not(.landing-page):not(.login-page) .content-shell {
+    background: #f6f8fb !important;
+}
+body.jaksa-bg:not(.landing-page):not(.login-page) .content-shell::before,
+body.jaksa-bg:not(.landing-page):not(.login-page) .content-shell::after { display: none !important; }
+body.jaksa-bg:not(.landing-page):not(.login-page) .main-content { background: transparent !important; }
+body.jaksa-bg .sidebar { background: linear-gradient(180deg, #143f71 0%, #155b87 48%, #0e7f99 100%) !important; }
+
+/* Compact sidebar matched to the Security distribution reference. */
+body.jaksa-bg {
+    --sidebar: 208px;
+}
+body.jaksa-bg .sidebar {
+    width: var(--sidebar) !important;
+    padding: 12px 10px 14px !important;
+    color: #f5fbff !important;
+    background:
+        radial-gradient(ellipse at 104% 12%, rgba(40,146,207,.20), transparent 37%),
+        linear-gradient(160deg, #082a59 0%, #0b4776 53%, #075b79 100%) !important;
+    border: 0 !important;
+    box-shadow: 6px 0 22px rgba(6,43,81,.20) !important;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+body.jaksa-bg .sidebar::-webkit-scrollbar { width: 0; height: 0; }
+body.jaksa-bg .brand.brand-jaksa {
+    min-height: 58px !important;
+    padding: 0 5px 12px !important;
+    overflow: hidden;
+}
+body.jaksa-bg .brand-jaksa-wordmark {
+    display: block !important;
+    flex: 0 0 auto !important;
+    width: 174px !important;
+    max-width: none !important;
+    height: auto !important;
+    filter: drop-shadow(0 3px 7px rgba(0,0,0,.16)) !important;
+    transform: scale(1.23);
+    transform-origin: center;
+}
+body.jaksa-bg .brand.brand-jaksa { position: relative !important; }
+body.jaksa-bg .brand-jaksa-expansion { color: rgba(241,249,255,.86) !important; font-size: 5.8px !important; }
+body.jaksa-bg .brand-jaksa-expansion b { color: #fff !important; -webkit-text-fill-color: #fff !important; }
+body.jaksa-bg .main-nav {
+    padding-right: 2px !important;
+    -ms-overflow-style: none;
+    scrollbar-width: none !important;
+}
+body.jaksa-bg .main-nav::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none; }
+body.jaksa-bg .main-nav::-webkit-scrollbar-thumb,
+body.jaksa-bg .main-nav::-webkit-scrollbar-track { background: transparent !important; }
+body.jaksa-bg .nav-label {
+    margin: 0 5px 7px !important;
+    color: rgba(226,243,253,.70) !important;
+    font-size: 7.5px !important;
+    letter-spacing: 1px !important;
+}
+body.jaksa-bg .nav-label-spaced { margin-top: 16px !important; }
+body.jaksa-bg .nav-link {
+    min-height: 40px !important;
+    margin-bottom: 3px !important;
+    padding: 6px 8px !important;
+    color: rgba(247,252,255,.94) !important;
+    border-radius: 9px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+}
+body.jaksa-bg .nav-link:hover { color: #fff !important; background: rgba(121,210,232,.13) !important; }
+body.jaksa-bg .nav-icon,
+body.jaksa-bg .nav-link .nav-icon {
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    color: #d9f2ff !important;
+    background: rgba(255,255,255,.10) !important;
+    border: 1px solid rgba(172,224,249,.26) !important;
+    border-radius: 8px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 3px 8px rgba(2,27,66,.18) !important;
+    font-size: 12px !important;
+}
+body.jaksa-bg .nav-icon > i { color: inherit !important; }
+body.jaksa-bg .nav-icon.image-nav-icon,
+body.jaksa-bg .nav-link .nav-icon.image-nav-icon {
+    background: rgba(255,255,255,.10) !important;
+    border-color: rgba(172,224,249,.26) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 3px 8px rgba(2,27,66,.18) !important;
+}
+body.jaksa-bg .image-nav-icon::before {
+    width: 17px !important;
+    height: 17px !important;
+    background: currentColor !important;
+}
+body.jaksa-bg .account-nav-icon { --nav-image: url("images/people-64.webp"); }
+body.jaksa-bg .nav-link:hover .nav-icon {
+    color: #fff !important;
+    background: rgba(87,191,224,.20) !important;
+    border-color: rgba(198,239,255,.38) !important;
+}
+body.jaksa-bg .nav-link.active,
+body.jaksa-bg .nav-parent.active {
+    color: #fff !important;
+    background: linear-gradient(100deg, #2a75c9 0%, #35b7ca 58%, #60cfb8 100%) !important;
+    box-shadow: 0 6px 14px rgba(4,43,95,.23) !important;
+}
+body.jaksa-bg .nav-link.active .nav-icon,
+body.jaksa-bg .nav-parent.active .nav-icon {
+    color: #fff !important;
+    background: rgba(255,255,255,.20) !important;
+    border-color: rgba(255,255,255,.34) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 3px 8px rgba(3,48,87,.14) !important;
+}
+body.jaksa-bg .nav-submenu {
+    margin: 0 0 6px 13px !important;
+    padding: 3px 0 3px 11px !important;
+    border-left-color: rgba(117,215,227,.42) !important;
+}
+body.jaksa-bg .nav-sublink {
+    min-height: 31px !important;
+    padding: 5px 8px !important;
+    color: rgba(242,250,255,.90) !important;
+    border-radius: 8px !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+}
+body.jaksa-bg .nav-sublink > span { color: #60d2dd !important; font-size: 5px !important; }
+body.jaksa-bg .nav-sublink:hover { color: #fff !important; background: rgba(121,210,232,.14) !important; }
+body.jaksa-bg .nav-sublink.active {
+    color: #fff !important;
+    background: linear-gradient(100deg, #237aca 0%, #39accc 63%, #ffd35d 100%) !important;
+    box-shadow: 0 6px 13px rgba(4,36,75,.24) !important;
+}
+body.jaksa-bg .nav-sublink.active > span { color: #fff !important; }
+body.jaksa-bg .nav-chevron { color: #e8f8ff !important; font-size: 13px !important; }
+body.jaksa-bg .nav-link-muted .nav-icon { color: #fff !important; background: rgba(88,168,220,.34) !important; }
+body.jaksa-bg .nav-status-dot { background: #ffd35d !important; box-shadow: 0 0 0 4px rgba(255,211,93,.15) !important; }
+body.jaksa-bg .sidebar-account { background: rgba(8,56,103,.30) !important; border-color: rgba(180,228,252,.17) !important; }
+/* Keep the sidebar quiet and legible: no decorative overlays or watermark. */
+body.jaksa-bg .sidebar::before,
+body.jaksa-bg .sidebar::after,
+body.jaksa-bg .sidebar-pattern {
+    display: none !important;
+    content: none !important;
+}
+
+/* Keep data panels clean; the page background remains outside the table only. */
+body.jaksa-bg .security-register-panel::after {
+    display: none !important;
+}
+body.jaksa-bg .security-register-panel,
+body.jaksa-bg .progress-document-panel {
+    min-height: 0 !important;
+}
+
+/* Progress tables fit a standard laptop viewport without clipping the action column. */
+body.jaksa-bg.progress-page .progress-document-panel table {
+    width: 100% !important;
+    min-width: 900px !important;
+    table-layout: fixed !important;
+}
+body.jaksa-bg.progress-page .progress-document-panel th,
+body.jaksa-bg.progress-page .progress-document-panel td {
+    padding-inline: 7px !important;
+}
+body.jaksa-bg.progress-page .progress-document-panel .table-actions { gap: 3px !important; }
+body.jaksa-bg.progress-page .progress-document-panel .table-actions .icon-btn {
+    width: 25px !important;
+    min-width: 25px !important;
+    height: 25px !important;
+    padding: 0 !important;
+    border-radius: 6px !important;
+    font-size: 10px !important;
+}
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(1) { width: 3%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(2) { width: 8%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(3) { width: 10%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(4) { width: 16%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(5) { width: 14%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(6) { width: 9%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(7) { width: 14%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(8) { width: 15%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(9) { width: 11%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(1) { width: 4%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(2) { width: 13%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(3) { width: 10%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(4),
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(5) { width: 9%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(6) { width: 10%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(7) { width: 17%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(8) { width: 9%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(9),
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(10) { width: 9.5%; }
+
+/* Neutral canvas while the replacement background template is being prepared. */
+body.jaksa-bg:not(.landing-page):not(.login-page) .page-heading:not(.security-page-heading):not(.distribution-heading),
+body.jaksa-bg:not(.landing-page):not(.login-page) .security-page-heading,
+body.jaksa-bg:not(.landing-page):not(.login-page) .distribution-heading {
+    background: #fff !important;
+}
+body.jaksa-bg:not(.landing-page):not(.login-page) .page-heading::before,
+body.jaksa-bg:not(.landing-page):not(.login-page) .page-heading::after,
+body.jaksa-bg:not(.landing-page):not(.login-page) .security-page-heading::before,
+body.jaksa-bg:not(.landing-page):not(.login-page) .security-page-heading::after,
+body.jaksa-bg:not(.landing-page):not(.login-page) .distribution-heading::before,
+body.jaksa-bg:not(.landing-page):not(.login-page) .distribution-heading::after {
+    display: none !important;
+}
+
+/* Preserve the application's desktop collapsed state after the sidebar resize. */
+@media (min-width: 901px) {
+    html.sidebar-collapsed body.jaksa-bg .sidebar {
+        width: 64px !important;
+        padding-inline: 8px !important;
+    }
+    html.sidebar-collapsed body.jaksa-bg .content-shell {
+        margin-left: 64px !important;
+    }
+}
+
+/* One shared card-tab design for every module with tab navigation. */
+body.jaksa-bg .vehicle-module-tabs,
+body.jaksa-bg .lr-report-tabs {
+    gap: 12px !important;
+    margin: 0 0 14px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+body.jaksa-bg .vehicle-module-tab,
+body.jaksa-bg .lr-report-tab {
+    display: grid !important;
+    grid-template-columns: 58px minmax(0, 1fr) !important;
+    column-gap: 18px !important;
+    align-items: center !important;
+    min-height: 91px !important;
+    padding: 15px 19px !important;
+    color: #0d356a !important;
+    background: linear-gradient(105deg, #fff, #f3fbff) !important;
+    border: 1px solid #d5e8f4 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 6px 16px rgba(20,80,120,.08) !important;
+    text-decoration: none !important;
+    transform: none !important;
+}
+body.jaksa-bg .vehicle-module-tab:hover,
+body.jaksa-bg .lr-report-tab:hover {
+    background: linear-gradient(110deg, #fff, #eef9ff) !important;
+    border-color: #a9d7ef !important;
+    transform: none !important;
+}
+body.jaksa-bg .vehicle-module-tab.active,
+body.jaksa-bg .lr-report-tab.is-active {
+    background: linear-gradient(110deg, #fff, #edf8ff 66%, #d9f2ff) !important;
+    border: 2px solid #248df1 !important;
+    box-shadow: 0 7px 17px rgba(21,121,225,.16) !important;
+}
+body.jaksa-bg .vehicle-module-tab > span,
+body.jaksa-bg .lr-report-tab-badge {
+    display: grid !important;
+    width: 58px !important;
+    height: 58px !important;
+    place-items: center !important;
+    color: #fff !important;
+    background: linear-gradient(135deg, #317fc8, #154b9a) !important;
+    border: 0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 7px 13px rgba(16,72,155,.22) !important;
+    font-size: 18px !important;
+    font-weight: 900 !important;
+}
+body.jaksa-bg .vehicle-module-tab:nth-child(2) > span,
+body.jaksa-bg .lr-report-tab:nth-child(2) .lr-report-tab-badge {
+    background: linear-gradient(135deg, #65d4bf, #2aadaf) !important;
+}
+body.jaksa-bg .vehicle-module-tab:nth-child(3) > span,
+body.jaksa-bg .vehicle-module-tab:nth-child(4) > span {
+    background: linear-gradient(135deg, #4c91d2, #2265ad) !important;
+}
+body.jaksa-bg .vehicle-module-tab > div,
+body.jaksa-bg .lr-report-tab > span:last-child {
+    display: grid !important;
+    min-width: 0 !important;
+    gap: 4px !important;
+}
+body.jaksa-bg .vehicle-module-tab strong,
+body.jaksa-bg .lr-report-tab strong {
+    color: #0d356a !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+}
+body.jaksa-bg .vehicle-module-tab small,
+body.jaksa-bg .lr-report-tab small {
+    margin: 0 !important;
+    color: #5e7fa8 !important;
+    font-size: 9.5px !important;
+    font-weight: 600 !important;
+}
+@media (max-width: 700px) {
+    body.jaksa-bg .vehicle-module-tabs,
+    body.jaksa-bg .lr-report-tabs {
+        display: flex !important;
+        overflow-x: auto !important;
+    }
+    body.jaksa-bg .vehicle-module-tab,
+    body.jaksa-bg .lr-report-tab { flex: 0 0 260px !important; }
+}
+
+/* Compact Distribution table so the complete action column fits on desktop. */
+body.jaksa-bg.distribution-page .security-register-panel table {
+    width: 100% !important;
+    min-width: 960px !important;
+    table-layout: fixed !important;
+}
+body.jaksa-bg.distribution-page .security-register-panel th,
+body.jaksa-bg.distribution-page .security-register-panel td {
+    padding: 9px 8px !important;
+    font-size: 9px !important;
+}
+body.jaksa-bg.distribution-page .security-register-panel th { height: 42px !important; font-size: 8px !important; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(1) { width: 4%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(2) { width: 18%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(3) { width: 15%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(4) { width: 12%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(5) { width: 13%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(6) { width: 7%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(7) { width: 5%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(8) { width: 7%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(9) { width: 19%; }
+body.jaksa-bg.distribution-page .security-register-panel .table-actions { gap: 3px !important; white-space: nowrap; }
+body.jaksa-bg.distribution-page .security-register-panel .icon-btn {
+    width: 27px !important;
+    min-width: 27px !important;
+    height: 27px !important;
+    padding: 0 !important;
+    border-radius: 7px !important;
+    font-size: 11px !important;
+}
+body.jaksa-bg.distribution-page .security-register-panel .distribution-action-button {
+    min-width: 44px !important;
+    min-height: 27px !important;
+    padding: 4px 6px !important;
+    border-radius: 7px !important;
+    font-size: 7px !important;
+}
+body.jaksa-bg.distribution-page .security-register-panel .security-type-chip,
+body.jaksa-bg.distribution-page .security-register-panel .security-expedition-chip {
+    padding: 4px 7px !important;
+    font-size: 7px !important;
+}
+
+/* The same compact table scale is used by every menu module. */
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table {
+    font-size: 9px !important;
+}
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table > thead > tr > th,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table > thead > tr > th {
+    height: 42px !important;
+    padding: 8px 9px !important;
+    font-size: 8px !important;
+}
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table > tbody > tr > td,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table > tbody > tr > td {
+    min-height: 42px !important;
+    padding: 8px 9px !important;
+    font-size: 9px !important;
+}
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-actions {
+    gap: 4px !important;
+}
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-actions .icon-btn {
+    width: 29px !important;
+    min-width: 29px !important;
+    height: 29px !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+}
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) :is(.security-type-chip, .security-expedition-chip, .agenda-source, .pickup-status, .vehicle-status, .vehicle-document-type, .vehicle-action, .vehicle-expiry, .magang-status, .simulation-stat) {
+    padding: 4px 7px !important;
+    font-size: 7px !important;
+}
+
+/* Compact application scale, aligned with the supplied reference layout. */
+body.jaksa-bg .topbar {
+    position: fixed !important;
+    min-height: 52px !important;
+    padding-inline: 18px !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: var(--sidebar) !important;
+    z-index: 110 !important;
+    overflow: visible !important;
+}
+body.jaksa-bg .main-content { padding-top: 69px !important; }
+html.sidebar-collapsed body.jaksa-bg .topbar { left: 64px !important; }
+/* Dropdowns belong to the navbar layer, never to the page flow. */
+body.jaksa-bg .content-shell { overflow: visible !important; }
+body.jaksa-bg .topbar-meta,
+body.jaksa-bg .topbar-profile,
+body.jaksa-bg .topbar-notification { position: relative !important; }
+body.jaksa-bg .topbar-meta { z-index: 111 !important; }
+body.jaksa-bg .topbar-profile-dropdown,
+body.jaksa-bg .topbar-notification-dropdown {
+    z-index: 130 !important;
+    top: calc(100% + 8px) !important;
+    overflow: hidden !important;
+    border-color: #d3e4f0 !important;
+    box-shadow: 0 16px 38px rgba(8,44,88,.20) !important;
+}
+body.jaksa-bg .topbar-profile-dropdown {
+    right: 0 !important;
+    left: auto !important;
+}
+body.jaksa-bg .topbar-notification-dropdown {
+    right: 0 !important;
+    left: auto !important;
+}
+body.jaksa-bg .topbar-profile.open .topbar-profile-trigger,
+body.jaksa-bg .topbar-notification.open .topbar-notification-trigger {
+    position: relative;
+    z-index: 131;
+}
+@media (max-width: 900px) {
+    body.jaksa-bg .topbar { left: 0 !important; }
+    body.jaksa-bg .topbar-profile-dropdown,
+    body.jaksa-bg .topbar-notification-dropdown {
+        position: fixed !important;
+        top: 60px !important;
+        right: 10px !important;
+        left: auto !important;
+        width: min(340px, calc(100vw - 20px)) !important;
+        max-height: calc(100dvh - 72px) !important;
+    }
+}
+body.jaksa-bg .menu-toggle {
+    width: 36px !important;
+    height: 36px !important;
+    margin-right: 11px !important;
+}
+body.jaksa-bg .topbar-title span { font-size: 7px !important; }
+body.jaksa-bg .topbar-title strong { font-size: 13px !important; }
+body.jaksa-bg .topbar-icon,
+body.jaksa-bg .date-pill,
+body.jaksa-bg .topbar-profile-trigger { min-height: 36px !important; }
+body.jaksa-bg .topbar-icon { width: 36px !important; height: 36px !important; }
+body.jaksa-bg .main-content { padding: 69px 20px 20px !important; }
+body.jaksa-bg .footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 40px !important;
+    margin-top: auto !important;
+    padding: 0 20px !important;
+    color: #8aa0b9 !important;
+    background: rgba(255,255,255,.94) !important;
+    border-top: 1px solid #dbe7f0 !important;
+    font-size: 8px !important;
+}
+body.jaksa-bg .page-heading,
+body.jaksa-bg .security-page-heading,
+body.jaksa-bg .distribution-heading {
+    min-height: 78px !important;
+    margin: -17px -20px 12px !important;
+    padding: 17px 20px 11px !important;
+}
+body.jaksa-bg .page-heading h1,
+body.jaksa-bg .security-page-heading h1,
+body.jaksa-bg .distribution-heading h1 { font-size: clamp(23px, 1.8vw, 29px) !important; }
+body.jaksa-bg .page-heading .eyebrow,
+body.jaksa-bg .security-page-heading .eyebrow,
+body.jaksa-bg .distribution-heading .eyebrow { margin-bottom: 4px !important; font-size: 8px !important; }
+body.jaksa-bg .heading-actions .btn,
+body.jaksa-bg .heading-button-group .btn { min-height: 38px !important; padding-inline: 16px !important; font-size: 9px !important; }
+
+body.jaksa-bg .security-distribution-tabs,
+body.jaksa-bg .vehicle-module-tabs,
+body.jaksa-bg .lr-report-tabs { gap: 10px !important; margin-bottom: 12px !important; }
+body.jaksa-bg .security-distribution-tabs .progress-document-tab,
+body.jaksa-bg .vehicle-module-tab,
+body.jaksa-bg .lr-report-tab {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    column-gap: 12px !important;
+    min-height: 74px !important;
+    padding: 11px 14px !important;
+    border-radius: 12px !important;
+}
+body.jaksa-bg .security-distribution-tabs .progress-document-tab > span,
+body.jaksa-bg .vehicle-module-tab > span,
+body.jaksa-bg .lr-report-tab-badge {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 5px 11px rgba(16,72,155,.18) !important;
+    font-size: 20px !important;
+}
+body.jaksa-bg .security-distribution-tabs .progress-document-tab strong,
+body.jaksa-bg .vehicle-module-tab strong,
+body.jaksa-bg .lr-report-tab strong { font-size: 10px !important; }
+body.jaksa-bg .security-distribution-tabs .progress-document-tab small,
+body.jaksa-bg .vehicle-module-tab small,
+body.jaksa-bg .lr-report-tab small { font-size: 8px !important; }
+
+body.jaksa-bg .filter-panel { padding: 10px 14px !important; }
+body.jaksa-bg .filter-panel label { font-size: 8px !important; }
+body.jaksa-bg .filter-panel :is(input, select) { min-height: 38px !important; font-size: 9px !important; }
+body.jaksa-bg .filter-panel .filter-actions .btn { min-height: 38px !important; padding-inline: 14px !important; font-size: 9px !important; }
+body.jaksa-bg .filter-panel .list-order-menu > summary { width: 38px !important; height: 38px !important; }
+body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel { padding: 10px 14px !important; }
+body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel :is(input, select) { min-height: 38px !important; font-size: 9px !important; }
+body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel .filter-actions .btn { min-height: 38px !important; font-size: 9px !important; }
+body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel .list-order-menu > summary { width: 38px !important; height: 38px !important; }
+
+/* PKS status cards follow the four-card visual hierarchy from the supplied reference. */
+body.jaksa-bg .pks-summary-grid { gap: 12px !important; margin-bottom: 16px !important; }
+body.jaksa-bg .pks-summary-card {
+    position: relative !important;
+    min-height: 86px !important;
+    padding: 15px 17px !important;
+    overflow: hidden !important;
+    background: linear-gradient(105deg, #fff 0%, #fbfdff 62%, #edf9ff 100%) !important;
+    border: 1px solid #d8e9f4 !important;
+    border-radius: 13px !important;
+    box-shadow: 0 8px 20px rgba(17,66,117,.08) !important;
+}
+body.jaksa-bg .pks-summary-card::after {
+    position: absolute;
+    top: -78px;
+    right: -47px;
+    width: 155px;
+    height: 155px;
+    border: 24px solid rgba(58,163,234,.13);
+    border-radius: 50%;
+    box-shadow: -31px 33px 0 -15px rgba(84,208,195,.12);
+    content: "";
+    pointer-events: none;
+}
+body.jaksa-bg .pks-summary-card > * { position: relative; z-index: 1; }
+body.jaksa-bg .pks-summary-card:hover {
+    border-color: #68c6e4 !important;
+    box-shadow: 0 12px 24px rgba(17,104,158,.14) !important;
+    transform: translateY(-2px);
+}
+body.jaksa-bg .pks-summary-card.is-active {
+    border-color: #53bae0 !important;
+    box-shadow: 0 0 0 2px rgba(39,149,220,.10), 0 10px 23px rgba(17,104,158,.12) !important;
+}
+body.jaksa-bg .pks-summary-icon {
+    flex-basis: 48px !important;
+    width: 48px !important;
+    height: 48px !important;
+    color: #fff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 16px rgba(10,85,150,.20) !important;
+    font-size: 19px !important;
+}
+body.jaksa-bg .pks-summary-icon.total { background: linear-gradient(135deg, #1778ce, #08b7bb) !important; }
+body.jaksa-bg .pks-summary-icon.active { background: linear-gradient(135deg, #078d80, #1dc8ad) !important; box-shadow: 0 8px 16px rgba(4,133,117,.20) !important; }
+body.jaksa-bg .pks-summary-icon.warning { background: linear-gradient(135deg, #ce7a00, #ffb415) !important; box-shadow: 0 8px 16px rgba(195,119,0,.20) !important; }
+body.jaksa-bg .pks-summary-icon.expired { background: linear-gradient(135deg, #be264a, #ec4c6a) !important; box-shadow: 0 8px 16px rgba(175,35,65,.20) !important; }
+body.jaksa-bg .pks-summary-card-active { background: linear-gradient(105deg, #fff 0%, #fbfffe 62%, #e8fbf5 100%) !important; }
+body.jaksa-bg .pks-summary-card-active::after { border-color: rgba(56,198,174,.13); box-shadow: -31px 33px 0 -15px rgba(96,216,206,.14); }
+body.jaksa-bg .pks-summary-card-warning { background: linear-gradient(105deg, #fff 0%, #fffefa 62%, #fff4d7 100%) !important; }
+body.jaksa-bg .pks-summary-card-warning::after { border-color: rgba(250,190,63,.15); box-shadow: -31px 33px 0 -15px rgba(255,210,109,.15); }
+body.jaksa-bg .pks-summary-card-expired { background: linear-gradient(105deg, #fff 0%, #fffdfd 62%, #fff0f3 100%) !important; }
+body.jaksa-bg .pks-summary-card-expired::after { border-color: rgba(233,95,120,.12); box-shadow: -31px 33px 0 -15px rgba(249,171,186,.14); }
+body.jaksa-bg .pks-summary-grid small { color: #7385a3 !important; font-size: 9px !important; }
+body.jaksa-bg .pks-summary-grid strong { margin-top: 4px !important; color: #0b3d7b !important; font-size: 23px !important; }
+
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table > thead > tr > th,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table > thead > tr > th {
+    height: 36px !important;
+    padding: 7px 8px !important;
+    font-size: 7.5px !important;
+}
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table > tbody > tr > td,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table > tbody > tr > td {
+    min-height: 38px !important;
+    padding: 7px 8px !important;
+    font-size: 8.5px !important;
+}
+@media (max-width: 700px) {
+    body.jaksa-bg .main-content { padding: 66px 14px 14px !important; }
+    body.jaksa-bg .page-heading,
+    body.jaksa-bg .security-page-heading,
+    body.jaksa-bg .distribution-heading { margin: -14px -14px 10px !important; padding: 14px !important; }
+    body.jaksa-bg .footer { align-items: flex-start !important; flex-direction: column !important; gap: 3px !important; min-height: 0 !important; padding: 9px 14px !important; }
+}
+
+/* Continuous navy-to-yellow gradient for every data-list header. */
+body.jaksa-bg .table-wrap > table > thead,
+body.jaksa-bg .oracle-mapping-table-wrap > table > thead,
+body.jaksa-bg table.simulation-table > thead,
+body.jaksa-bg .lr-report-table > thead {
+    background: linear-gradient(90deg, #123f7e 0%, #1f6fa7 24%, #209cad 47%, #76af93 72%, #f4ca5b 100%) !important;
+}
+body.jaksa-bg .table-wrap > table > thead > tr > th,
+body.jaksa-bg .oracle-mapping-table-wrap > table > thead > tr > th,
+body.jaksa-bg table.simulation-table > thead > tr > th,
+body.jaksa-bg .lr-report-table > thead > tr > th {
+    color: #fff !important;
+    background: transparent !important;
+    border-color: rgba(255,255,255,.24) !important;
+}
+
+/* Shared popup system: always fit the viewport and use the application palette. */
+body.jaksa-bg .input-modal,
+body.jaksa-bg .edit-modal,
+body.jaksa-bg .delete-modal,
+body.jaksa-bg .detail-modal,
+body.jaksa-bg .agendaris-form-modal,
+body.jaksa-bg .agendaris-detail-modal,
+body.jaksa-bg .agendaris-delete-modal,
+body.jaksa-bg .distribution-action-modal,
+body.jaksa-bg .account-modal,
+body.jaksa-bg .vehicle-crud-modal,
+body.jaksa-bg .attendance-calendar-modal,
+body.jaksa-bg .attendance-detail-modal,
+body.jaksa-bg .attendance-report-modal,
+body.jaksa-bg .attendance-recap-delete-modal,
+body.jaksa-bg .spk-edit-modal,
+body.jaksa-bg .pks-main-modal,
+body.jaksa-bg .pks-delete-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1000 !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 16px !important;
+    isolation: isolate;
+}
+/* Preserve every popup's native hidden state while the shared layer is inactive. */
+body.jaksa-bg .input-modal[hidden],
+body.jaksa-bg .edit-modal[hidden],
+body.jaksa-bg .delete-modal[hidden],
+body.jaksa-bg .detail-modal[hidden],
+body.jaksa-bg .agendaris-form-modal[hidden],
+body.jaksa-bg .agendaris-detail-modal[hidden],
+body.jaksa-bg .agendaris-delete-modal[hidden],
+body.jaksa-bg .distribution-action-modal[hidden],
+body.jaksa-bg .account-modal[hidden],
+body.jaksa-bg .vehicle-crud-modal[hidden],
+body.jaksa-bg .attendance-calendar-modal[hidden],
+body.jaksa-bg .attendance-detail-modal[hidden],
+body.jaksa-bg .attendance-report-modal[hidden],
+body.jaksa-bg .attendance-recap-delete-modal[hidden],
+body.jaksa-bg .spk-edit-modal[hidden],
+body.jaksa-bg .pks-main-modal[hidden],
+body.jaksa-bg .pks-delete-modal[hidden] {
+    display: none !important;
+}
+body.jaksa-bg .modal-backdrop {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    background: rgba(7,35,69,.56) !important;
+    backdrop-filter: blur(5px) !important;
+}
+body.jaksa-bg .modal-dialog,
+body.jaksa-bg dialog {
+    position: relative !important;
+    z-index: 1 !important;
+    max-height: calc(100dvh - 32px) !important;
+    border: 1px solid #d8e7f2 !important;
+    border-radius: 16px !important;
+    background: #fff !important;
+    box-shadow: 0 26px 72px rgba(4,31,65,.30) !important;
+}
+body.jaksa-bg dialog::backdrop { background: rgba(7,35,69,.56) !important; backdrop-filter: blur(5px) !important; }
+body.jaksa-bg.modal-open { overflow: hidden !important; }
+body.jaksa-bg .modal-dialog > form,
+body.jaksa-bg .modal-dialog > .modal-body,
+body.jaksa-bg .modal-dialog > .edit-modal-body,
+body.jaksa-bg .modal-dialog > .agendaris-modal-body {
+    min-height: 0 !important;
+}
+body.jaksa-bg .modal-dialog > form {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+}
+body.jaksa-bg .modal-body,
+body.jaksa-bg .input-modal-body,
+body.jaksa-bg .edit-modal-body,
+body.jaksa-bg .agendaris-modal-body,
+body.jaksa-bg .detail-modal-content {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-color: #3a9db6 #edf5fa;
+}
+body.jaksa-bg .modal-header {
+    flex: 0 0 auto !important;
+    padding: 16px 20px !important;
+    border-bottom-color: #dfeaf3 !important;
+    background: linear-gradient(105deg, #fff, #f1f9ff) !important;
+}
+body.jaksa-bg .modal-title-icon {
+    color: #fff !important;
+    background: linear-gradient(135deg, #123f7e, #2587d1 63%, #45c5b8) !important;
+    border-radius: 11px !important;
+    box-shadow: 0 7px 14px rgba(18,63,126,.22) !important;
+}
+body.jaksa-bg .modal-title-group p { color: #6a83a2 !important; }
+body.jaksa-bg .modal-title-group h2 { color: #0b3369 !important; }
+body.jaksa-bg .modal-close {
+    color: #55759c !important;
+    background: #f1f7fc !important;
+    border: 1px solid #dfebf5 !important;
+}
+body.jaksa-bg .modal-close:hover { color: #0d4f8d !important; background: #e5f3ff !important; }
+body.jaksa-bg .modal-section-heading { border-bottom-color: #e2edf5 !important; }
+body.jaksa-bg .modal-section-heading > span {
+    color: #176bae !important;
+    background: #e4f3ff !important;
+    border-radius: 8px !important;
+}
+body.jaksa-bg .modal-section-heading strong { color: #173b6d !important; }
+body.jaksa-bg .modal-section-heading small { color: #8094ad !important; }
+body.jaksa-bg .modal-footer,
+body.jaksa-bg .delete-modal-actions,
+body.jaksa-bg .detail-modal-footer {
+    flex: 0 0 auto !important;
+    border-top-color: #dfeaf3 !important;
+    background: #f8fbfe !important;
+}
+body.jaksa-bg .modal-body :is(input, select, textarea) {
+    border-color: #cfe1ef !important;
+    background: #fff !important;
+}
+body.jaksa-bg .modal-body :is(input, select, textarea):focus {
+    border-color: #2992d3 !important;
+    box-shadow: 0 0 0 3px rgba(41,146,211,.13) !important;
+}
+
+/* Account management matches the dedicated Add Account reference. */
+body.jaksa-bg.account-management-page .account-heading {
+    min-height: 142px !important;
+    margin: 0 0 16px !important;
+    padding: 25px 27px !important;
+    overflow: hidden !important;
+    background:
+        radial-gradient(ellipse 44% 230% at 76% -42%, rgba(255,201,71,.27) 0 38%, transparent 39%),
+        radial-gradient(ellipse 34% 200% at 88% -34%, rgba(91,211,229,.22) 0 48%, transparent 49%),
+        radial-gradient(ellipse 38% 220% at 100% 35%, rgba(65,197,184,.18) 0 34%, transparent 35%),
+        linear-gradient(115deg, #fffdf7 0%, #fff 49%, #f5fcff 100%) !important;
+    border: 1px solid #dce9f3 !important;
+    border-radius: 17px !important;
+    box-shadow: 0 11px 26px rgba(18,63,126,.06) !important;
+}
+body.jaksa-bg.account-management-page .account-heading::after {
+    display: block !important;
+    top: -120px !important;
+    right: -62px !important;
+    width: 410px !important;
+    height: 265px !important;
+    border: 25px solid rgba(98,207,225,.16) !important;
+    border-radius: 50% !important;
+    box-shadow: -68px 3px 0 -22px rgba(255,202,75,.18), -130px -24px 0 -28px rgba(64,196,184,.13) !important;
+    transform: rotate(-19deg) !important;
+}
+body.jaksa-bg.account-management-page .account-heading > div:first-child {
+    position: relative !important;
+    min-height: 0;
+    padding: 0;
+}
+body.jaksa-bg.account-management-page .account-heading > div:first-child::before,
+body.jaksa-bg.account-management-page .account-heading > div:first-child::after { display: none !important; }
+body.jaksa-bg.account-management-page .account-heading .eyebrow { color: #0788db !important; font-size: 9px !important; }
+body.jaksa-bg.account-management-page .account-heading h1 { margin-top: 9px !important; color: #082759 !important; font-size: 31px !important; letter-spacing: -.6px !important; }
+body.jaksa-bg.account-management-page .account-heading p { margin-top: 7px !important; color: #607aa4 !important; font-size: 14px !important; }
+body.jaksa-bg.account-management-page .account-heading .btn-primary {
+    min-height: 45px !important;
+    padding: 0 20px !important;
+    color: #fff !important;
+    background: linear-gradient(135deg, #ffbd45, #ffa828) !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 9px 19px rgba(238,154,27,.25) !important;
+    font-size: 11px !important;
+}
+body.jaksa-bg.account-management-page .account-stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    gap: 11px !important;
+    margin-bottom: 16px !important;
+}
+body.jaksa-bg.account-management-page .account-stat-grid article {
+    position: relative !important;
+    min-height: 87px !important;
+    padding: 20px 15px 14px 75px !important;
+    background: #fff !important;
+    border: 1px solid #d8e8f3 !important;
+    border-top: 1px solid #d8e8f3 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 20px rgba(18,63,126,.07) !important;
+}
+body.jaksa-bg.account-management-page .account-stat-grid article::before {
+    position: absolute;
+    top: 20px;
+    left: 16px;
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    background: #e9f5ff;
+    content: "";
+    -webkit-mask: var(--account-stat-icon) center / 19px no-repeat;
+    mask: var(--account-stat-icon) center / 19px no-repeat;
+}
+body.jaksa-bg.account-management-page .account-stat-grid .is-total { --account-stat-icon: url("images/people-64.webp"); }
+body.jaksa-bg.account-management-page .account-stat-grid .role-admin { --account-stat-icon: url("images/people-64.webp"); }
+body.jaksa-bg.account-management-page .account-stat-grid .role-security { --account-stat-icon: url("images/security-policeman-64.webp"); }
+body.jaksa-bg.account-management-page .account-stat-grid .role-agendaris { --account-stat-icon: url("images/agendaris-agenda-64.webp"); }
+body.jaksa-bg.account-management-page .account-stat-grid .role-umum_1,
+body.jaksa-bg.account-management-page .account-stat-grid .role-umum_2 { --account-stat-icon: url("images/general-section-64.webp"); }
+body.jaksa-bg.account-management-page .account-stat-grid .role-akutansi { --account-stat-icon: url("images/indonesian-rupiah-64.webp"); }
+body.jaksa-bg.account-management-page .account-stat-grid .role-sdm { --account-stat-icon: url("images/people-64.webp"); }
+body.jaksa-bg.account-management-page .account-stat-grid .is-total::before { background: #168ef2; }
+body.jaksa-bg.account-management-page .account-stat-grid .role-admin::before { background: #df4965; }
+body.jaksa-bg.account-management-page .account-stat-grid .role-security::before { background: #18a771; }
+body.jaksa-bg.account-management-page .account-stat-grid .role-agendaris::before,
+body.jaksa-bg.account-management-page .account-stat-grid .role-sdm::before { background: #7e43dc; }
+body.jaksa-bg.account-management-page .account-stat-grid .role-umum_1::before,
+body.jaksa-bg.account-management-page .account-stat-grid .role-umum_2::before { background: #2189e8; }
+body.jaksa-bg.account-management-page .account-stat-grid .role-akutansi::before { background: #efa122; }
+body.jaksa-bg.account-management-page .account-stat-grid span { color: #6680a7 !important; font-size: 9px !important; }
+body.jaksa-bg.account-management-page .account-stat-grid strong { margin-top: 5px !important; color: #082759 !important; font-size: 22px !important; }
+body.jaksa-bg.account-management-page .account-table-panel { border-top: 3px solid #20afa9 !important; }
+body.jaksa-bg.account-management-page .account-name-cell > span {
+    color: #fff !important;
+    background: linear-gradient(135deg, #176bb4, #46c4b8) !important;
+    border-color: transparent !important;
+}
+body.jaksa-bg.account-management-page .account-role {
+    border-color: #bde7e2 !important;
+    background: #ecfaf7 !important;
+    color: #157d78 !important;
+}
+@media (max-width: 700px) {
+    body.jaksa-bg.account-management-page .account-heading {
+        min-height: 122px !important;
+        margin: 0 0 10px !important;
+        padding: 18px !important;
+    }
+    body.jaksa-bg.account-management-page .account-heading h1 { font-size: 24px !important; }
+    body.jaksa-bg.account-management-page .account-heading p { font-size: 11px !important; }
+    body.jaksa-bg.account-management-page .account-heading .btn-primary { min-height: 38px !important; padding-inline: 13px !important; }
+    body.jaksa-bg.account-management-page .account-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 700px) {
+    body.jaksa-bg .input-modal,
+    body.jaksa-bg .edit-modal,
+    body.jaksa-bg .delete-modal,
+    body.jaksa-bg .detail-modal,
+    body.jaksa-bg .agendaris-form-modal,
+    body.jaksa-bg .agendaris-detail-modal,
+    body.jaksa-bg .agendaris-delete-modal,
+    body.jaksa-bg .distribution-action-modal,
+    body.jaksa-bg .account-modal,
+    body.jaksa-bg .vehicle-crud-modal,
+    body.jaksa-bg .attendance-calendar-modal,
+    body.jaksa-bg .attendance-detail-modal,
+    body.jaksa-bg .attendance-report-modal,
+    body.jaksa-bg .attendance-recap-delete-modal,
+    body.jaksa-bg .spk-edit-modal,
+    body.jaksa-bg .pks-main-modal,
+    body.jaksa-bg .pks-delete-modal { padding: 8px !important; }
+    body.jaksa-bg .modal-dialog,
+    body.jaksa-bg dialog { max-height: calc(100dvh - 16px) !important; border-radius: 14px !important; }
+}

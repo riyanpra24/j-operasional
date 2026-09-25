@@ -18,7 +18,7 @@ $contextLabel = $tellerArchiveView ? 'SDM & TELLER' : ($generalSectionView ? 'BA
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<section class="page-heading heading-actions">
+<section class="page-heading heading-actions <?= ($securityView ?? false) ? 'security-page-heading' : '' ?>">
     <div>
         <p class="eyebrow"><?= esc($contextLabel) ?></p>
         <h1><?= esc($title) ?></h1>
@@ -27,7 +27,7 @@ $contextLabel = $tellerArchiveView ? 'SDM & TELLER' : ($generalSectionView ? 'BA
     <?php if (! $readOnly): ?><button type="button" class="btn btn-primary" data-dokumen-keluar-add>＋ Tambah Surat Keluar</button><?php endif ?>
 </section>
 
-<section class="panel filter-panel">
+<section class="panel filter-panel <?= ($securityView ?? false) ? 'security-filter-panel' : '' ?>">
     <form method="get" action="<?= $indexUrl ?>" class="agendaris-filter-form">
         <div class="form-group search-group"><label for="keluar_q">Cari dokumen</label>
             <div class="input-with-icon"><span>⌕</span><input id="keluar_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor surat, pemohon, pelaksana, UP, alamat..."></div>
@@ -43,7 +43,7 @@ $contextLabel = $tellerArchiveView ? 'SDM & TELLER' : ($generalSectionView ? 'BA
     </form>
 </section>
 
-<section class="panel register-panel agendaris-table-panel">
+<section class="panel register-panel agendaris-table-panel <?= ($securityView ?? false) ? 'security-register-panel' : '' ?>">
     <div class="table-wrap">
         <table>
             <thead>

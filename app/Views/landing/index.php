@@ -19,6 +19,7 @@ $landingCssAsset = $resolveOptimizedAsset('assets/app.css', 'assets/app.min.css'
 $requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
 $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
 $landingCssVersion = $assetVersion($landingCssAsset);
+$flowuiThemeVersion = $assetVersion('assets/flowui-theme.css');
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
 $urlMaskVersion = $assetVersion($urlMaskAsset);
 $loginError        = session()->getFlashdata('login_error');
@@ -45,6 +46,7 @@ $openLoginModal    = (bool) session()->getFlashdata('open_login_modal')
     <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
     <link rel="preload" as="image" type="image/webp" href="<?= base_url('assets/images/jaksa-wordmark.webp') ?>" fetchpriority="high">
     <link rel="stylesheet" href="<?= base_url($landingCssAsset) ?>?v=<?= esc($landingCssVersion, 'attr') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/flowui-theme.css') ?>?v=<?= esc($flowuiThemeVersion, 'attr') ?>">
     <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>
     <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
 </head>

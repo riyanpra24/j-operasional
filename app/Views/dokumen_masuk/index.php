@@ -7,7 +7,7 @@
 ?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
-<section class="page-heading">
+<section class="page-heading security-page-heading">
     <div>
         <p class="eyebrow">BUKU REGISTER DIGITAL</p>
         <h1>Dokumen Masuk</h1>
@@ -15,7 +15,7 @@
     </div>
 </section>
 
-<section class="panel filter-panel">
+<section class="panel filter-panel security-filter-panel">
     <form method="get" action="<?= site_url('dokumen-masuk') ?>" class="filter-form">
         <div class="form-group search-group"><label for="q">Cari dokumen</label>
             <div class="input-with-icon"><span>⌕</span><input id="q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Pengirim, perihal, penerima, jenis..."></div>
@@ -31,7 +31,7 @@
     </form>
 </section>
 
-<section class="panel register-panel">
+<section class="panel register-panel security-register-panel">
     <div class="table-wrap">
         <table>
             <thead>

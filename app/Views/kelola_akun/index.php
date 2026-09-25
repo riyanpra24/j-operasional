@@ -24,9 +24,9 @@ $editId = session()->getFlashdata('account_edit_id');
 </section>
 
 <section class="account-stat-grid" aria-label="Ringkasan akun">
-    <article><span>Total Akun</span><strong><?= number_format($counts['total'], 0, ',', '.') ?></strong></article>
+    <article class="account-stat-card is-total"><span>Total Akun</span><strong><?= number_format($counts['total'], 0, ',', '.') ?></strong></article>
     <?php foreach ($roleLabels as $roleValue => $roleName): ?>
-        <article><span><?= esc($roleName) ?></span><strong><?= number_format($counts[$roleValue] ?? 0, 0, ',', '.') ?></strong></article>
+        <article class="account-stat-card role-<?= esc($roleValue, 'attr') ?>"><span><?= esc($roleName) ?></span><strong><?= number_format($counts[$roleValue] ?? 0, 0, ',', '.') ?></strong></article>
     <?php endforeach ?>
 </section>
 

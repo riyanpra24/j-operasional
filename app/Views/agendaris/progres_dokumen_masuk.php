@@ -7,7 +7,7 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<section class="page-heading heading-actions">
+<section class="page-heading heading-actions distribution-heading">
     <div>
         <p class="eyebrow">AGENDARIS</p>
         <h1>Progres Dokumen</h1>
@@ -24,7 +24,7 @@
 
 <?= view('agendaris/progres_tabs', ['activeTab' => 'masuk']) ?>
 
-<section class="panel filter-panel">
+<section class="panel filter-panel security-filter-panel">
     <form method="get" action="<?= site_url('agendaris/progres-dokumen') ?>" class="agendaris-filter-form">
         <div class="form-group search-group"><label for="incoming_progress_q">Cari dokumen</label>
             <div class="input-with-icon"><span>⌕</span><input id="incoming_progress_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor Agendaris, pengirim, perihal, penerima..."></div>
@@ -40,7 +40,7 @@
     </form>
 </section>
 
-<section class="panel register-panel agendaris-table-panel progress-document-panel">
+<section class="panel register-panel agendaris-table-panel progress-document-panel security-register-panel">
     <div class="table-wrap">
         <table>
             <thead>

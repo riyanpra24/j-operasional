@@ -9,7 +9,7 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<section class="page-heading heading-actions distribution-heading">
+<section class="page-heading heading-actions distribution-heading security-page-heading">
     <div>
         <p class="eyebrow">PENGELOLAAN DOKUMEN</p>
         <h1>Distribusi Dokumen</h1>
@@ -19,7 +19,7 @@
 
 <?= view('distribusi_dokumen/tabs', ['activeTab' => $filters['tab']]) ?>
 
-<section class="panel filter-panel">
+<section class="panel filter-panel security-filter-panel">
     <form method="get" action="<?= site_url('distribusi-dokumen') ?>" class="distribution-filter-form">
         <div class="form-group search-group"><label for="q">Cari dokumen</label>
             <div class="input-with-icon"><span>⌕</span><input id="q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="<?= $filters['tab'] === 'masuk' ? 'Pengirim, perihal, penerima, jenis...' : 'Jenis, pelaksana, UP, Security...' ?>"></div>
@@ -34,7 +34,7 @@
 </section>
 
 <?php if ($filters['tab'] === 'masuk'): ?>
-    <section class="panel register-panel distribution-table-panel">
+    <section class="panel register-panel distribution-table-panel security-register-panel">
         <div class="table-wrap">
             <table>
                 <thead>
@@ -68,9 +68,9 @@
                                 <td>
                                     <div class="date-cell"><strong><?= esc($row['hari']) ?></strong><span><?= date('d-m-Y', strtotime($row['tanggal'])) ?></span></div>
                                 </td>
-                                <td><?= esc($row['jenis']) ?></td>
+                                <td><span class="security-type-chip"><?= esc($row['jenis']) ?></span></td>
                                 <td><?= number_format($row['jumlah'], 0, ',', '.') ?><?= ! empty($row['satuan_jumlah']) ? ' ' . esc($row['satuan_jumlah']) : '' ?></td>
-                                <td><?= esc($row['ekspedisi'] ?: '-') ?></td>
+                                <td><span class="security-expedition-chip"><?= esc($row['ekspedisi'] ?: '-') ?></span></td>
                                 <td>
                                     <div class="table-actions">
                                         <button type="button" class="icon-btn" title="Detail" data-open-detail-modal data-detail-url="<?= site_url('distribusi-dokumen/dokumen-masuk/' . $row['id']) ?>">⌕</button>
@@ -89,7 +89,7 @@
         </div>
     </section>
 <?php else: ?>
-    <section class="panel register-panel distribution-table-panel distribution-outgoing-panel">
+    <section class="panel register-panel distribution-table-panel distribution-outgoing-panel security-register-panel">
         <div class="table-wrap">
             <table>
                 <thead>
@@ -119,9 +119,9 @@
                             <?php $progressComplete = $row['progres'] === 'Diambil Ekspedisi'; ?>
                             <tr>
                                 <td><strong><?= $outgoingNumber++ ?></strong></td>
-                                <td><?= esc($row['jenis_surat']) ?></td>
+                                <td><span class="security-type-chip"><?= esc($row['jenis_surat']) ?></span></td>
                                 <td><?= esc(($row['jumlah_dokumen'] ?? null) ?: '-') ?></td>
-                                <td><?= esc(($row['nama_ekspedisi'] ?? null) ?: '-') ?></td>
+                                <td><span class="security-expedition-chip"><?= esc(($row['nama_ekspedisi'] ?? null) ?: '-') ?></span></td>
                                 <td><?= esc($row['pelaksana'] ?: '-') ?></td>
                                 <td><?= esc($row['up'] ?: '-') ?></td>
                                 <td class="cell-wrap"><?= esc($row['alamat_penerima']) ?></td>

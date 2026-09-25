@@ -21,6 +21,19 @@ $sdmPage = $sdmActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : '
 $akutansiActive = $segment === 'akutansi';
 $akutansiPage = $akutansiActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : '';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
+$pageClasses = [];
+if ($segment === 'distribusi-dokumen') {
+    $pageClasses[] = 'distribution-page';
+}
+if ($agendarisActive && in_array($agendarisPage, ['progres-dokumen', 'progres-dokumen-keluar'], true)) {
+    $pageClasses[] = 'progress-page';
+}
+if ($accountManagementActive) {
+    $pageClasses[] = 'account-management-page';
+}
+if ($akutansiActive) {
+    $pageClasses[] = 'accounting-page';
+}
 $currentRole = (string) session()->get('auth_role');
 $displayName = (string) session()->get('auth_display_name');
 $authUsername = (string) session()->get('auth_username');
@@ -59,6 +72,8 @@ $appJsAsset = $resolveOptimizedAsset('assets/app.js', 'assets/app.min.js');
 $requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
 $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
 $appCssVersion = $assetVersion($appCssAsset);
+$flowuiThemeVersion = $assetVersion('assets/flowui-theme.css');
+$jaksaBackgroundVersion = $assetVersion('assets/jaksa-background.css');
 $welcomeMotionVersion = $assetVersion('assets/welcome-motion.css');
 $appJsVersion = $assetVersion($appJsAsset);
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
@@ -107,6 +122,8 @@ if ($currentRole === 'security') {
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
     <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
     <link rel="stylesheet" href="<?= base_url($appCssAsset) ?>?v=<?= esc($appCssVersion, 'attr') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/flowui-theme.css') ?>?v=<?= esc($flowuiThemeVersion, 'attr') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/jaksa-background.css') ?>?v=<?= esc($jaksaBackgroundVersion, 'attr') ?>">
     <?php if ($segment === 'welcome'): ?>
         <link rel="stylesheet" href="<?= base_url('assets/welcome-motion.css') ?>?v=<?= esc($welcomeMotionVersion, 'attr') ?>">
     <?php endif; ?>
@@ -114,13 +131,18 @@ if ($currentRole === 'security') {
     <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
     <script>
         try {
-            if (window.innerWidth > 900 && localStorage.getItem('j-operasional-sidebar') === 'collapsed') {
-                document.documentElement.classList.add('sidebar-collapsed');
+            const isWelcomePage = <?= $segment === 'welcome' ? 'true' : 'false' ?>;
+            if (window.innerWidth > 900) {
+                if (isWelcomePage) {
+                    localStorage.setItem('j-operasional-sidebar', 'expanded');
+                } else if (localStorage.getItem('j-operasional-sidebar') === 'collapsed') {
+                    document.documentElement.classList.add('sidebar-collapsed');
+                }
             }
         } catch (error) {}
     </script>
 </head>
-<body
+<body class="jaksa-bg <?= esc(implode(' ', $pageClasses), 'attr') ?>"
     data-auth-expires-at="<?= $authExpiresAt ?>"
     data-login-url="<?= esc(site_url('login'), 'attr') ?>"
     data-landing-url="<?= esc(site_url('/') . '?login=1', 'attr') ?>"
@@ -135,10 +157,11 @@ if ($currentRole === 'security') {
             <button type="button" data-success-toast-close aria-label="Tutup notifikasi">×</button>
         </div>
     <?php endif ?>
+    <div class="jaksa-bg-ornaments" aria-hidden="true"><span class="arc-left-bottom"></span><span class="arc-right-mid"></span></div>
     <div class="app-shell">
         <aside class="sidebar" id="sidebar">
             <a href="<?= site_url('dashboard') ?>" class="brand brand-jaksa" aria-label="Dashboard JAKSA — Jamkrindo Kanwil Surabaya Operasional">
-                <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-wordmark-sidebar.webp') ?>" width="224" height="49" alt="JAKSA" decoding="async">
+        <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-sidebar-logo-photoroom.png') ?>" width="2172" height="724" alt="JAKSA" decoding="async">
                 <span class="brand-jaksa-expansion" aria-label="Jamkrindo Kanwil Surabaya Operasional">
                     <b>JA</b>mkrindo <i>·</i> <b>K</b>anwil <i>·</i> <b>S</b>urabaya <i>·</i> oper<b>A</b>sional
                 </span>
@@ -329,7 +352,7 @@ if ($currentRole === 'security') {
                 <?php if ($currentRole === 'admin'): ?>
                 <div class="nav-group <?= $accountManagementActive ? 'open' : '' ?>" data-nav-group>
                     <button type="button" class="nav-link nav-parent <?= $accountManagementActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $accountManagementActive ? 'true' : 'false' ?>" aria-controls="accountManagementSubmenu" title="Kelola Akun">
-                        <span class="nav-icon" aria-hidden="true"><i>♙</i></span>
+                        <span class="nav-icon image-nav-icon account-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Kelola Akun</span>
                         <span class="nav-chevron" aria-hidden="true">⌄</span>
                     </button>
@@ -358,7 +381,6 @@ if ($currentRole === 'security') {
                 </span>
             </nav>
 
-            <div class="sidebar-pattern" aria-hidden="true">OPERASIONAL</div>
         </aside>
 
         <button class="sidebar-backdrop" type="button" data-sidebar-close aria-label="Tutup menu"></button>
@@ -492,6 +514,26 @@ if ($currentRole === 'security') {
         <?= view('components/detail_modal', ['readOnly' => $incomingArchive]) ?>
         <?php if (! $incomingArchive): ?><?= view('components/edit_modal') ?><?= view('components/delete_modal') ?><?php endif ?>
     <?php endif ?>
+    <script>
+        /* Popups must live at the document layer, never inside a page panel.
+           This lets their backdrop cover the sidebar and fixed navbar as well. */
+        (() => {
+            const popupSelector = [
+                '.input-modal', '.edit-modal', '.delete-modal', '.detail-modal',
+                '.agendaris-form-modal', '.agendaris-detail-modal', '.agendaris-delete-modal',
+                '.distribution-action-modal', '.account-modal', '.vehicle-crud-modal',
+                '.attendance-calendar-modal', '.attendance-detail-modal',
+                '.attendance-report-modal', '.attendance-recap-delete-modal',
+                '.spk-edit-modal', '.pks-main-modal', '.pks-delete-modal'
+            ].join(',');
+
+            document.querySelectorAll(popupSelector).forEach((popup) => {
+                if (popup.parentElement !== document.body) {
+                    document.body.append(popup);
+                }
+            });
+        })();
+    </script>
     <script src="<?= base_url($appJsAsset) ?>?v=<?= esc($appJsVersion, 'attr') ?>"></script>
 </body>
 </html>

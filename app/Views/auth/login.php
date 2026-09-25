@@ -20,6 +20,7 @@ $loginCssAsset = $resolveOptimizedAsset('assets/app.css', 'assets/app.min.css');
 $requiredMarkersAsset = $resolveOptimizedAsset('assets/required-markers.js', 'assets/required-markers.min.js');
 $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.min.js');
 $loginCssVersion = $assetVersion($loginCssAsset);
+$flowuiThemeVersion = $assetVersion('assets/flowui-theme.css');
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
 $urlMaskVersion = $assetVersion($urlMaskAsset);
 ?>
@@ -33,6 +34,7 @@ $urlMaskVersion = $assetVersion($urlMaskAsset);
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
     <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
     <link rel="stylesheet" href="<?= base_url($loginCssAsset) ?>?v=<?= esc($loginCssVersion, 'attr') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/flowui-theme.css') ?>?v=<?= esc($flowuiThemeVersion, 'attr') ?>">
     <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>
     <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
 </head>
