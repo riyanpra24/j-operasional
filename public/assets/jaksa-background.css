@@ -122,7 +122,11 @@ body.jaksa-bg .nav-link {
     font-size: 10px !important;
     font-weight: 700 !important;
 }
-body.jaksa-bg .nav-link:hover { color: #fff !important; background: rgba(121,210,232,.13) !important; }
+body.jaksa-bg .nav-link:hover {
+    color: #fff !important;
+    background: rgba(121,210,232,.13) !important;
+    box-shadow: inset 3px 0 0 #ffd35d !important;
+}
 body.jaksa-bg .nav-icon,
 body.jaksa-bg .nav-link .nav-icon {
     flex: 0 0 30px !important;
@@ -157,7 +161,7 @@ body.jaksa-bg .nav-link.active,
 body.jaksa-bg .nav-parent.active {
     color: #fff !important;
     background: linear-gradient(100deg, #2a75c9 0%, #35b7ca 58%, #60cfb8 100%) !important;
-    box-shadow: 0 6px 14px rgba(4,43,95,.23) !important;
+    box-shadow: inset 3px 0 0 #ffd35d, 0 6px 14px rgba(4,43,95,.23) !important;
 }
 body.jaksa-bg .nav-link.active .nav-icon,
 body.jaksa-bg .nav-parent.active .nav-icon {
@@ -180,7 +184,12 @@ body.jaksa-bg .nav-sublink {
     font-weight: 700 !important;
 }
 body.jaksa-bg .nav-sublink > span { color: #60d2dd !important; font-size: 5px !important; }
-body.jaksa-bg .nav-sublink:hover { color: #fff !important; background: rgba(121,210,232,.14) !important; }
+body.jaksa-bg .nav-sublink:hover {
+    color: #fff !important;
+    background: rgba(121,210,232,.14) !important;
+    box-shadow: inset 3px 0 0 #ffd35d !important;
+}
+body.jaksa-bg .nav-sublink:hover > span { color: #ffd35d !important; }
 body.jaksa-bg .nav-sublink.active {
     color: #fff !important;
     background: linear-gradient(100deg, #237aca 0%, #39accc 63%, #ffd35d 100%) !important;
@@ -237,15 +246,25 @@ body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-pane
 body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(8) { width: 15%; }
 body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(9) { width: 11%; }
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(1) { width: 4%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(2) { width: 13%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(2) { width: 14%; }
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(3) { width: 10%; }
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(4),
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(5) { width: 9%; }
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(6) { width: 10%; }
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(7) { width: 17%; }
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(8) { width: 9%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(9),
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(10) { width: 9.5%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(9) { width: 11%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(10) { width: 7%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel td {
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+}
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel td:nth-child(2) > strong {
+    display: block !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    line-height: 1.45 !important;
+}
 
 /* Neutral canvas while the replacement background template is being prepared. */
 body.jaksa-bg:not(.landing-page):not(.login-page) .page-heading:not(.security-page-heading):not(.distribution-heading),
@@ -754,9 +773,9 @@ body.jaksa-bg .modal-header {
 }
 body.jaksa-bg .modal-title-icon {
     color: #fff !important;
-    background: linear-gradient(135deg, #123f7e, #2587d1 63%, #45c5b8) !important;
+    background: linear-gradient(135deg, #123f7e 0%, #176b9c 55%, #32b7ae 100%) !important;
     border-radius: 11px !important;
-    box-shadow: 0 7px 14px rgba(18,63,126,.22) !important;
+    box-shadow: 0 7px 14px rgba(18,63,126,.24) !important;
 }
 body.jaksa-bg .modal-title-group p { color: #6a83a2 !important; }
 body.jaksa-bg .modal-title-group h2 { color: #0b3369 !important; }
@@ -788,6 +807,26 @@ body.jaksa-bg .modal-body :is(input, select, textarea) {
 body.jaksa-bg .modal-body :is(input, select, textarea):focus {
     border-color: #2992d3 !important;
     box-shadow: 0 0 0 3px rgba(41,146,211,.13) !important;
+}
+
+/* Navy-to-teal accent for modal progress and primary actions. */
+body.jaksa-bg .modal-footer .btn-primary,
+body.jaksa-bg .agendaris-form-modal .btn-primary,
+body.jaksa-bg .distribution-action-modal .btn-primary {
+    color: #fff !important;
+    background: linear-gradient(135deg, #123f7e 0%, #176b9c 55%, #32b7ae 100%) !important;
+    box-shadow: 0 7px 16px rgba(18,63,126,.24) !important;
+}
+body.jaksa-bg .modal-footer .btn-primary:hover,
+body.jaksa-bg .agendaris-form-modal .btn-primary:hover,
+body.jaksa-bg .distribution-action-modal .btn-primary:hover {
+    background: linear-gradient(135deg, #0c3169 0%, #135b89 55%, #249a94 100%) !important;
+}
+body.jaksa-bg .outgoing-distribution-steps span.active { color: #176b9c !important; }
+body.jaksa-bg .outgoing-distribution-steps span.active b {
+    color: #fff !important;
+    background: linear-gradient(135deg, #123f7e 0%, #176b9c 55%, #32b7ae 100%) !important;
+    box-shadow: 0 5px 11px rgba(18,63,126,.18) !important;
 }
 
 /* Account management matches the dedicated Add Account reference. */
