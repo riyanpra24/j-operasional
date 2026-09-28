@@ -3,6 +3,7 @@
 
 $uri = service('uri');
 $segment = $uri->getSegment(1);
+$isWelcomePage = $segment === 'welcome';
 $securityActive = in_array($segment, ['dokumen-masuk', 'dokumen-keluar', 'distribusi-dokumen'], true);
 $agendarisActive = $segment === 'agendaris';
 $accountManagementActive = in_array($segment, ['kelola-akun', 'data-terhapus'], true);
@@ -22,6 +23,7 @@ $akutansiActive = $segment === 'akutansi';
 $akutansiPage = $akutansiActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : '';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
 $pageClasses = [];
+$pageClasses[] = $isWelcomePage ? 'welcome-page' : '';
 if ($segment === 'distribusi-dokumen') {
     $pageClasses[] = 'distribution-page';
 }
@@ -74,8 +76,9 @@ $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.mi
 $appCssVersion = $assetVersion($appCssAsset);
 $flowuiThemeVersion = $assetVersion('assets/flowui-theme.css');
 $jaksaBackgroundVersion = $assetVersion('assets/jaksa-background.css');
-$sidebarLogoVersion = $assetVersion('assets/images/jaksa-sidebar-logo-photoroom.png');
+$sidebarLogoVersion = $assetVersion('assets/images/jaksa-sidebar-logo-selected.png');
 $welcomeMotionVersion = $assetVersion('assets/welcome-motion.css');
+$welcomeFluidVersion = $assetVersion('assets/welcome-fluid-simulation.js');
 $appJsVersion = $assetVersion($appJsAsset);
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
 $urlMaskVersion = $assetVersion($urlMaskAsset);
@@ -160,9 +163,10 @@ if ($currentRole === 'security') {
     <?php endif ?>
     <div class="jaksa-bg-ornaments" aria-hidden="true"><span class="arc-left-bottom"></span><span class="arc-right-mid"></span></div>
     <div class="app-shell">
+        <?php if (! $isWelcomePage): ?>
         <aside class="sidebar" id="sidebar">
             <a href="<?= site_url('dashboard') ?>" class="brand brand-jaksa" aria-label="Dashboard JAKSA — Jamkrindo Kanwil Surabaya Operasional">
-                <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-sidebar-logo-photoroom.png') ?>?v=<?= esc($sidebarLogoVersion, 'attr') ?>" width="2172" height="724" alt="JAKSA" decoding="async">
+                <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-sidebar-logo-selected.png') ?>?v=<?= esc($sidebarLogoVersion, 'attr') ?>" width="2138" height="736" alt="JAKSA" decoding="async">
             </a>
 
             <nav class="main-nav" aria-label="Navigasi utama">
@@ -178,7 +182,7 @@ if ($currentRole === 'security') {
                     <button type="button" class="nav-link nav-parent <?= $securityActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $securityActive ? 'true' : 'false' ?>" aria-controls="securitySubmenu" title="Security">
                         <span class="nav-icon image-nav-icon security-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Security</span>
-                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                        <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="securitySubmenu" data-nav-submenu <?= $securityActive ? '' : 'hidden' ?>>
                         <a href="<?= site_url('dokumen-masuk') ?>" class="nav-sublink <?= $segment === 'dokumen-masuk' ? 'active' : '' ?>">
@@ -201,7 +205,7 @@ if ($currentRole === 'security') {
                     <button type="button" class="nav-link nav-parent <?= $agendarisActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $agendarisActive ? 'true' : 'false' ?>" aria-controls="agendarisSubmenu" title="Agendaris">
                         <span class="nav-icon image-nav-icon agendaris-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Agendaris</span>
-                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                        <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="agendarisSubmenu" data-nav-submenu <?= $agendarisActive ? '' : 'hidden' ?>>
                         <a href="<?= site_url('agendaris/surat-masuk') ?>" class="nav-sublink <?= $agendarisActive && $agendarisPage === 'surat-masuk' ? 'active' : '' ?>">
@@ -224,7 +228,7 @@ if ($currentRole === 'security') {
                     <button type="button" class="nav-link nav-parent <?= $generalSectionActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $generalSectionActive ? 'true' : 'false' ?>" aria-controls="generalSectionSubmenu" title="Bagian Umum 1">
                         <span class="nav-icon image-nav-icon general-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Bagian Umum 1</span>
-                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                        <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="generalSectionSubmenu" data-nav-submenu <?= $generalSectionActive ? '' : 'hidden' ?>>
                         <a href="<?= site_url('bagian-umum-1/dokumen-masuk') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'dokumen-masuk' ? 'active' : '' ?>">
@@ -255,7 +259,7 @@ if ($currentRole === 'security') {
                     <button type="button" class="nav-link nav-parent <?= $generalSectionTwoActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $generalSectionTwoActive ? 'true' : 'false' ?>" aria-controls="generalSectionTwoSubmenu" title="Bagian Umum 2">
                         <span class="nav-icon image-nav-icon general-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Bagian Umum 2</span>
-                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                        <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="generalSectionTwoSubmenu" data-nav-submenu <?= $generalSectionTwoActive ? '' : 'hidden' ?>>
                         <a href="<?= site_url('bagian-umum-2/dokumen-masuk') ?>" class="nav-sublink <?= $generalSectionTwoActive && $uri->getSegment(2) === 'dokumen-masuk' ? 'active' : '' ?>">
@@ -278,7 +282,7 @@ if ($currentRole === 'security') {
                     <button type="button" class="nav-link nav-parent <?= $sdmActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $sdmActive ? 'true' : 'false' ?>" aria-controls="sdmSubmenu" title="SDM &amp; Teller">
                         <span class="nav-icon image-nav-icon sdm-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">SDM &amp; Teller</span>
-                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                        <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="sdmSubmenu" data-nav-submenu <?= $sdmActive ? '' : 'hidden' ?>>
                         <a href="<?= site_url('sdm/dokumen-masuk') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'dokumen-masuk' ? 'active' : '' ?>">
@@ -321,7 +325,7 @@ if ($currentRole === 'security') {
                     <button type="button" class="nav-link nav-parent <?= $akutansiActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $akutansiActive ? 'true' : 'false' ?>" aria-controls="akutansiSubmenu" title="Akuntansi">
                         <span class="nav-icon image-nav-icon accounting-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Akuntansi</span>
-                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                        <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="akutansiSubmenu" data-nav-submenu <?= $akutansiActive ? '' : 'hidden' ?>>
                         <a href="<?= site_url('akutansi/rka-kanwil-surabaya') ?>" class="nav-sublink <?= $akutansiPage === 'rka-kanwil-surabaya' ? 'active' : '' ?>">
@@ -352,7 +356,7 @@ if ($currentRole === 'security') {
                     <button type="button" class="nav-link nav-parent <?= $accountManagementActive ? 'active' : '' ?>" data-nav-toggle aria-expanded="<?= $accountManagementActive ? 'true' : 'false' ?>" aria-controls="accountManagementSubmenu" title="Kelola Akun">
                         <span class="nav-icon image-nav-icon account-nav-icon" aria-hidden="true"></span>
                         <span class="nav-link-text">Kelola Akun</span>
-                        <span class="nav-chevron" aria-hidden="true">⌄</span>
+                        <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="accountManagementSubmenu" data-nav-submenu <?= $accountManagementActive ? '' : 'hidden' ?>>
                         <a href="<?= site_url('kelola-akun') ?>" class="nav-sublink <?= $accountManagementActive && $accountManagementPage === 'add-account' ? 'active' : '' ?>">
@@ -382,8 +386,10 @@ if ($currentRole === 'security') {
         </aside>
 
         <button class="sidebar-backdrop" type="button" data-sidebar-close aria-label="Tutup menu"></button>
+        <?php endif; ?>
 
         <div class="content-shell">
+            <?php if (! $isWelcomePage): ?>
             <header class="topbar">
                 <button class="menu-toggle" type="button" data-sidebar-toggle aria-label="Tutup menu" aria-controls="sidebar" aria-expanded="true"><span aria-hidden="true">☰</span></button>
                 <div class="topbar-title">
@@ -451,7 +457,7 @@ if ($currentRole === 'security') {
                                 <strong><?= esc($displayName) ?></strong>
                                 <small><?= esc($roleLabel) ?></small>
                             </span>
-                            <span class="topbar-profile-chevron" aria-hidden="true">⌄</span>
+                            <span class="topbar-profile-chevron" aria-hidden="true">›</span>
                         </button>
                         <div class="topbar-profile-dropdown" id="topbarProfileMenu" data-profile-dropdown hidden>
                             <header>
@@ -477,6 +483,7 @@ if ($currentRole === 'security') {
                     </div>
                 </div>
             </header>
+            <?php endif; ?>
 
             <main class="main-content">
                 <?php if ($error): ?>
@@ -501,10 +508,12 @@ if ($currentRole === 'security') {
                 <?= $this->renderSection('content') ?>
             </main>
 
+            <?php if (! $isWelcomePage): ?>
             <footer class="footer">
                 <span>Register Operasional · <?= date('Y') ?></span>
                 <span>Waktu sistem: Asia/Jakarta</span>
             </footer>
+            <?php endif; ?>
         </div>
     </div>
     <?php if ($canAccessSecurity && $incomingWorkspace): ?>
@@ -533,5 +542,8 @@ if ($currentRole === 'security') {
         })();
     </script>
     <script src="<?= base_url($appJsAsset) ?>?v=<?= esc($appJsVersion, 'attr') ?>"></script>
+    <?php if ($segment === 'welcome'): ?>
+        <script src="<?= base_url('assets/welcome-fluid-simulation.js') ?>?v=<?= esc($welcomeFluidVersion, 'attr') ?>"></script>
+    <?php endif; ?>
 </body>
 </html>

@@ -48,7 +48,6 @@ $contextLabel = $tellerArchiveView ? 'SDM & TELLER' : ($generalSectionView ? 'BA
         <table>
             <thead>
                 <tr>
-                    <th>No.</th>
                     <th>Nomor Surat</th>
                     <th>Jenis Dokumen</th>
                     <th>Jumlah Dokumen</th>
@@ -64,16 +63,14 @@ $contextLabel = $tellerArchiveView ? 'SDM & TELLER' : ($generalSectionView ? 'BA
             <tbody>
                 <?php if ($dokumen === []): ?>
                     <tr>
-                        <td colspan="11">
+                        <td colspan="10">
                             <div class="empty-state"><span>⇢</span><strong>Belum ada Dokumen Keluar selesai</strong>
                                 <p>Selesaikan dokumen melalui menu Progres Dokumen agar tampil di halaman ini.</p>
                             </div>
                         </td>
                     </tr>
                 <?php else: ?>
-                    <?php $rowNumber = (($pager->getCurrentPage('dokumen_keluar') - 1) * $filters['perPage']) + 1; ?>
                     <?php foreach ($dokumen as $row): ?><tr>
-                            <td><strong><?= $rowNumber++ ?></strong></td>
                             <td><strong><?= esc($row['nomor_surat']) ?></strong></td>
                             <td><?= esc($row['jenis_surat']) ?></td>
                             <td><?= esc(($row['jumlah_dokumen'] ?? null) ?: '-') ?></td>

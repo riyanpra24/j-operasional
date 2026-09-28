@@ -52,12 +52,11 @@
 <section class="panel register-panel agendaris-table-panel">
     <div class="table-wrap">
         <table>
-            <thead><tr><th>No</th><th>Sumber</th><th>Nomor Agendaris</th><th>Tanggal Surat</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tracking Disposisi</th><th>Tanggal Diterima</th><th>Aksi</th></tr></thead>
+            <thead><tr><th>Sumber</th><th>Nomor Agendaris</th><th>Tanggal Surat</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tracking Disposisi</th><th>Tanggal Diterima</th><th>Aksi</th></tr></thead>
             <tbody>
             <?php if ($documents === []): ?>
-                <tr><td colspan="10"><div class="empty-state"><span aria-hidden="true">▤</span><strong><?= $historyMode ? 'Belum ada riwayat dokumen masuk' : (($isAdminView ?? false) ? 'Belum ada disposisi aktif ke akun SDM & Teller' : 'Belum ada dokumen masuk untuk Anda') ?></strong><p><?= $historyMode ? 'Dokumen yang sudah diteruskan akan tersimpan di halaman ini.' : (($isAdminView ?? false) ? 'Dokumen lama yang sudah diteruskan dapat diperiksa melalui submenu Riwayat Dokumen.' : 'Dokumen akan muncul otomatis ketika nama Anda menjadi penerima disposisi terakhir.') ?></p></div></td></tr>
+                <tr><td colspan="9"><div class="empty-state"><span aria-hidden="true">▤</span><strong><?= $historyMode ? 'Belum ada riwayat dokumen masuk' : (($isAdminView ?? false) ? 'Belum ada disposisi aktif ke akun SDM & Teller' : 'Belum ada dokumen masuk untuk Anda') ?></strong><p><?= $historyMode ? 'Dokumen yang sudah diteruskan akan tersimpan di halaman ini.' : (($isAdminView ?? false) ? 'Dokumen lama yang sudah diteruskan dapat diperiksa melalui submenu Riwayat Dokumen.' : 'Dokumen akan muncul otomatis ketika nama Anda menjadi penerima disposisi terakhir.') ?></p></div></td></tr>
             <?php else: ?>
-                <?php $rowNumber = (($pager->getCurrentPage($pagerGroup) - 1) * $filters['perPage']) + 1; ?>
                 <?php foreach ($documents as $document): ?>
                     <?php
                     $statusClass = ['Menunggu' => 'pending', 'Diterima' => 'received', 'Diproses' => 'active', 'Diteruskan' => 'forwarded', 'Selesai' => 'completed'][$document['status_disposisi_terakhir']] ?? 'empty';
@@ -106,7 +105,6 @@
                     $documentModalJson = esc(json_encode($documentModalData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'attr');
                     ?>
                     <tr>
-                        <td><strong><?= $rowNumber++ ?></strong></td>
                         <td><strong><?= $document['dokumen_masuk_id'] !== null ? 'Security' : 'Input Manual' ?></strong></td>
                         <td><strong><?= $document['nomor_agendaris'] ? esc($document['nomor_agendaris']) : '<span class="agenda-incomplete">Belum dibuat</span>' ?></strong></td>
                         <td><?= $document['tanggal_surat'] ? date('d-m-Y', strtotime($document['tanggal_surat'])) : '<span class="agenda-incomplete">Belum diisi</span>' ?></td>

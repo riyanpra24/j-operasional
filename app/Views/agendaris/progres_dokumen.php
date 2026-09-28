@@ -38,7 +38,6 @@
         <table>
             <thead>
                 <tr>
-                    <th>No.</th>
                     <th>Nomor Surat</th>
                     <th>Jenis Dokumen</th>
                     <th>Pemohon</th>
@@ -52,17 +51,15 @@
             </thead>
             <tbody>
                 <?php if ($dokumen === []): ?><tr>
-                        <td colspan="10">
+                        <td colspan="9">
                             <div class="empty-state"><span>⇢</span><strong>Belum ada Progres Dokumen Keluar</strong>
                                 <p>Tambahkan Dokumen Keluar atau ubah filter pencarian.</p>
                             </div>
                         </td>
                     </tr>
                 <?php else: ?>
-                    <?php $rowNumber = (($pager->getCurrentPage('progres_dokumen') - 1) * $filters['perPage']) + 1; ?>
                     <?php foreach ($dokumen as $row): ?><?php $locked = $row['progres'] === 'Diambil Ekspedisi';
                                                         $adminCanDelete = (string) session()->get('auth_role') === 'admin'; ?><tr>
-                        <td><strong><?= $rowNumber++ ?></strong></td>
                         <td><strong><?= esc($row['nomor_surat']) ?></strong></td>
                         <td><?= esc($row['jenis_surat']) ?></td>
                         <td><?= esc($row['pemohon'] ?: '-') ?></td>

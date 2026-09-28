@@ -69,7 +69,11 @@ class DokumenMasuk extends BaseController
             $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
             $this->model->orderBy('tanggal', $direction)->orderBy('id', $direction);
         } else {
-            $this->model->orderBy('created_at', 'ASC')->orderBy('id', 'ASC');
+            // Dokumen yang paling akhir diproses/diubah tampil terlebih dahulu.
+            $this->model
+                ->orderBy('updated_at', 'DESC')
+                ->orderBy('tanggal', 'DESC')
+                ->orderBy('id', 'DESC');
         }
 
         return view('dokumen_masuk/index', [

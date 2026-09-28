@@ -45,7 +45,6 @@
         <table>
             <thead>
                 <tr>
-                    <th>No.</th>
                     <th>Sumber</th>
                     <th>Nomor Agendaris</th>
                     <th>Nomor Surat</th>
@@ -59,16 +58,14 @@
             <tbody>
                 <?php if ($agenda === []): ?>
                     <tr>
-                        <td colspan="9">
+                        <td colspan="8">
                             <div class="empty-state"><span>▦</span><strong>Belum ada Dokumen Masuk</strong>
                                 <p>Tambahkan Dokumen Masuk baru atau sinkronkan dari data Security.</p>
                             </div>
                         </td>
                     </tr>
                 <?php else: ?>
-                    <?php $rowNumber = (($pager->getCurrentPage('progres_dokumen_masuk') - 1) * $filters['perPage']) + 1; ?>
                     <?php foreach ($agenda as $row): ?><tr>
-                            <td><strong><?= $rowNumber++ ?></strong></td>
                             <td><span class="agenda-source <?= $row['dokumen_masuk_id'] !== null ? 'security' : 'manual' ?>"><?= $row['dokumen_masuk_id'] !== null ? 'Security' : 'Input Manual' ?></span></td>
                             <td><strong><?= $row['nomor_agendaris'] ? esc($row['nomor_agendaris']) : '<span class="agenda-incomplete">Belum dibuat</span>' ?></strong></td>
                             <td><strong><?= $row['nomor_surat'] ? esc($row['nomor_surat']) : '<span class="agenda-incomplete">Belum diisi</span>' ?></strong></td>

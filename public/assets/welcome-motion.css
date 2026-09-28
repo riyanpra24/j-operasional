@@ -1,25 +1,443 @@
-/* Enhanced welcome experience: lightweight pointer and ambient interaction. */
-.welcome-screen{isolation:isolate;overflow:hidden;background:radial-gradient(circle at 13% 16%,rgba(37,211,197,.20),transparent 26%),radial-gradient(circle at 88% 78%,rgba(24,126,206,.17),transparent 28%),linear-gradient(135deg,#effcfc 0%,#f7fbff 46%,#effafa 100%)}
-.welcome-screen:before,.welcome-screen:after{position:absolute;z-index:-1;width:34vw;height:34vw;min-width:250px;min-height:250px;border:1px solid rgba(11,162,179,.14);border-radius:50%;content:"";pointer-events:none}.welcome-screen:before{top:-17vw;right:-9vw}.welcome-screen:after{bottom:-23vw;left:-10vw}
-.welcome-particles{position:absolute;z-index:-1;inset:0;overflow:hidden;pointer-events:none}.welcome-particle{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);border-radius:50%;background:linear-gradient(135deg,#0ab7af,#1769b0);box-shadow:0 0 0 4px rgba(15,172,174,.08),0 0 16px rgba(6,145,184,.25);opacity:.7;animation:welcomeParticle var(--duration) ease-in-out var(--delay) infinite}
-.welcome-card{position:relative;z-index:1;transform:perspective(1200px) translate3d(0,0,0);width:min(590px,calc(100% - 42px));padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;transform-style:preserve-3d;transition:transform .25s ease-out}.welcome-card:hover{box-shadow:none}.welcome-card [data-welcome-depth]{--welcome-parallax-x:0px;--welcome-parallax-y:0px;--welcome-drag-x:0px;--welcome-drag-y:0px;transform:translate3d(calc(var(--welcome-parallax-x) + var(--welcome-drag-x)),calc(var(--welcome-parallax-y) + var(--welcome-drag-y)),0);will-change:transform;transition:transform .22s ease-out}[data-welcome-drag]{cursor:grab;touch-action:none;user-select:none}[data-welcome-drag].is-dragging{cursor:grabbing;transition:none!important}[data-welcome-return].is-returning{transition:transform 1.35s cubic-bezier(.2,.8,.2,1)!important}.welcome-role{margin-bottom:0}
-.welcome-emblem{position:relative;display:grid;place-items:center;width:154px;height:154px;margin:0 auto 18px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;isolation:isolate}.welcome-emblem:focus-visible{outline:3px solid rgba(4,158,155,.45);outline-offset:6px}.welcome-emblem:after{position:absolute;z-index:-1;inset:15px;border-radius:50%;background:radial-gradient(circle,rgba(9,173,167,.25),transparent 68%);content:"";filter:blur(10px);animation:welcomePulse 2.8s ease-in-out infinite}.welcome-emblem-ring{animation:welcomeRing 11s linear infinite}.welcome-emblem-mark{color:#13c1b7;text-shadow:0 2px 7px rgba(0,100,113,.22);transition:transform .26s ease}.welcome-emblem:hover .welcome-emblem-mark{transform:scale(1.1) rotate(-4deg)}.welcome-emblem:hover .welcome-emblem-spark{filter:drop-shadow(0 0 7px rgba(255,197,82,.9))}
-.welcome-status{display:inline-flex;align-items:center;justify-content:center;gap:7px;margin:14px auto 0;color:#55738b;font-size:8.5px;font-weight:750}.welcome-status-pulse{position:relative;width:8px;height:8px;border-radius:50%;background:#08a69d}.welcome-status-pulse:after{position:absolute;inset:-4px;border:1px solid rgba(8,166,157,.45);border-radius:50%;content:"";animation:welcomeStatusPulse 1.9s ease-out infinite}.welcome-status [data-welcome-status].is-changing{animation:welcomeStatusIn .34s ease both}
-.welcome-start{position:relative;display:grid;place-items:center;width:58px;min-width:58px;height:56px;min-height:56px;margin-top:24px;padding:0;overflow:hidden;border-radius:16px;font-size:25px;line-height:1;transition:transform .2s ease,box-shadow .2s ease}.welcome-start:before{position:absolute;top:0;left:-80%;width:42%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.37),transparent);content:"";transform:skewX(-22deg);transition:left .55s ease}.welcome-start:hover{box-shadow:0 14px 25px rgba(0,103,172,.25)}.welcome-start:hover:before{left:145%}.welcome-start span{position:relative;z-index:1;transition:transform .2s ease}.welcome-start:hover span{transform:translateX(4px)}
-.welcome-emblem.is-celebrating{animation:welcomeCelebrate .75s cubic-bezier(.2,.85,.25,1.2)}.welcome-emblem.is-celebrating .welcome-emblem-ring{animation:welcomeRing .9s linear 2}.welcome-emblem.is-celebrating .welcome-emblem-spark{animation-duration:.42s}
-.welcome-planets{position:absolute;z-index:0;inset:0;pointer-events:none}.welcome-planet-flight{position:absolute;pointer-events:none;will-change:transform}.welcome-planet-flight-one{top:13%;left:8%;animation:welcomePlanetFlightOne 9.7s cubic-bezier(.42,0,.58,1) infinite}.welcome-planet-flight-two{top:12%;right:9%;animation:welcomePlanetFlightTwo 12.4s cubic-bezier(.6,.04,.34,1) -3.1s infinite}.welcome-planet-flight-three{top:48%;left:5%;animation:welcomePlanetFlightThree 8.6s cubic-bezier(.38,.02,.68,1) -5.2s infinite}.welcome-planet-flight-four{top:53%;right:7%;animation:welcomePlanetFlightFour 10.8s cubic-bezier(.43,.04,.71,1) -1.7s infinite}.welcome-planet-flight-five{bottom:11%;left:17%;animation:welcomePlanetFlightFive 13.1s cubic-bezier(.5,0,.55,1) -7.3s infinite}.welcome-planet-flight-six{right:17%;bottom:12%;animation:welcomePlanetFlightSix 11.5s cubic-bezier(.42,.05,.58,1) -2.2s infinite}.welcome-planet-flight-seven{top:7%;left:25%;animation:welcomePlanetFlightSeven 9.2s cubic-bezier(.36,.03,.7,1) -4.6s infinite}.welcome-planet-flight-eight{right:28%;bottom:7%;animation:welcomePlanetFlightEight 12.8s cubic-bezier(.58,.01,.39,1) -6.8s infinite}.welcome-planet{--welcome-drag-x:0px;--welcome-drag-y:0px;display:block;width:34px;height:34px;pointer-events:auto;object-fit:contain;filter:drop-shadow(0 6px 9px rgba(0,80,122,.18));transform:translate3d(var(--welcome-drag-x),var(--welcome-drag-y),0);will-change:transform}.welcome-planet-flight-five .welcome-planet{width:47px;height:47px}.welcome-planet-flight-six .welcome-planet{width:44px;height:44px}.welcome-planet-flight-three .welcome-planet,.welcome-planet-flight-eight .welcome-planet{width:38px;height:38px}.welcome-planet-credit{position:absolute;right:18px;bottom:12px;z-index:2;margin:0;color:#7691a3;font-size:7px;line-height:1.4}.welcome-planet-credit a{color:#168f99;text-decoration:underline}
-@keyframes welcomeParticle{0%,100%{transform:translate3d(0,0,0) scale(.75);opacity:.16}50%{transform:translate3d(15px,-24px,0) scale(1.22);opacity:.85}}@keyframes welcomeRing{to{transform:rotate(360deg)}}@keyframes welcomePulse{0%,100%{transform:scale(.85);opacity:.35}50%{transform:scale(1.25);opacity:.8}}@keyframes welcomeStatusPulse{0%{transform:scale(.7);opacity:.8}100%{transform:scale(1.8);opacity:0}}@keyframes welcomeStatusIn{from{opacity:.15;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}@keyframes welcomeCelebrate{0%{transform:scale(1)}36%{transform:scale(1.13) rotate(-6deg)}68%{transform:scale(.96) rotate(4deg)}100%{transform:scale(1)}}@keyframes welcomePlanetFlightOne{0%,100%{transform:translate3d(0,0,0) rotate(-8deg)}35%{transform:translate3d(67px,-39px,0) rotate(12deg)}70%{transform:translate3d(21px,31px,0) rotate(-4deg)}}@keyframes welcomePlanetFlightTwo{0%,100%{transform:translate3d(0,0,0) rotate(10deg)}28%{transform:translate3d(-58px,28px,0) rotate(-10deg)}68%{transform:translate3d(-93px,-34px,0) rotate(7deg)}}@keyframes welcomePlanetFlightThree{0%,100%{transform:translate3d(0,0,0) rotate(-12deg)}23%{transform:translate3d(41px,-52px,0) rotate(8deg)}62%{transform:translate3d(88px,9px,0) rotate(-6deg)}}@keyframes welcomePlanetFlightFour{0%,100%{transform:translate3d(0,0,0) rotate(12deg)}31%{transform:translate3d(-53px,-31px,0) rotate(-8deg)}76%{transform:translate3d(-18px,46px,0) rotate(10deg)}}@keyframes welcomePlanetFlightFive{0%,100%{transform:translate3d(0,0,0) rotate(-5deg)}19%{transform:translate3d(72px,-24px,0) rotate(8deg)}49%{transform:translate3d(109px,29px,0) rotate(-9deg)}77%{transform:translate3d(29px,42px,0) rotate(5deg)}}@keyframes welcomePlanetFlightSix{0%,100%{transform:translate3d(0,0,0) rotate(9deg)}26%{transform:translate3d(-76px,19px,0) rotate(-11deg)}59%{transform:translate3d(-100px,-42px,0) rotate(7deg)}84%{transform:translate3d(-25px,-54px,0) rotate(-4deg)}}@keyframes welcomePlanetFlightSeven{0%,100%{transform:translate3d(0,0,0) rotate(-7deg)}32%{transform:translate3d(34px,44px,0) rotate(11deg)}71%{transform:translate3d(-48px,56px,0) rotate(-8deg)}}@keyframes welcomePlanetFlightEight{0%,100%{transform:translate3d(0,0,0) rotate(13deg)}22%{transform:translate3d(-38px,-59px,0) rotate(-10deg)}54%{transform:translate3d(33px,-75px,0) rotate(6deg)}81%{transform:translate3d(63px,-20px,0) rotate(-6deg)}}
-@media(max-width:640px){.welcome-card{max-width:calc(100% - 28px)}.welcome-emblem{width:132px;height:132px}.welcome-screen:before{top:-80px;right:-100px}.welcome-screen:after{bottom:-140px;left:-120px}}@media(prefers-reduced-motion:reduce){.welcome-screen *,.welcome-screen:before,.welcome-screen:after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.welcome-particles{display:none}}
-.welcome-planets{pointer-events:auto}.welcome-planet{-webkit-user-drag:none;width:21px;height:21px}.welcome-planet-flight-three .welcome-planet,.welcome-planet-flight-eight .welcome-planet{width:24px;height:24px}.welcome-planet-flight-five .welcome-planet{width:30px;height:30px}.welcome-planet-flight-six .welcome-planet{width:28px;height:28px}
-.content-shell:has(.welcome-screen){min-height:100vh}.content-shell:has(.welcome-screen) .main-content{display:flex;flex:1;align-items:stretch}.welcome-screen{flex:1;min-height:0}.welcome-start{display:flex;width:min(100%,360px);min-width:0;height:58px;min-height:58px;margin-top:22px;padding:0 24px;border-radius:14px;font-size:14px;font-weight:800;letter-spacing:.15px;text-transform:uppercase}.welcome-start b{font-size:19px;font-weight:600;line-height:1}.welcome-start:hover span{transform:none}.welcome-start:hover b{transform:translateX(4px)}
+/* Welcome page: sky and water visual supplied for the operational landing page. */
+body.jaksa-bg.welcome-page .app-shell {
+    display: block;
+    min-height: 100dvh;
+}
 
-/* Welcome screen aligned with the operational navy, blue, turquoise and gold palette. */
-.welcome-screen{border-color:#c9deed;background:radial-gradient(circle at 12% 18%,rgba(35,122,202,.14),transparent 28%),radial-gradient(circle at 88% 76%,rgba(57,172,204,.16),transparent 31%),linear-gradient(135deg,#f8fbfe 0%,#edf6fb 50%,#eef9f8 100%)}
-.welcome-glow-one{background:radial-gradient(circle,rgba(35,122,202,.18) 0,rgba(35,122,202,0) 68%)}.welcome-glow-two{background:radial-gradient(circle,rgba(57,172,204,.17) 0,rgba(57,172,204,0) 69%)}
-.welcome-screen:before,.welcome-screen:after{border-color:rgba(35,122,202,.14)}
-.welcome-particle{background:linear-gradient(135deg,#0b4776,#237aca 54%,#39accc);box-shadow:0 0 0 4px rgba(35,122,202,.08),0 0 16px rgba(11,71,118,.20)}
-.welcome-emblem{background:linear-gradient(145deg,#0b4776 0%,#237aca 58%,#39accc 100%);box-shadow:0 15px 29px rgba(8,42,89,.24)}.welcome-emblem:after{background:radial-gradient(circle,rgba(35,122,202,.24),transparent 68%)}.welcome-emblem-ring{border-color:#72d3dc}.welcome-emblem-mark{color:#fff;text-shadow:0 2px 7px rgba(4,33,68,.28)}.welcome-emblem-spark{color:#ffd35d}
-.welcome-kicker{color:#0b4776}.welcome-kicker span,.welcome-status-pulse{background:#39accc}.welcome-kicker span{box-shadow:0 0 0 0 rgba(57,172,204,.45)}.welcome-card h1{color:#082a59}.welcome-message{color:#607d9e}.welcome-role{border-color:#bfdfeb;background:#f5fbfd}.welcome-role>span{background:linear-gradient(135deg,#237aca,#39accc)}.welcome-role small{color:#6e89a6}.welcome-role strong{color:#0b4776}.welcome-status{color:#52708e}.welcome-status-pulse:after{border-color:rgba(57,172,204,.45)}.welcome-start{background:linear-gradient(135deg,#0b4776 0%,#237aca 52%,#39accc 100%);box-shadow:0 12px 23px rgba(8,42,89,.20)}.welcome-start:hover{background:linear-gradient(135deg,#082a59 0%,#176aa8 52%,#2caeae 100%);box-shadow:0 15px 28px rgba(8,42,89,.27)}
+body.jaksa-bg.welcome-page {
+    height: 100dvh;
+    overflow: hidden;
+}
 
-/* Keep the welcome panel directly below the fixed navbar on every sidebar state. */
-body.jaksa-bg:has(.welcome-screen) .content-shell{margin:0 0 0 var(--sidebar)!important;border-radius:0!important}html.sidebar-collapsed body.jaksa-bg:has(.welcome-screen) .content-shell{margin-left:64px!important}body.jaksa-bg:has(.welcome-screen) .main-content{padding:0 20px 20px!important}body.jaksa-bg:has(.welcome-screen) .welcome-screen{margin-top:52px!important}
+body.jaksa-bg.welcome-page .jaksa-bg-ornaments {
+    display: none;
+}
+
+/* Notifikasi login harus mengambang, bukan menjadi baris sebelum welcome. */
+body.jaksa-bg.welcome-page > .success-toast {
+    position: fixed !important;
+    top: 12px !important;
+    right: 14px !important;
+    bottom: auto !important;
+    left: auto !important;
+    margin: 0 !important;
+    z-index: 220 !important;
+}
+
+body.jaksa-bg.welcome-page .content-shell {
+    width: 100%;
+    margin: 0 !important;
+    height: 100dvh;
+    min-height: 0;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+body.jaksa-bg.welcome-page .main-content {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    margin: 0;
+    min-height: 0;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+body.jaksa-bg.welcome-page .footer {
+    display: none !important;
+}
+
+.welcome-screen {
+    position: relative;
+    display: grid;
+    flex: 1;
+    min-height: 0;
+    place-items: center;
+    overflow: hidden;
+    isolation: isolate;
+    border: 0;
+    border-radius: 0;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .10)),
+        url("images/welcome-sky-background.webp") center center / cover no-repeat;
+    box-shadow: none;
+}
+
+.welcome-screen::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .02) 0%, rgba(255, 255, 255, .14) 52%, rgba(255, 255, 255, .04) 100%);
+    content: "";
+    pointer-events: none;
+}
+
+.welcome-screen::after {
+    position: absolute;
+    top: -8%;
+    left: -8%;
+    z-index: 0;
+    width: 116%;
+    height: 68%;
+    background: url("images/welcome-cloud-overlay.png") center top / 100% auto no-repeat;
+    content: "";
+    opacity: .58;
+    pointer-events: none;
+    transform: translate3d(0, 0, 0) scale(1.02);
+    transform-origin: center top;
+    will-change: transform;
+    animation: welcome-cloud-drift 13s ease-in-out infinite alternate;
+}
+
+@keyframes welcome-cloud-drift {
+    from { transform: translate3d(-4%, 0, 0) scale(1.02); }
+    to { transform: translate3d(4%, -1%, 0) scale(1.06); }
+}
+
+.welcome-particles {
+    --welcome-bubble-shift-x: 0px;
+    --welcome-bubble-shift-y: 0px;
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translate3d(var(--welcome-bubble-shift-x), var(--welcome-bubble-shift-y), 0);
+    transition: transform .65s cubic-bezier(.2, .7, .2, 1);
+}
+
+.welcome-liquid-canvas {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .72;
+    pointer-events: auto;
+}
+
+.welcome-particle {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--size);
+    height: var(--size);
+    border: 1px solid rgba(255, 255, 255, .92);
+    border-radius: 50%;
+    background: radial-gradient(circle at 31% 28%, #fff 0 9%, #8ed8ff 12% 35%, #087ee7 57%, rgba(8, 126, 231, .12) 72%);
+    box-shadow: 0 0 0 5px rgba(31, 150, 242, .18), 0 8px 20px rgba(8, 100, 175, .31);
+    opacity: .94;
+    animation: welcome-bubble-float var(--duration) ease-in-out var(--delay) infinite;
+}
+
+.welcome-particle:nth-child(3n) {
+    background: radial-gradient(circle at 31% 28%, #fff 0 9%, #c5f1d8 12% 35%, #7ccca2 57%, rgba(124, 204, 162, .12) 72%);
+    box-shadow: 0 0 0 5px rgba(144, 215, 177, .20), 0 8px 20px rgba(73, 150, 112, .22);
+}
+
+.welcome-particle:nth-child(3n + 1) {
+    background: radial-gradient(circle at 31% 28%, #fff 0 9%, #fff5be 12% 35%, #f1d675 57%, rgba(241, 214, 117, .12) 72%);
+    box-shadow: 0 0 0 5px rgba(245, 221, 141, .22), 0 8px 20px rgba(172, 145, 52, .20);
+}
+
+@keyframes welcome-bubble-float {
+    0%, 100% { opacity: .34; transform: translate3d(0, 0, 0) scale(.72); }
+    50% { opacity: 1; transform: translate3d(18px, -28px, 0) scale(1.18); }
+}
+
+.welcome-particle:nth-child(4n + 1) { animation-name: welcome-bubble-drift-one; animation-timing-function: cubic-bezier(.35, .05, .2, 1); }
+.welcome-particle:nth-child(4n + 2) { animation-name: welcome-bubble-drift-two; animation-timing-function: cubic-bezier(.5, 0, .25, 1); }
+.welcome-particle:nth-child(4n + 3) { animation-name: welcome-bubble-drift-three; animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
+.welcome-particle:nth-child(4n) { animation-name: welcome-bubble-drift-four; animation-timing-function: cubic-bezier(.6, .05, .35, 1); }
+
+@keyframes welcome-bubble-drift-one {
+    0%, 100% { opacity: .26; transform: translate3d(0, 0, 0) scale(.72); }
+    28% { opacity: .9; transform: translate3d(19px, -31px, 0) scale(1.12); }
+    64% { opacity: .54; transform: translate3d(-12px, -57px, 0) scale(.88); }
+}
+
+@keyframes welcome-bubble-drift-two {
+    0%, 100% { opacity: .3; transform: translate3d(0, 0, 0) scale(.68); }
+    42% { opacity: 1; transform: translate3d(-22px, -18px, 0) scale(1.2); }
+    76% { opacity: .45; transform: translate3d(9px, -49px, 0) scale(.83); }
+}
+
+@keyframes welcome-bubble-drift-three {
+    0%, 100% { opacity: .28; transform: translate3d(0, 0, 0) scale(.75); }
+    24% { opacity: .85; transform: translate3d(12px, -19px, 0) scale(1.04); }
+    57% { opacity: .6; transform: translate3d(28px, -45px, 0) scale(.91); }
+    83% { opacity: .94; transform: translate3d(-8px, -62px, 0) scale(1.14); }
+}
+
+@keyframes welcome-bubble-drift-four {
+    0%, 100% { opacity: .25; transform: translate3d(0, 0, 0) scale(.7); }
+    34% { opacity: .94; transform: translate3d(-15px, -39px, 0) scale(1.18); }
+    70% { opacity: .48; transform: translate3d(17px, -55px, 0) scale(.82); }
+}
+
+.welcome-ripples {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.welcome-ripple {
+    position: absolute;
+    left: var(--ripple-x);
+    top: var(--ripple-y);
+    width: 20px;
+    height: 8px;
+    border: 1.5px solid rgba(112, 224, 246, .92);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .55), 0 0 13px rgba(8, 163, 211, .28);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.15);
+    animation: welcome-water-ripple 1.6s cubic-bezier(.18, .56, .3, 1) var(--ripple-delay, 0ms) forwards;
+}
+
+@keyframes welcome-water-ripple {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(.2); }
+    10% { opacity: .92; }
+    72% { opacity: .42; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(18); }
+}
+
+.welcome-card {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    width: min(570px, calc(100% - 40px));
+    justify-items: center;
+    padding: 20px 24px;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    text-align: center;
+    transform: perspective(1200px) translate3d(0, 0, 0);
+    transform-style: preserve-3d;
+    transition: transform .25s ease-out;
+    pointer-events: none;
+}
+
+/* Keep the welcome copy fixed while gestures control the water simulation behind it. */
+.welcome-card,
+.welcome-card [data-welcome-depth] { transform: none !important; }
+.welcome-start { pointer-events: auto; }
+
+.welcome-card [data-welcome-depth] {
+    --welcome-parallax-x: 0px;
+    --welcome-parallax-y: 0px;
+    --welcome-drag-x: 0px;
+    --welcome-drag-y: 0px;
+    transform: translate3d(calc(var(--welcome-parallax-x) + var(--welcome-drag-x)), calc(var(--welcome-parallax-y) + var(--welcome-drag-y)), 0);
+    transition: transform .22s ease-out;
+    will-change: transform;
+}
+
+[data-welcome-drag] { cursor: grab; touch-action: none; user-select: none; }
+[data-welcome-drag].is-dragging { cursor: grabbing; transition: none !important; }
+[data-welcome-return].is-returning { transition: transform 1.35s cubic-bezier(.2, .8, .2, 1) !important; }
+
+.welcome-brand {
+    display: grid;
+    justify-items: center;
+    margin-bottom: 18px;
+}
+
+.welcome-brand-logo {
+    display: block;
+    width: min(238px, 61vw);
+    height: auto;
+    filter: drop-shadow(0 4px 8px rgba(4, 57, 112, .12));
+}
+
+.welcome-brand-name {
+    margin: 6px 0 0;
+    color: #4d6192;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .22em;
+    line-height: 1.2;
+    animation: welcome-copy-sway 5.8s ease-in-out infinite;
+}
+
+.welcome-brand-accent {
+    display: flex;
+    width: 130px;
+    height: 6px;
+    margin-top: 16px;
+    overflow: hidden;
+    border-radius: 999px;
+    box-shadow: 0 3px 8px rgba(31, 111, 180, .14);
+}
+
+.welcome-brand-accent i { display: block; height: 100%; }
+.welcome-brand-accent i:nth-child(1) { width: 42%; background: #0db5b2; }
+.welcome-brand-accent i:nth-child(2) { width: 37%; background: #1677de; }
+.welcome-brand-accent i:nth-child(3) { width: 21%; background: #ffb31b; }
+
+.welcome-card h1 {
+    max-width: 600px;
+    margin: 0;
+    color: #093578;
+    font-size: clamp(28px, 2.7vw, 41px);
+    font-weight: 850;
+    letter-spacing: -.045em;
+    line-height: .99;
+    text-shadow: 0 2px 0 rgba(255, 255, 255, .42);
+    animation: welcome-copy-sway 6.6s ease-in-out -.9s infinite;
+}
+
+.welcome-card h1 > span,
+.welcome-card h1 > strong {
+    display: block;
+}
+
+.welcome-card h1 > strong {
+    margin-top: 4px;
+    color: #0788b7;
+    font: inherit;
+    background: linear-gradient(90deg, #0782c4 4%, #0087aa 94%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.welcome-message {
+    max-width: 570px;
+    margin: 17px 0 19px;
+    color: #3c5a97;
+    font-size: clamp(12px, .98vw, 14px);
+    font-weight: 500;
+    line-height: 1.55;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+    animation: welcome-copy-sway 7.3s ease-in-out -2.1s infinite;
+}
+
+.welcome-role {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 228px;
+    padding: 9px 15px 9px 10px;
+    border: 1px solid rgba(102, 180, 235, .55);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .78);
+    box-shadow: 0 9px 19px rgba(17, 93, 147, .08);
+    text-align: left;
+    animation: welcome-copy-sway 6.1s ease-in-out -3.4s infinite;
+}
+
+@keyframes welcome-copy-sway {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    28% { transform: translate3d(2px, -2px, 0) rotate(.25deg); }
+    57% { transform: translate3d(-2px, 1px, 0) rotate(-.22deg); }
+    79% { transform: translate3d(1px, 2px, 0) rotate(.14deg); }
+}
+
+.welcome-role-icon {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    border-radius: 12px;
+    color: #fff;
+    background: linear-gradient(145deg, #d9efff, #8ed1f1);
+}
+
+.welcome-role-icon svg { width: 21px; height: 21px; fill: #1789df; }
+.welcome-role small,
+.welcome-role strong { display: block; }
+.welcome-role small { color: #687aa2; font-size: 9px; font-weight: 850; letter-spacing: .10em; }
+.welcome-role strong { margin-top: 3px; color: #0c3171; font-size: 13px; line-height: 1.1; }
+
+.welcome-start {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: min(100%, 300px) !important;
+    max-width: 300px !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    margin-top: 18px;
+    padding: 0 24px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 999px !important;
+    color: #fff !important;
+    background: linear-gradient(100deg, #073b83 0%, #0874b7 45%, #11bba9 100%);
+    box-shadow: 0 15px 28px rgba(8, 82, 141, .23);
+    font-size: 14px;
+    font-weight: 850;
+    letter-spacing: .01em;
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.welcome-start::before {
+    position: absolute;
+    top: 0;
+    left: -85%;
+    width: 38%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .34), transparent);
+    content: "";
+    transform: skewX(-22deg);
+    transition: left .55s ease;
+}
+
+.welcome-start:hover { color: #fff !important; box-shadow: 0 18px 33px rgba(8, 82, 141, .30); transform: translateY(-2px); }
+.welcome-start:hover::before { left: 145%; }
+.welcome-start span,
+.welcome-start b { position: relative; z-index: 1; }
+.welcome-start b { font-size: 23px; font-weight: 400; line-height: .8; }
+
+@media (max-width: 900px) {
+    body.jaksa-bg.welcome-page .main-content { min-height: 0; padding: 0 !important; }
+    .welcome-screen { min-height: 0; border-radius: 0; background-position: center center; }
+    .welcome-card { padding: 18px 22px; }
+}
+
+@media (max-width: 640px) {
+    body.jaksa-bg.welcome-page .main-content { padding: 0 !important; }
+    .welcome-screen { min-height: 0; border-radius: 0; background-position: 52% center; }
+    .welcome-card { width: min(100% - 24px, 570px); padding: 16px 8px; }
+    .welcome-brand { margin-bottom: 14px; }
+    .welcome-brand-logo { width: min(190px, 59vw); }
+    .welcome-brand-name { margin-top: 6px; font-size: 9px; }
+    .welcome-brand-accent { width: 106px; height: 5px; margin-top: 12px; }
+    .welcome-card h1 { font-size: clamp(29px, 9vw, 39px); }
+    .welcome-message { max-width: 330px; margin: 14px 0 16px; font-size: 12px; }
+    .welcome-role { min-width: 224px; padding: 9px 14px 9px 10px; }
+    .welcome-role-icon { width: 38px; height: 38px; flex-basis: 38px; }
+    .welcome-role strong { font-size: 15px; }
+    .welcome-start { width: min(100%, 260px) !important; max-width: 260px !important; height: 46px !important; min-height: 46px !important; margin-top: 16px; font-size: 14px; }
+    .welcome-start b { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .welcome-card,
+    .welcome-start,
+    .welcome-start::before,
+    .welcome-particles { transition: none !important; }
+    .welcome-particle,
+    .welcome-screen::after,
+    .welcome-ripple,
+    .welcome-brand-name,
+    .welcome-card h1,
+    .welcome-message,
+    .welcome-role { animation: none !important; }
+}

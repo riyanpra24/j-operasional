@@ -2330,6 +2330,7 @@
 
     const card = scene.querySelector('[data-welcome-card]');
     const particleLayer = scene.querySelector('[data-welcome-particles]');
+    const liquidCanvas = scene.querySelector('[data-welcome-liquid]');
     const emblem = scene.querySelector('[data-welcome-emblem]');
     const status = scene.querySelector('[data-welcome-status]');
     const depthElements = scene.querySelectorAll('[data-welcome-depth]');
@@ -2337,7 +2338,118 @@
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let activeDrag = null;
     let draggedUntil = 0;
+    let ripplePointerId = null;
+    let lastRippleAt = 0;
+    let lastRipplePoint = null;
     const returnTimers = new WeakMap();
+    const liquidContext = liquidCanvas?.getContext('2d');
+    const liquidRipples = [];
+    let liquidFrame = 0;
+
+    const resizeLiquidCanvas = () => {
+        if (!liquidCanvas || !liquidContext) return;
+        const bounds = scene.getBoundingClientRect();
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        liquidCanvas.width = Math.max(1, Math.round(bounds.width * ratio));
+        liquidCanvas.height = Math.max(1, Math.round(bounds.height * ratio));
+        liquidContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+    };
+
+    const drawLiquid = (now) => {
+        if (!liquidCanvas || !liquidContext) return;
+        const bounds = scene.getBoundingClientRect();
+        liquidContext.clearRect(0, 0, bounds.width, bounds.height);
+
+        for (let index = liquidRipples.length - 1; index >= 0; index -= 1) {
+            const ripple = liquidRipples[index];
+            const age = (now - ripple.startedAt) / 1450;
+            if (age >= 1) {
+                liquidRipples.splice(index, 1);
+                continue;
+            }
+
+            const fade = Math.pow(1 - age, 1.65);
+            const radius = 10 + age * (142 + ripple.energy * 38);
+            const isWake = ripple.isDrag;
+            const glow = liquidContext.createRadialGradient(ripple.x, ripple.y, 0, ripple.x, ripple.y, 36 + age * 42);
+            glow.addColorStop(0, `rgba(235, 252, 255, ${.11 * fade})`);
+            glow.addColorStop(.45, `rgba(151, 222, 242, ${.045 * fade})`);
+            glow.addColorStop(1, 'rgba(151, 222, 242, 0)');
+            liquidContext.fillStyle = glow;
+            liquidContext.beginPath();
+            liquidContext.ellipse(ripple.x, ripple.y, radius * .58, radius * .22, 0, 0, Math.PI * 2);
+            liquidContext.fill();
+
+            for (let ring = 0; ring < 3; ring += 1) {
+                const ringAge = age - ring * .11;
+                if (ringAge <= 0) continue;
+                const ringRadius = 8 + ringAge * (136 + ripple.energy * 34);
+                const ringFade = Math.pow(Math.max(0, 1 - ringAge), 1.6) * (.78 - ring * .14);
+                const xRadius = isWake ? ringRadius * .44 : ringRadius;
+                const yRadius = isWake ? ringRadius * .76 : Math.max(4, ringRadius * .29);
+                liquidContext.beginPath();
+                liquidContext.ellipse(ripple.x, ripple.y, xRadius, yRadius, isWake ? ripple.angle : 0, 0, Math.PI * 2);
+                liquidContext.strokeStyle = `rgba(224, 252, 255, ${ringFade})`;
+                liquidContext.lineWidth = Math.max(.75, 1.7 - ring * .25);
+                liquidContext.shadowColor = `rgba(30, 167, 208, ${ringFade * .62})`;
+                liquidContext.shadowBlur = 8;
+                liquidContext.stroke();
+            }
+            liquidContext.shadowBlur = 0;
+        }
+
+        liquidFrame = liquidRipples.length ? window.requestAnimationFrame(drawLiquid) : 0;
+    };
+
+    const createLiquidRipple = (event, isDrag = false) => {
+        if (!liquidContext || reduceMotion) return;
+        const bounds = scene.getBoundingClientRect();
+        const x = event.clientX - bounds.left;
+        const y = event.clientY - bounds.top;
+        const previous = lastRipplePoint;
+        const angle = previous ? Math.atan2(y - previous.y, x - previous.x) + Math.PI / 2 : 0;
+        const distance = previous ? Math.hypot(x - previous.x, y - previous.y) : 0;
+        liquidRipples.push({
+            x,
+            y,
+            angle,
+            isDrag,
+            energy: isDrag ? Math.min(1.05, .4 + distance / 38) : 1,
+            startedAt: performance.now(),
+        });
+        if (!liquidFrame) liquidFrame = window.requestAnimationFrame(drawLiquid);
+        lastRippleAt = performance.now();
+        lastRipplePoint = { x, y };
+    };
+
+    if (liquidContext && !reduceMotion) {
+        resizeLiquidCanvas();
+        new ResizeObserver(resizeLiquidCanvas).observe(scene);
+        scene.addEventListener('pointerdown', (event) => {
+            if (event.button > 0 || event.target.closest('[data-welcome-drag], .welcome-start')) return;
+            ripplePointerId = event.pointerId;
+            scene.setPointerCapture?.(event.pointerId);
+            createLiquidRipple(event);
+        });
+
+        scene.addEventListener('pointermove', (event) => {
+            if (ripplePointerId !== event.pointerId) return;
+            const bounds = scene.getBoundingClientRect();
+            const x = event.clientX - bounds.left;
+            const y = event.clientY - bounds.top;
+            const distance = lastRipplePoint ? Math.hypot(x - lastRipplePoint.x, y - lastRipplePoint.y) : Infinity;
+            if (performance.now() - lastRippleAt > 52 && distance > 12) createLiquidRipple(event, true);
+        });
+
+        const stopRipples = (event) => {
+            if (ripplePointerId !== event.pointerId) return;
+            scene.releasePointerCapture?.(event.pointerId);
+            ripplePointerId = null;
+            lastRipplePoint = null;
+        };
+        scene.addEventListener('pointerup', stopRipples);
+        scene.addEventListener('pointercancel', stopRipples);
+    }
 
     if (particleLayer && !reduceMotion) {
         Array.from({ length: 16 }).forEach((_, index) => {
@@ -2345,7 +2457,7 @@
             particle.className = 'welcome-particle';
             particle.style.setProperty('--x', `${6 + ((index * 37) % 88)}%`);
             particle.style.setProperty('--y', `${8 + ((index * 53) % 78)}%`);
-            particle.style.setProperty('--size', `${4 + ((index * 7) % 8)}px`);
+            particle.style.setProperty('--size', `${8 + ((index * 7) % 13)}px`);
             particle.style.setProperty('--delay', `${(index % 8) * -0.65}s`);
             particle.style.setProperty('--duration', `${5.5 + ((index * 11) % 32) / 10}s`);
             particleLayer.appendChild(particle);
@@ -2358,6 +2470,8 @@
             const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - 0.5) * 2));
             const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - 0.5) * 2));
             card.style.transform = `perspective(1200px) translate3d(${x * 5}px, ${y * 4}px, 0) rotateX(${y * -2.2}deg) rotateY(${x * 2.8}deg)`;
+            particleLayer?.style.setProperty('--welcome-bubble-shift-x', `${x * 11}px`);
+            particleLayer?.style.setProperty('--welcome-bubble-shift-y', `${y * 8}px`);
             depthElements.forEach((element) => {
                 const depth = Number(element.dataset.welcomeDepth || 1);
                 element.style.setProperty('--welcome-parallax-x', `${x * depth * 8}px`);
@@ -2366,6 +2480,8 @@
         });
         scene.addEventListener('pointerleave', () => {
             card.style.transform = '';
+            particleLayer?.style.setProperty('--welcome-bubble-shift-x', '0px');
+            particleLayer?.style.setProperty('--welcome-bubble-shift-y', '0px');
             depthElements.forEach((element) => {
                 element.style.setProperty('--welcome-parallax-x', '0px');
                 element.style.setProperty('--welcome-parallax-y', '0px');

@@ -56,7 +56,9 @@
 /* Integration with the existing application shell. */
 /* Match the specificity of legacy page styles so every menu reveals this backdrop. */
 body.jaksa-bg:not(.landing-page):not(.login-page) .content-shell {
-    background: #f6f8fb !important;
+    background:
+        linear-gradient(rgba(255, 255, 255, .50), rgba(255, 255, 255, .50)),
+        #f6f8fb url("images/operasional-content-background.png") center center / cover fixed no-repeat !important;
 }
 body.jaksa-bg:not(.landing-page):not(.login-page) .content-shell::before,
 body.jaksa-bg:not(.landing-page):not(.login-page) .content-shell::after { display: none !important; }
@@ -72,8 +74,8 @@ body.jaksa-bg .sidebar {
     padding: 12px 10px 14px !important;
     color: #f5fbff !important;
     background:
-        radial-gradient(ellipse at 104% 12%, rgba(40,146,207,.20), transparent 37%),
-        linear-gradient(160deg, #082a59 0%, #0b4776 53%, #075b79 100%) !important;
+        linear-gradient(rgba(3, 39, 77, .74), rgba(4, 58, 91, .74)),
+        #063664 url("images/jaksa-sidebar-background.png") center center / cover no-repeat !important;
     border: 0 !important;
     box-shadow: 6px 0 22px rgba(6,43,81,.20) !important;
     -ms-overflow-style: none;
@@ -96,6 +98,11 @@ body.jaksa-bg .brand-jaksa-wordmark {
     transform-origin: center;
 }
 body.jaksa-bg .brand.brand-jaksa { position: relative !important; }
+/* Remove the legacy gold triangle injected by the previous sidebar theme. */
+body.jaksa-bg .brand.brand-jaksa::before {
+    display: none !important;
+    content: none !important;
+}
 /* Compatibility for pages rendered from an older cached layout. */
 body.jaksa-bg .brand-jaksa-expansion { display: none !important; }
 body.jaksa-bg .main-nav {
@@ -197,6 +204,34 @@ body.jaksa-bg .nav-sublink.active {
 }
 body.jaksa-bg .nav-sublink.active > span { color: #fff !important; }
 body.jaksa-bg .nav-chevron { color: #e8f8ff !important; font-size: 13px !important; }
+/* Uniform right-facing submenu indicator, matching the supplied arrow reference. */
+body.jaksa-bg .nav-chevron {
+    display: grid !important;
+    place-items: center;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin-left: auto;
+    padding: 0;
+    color: #c6f3ff !important;
+    background: transparent !important;
+    border: 0;
+    border-radius: 0;
+    font-family: Arial, sans-serif;
+    font-size: 17px !important;
+    font-weight: 800;
+    line-height: 1;
+    transform: rotate(0deg) !important;
+    transition: transform .16s ease, color .16s ease;
+}
+body.jaksa-bg .nav-group.open .nav-chevron {
+    color: #fff !important;
+    transform: rotate(90deg) !important;
+}
+body.jaksa-bg .nav-parent:hover .nav-chevron,
+body.jaksa-bg .nav-parent.active .nav-chevron {
+    color: #fff !important;
+}
 body.jaksa-bg .nav-link-muted .nav-icon { color: #fff !important; background: rgba(88,168,220,.34) !important; }
 body.jaksa-bg .nav-status-dot { background: #ffd35d !important; box-shadow: 0 0 0 4px rgba(255,211,93,.15) !important; }
 body.jaksa-bg .sidebar-account { background: rgba(8,56,103,.30) !important; border-color: rgba(180,228,252,.17) !important; }
@@ -236,25 +271,25 @@ body.jaksa-bg.progress-page .progress-document-panel .table-actions .icon-btn {
     border-radius: 6px !important;
     font-size: 10px !important;
 }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(1) { width: 3%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(2) { width: 8%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(3) { width: 10%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(4) { width: 16%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(5) { width: 14%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(6) { width: 9%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(7) { width: 14%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(8) { width: 15%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(9) { width: 11%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(1) { width: 4%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(2) { width: 14%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(3) { width: 10%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(4),
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(5) { width: 9%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(6) { width: 10%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(7) { width: 17%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(8) { width: 9%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(9) { width: 11%; }
-body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(10) { width: 7%; }
+/* Widths follow the visible columns after the row-number column was removed. */
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(1) { width: 8%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(2) { width: 14%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(3) { width: 15%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(4) { width: 17%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(5) { width: 10%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(6) { width: 14%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(7) { width: 10%; }
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(8) { width: 12%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(1) { width: 16%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(2) { width: 9%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(3),
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(4) { width: 10%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(5) { width: 7%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(6) { width: 17%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(7) { width: 10%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(8) { width: 11%; }
+body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(9) { width: 10%; }
+body.jaksa-bg.progress-page .progress-document-panel td { overflow-wrap: anywhere !important; }
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel td {
     overflow-wrap: anywhere !important;
     word-break: normal !important;
@@ -289,6 +324,125 @@ body.jaksa-bg:not(.landing-page):not(.login-page) .distribution-heading::after {
     }
     html.sidebar-collapsed body.jaksa-bg .content-shell {
         margin-left: 64px !important;
+    }
+}
+
+/* Shared shell controls: identical on every module and responsive to sidebar state. */
+body.jaksa-bg .brand.brand-jaksa {
+    min-height: 70px !important;
+    padding: 4px 5px 13px !important;
+}
+body.jaksa-bg .brand-jaksa-wordmark {
+    width: 164px !important;
+    max-width: 100% !important;
+    transform: none !important;
+}
+body.jaksa-bg .menu-toggle {
+    display: grid !important;
+    place-items: center !important;
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    height: 42px !important;
+    margin-right: 12px !important;
+    padding: 0 !important;
+    color: #0572ae !important;
+    background: #fff !important;
+    border: 1px solid #d3e4ee !important;
+    border-radius: 11px !important;
+    box-shadow: 0 3px 10px rgba(7,68,110,.05) !important;
+}
+body.jaksa-bg .menu-toggle:hover {
+    color: #0572ae !important;
+    background: #f7fcff !important;
+    border-color: #b8d8e8 !important;
+}
+body.jaksa-bg .menu-toggle > span {
+    width: 16px;
+    height: 12px;
+    overflow: hidden;
+    color: transparent;
+    background: linear-gradient(#0572ae 0 2px, transparent 2px 5px, #0572ae 5px 7px, transparent 7px 10px, #0572ae 10px 12px);
+    border-radius: 1px;
+    font-size: 0;
+}
+body.jaksa-bg .topbar-profile-trigger {
+    gap: 9px !important;
+    min-height: 44px !important;
+    padding: 4px 10px 4px 5px !important;
+    background: #fff !important;
+    border: 1px solid #c9deea !important;
+    border-radius: 15px !important;
+    box-shadow: 0 3px 10px rgba(7,68,110,.05) !important;
+}
+body.jaksa-bg .topbar-profile-avatar {
+    flex-basis: 34px !important;
+    width: 34px !important;
+    height: 34px !important;
+    background: linear-gradient(135deg, #0759a9 0%, #168ad0 58%, #17b3b0 100%) !important;
+    border-radius: 11px !important;
+    box-shadow: 0 5px 12px rgba(2,91,163,.22) !important;
+    font-size: 11px !important;
+}
+body.jaksa-bg .topbar-profile-copy strong { color: #173d61 !important; font-size: 9px !important; }
+body.jaksa-bg .topbar-profile-copy small { color: #7f91a3 !important; font-size: 7px !important; }
+body.jaksa-bg .topbar-profile-chevron {
+    display: grid;
+    place-items: center;
+    width: 14px;
+    height: 14px;
+    margin-left: 2px;
+    color: #39738e !important;
+    font-family: Arial, sans-serif;
+    font-size: 16px !important;
+    font-weight: 800;
+    line-height: 1;
+    transform: rotate(90deg) !important;
+    transition: transform .16s ease, color .16s ease;
+}
+body.jaksa-bg .topbar-profile.open .topbar-profile-chevron {
+    color: #0b679a !important;
+    transform: rotate(-90deg) !important;
+}
+@media (min-width: 901px) {
+    html.sidebar-collapsed body.jaksa-bg .brand.brand-jaksa {
+        min-height: 52px !important;
+        padding: 6px 0 8px !important;
+    }
+    html.sidebar-collapsed body.jaksa-bg .brand-jaksa-wordmark {
+        width: 42px !important;
+        max-width: 42px !important;
+        transform: none !important;
+    }
+}
+
+/* Keep desktop sidebar toggling light: animate only the shell, not every menu item. */
+@media (min-width: 901px) {
+    body.jaksa-bg .sidebar {
+        contain: layout;
+        will-change: width;
+        transition: width .18s ease-out, padding .18s ease-out !important;
+    }
+    body.jaksa-bg .content-shell {
+        transition: margin-left .18s ease-out !important;
+    }
+    body.jaksa-bg .topbar {
+        transition: left .18s ease-out !important;
+    }
+    body.jaksa-bg :is(.brand.brand-jaksa, .brand-jaksa-wordmark, .brand-jaksa-expansion,
+        .nav-link, .nav-link .nav-icon, .nav-link-text, .main-nav > .nav-label,
+        .nav-group.open > .nav-submenu) {
+        transition: none !important;
+    }
+}
+@media (max-width: 900px) {
+    body.jaksa-bg .menu-toggle { margin-right: 0 !important; }
+    body.jaksa-bg .sidebar {
+        will-change: transform;
+        transition: transform .2s ease-out, box-shadow .2s ease-out !important;
+    }
+    body.jaksa-bg .sidebar.open + .sidebar-backdrop {
+        backdrop-filter: none !important;
+        animation: none !important;
     }
 }
 
@@ -393,15 +547,24 @@ body.jaksa-bg.distribution-page .security-register-panel td {
     font-size: 9px !important;
 }
 body.jaksa-bg.distribution-page .security-register-panel th { height: 42px !important; font-size: 8px !important; }
-body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(1) { width: 4%; }
-body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(2) { width: 18%; }
-body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(3) { width: 15%; }
-body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(4) { width: 12%; }
-body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(5) { width: 13%; }
+/* Distribution tabs use the same visible-column order, without the former No. column. */
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(1) { width: 16%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(2) { width: 16%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(3) { width: 12%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(4) { width: 13%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(5) { width: 9%; }
 body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(6) { width: 7%; }
-body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(7) { width: 5%; }
-body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(8) { width: 7%; }
-body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(9) { width: 19%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(7) { width: 8%; }
+body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(8) { width: 19%; }
+body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(1) { width: 12%; }
+body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(2) { width: 10%; }
+body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(3) { width: 13%; }
+body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(4) { width: 12%; }
+body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(5) { width: 9%; }
+body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(6) { width: 25%; }
+body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(7) { width: 10%; }
+body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(8) { width: 9%; }
+body.jaksa-bg.distribution-page .distribution-table-panel td { overflow-wrap: anywhere !important; }
 body.jaksa-bg.distribution-page .security-register-panel .table-actions { gap: 3px !important; white-space: nowrap; }
 body.jaksa-bg.distribution-page .security-register-panel .icon-btn {
     width: 27px !important;
@@ -509,16 +672,20 @@ body.jaksa-bg .topbar-notification.open .topbar-notification-trigger {
     }
 }
 body.jaksa-bg .menu-toggle {
-    width: 36px !important;
-    height: 36px !important;
-    margin-right: 11px !important;
+    flex-basis: 42px !important;
+    width: 42px !important;
+    height: 42px !important;
+    margin-right: 12px !important;
 }
 body.jaksa-bg .topbar-title span { font-size: 7px !important; }
 body.jaksa-bg .topbar-title strong { font-size: 13px !important; }
 body.jaksa-bg .topbar-icon,
-body.jaksa-bg .date-pill,
-body.jaksa-bg .topbar-profile-trigger { min-height: 36px !important; }
+body.jaksa-bg .date-pill { min-height: 36px !important; }
+body.jaksa-bg .topbar-profile-trigger { min-height: 44px !important; }
 body.jaksa-bg .topbar-icon { width: 36px !important; height: 36px !important; }
+@media (max-width: 900px) {
+    body.jaksa-bg .menu-toggle { margin-right: 0 !important; }
+}
 body.jaksa-bg .main-content { padding: 69px 20px 20px !important; }
 body.jaksa-bg .footer {
     display: flex !important;
@@ -576,6 +743,65 @@ body.jaksa-bg .security-distribution-tabs .progress-document-tab small,
 body.jaksa-bg .vehicle-module-tab small,
 body.jaksa-bg .lr-report-tab small { font-size: 8px !important; }
 
+/* Match the soft lower-right half-circle across Distribution, Progress, and Laba/Rugi tabs. */
+body.jaksa-bg:is(.distribution-page, .progress-page) .security-distribution-tabs .progress-document-tab,
+body.jaksa-bg.accounting-page .lr-report-tab {
+    position: relative !important;
+    isolation: isolate;
+    overflow: hidden !important;
+}
+body.jaksa-bg:is(.distribution-page, .progress-page) .security-distribution-tabs .progress-document-tab::after,
+body.jaksa-bg.accounting-page .lr-report-tab::after {
+    position: absolute;
+    right: -68px;
+    bottom: -96px;
+    z-index: 0;
+    width: 208px;
+    height: 142px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(59, 161, 235, .16) 0 47%, transparent 48%);
+    content: "";
+    pointer-events: none;
+}
+body.jaksa-bg:is(.distribution-page, .progress-page) .security-distribution-tabs .progress-document-tab:nth-child(2)::after,
+body.jaksa-bg.accounting-page .lr-report-tab:nth-child(2)::after {
+    background: radial-gradient(ellipse, rgba(61, 198, 185, .16) 0 47%, transparent 48%);
+}
+body.jaksa-bg:is(.distribution-page, .progress-page) .security-distribution-tabs .progress-document-tab > *,
+body.jaksa-bg.accounting-page .lr-report-tab > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Keep YTD/PTD inside their badges and readable at every card width. */
+body.jaksa-bg.accounting-page .lr-report-tab-badge {
+    overflow: hidden !important;
+    color: #fff !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+    text-align: center;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+body.jaksa-bg.accounting-page .lr-report-tab:nth-child(1) .lr-report-tab-badge {
+    color: #fff !important;
+    background: linear-gradient(135deg, #317fc8, #154b9a) !important;
+}
+body.jaksa-bg.accounting-page .lr-report-tab:nth-child(2) .lr-report-tab-badge {
+    color: #fff !important;
+    background: linear-gradient(135deg, #65d4bf, #2aadaf) !important;
+}
+body.jaksa-bg.accounting-page .lr-report-tab strong {
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+}
+body.jaksa-bg.accounting-page .lr-report-tab small {
+    font-size: 8px !important;
+    line-height: 1.35 !important;
+}
+
 body.jaksa-bg .filter-panel { padding: 10px 14px !important; }
 body.jaksa-bg .filter-panel label { font-size: 8px !important; }
 body.jaksa-bg .filter-panel :is(input, select) { min-height: 38px !important; font-size: 9px !important; }
@@ -585,6 +811,38 @@ body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel { pa
 body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel :is(input, select) { min-height: 38px !important; font-size: 9px !important; }
 body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel .filter-actions .btn { min-height: 38px !important; font-size: 9px !important; }
 body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel .list-order-menu > summary { width: 38px !important; height: 38px !important; }
+
+/* Keep both filter actions inside the Progres Dokumen panel instead of clipping Reset at the right edge. */
+body.jaksa-bg.progress-page .agendaris-filter-form:not(.progress-outgoing-filter-form) {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, .8fr) minmax(0, .72fr) minmax(0, .72fr) 38px max-content !important;
+    gap: 10px !important;
+}
+body.jaksa-bg.progress-page .agendaris-filter-form.progress-outgoing-filter-form {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, .8fr) 38px max-content !important;
+    gap: 10px !important;
+}
+body.jaksa-bg.progress-page .agendaris-filter-form .filter-actions {
+    min-width: 0;
+    gap: 8px !important;
+}
+body.jaksa-bg.progress-page .agendaris-filter-form .filter-actions .btn {
+    padding-inline: 11px !important;
+}
+
+@media (max-width: 980px) {
+    body.jaksa-bg.progress-page .agendaris-filter-form:not(.progress-outgoing-filter-form) {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    body.jaksa-bg.progress-page .agendaris-filter-form:not(.progress-outgoing-filter-form) .search-group {
+        grid-column: span 2;
+    }
+    body.jaksa-bg.progress-page .agendaris-filter-form.progress-outgoing-filter-form {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    }
+    body.jaksa-bg.progress-page .agendaris-filter-form .filter-actions {
+        justify-self: end;
+    }
+}
 
 /* PKS status cards follow the four-card visual hierarchy from the supplied reference. */
 body.jaksa-bg .pks-summary-grid { gap: 12px !important; margin-bottom: 16px !important; }

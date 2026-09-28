@@ -39,7 +39,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>No.</th>
                         <th>Pengirim</th>
                         <th>Perihal</th>
                         <th>Penerima</th>
@@ -52,16 +51,14 @@
                 </thead>
                 <tbody>
                     <?php if ($dokumen === []): ?><tr>
-                            <td colspan="9">
+                            <td colspan="8">
                                 <div class="empty-state"><span>⇢</span><strong>Belum ada dokumen untuk didistribusikan</strong>
                                     <p>Gunakan tombol Tambah Dokumen Masuk untuk membuat antrean distribusi baru.</p>
                                 </div>
                             </td>
                         </tr>
                     <?php else: ?>
-                        <?php $rowNumber = (($pager->getCurrentPage('distribusi_dokumen') - 1) * $filters['perPage']) + 1; ?>
                         <?php foreach ($dokumen as $row): ?><tr>
-                                <td><strong><?= $rowNumber++ ?></strong></td>
                                 <td><strong><?= esc($row['pengirim']) ?></strong></td>
                                 <td class="cell-wrap"><?= esc($row['perihal'] ?: '-') ?></td>
                                 <td><?= esc($row['penerima'] ?: '-') ?></td>
@@ -94,7 +91,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>No.</th>
                         <th>Jenis</th>
                         <th>Jumlah Dokumen</th>
                         <th>Nama Ekspedisi</th>
@@ -114,11 +110,9 @@
                             </td>
                         </tr>
                     <?php else: ?>
-                        <?php $outgoingNumber = (($pagerKeluar->getCurrentPage('distribusi_keluar') - 1) * $filters['perPage']) + 1; ?>
                         <?php foreach ($dokumenKeluar as $row): ?>
                             <?php $progressComplete = $row['progres'] === 'Diambil Ekspedisi'; ?>
                             <tr>
-                                <td><strong><?= $outgoingNumber++ ?></strong></td>
                                 <td><span class="security-type-chip"><?= esc($row['jenis_surat']) ?></span></td>
                                 <td><?= esc(($row['jumlah_dokumen'] ?? null) ?: '-') ?></td>
                                 <td><span class="security-expedition-chip"><?= esc(($row['nama_ekspedisi'] ?? null) ?: '-') ?></span></td>

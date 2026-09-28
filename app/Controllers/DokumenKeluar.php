@@ -80,7 +80,10 @@ class DokumenKeluar extends BaseController
             $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
             $this->model->orderBy('tanggal_pengiriman', $direction)->orderBy('id', $direction);
         } else {
-            $this->model->orderBy('id', 'ASC');
+            // Gunakan waktu tahap proses terakhir, bukan nomor/generator data.
+            $this->model
+                ->orderBy('COALESCE(selesai_agendaris_at, diambil_ekspedisi_at, diterima_security_at, tanggal_pengiriman)', 'DESC', false)
+                ->orderBy('id', 'DESC');
         }
 
         return view('dokumen_keluar/index', [

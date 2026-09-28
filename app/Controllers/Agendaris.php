@@ -87,7 +87,12 @@ class Agendaris extends BaseController
             $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
             $this->model->orderBy('agendaris.tanggal_diterima', $direction)->orderBy('agendaris.id', $direction);
         } else {
-            $this->model->orderBy('agendaris.created_at', 'ASC')->orderBy('agendaris.id', 'ASC');
+            // Arsip menampilkan dokumen yang paling akhir diproses/selesai lebih dahulu.
+            // Nomor agendaris tidak dipakai sebagai dasar urutan.
+            $this->model
+                ->orderBy('agendaris.updated_at', 'DESC')
+                ->orderBy('agendaris.tanggal_diterima', 'DESC')
+                ->orderBy('agendaris.id', 'DESC');
         }
 
         return view('agendaris/index', [

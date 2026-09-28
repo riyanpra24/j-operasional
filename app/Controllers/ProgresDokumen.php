@@ -79,8 +79,9 @@ class ProgresDokumen extends BaseController
                 ->orderBy('agendaris.id', $direction);
         } else {
             $this->agendarisModel
-                ->orderBy('agendaris.created_at', 'ASC')
-                ->orderBy('agendaris.id', 'ASC');
+                ->orderBy('agendaris.updated_at', 'DESC')
+                ->orderBy('agendaris.tanggal_diterima', 'DESC')
+                ->orderBy('agendaris.id', 'DESC');
         }
 
         return view('agendaris/progres_dokumen_masuk', [
@@ -160,7 +161,9 @@ class ProgresDokumen extends BaseController
             $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
             $this->model->orderBy('tanggal_pengiriman', $direction)->orderBy('id', $direction);
         } else {
-            $this->model->orderBy('id', 'ASC');
+            $this->model
+                ->orderBy('COALESCE(diambil_ekspedisi_at, diterima_security_at, tanggal_pengiriman)', 'DESC', false)
+                ->orderBy('id', 'DESC');
         }
 
         return view('agendaris/progres_dokumen', [

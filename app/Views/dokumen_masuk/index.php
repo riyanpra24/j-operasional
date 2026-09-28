@@ -36,7 +36,6 @@
         <table>
             <thead>
                 <tr>
-                    <th>No.</th>
                     <th>Pengirim</th>
                     <th>Perihal</th>
                     <th>Penerima</th>
@@ -48,14 +47,13 @@
             </thead>
             <tbody>
                 <?php if ($dokumen === []): ?><tr>
-                        <td colspan="8">
+                        <td colspan="7">
                             <div class="empty-state"><span>⌕</span><strong>Belum ada Dokumen Masuk selesai</strong>
                                 <p>Selesaikan penyerahan melalui menu Distribusi Dokumen agar data tampil di halaman ini.</p>
                             </div>
                         </td>
                     </tr>
-                    <?php else: ?><?php $rowNumber = (($pager->getCurrentPage('dokumen_masuk') - 1) * $filters['perPage']) + 1; ?><?php foreach ($dokumen as $row): ?><tr>
-                        <td><strong><?= $rowNumber++ ?></strong></td>
+                    <?php else: ?><?php foreach ($dokumen as $row): ?><tr>
                         <td><strong><?= esc($row['pengirim']) ?></strong></td>
                         <td class="cell-wrap"><?= esc($row['perihal'] ?: '-') ?></td>
                         <td><?= esc($row['penerima'] ?: '-') ?></td>
