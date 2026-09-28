@@ -179,11 +179,12 @@ body.landing-surabaya-page::before {
     text-align: center;
 }
 .surabaya-login-form {
+    --login-row-gap: 12px;
     display: grid;
-    flex: 1;
+    flex: 0 0 auto;
     grid-template-rows: repeat(5, auto);
-    align-content: space-between;
-    gap: 0;
+    align-content: start;
+    gap: var(--login-row-gap);
     margin-top: 21px;
 }
 .surabaya-field {
@@ -201,15 +202,16 @@ body.landing-surabaya-page::before {
 .surabaya-field input::placeholder { color: #6172a2; opacity: 1; }
 .surabaya-field:focus-within { border-color: #198bb9; box-shadow: 0 0 0 3px rgba(25,139,185,.12); }
 .surabaya-field button { padding: 5px; color: #5870ad; background: transparent; border: 0; font-size: 16px; cursor: pointer; }
-.surabaya-login-options { display: flex; justify-content: space-between; align-items: center; margin-top: -1px; color: #183d74; font-size: 12px; }
+.surabaya-login-options { display: flex; justify-content: space-between; align-items: center; color: #183d74; font-size: 12px; }
 .surabaya-login-hint {
     margin: 0;
-    color: #6879a5;
-    font-size: 8px;
-    font-weight: 600;
-    letter-spacing: .02em;
+    color: #6a79a9;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: .28em;
     line-height: 1.4;
     text-align: center;
+    text-transform: uppercase;
 }
 .surabaya-login-options label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .surabaya-login-options input { width: 20px; height: 20px; margin: 0; accent-color: #087ba9; }
@@ -221,7 +223,7 @@ body.landing-surabaya-page::before {
     gap: 17px;
     width: 100%;
     min-height: 42px;
-    margin-top: 1px;
+    margin-top: 0;
     color: #fff;
     background: linear-gradient(105deg, #063d79 0%, #08769d 54%, #12a488 100%);
     border: 0;
@@ -272,5 +274,7 @@ body.landing-surabaya-page::before {
     .surabaya-login-card { width: min(100%, 350px); min-height: 420px; margin-inline: auto; padding: 24px 20px 22px; transform: none; }
     .surabaya-login-logo { width: 192px; height: 70px; }
     .surabaya-login-caption { margin-bottom: 15px; font-size: 8px; }
-    .surabaya-login-secure { gap: 8px; font-size: 6px; letter-spacing: .19em; }
+    .surabaya-login-hint,
+    .surabaya-login-secure { font-size: 6px; letter-spacing: .19em; }
+    .surabaya-login-secure { gap: 8px; }
 }
