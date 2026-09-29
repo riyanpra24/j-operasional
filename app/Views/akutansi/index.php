@@ -5,7 +5,7 @@
     <div>
         <p class="eyebrow">AKUTANSI</p>
         <h1>Akutansi</h1>
-        <p>Pilih menu laporan, RKA, simulasi hitung, export dokumen, atau penyesuaian sumber Oracle.</p>
+        <p>Pilih menu laporan, RKA, simulasi hitung, atau export dokumen.</p>
     </div>
 </section>
 
@@ -28,11 +28,6 @@
     <a class="panel accounting-menu-card is-export" href="<?= site_url('akutansi/export-dokumen') ?>">
         <span class="accounting-menu-icon" aria-hidden="true">⇩</span>
         <span><small>DOKUMEN</small><strong>Export Dokumen</strong><p>Export RKA dan Realisasi dengan format template Deviasi Anggaran.</p></span>
-        <b aria-hidden="true">→</b>
-    </a>
-    <a class="panel accounting-menu-card is-source" href="<?= site_url('akutansi/seting-rumus') ?>">
-        <span class="accounting-menu-icon" aria-hidden="true">±</span>
-        <span><small>SUMBER ORACLE</small><strong>Penyesuaian Sumber Oracle</strong><p>Ajukan perubahan sumber COA per unit, LOB, dan periode.</p></span>
         <b aria-hidden="true">→</b>
     </a>
 </section>

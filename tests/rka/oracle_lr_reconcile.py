@@ -5,7 +5,7 @@ from decimal import Decimal, ROUND_HALF_UP, getcontext
 import subprocess, json, re
 
 source = 'C:/Users/Jamkrindo/Downloads/LR SEKANWIL YTD AGUSTUS 2026.xlsx'
-prefix = 'require "app/Libraries/LrMoney.php"; require "app/Libraries/OracleLrSalaryParser.php"; require "app/Libraries/LrReportRows.php"; require "app/Libraries/LrSignRules.php"; require "app/Libraries/OracleLrMappingService.php"; '
+prefix = 'require "app/Libraries/LrMoney.php"; require "app/Libraries/OracleLrSalaryParser.php"; require "app/Libraries/LrReportRows.php"; require "app/Libraries/LrSignRules.php"; '
 getcontext().prec = 180
 run = lambda code: json.loads(subprocess.check_output(['C:/xampp/php/php.exe', '-r', prefix + code], text=True))
 mapping = run('echo json_encode(App\\Libraries\\LrReportRows::sourceMap());')

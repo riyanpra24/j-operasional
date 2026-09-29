@@ -24,8 +24,8 @@
     <?php if (!$simulations): ?>
         <p class="simulation-empty">Belum ada hasil simulasi. Unggah LR Oracle untuk membuat kertas kerja pertama.</p>
     <?php else: ?>
-        <div class="oracle-mapping-table-wrap" role="region" aria-label="Daftar hasil simulasi hitung" tabindex="0">
-            <table class="oracle-mapping-table simulation-table">
+        <div class="lr-audit-table-wrap" role="region" aria-label="Daftar hasil simulasi hitung" tabindex="0">
+            <table class="lr-audit-table simulation-table">
                 <thead>
                     <tr>
                         <th>Dibuat</th>

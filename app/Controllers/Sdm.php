@@ -1114,8 +1114,63 @@ class Sdm extends BaseController
         return $this->response->setJSON([
             'success' => true,
             'message' => $message,
+            'redirect_url' => $this->incomingDocumentListUrl(),
             'csrf' => ['name' => csrf_token(), 'hash' => csrf_hash()],
         ]);
+    }
+
+    /**
+     * Keep the active document-list filters after an AJAX disposition update.
+     * Only local SDM list paths and their expected filter keys are accepted.
+     */
+    private function incomingDocumentListUrl(): string
+    {
+        $fallbackRoute = 'sdm/dokumen-masuk';
+        $returnUrl = trim((string) $this->request->getPost('return_url'));
+
+        if ($returnUrl === '') {
+            $returnUrl = trim((string) $this->request->getServer('HTTP_REFERER'));
+        }
+
+        $parts = $returnUrl !== '' ? parse_url($returnUrl) : false;
+        if (! is_array($parts) || ! isset($parts['path'])) {
+            return site_url($fallbackRoute);
+        }
+
+        $incomingPath = rtrim((string) parse_url(site_url('sdm/dokumen-masuk'), PHP_URL_PATH), '/');
+        $historyPath = rtrim((string) parse_url(site_url('sdm/riwayat'), PHP_URL_PATH), '/');
+        $requestedPath = rtrim((string) $parts['path'], '/');
+        $route = $requestedPath === $historyPath
+            ? 'sdm/riwayat'
+            : ($requestedPath === $incomingPath ? 'sdm/dokumen-masuk' : $fallbackRoute);
+
+        if ($route === $fallbackRoute && $requestedPath !== $incomingPath) {
+            return site_url($fallbackRoute);
+        }
+
+        $query = [];
+        parse_str((string) ($parts['query'] ?? ''), $query);
+        $allowedKeys = [
+            'q',
+            'status',
+            'urutan',
+            'per_page',
+            'page_sdm_incoming_documents',
+            'page_sdm_incoming_history',
+        ];
+        $filters = [];
+        foreach ($allowedKeys as $key) {
+            if (! isset($query[$key]) || is_array($query[$key])) {
+                continue;
+            }
+
+            $value = trim((string) $query[$key]);
+            if ($value !== '') {
+                $filters[$key] = $value;
+            }
+        }
+
+        return site_url($route) . ($filters !== [] ? '?' . http_build_query($filters) : '');
     }
 
     private function latestDispositionStep(array $document): int

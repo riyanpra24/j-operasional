@@ -33,10 +33,8 @@ final class LrRealizationService
         }
 
         $results = [];
-        $periods = [];
         foreach ($latest as $unit => $row) {
             $results[$unit] = json_decode($row['result_json'], true, 512, JSON_THROW_ON_ERROR);
-            $periods[$unit] = ['year' => (int) $row['report_year'], 'month' => (int) $row['report_month']];
         }
         // Imports created before the LOB percentage detail was introduced still
         // retain their original workbook. Re-read it only when needed so the
@@ -65,7 +63,7 @@ final class LrRealizationService
             $record = $budgetService->find($unit, $year);
             $rka[$unit] = $record === null ? null : json_decode($record['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
         }
-        $valuesByUnit = (new LrRealizationCalculator())->calculate($results, $rka, $periods);
+        $valuesByUnit = (new LrRealizationCalculator())->calculate($results, $rka);
 
         return [
             'import' => $latest[$selectedUnit] ?? null,
@@ -75,6 +73,99 @@ final class LrRealizationService
             'basis' => $basis,
             'month' => $month,
         ];
+    }
+
+    /**
+     * Returns the BOPO source values stored in the selected YTD workpaper.
+     * Old imports are read again from their original workpaper so a re-upload
+     * is not required when the BOPO section is introduced.
+     *
+     * @return array<string,array{realisasi:?string,target:?string,pencapaian:?string}>
+     */
+    public function bopoYtd(int $year, int $month): array
+    {
+        return $this->bopo($year, $month, 'YTD');
+    }
+
+    /** @return array<string,array{realisasi:?string,target:?string,pencapaian:?string}> */
+    public function bopoPtd(int $year, int $month): array
+    {
+        return $this->bopo($year, $month, 'PTD');
+    }
+
+    /** @return array<string,array{realisasi:?string,target:?string,pencapaian:?string}> */
+    private function bopo(int $year, int $month, string $basis): array
+    {
+        if ($month < 1 || $month > 12 || !in_array($basis, self::BASES, true)) return [];
+        $rows = (new AccountingLrImportModel())
+            ->where('report_year', $year)
+            ->where('report_basis', $basis)
+            ->where('report_month', $month)
+            ->orderBy('id', 'DESC')
+            ->findAll();
+
+        $latest = [];
+        foreach ($rows as $row) {
+            $unit = (string) ($row['unit_name'] ?? '');
+            $isSourceUnit = in_array($unit, RkaCalculator::SOURCE_UNITS, true);
+            $isWorkpaperCorporate = $unit === 'Korporat Kanwil'
+                && (string) ($row['rule_version'] ?? '') === LrWorkpaperImportParser::RULE;
+            if (($isSourceUnit || $isWorkpaperCorporate) && !isset($latest[$unit])) $latest[$unit] = $row;
+        }
+
+        $values = [];
+        $reparsedByPath = [];
+        foreach ($latest as $unit => $row) {
+            $result = null;
+            try { $result = json_decode((string) $row['result_json'], true, 512, JSON_THROW_ON_ERROR); }
+            catch (\JsonException) { $result = null; }
+            $bopo = is_array($result) && is_array($result['bopo'] ?? null) ? $result['bopo'] : null;
+
+            // Imports created before the per-unit S168 fallback was added need
+            // a one-time read from their original YTD workpaper.
+            if ($bopo === null || !$this->hasBopoPencapaian($bopo)) {
+                $path = $this->sourcePath($row);
+                if ($path !== null) {
+                    if (!array_key_exists($path, $reparsedByPath)) {
+                        try {
+                            $reparsedByPath[$path] = (new LrWorkpaperImportParser())->parse(
+                                $path,
+                                (int) $row['report_year'],
+                                (int) $row['report_month'],
+                                (string) $row['report_basis'],
+                                is_array($result) && ($result['manual_adjustment_approved'] ?? false) === true,
+                            );
+                        } catch (\Throwable $exception) {
+                            log_message('notice', 'Sumber BOPO belum dapat dibaca ulang: {message}', ['message' => $exception->getMessage()]);
+                            $reparsedByPath[$path] = [];
+                        }
+                    }
+                    $bopo = $reparsedByPath[$path][$unit]['bopo'] ?? null;
+                }
+            }
+
+            $values[$unit] = $this->normalizeBopo($bopo);
+        }
+        return $values;
+    }
+
+    /** @param mixed $raw @return array{realisasi:?string,target:?string,pencapaian:?string} */
+    private function normalizeBopo(mixed $raw): array
+    {
+        $result = ['realisasi' => null, 'target' => null, 'pencapaian' => null];
+        if (!is_array($raw)) return $result;
+        foreach (array_keys($result) as $key) {
+            if (!is_string($raw[$key] ?? null)) continue;
+            try { $result[$key] = LrMoney::decimal($raw[$key]); }
+            catch (\InvalidArgumentException) { /* An unreadable optional control cell stays empty. */ }
+        }
+        return $result;
+    }
+
+    /** @param mixed $bopo */
+    private function hasBopoPencapaian(mixed $bopo): bool
+    {
+        return is_array($bopo) && is_string($bopo['pencapaian'] ?? null) && $bopo['pencapaian'] !== '';
     }
 
     /** @param array<string,mixed> $result */

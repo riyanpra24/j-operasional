@@ -6,7 +6,7 @@ use RuntimeException;
 use SimpleXMLElement;
 use ZipArchive;
 
-/** Oracle LR reader with administrator-managed LOB and COA mappings. */
+/** Oracle LR reader with verified, built-in LOB and COA rules. */
 final class OracleLrSalaryParser
 {
     private const NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
@@ -20,14 +20,11 @@ final class OracleLrSalaryParser
     public const LEGACY_RULE = 'kur_salary_v1';
     public const BRANCH_UNITS = ['Surabaya','Kediri','Malang','Madiun','Banyuwangi'];
     public const IMPORT_UNITS = ['Kanwil','Surabaya','Kediri','Malang','Madiun','Banyuwangi'];
+    private const TARGET_COLUMNS = ['KUR', 'NON KUR', 'PEN'];
     private const UNIT_SHEETS = [
         'Kanwil'=>'KANWIL','Surabaya'=>'SURABAYA','Kediri'=>'KEDIRI',
         'Malang'=>'MALANG','Madiun'=>'MADIUN','Banyuwangi'=>'BANYUWANGI',
     ];
-
-    public function __construct(private ?OracleLrMappingService $mappingService = null)
-    {
-    }
 
     public static function columnForLob(string $lob): ?string
     {
@@ -135,10 +132,9 @@ final class OracleLrSalaryParser
             if ($year<2000 || $year>2100) throw new RuntimeException('Tahun laporan harus 2000–2100.');
             $matches=[]; $unmapped=[]; $sourceTotal='0.00'; $calculationTotal='0.00';
             $helperRows=['KUR'=>[],'NON KUR'=>[],'PEN'=>[]];
-            $mappingService=$this->mappingService ??= new OracleLrMappingService();
-            $sourceMap=$mappingService->accountMap($unit);
-            $sourceLabels=$mappingService->reportLabels($unit);
-            $segmentCounts=array_fill_keys(OracleLrMappingService::TARGET_COLUMNS,0);
+            $sourceMap=self::sourceMapForUnit($unit);
+            $sourceLabels=array_values(array_unique(array_column($sourceMap, 'report_label')));
+            $segmentCounts=array_fill_keys(self::TARGET_COLUMNS,0);
             $dateStyles=$this->dateStyles($zip);
             foreach ($cells as $address=>$lob) {
                 if (!preg_match('/^'.preg_quote($layout['lob'],'/').'(\d+)$/D',$address,$row) || (int)$row[1]<=7) continue;
@@ -146,43 +142,43 @@ final class OracleLrSalaryParser
                 $r=(int)$row[1]; $description=$cells[$layout['description'].$r]??null; $descriptionLob=$cells[$layout['description_lob'].$r]['value']??'';
                 $descriptionKey=self::normalizeLabel($description['value']??'');
                 $amountAddress=$layout['amount'].$r; $amount=$cells[$amountAddress]??null;
-                $lobMapping=$mappingService->classify((string) $lob['value'],(string) $descriptionLob);
+                $column=self::columnForLob((string) $lob['value']);
                 $formulaSegments=$unit==='Kanwil' ? null : LrReportRows::branchFormulaSourceSegments($descriptionKey);
-                $formulaSegmentAllowed=$formulaSegments===null || ($lobMapping!==null && in_array($lobMapping['target_column'],$formulaSegments,true));
+                $formulaSegmentAllowed=$formulaSegments===null || ($column!==null && in_array($column,$formulaSegments,true));
                 if ($amount===null || $amount['value']==='') {
-                    if ($lobMapping!==null && isset($sourceMap[$descriptionKey])) throw new RuntimeException('Nominal '.$amountAddress.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
+                    if ($column!==null && isset($sourceMap[$descriptionKey])) throw new RuntimeException('Nominal '.$amountAddress.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
                     continue;
                 }
                 if ($lob['formula'] || ($description['formula']??false) || $amount['formula']
                     || !in_array($amount['type'],['','n'],true) || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal '.$amountAddress.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
                 try { $normalized=self::money($amount['value']); }
                 catch (\InvalidArgumentException $e) { throw new RuntimeException($amountAddress.': '.$e->getMessage()); }
-                if ($includeHelperRows && $lobMapping!==null) {
-                    $helperRows[$lobMapping['target_column']][]=[
+                if ($includeHelperRows && $column!==null) {
+                    $helperRows[$column][]=[
                         'row'=>$r,
                         'description'=>trim((string)preg_replace('/[\s\x{00a0}]+/u',' ',(string)($description['value']??''))),
                         'description_lob'=>trim((string)preg_replace('/[\s\x{00a0}]+/u',' ',(string)$descriptionLob)),
                         'amount'=>$normalized,
                     ];
                 }
-                if ($lobMapping===null || !isset($sourceMap[$descriptionKey]) || !$formulaSegmentAllowed) {
+                if ($column===null || !isset($sourceMap[$descriptionKey]) || !$formulaSegmentAllowed) {
                     $unmapped[]=[
                         'row'=>$r,'source_lob'=>trim((string)$lob['value']),'description_lob'=>trim((string)$descriptionLob),
                         'description'=>trim((string)($description['value']??'')),'source_amount'=>$amount['value'],
-                        'reason'=>$lobMapping===null ? 'lob' : (!isset($sourceMap[$descriptionKey]) ? 'account' : 'segment'),
+                        'reason'=>$column===null ? 'lob' : (!isset($sourceMap[$descriptionKey]) ? 'account' : 'segment'),
                     ];
                     continue;
                 }
-                $column=$lobMapping['target_column']; $accountMapping=$sourceMap[$descriptionKey];
+                $accountMapping=$sourceMap[$descriptionKey];
                 if ($lob['formula'] || $description['formula'] || $amount===null || $amount['formula']
                     || !in_array($amount['type'],['','n'],true) || $amount['value']==='' || isset($dateStyles[$amount['style']])) throw new RuntimeException('Nominal '.$amountAddress.' harus angka sumber Oracle, bukan teks, tanggal, atau rumus Excel.');
-                $calculation=$mappingService->calculationValue($accountMapping['sign_mode'],$normalized,$sheetName);
+                $calculation=self::calculationValue($accountMapping['sign_mode'],$normalized,$sheetName);
                 $sourceTotal=LrMoney::add($sourceTotal,$normalized); $calculationTotal=LrMoney::add($calculationTotal,$calculation);
                 $segmentCounts[$column]++;
                 $matches[]=['row'=>$r,'lob'=>$column,'source_lob'=>trim((string)$lob['value']),'description_lob'=>trim((string)$descriptionLob),
                     'account'=>$cells[$layout['account'].$r]['value']??'','description'=>trim($description['value']),
                     'report_label'=>$accountMapping['report_label'],'source_amount'=>$amount['value'],'amount'=>$normalized,'calculation_amount'=>$calculation,
-                    'lob_mapping_id'=>$lobMapping['id'],'account_mapping_id'=>$accountMapping['id'],'sign_mode'=>$accountMapping['sign_mode'],
+                    'sign_mode'=>$accountMapping['sign_mode'],
                     'sign_inverted'=>$calculation!==$normalized];
             }
             if (!$matches) throw new RuntimeException('Tidak ada baris KUR, NON KUR, atau PEN dengan Description COA yang cocok dengan mapping aktif pada sheet '.$sheetName.'. Data sebelumnya tidak diubah.');
@@ -219,13 +215,54 @@ final class OracleLrSalaryParser
             $result=['rule'=>self::RULE,'unit'=>$unit,'sheet'=>$sheetName,'year'=>$year,'month'=>$months[$parts[1]],'period'=>trim($cells[$periodAddress]['value']),
                 'source_total'=>$sourceTotal,'calculation_total'=>$calculationTotal,'matches'=>$matches,'sign_rule_inputs'=>$signRuleInputs,'all_sheet_sign_rule_inputs'=>$allSheetSignInputs,
                 'precision'=>'source_exact_display_half_up','segment_counts'=>$segmentCounts,'unmapped'=>$unmapped,
-                'mapping_version'=>$mappingService->version()];
+                ];
             if ($includeHelperRows) $result['helper_rows']=$helperRows;
             $values=self::reportValues($result);
-            foreach (OracleLrMappingService::TARGET_COLUMNS as $segment) $result['missing_labels_by_segment'][$segment]=array_values(array_filter($sourceLabels,static fn($label)=>!isset($values[self::normalizeLabel($label)][$segment])));
+            foreach (self::TARGET_COLUMNS as $segment) $result['missing_labels_by_segment'][$segment]=array_values(array_filter($sourceLabels,static fn($label)=>!isset($values[self::normalizeLabel($label)][$segment])));
             $result['missing_labels']=$result['missing_labels_by_segment']['KUR'];
             return $result;
         } finally { $zip->close(); }
+    }
+
+    /** @return array<string,array{report_label:string,sign_mode:string}> */
+    private static function sourceMapForUnit(string $unit): array
+    {
+        $map = [];
+        foreach (LrReportRows::branchSourceMap() as $source => $label) {
+            $map[self::normalizeLabel($source)] = self::accountRule($label);
+        }
+        if ($unit === 'Kanwil') {
+            foreach (LrReportRows::sourceMap() as $source => $label) {
+                $map[self::normalizeLabel($source)] = self::accountRule($label);
+            }
+            return $map;
+        }
+        foreach (LrReportRows::branchFormulaSourceMappings() as $mapping) {
+            $source = self::normalizeLabel((string) ($mapping['source_description'] ?? ''));
+            if ($source === '') continue;
+            $map[$source] = [
+                'report_label' => (string) ($mapping['report_label'] ?? ''),
+                'sign_mode' => (string) ($mapping['sign_mode'] ?? 'keep'),
+            ];
+        }
+        return $map;
+    }
+
+    /** @return array{report_label:string,sign_mode:string} */
+    private static function accountRule(string $label): array
+    {
+        return [
+            'report_label' => $label,
+            'sign_mode' => in_array(self::normalizeLabel($label), ['pendapatan jasa giro', 'pendapatan lainnya'], true) ? 'invert' : 'keep',
+        ];
+    }
+
+    private static function calculationValue(string $mode, string $sourceAmount, string $sheetName): string
+    {
+        $value = LrMoney::decimal($sourceAmount);
+        $invert = $mode === 'invert' || ($mode === 'invert_kanwil' && self::normalizeLabel($sheetName) === 'kanwil');
+        if (!$invert || !preg_match('/[1-9]/', $value)) return $value;
+        return str_starts_with($value, '-') ? substr($value, 1) : '-' . $value;
     }
 
     /** All Oracle unit sheets must use the same A–G source layout. */

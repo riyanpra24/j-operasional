@@ -2620,201 +2620,11 @@
             if (event.target === dialog) dialog.close();
         });
     }
-    document.querySelectorAll('form[data-mapping-delete]').forEach((form) => form.addEventListener('submit', (event) => {
-        if (!window.confirm('Hapus mapping ini? Upload berikutnya tidak akan memakai aturan tersebut.')) event.preventDefault();
-    }));
-    document.querySelectorAll('[data-mapping-search]').forEach((input) => input.addEventListener('input', () => {
-        const rows = document.querySelector('[data-mapping-search-rows]');
-        if (!rows) return;
-        const keyword = input.value.trim().toLocaleLowerCase('id-ID');
-        rows.querySelectorAll('tr').forEach((row) => {
-            row.hidden = keyword !== '' && !row.textContent.toLocaleLowerCase('id-ID').includes(keyword);
-        });
-    }));
 })();
 
-// Period-bound Oracle source adjustments: visual raw-COA formula editor with audit-safe deactivation.
 (() => {
-    const dialog = document.querySelector('#sourceAdjustmentDialog');
-    const form = dialog?.querySelector('[data-source-adjustment-form]');
-    if (!(dialog instanceof HTMLDialogElement) || !(form instanceof HTMLFormElement)) return;
-    const approvalRequired = form.dataset.approvalRequired === '1';
-    const fields = {
-        id: form.querySelector('[data-source-adjustment-id]'),
-        scope: form.querySelector('[data-source-adjustment-scope]'),
-        column: form.querySelector('[data-source-adjustment-column]'),
-        target: form.querySelector('[data-source-adjustment-target]'),
-        from: form.querySelector('[data-source-adjustment-from]'),
-        to: form.querySelector('[data-source-adjustment-to]'),
-        reason: form.querySelector('[data-source-adjustment-reason]'),
-        active: form.querySelector('[data-source-adjustment-active]'),
-        lines: form.querySelector('[data-source-adjustment-lines]'),
-        component: form.querySelector('[data-source-adjustment-component]'),
-        list: form.querySelector('[data-source-adjustment-term-list]'),
-        empty: form.querySelector('[data-source-adjustment-empty]'),
-        count: form.querySelector('[data-source-adjustment-count]'),
-        submit: form.querySelector('[data-source-adjustment-submit]'),
-        title: dialog.querySelector('[data-source-adjustment-title]'),
-        menu: form.querySelector('[data-source-description-menu]'),
-        menuToggle: form.querySelector('[data-source-description-toggle]'),
-        addDescription: form.querySelector('[data-source-adjustment-add-description]'),
-    };
-    const normalize = (value) => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('id-ID');
-    const sourceOptions = [...form.querySelectorAll('[data-source-description-option]')];
-    const sourceMap = new Map(sourceOptions.map((option) => [normalize(option.dataset.value), option.dataset.value]));
-    let terms = [];
-    const decode = (encoded) => {
-        try {
-            const bytes = Uint8Array.from(window.atob(encoded || ''), (character) => character.charCodeAt(0));
-            return new TextDecoder().decode(bytes);
-        } catch (_error) { return ''; }
-    };
-    const parse = (value) => String(value || '').split(/\r?\n/).map((line) => {
-        const match = line.trim().match(/^([+\-*\/×÷])\s*(.+)$/);
-        if (!match) return null;
-        return { operator: match[1] === '×' ? '*' : (match[1] === '÷' ? '/' : match[1]), label: match[2].trim() };
-    }).filter(Boolean);
-    const sync = () => {
-        if (!(fields.list instanceof HTMLElement) || !(fields.lines instanceof HTMLTextAreaElement)) return;
-        if (terms[0]) terms[0].operator = '+';
-        fields.list.replaceChildren();
-        terms.forEach((term, index) => {
-            if (index > 0) {
-                const connector = document.createElement('div'); connector.className = `formula-term-connector ${term.operator === '-' ? 'is-minus' : (['*', '/'].includes(term.operator) ? 'is-math' : 'is-plus')}`;
-                const connectorLabel = document.createElement('span'); connectorLabel.textContent = 'Pilih operasi';
-                const choices = document.createElement('div'); choices.className = 'formula-term-choices'; choices.setAttribute('role', 'group'); choices.setAttribute('aria-label', `Operasi sebelum ${term.label}`);
-                [['+', '+', 'Tambah'], ['-', '−', 'Kurang'], ['*', '×', 'Kali'], ['/', '÷', 'Bagi']].forEach(([value, symbol, text]) => {
-                    const choice = document.createElement('button'); choice.type = 'button'; choice.className = 'formula-term-choice';
-                    choice.classList.toggle('is-selected', term.operator === value);
-                    choice.setAttribute('aria-pressed', term.operator === value ? 'true' : 'false');
-                    choice.innerHTML = `<b>${symbol}</b><span>${text}</span>`;
-                    choice.addEventListener('click', () => { term.operator = value; sync(); });
-                    choices.append(choice);
-                });
-                connector.append(connectorLabel, choices); fields.list.append(connector);
-            }
-            const row = document.createElement('div');
-            row.className = 'formula-term-row source-formula-term';
-            const content = document.createElement('div'); content.className = 'formula-term-content';
-            const label = document.createElement('span'); label.className = 'formula-term-label'; label.textContent = term.label;
-            content.append(label);
-            const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'formula-term-remove'; remove.textContent = '×'; remove.setAttribute('aria-label', `Hapus ${term.label}`);
-            remove.addEventListener('click', () => { terms.splice(index, 1); sync(); });
-            row.append(content, remove); fields.list.append(row);
-        });
-        fields.lines.value = terms.map((term) => `${term.operator} ${term.label}`).join('\n');
-        if (fields.empty instanceof HTMLElement) fields.empty.hidden = terms.length > 0;
-        if (fields.count instanceof HTMLElement) fields.count.textContent = `${terms.length} uraian`;
-        if (fields.submit instanceof HTMLButtonElement) fields.submit.disabled = terms.length === 0;
-    };
-    const open = (button = null) => {
-        const editing = button instanceof HTMLElement && button.hasAttribute('data-source-adjustment-edit');
-        form.reset();
-        const currentMonth = new Date().toISOString().slice(0, 7);
-        terms = editing ? parse(decode(button.dataset.lines)) : [];
-        if (fields.id instanceof HTMLInputElement) fields.id.value = editing ? button.dataset.id || '' : '';
-        if (fields.scope instanceof HTMLSelectElement) fields.scope.value = editing ? button.dataset.scope || 'all' : 'surabaya';
-        if (fields.column instanceof HTMLSelectElement) fields.column.value = editing ? button.dataset.column || 'all' : 'all';
-        if (fields.target instanceof HTMLSelectElement && editing) fields.target.value = button.dataset.target || fields.target.options[0]?.value;
-        if (fields.from instanceof HTMLInputElement) fields.from.value = editing ? button.dataset.from || currentMonth : currentMonth;
-        if (fields.to instanceof HTMLInputElement) fields.to.value = editing ? button.dataset.to || currentMonth : currentMonth;
-        if (fields.reason instanceof HTMLTextAreaElement) fields.reason.value = editing ? button.dataset.reason || '' : '';
-        if (fields.active instanceof HTMLInputElement) fields.active.checked = editing ? button.dataset.active === '1' : true;
-        if (fields.title instanceof HTMLElement) fields.title.textContent = approvalRequired
-            ? (editing ? 'Ajukan Perubahan Sumber' : 'Ajukan Penyesuaian Sumber')
-            : (editing ? 'Edit Penyesuaian Sumber' : 'Buat Penyesuaian Sumber');
-        if (fields.submit instanceof HTMLButtonElement) fields.submit.textContent = approvalRequired
-            ? 'Kirim untuk Persetujuan'
-            : (editing ? 'Simpan Perubahan' : 'Simpan Penyesuaian');
-        sync();
-        if (!dialog.open) dialog.showModal();
-    };
-    document.querySelectorAll('[data-source-adjustment-create]').forEach((button) => button.addEventListener('click', () => open()));
-    document.querySelectorAll('[data-source-adjustment-edit]').forEach((button) => button.addEventListener('click', () => open(button)));
-    dialog.querySelectorAll('[data-source-adjustment-close]').forEach((button) => button.addEventListener('click', () => dialog.close()));
-    dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
-    const closeSourceMenu = () => {
-        if (fields.menu instanceof HTMLElement) fields.menu.hidden = true;
-        if (fields.component instanceof HTMLInputElement) fields.component.setAttribute('aria-expanded', 'false');
-    };
-    const filterSourceMenu = () => {
-        if (!(fields.component instanceof HTMLInputElement) || !(fields.menu instanceof HTMLElement)) return;
-        const keyword = normalize(fields.component.value);
-        let visible = 0;
-        sourceOptions.forEach((option) => {
-            option.hidden = keyword !== '' && !normalize(option.dataset.value).includes(keyword);
-            if (!option.hidden) visible++;
-        });
-        fields.menu.hidden = false;
-        fields.component.setAttribute('aria-expanded', 'true');
-        fields.menu.dataset.empty = visible === 0 ? '1' : '0';
-    };
-    sourceOptions.forEach((option) => option.addEventListener('click', () => {
-        if (fields.component instanceof HTMLInputElement) {
-            fields.component.value = option.dataset.value || '';
-            fields.component.setCustomValidity('');
-            fields.component.focus();
-        }
-        closeSourceMenu();
-    }));
-    fields.menuToggle?.addEventListener('click', () => {
-        if (fields.menu instanceof HTMLElement && !fields.menu.hidden) closeSourceMenu();
-        else { fields.component?.focus(); filterSourceMenu(); }
-    });
-    fields.component?.addEventListener('focus', filterSourceMenu);
-    fields.component?.addEventListener('input', () => { fields.component.setCustomValidity(''); filterSourceMenu(); });
-    fields.component?.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') closeSourceMenu();
-        if (event.key === 'Enter') {
-            const firstVisible = sourceOptions.find((option) => !option.hidden);
-            if (firstVisible) { event.preventDefault(); firstVisible.click(); }
-        }
-    });
-    document.addEventListener('click', (event) => {
-        if (!event.target.closest('.source-description-picker')) closeSourceMenu();
-    });
-    fields.addDescription?.addEventListener('click', () => {
-        if (!(fields.component instanceof HTMLInputElement)) return;
-        const key = normalize(fields.component.value);
-        const canonical = sourceMap.get(key);
-        if (!canonical) {
-            fields.component.setCustomValidity('Pilih uraian Oracle yang tersedia pada daftar. Unggah laporan Oracle terlebih dahulu jika uraian belum tersedia.');
-            fields.component.reportValidity();
-            return;
-        }
-        fields.component.setCustomValidity('');
-        const existing = terms.find((term) => normalize(term.label) === key);
-        if (!existing) terms.push({ label: canonical, operator: '+' });
-        fields.component.value = '';
-        closeSourceMenu();
-        sync();
-    });
-    form.addEventListener('submit', (event) => {
-        const message = approvalRequired
-            ? 'Kirim pengajuan ini kepada Administrator? Perhitungan belum berubah sampai pengajuan disetujui.'
-            : 'Simpan penyesuaian sumber ini? Nilai laporan pada unit, LOB, dan periode terpilih akan dihitung ulang dari Ending Balance Oracle.';
-        if (terms.length === 0 || !window.confirm(message)) event.preventDefault();
-    });
-    document.querySelectorAll('form[data-source-adjustment-deactivate]').forEach((deactivateForm) => deactivateForm.addEventListener('submit', (event) => {
-        const message = deactivateForm.dataset.approvalRequired === '1'
-            ? 'Ajukan penonaktifan kepada Administrator? Aturan tetap aktif sampai pengajuan disetujui.'
-            : 'Nonaktifkan penyesuaian ini? Sistem akan kembali memakai aturan sumber yang lebih umum atau standar.';
-        if (!window.confirm(message)) event.preventDefault();
-    }));
-    document.querySelectorAll('form[data-source-adjustment-delete]').forEach((deleteForm) => deleteForm.addEventListener('submit', (event) => {
-        const message = deleteForm.dataset.approvalRequired === '1'
-            ? 'Ajukan penghapusan kepada Administrator? Aturan nonaktif tetap tersimpan sampai pengajuan disetujui.'
-            : 'Hapus penyesuaian nonaktif ini? Aturan tidak dapat dipulihkan dari daftar, tetapi riwayat audit tetap disimpan.';
-        if (!window.confirm(message)) event.preventDefault();
-    }));
-    document.querySelectorAll('form[data-simulation-delete]').forEach((deleteForm) => deleteForm.addEventListener('submit', (event) => {
+    document.querySelectorAll('form[data-simulation-delete]').forEach((form) => form.addEventListener('submit', (event) => {
         if (!window.confirm('Hapus hasil simulasi ini? Berkas kertas kerja tidak dapat diunduh lagi setelah dihapus.')) event.preventDefault();
-    }));
-    document.querySelectorAll('form[data-source-request-approve]').forEach((approvalForm) => approvalForm.addEventListener('submit', (event) => {
-        if (!window.confirm('Setujui pengajuan ini? Perubahan akan langsung diterapkan pada perhitungan laporan.')) event.preventDefault();
-    }));
-    document.querySelectorAll('form[data-source-request-reject]').forEach((rejectionForm) => rejectionForm.addEventListener('submit', (event) => {
-        if (!window.confirm('Tolak pengajuan ini? Perubahan tidak akan diterapkan.')) event.preventDefault();
     }));
 })();
 
@@ -2908,6 +2718,26 @@
         button.disabled = true; button.textContent = 'Menghitung…';
     });
     if (dialog.dataset.autoOpen === 'true') dialog.showModal();
+})();
+
+// Laba/Rugi: BOPO and document export stay in the page menu as compact pop-ups.
+(() => {
+    const bindDialog = (selector, openSelector, closeSelector) => {
+        const dialog = document.querySelector(selector);
+        if (!(dialog instanceof HTMLDialogElement)) return null;
+        document.querySelectorAll(openSelector).forEach((button) => button.addEventListener('click', () => {
+            if (!dialog.open) dialog.showModal();
+        }));
+        dialog.querySelectorAll(closeSelector).forEach((button) => button.addEventListener('click', () => dialog.close()));
+        dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+        return dialog;
+    };
+    bindDialog('#lrBopoDialog', '[data-lr-bopo-open]', '[data-lr-bopo-close]');
+    const exportDialog = bindDialog('#lrExportDialog', '[data-lr-export-open]', '[data-lr-export-close]');
+    exportDialog?.querySelector('[data-lr-export-form]')?.addEventListener('submit', () => {
+        const button = exportDialog.querySelector('button[type="submit"]');
+        if (button instanceof HTMLButtonElement) { button.disabled = true; button.textContent = 'Menyiapkan Excel…'; }
+    });
 })();
 
 // Simulasi Hitung: formulir pengisian berada dalam pop-up agar daftar hasil tetap ringkas.

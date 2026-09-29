@@ -103,8 +103,26 @@ body.jaksa-bg .brand.brand-jaksa::before {
     display: none !important;
     content: none !important;
 }
-/* Compatibility for pages rendered from an older cached layout. */
-body.jaksa-bg .brand-jaksa-expansion { display: none !important; }
+/* Kepanjangan JAKSA selalu berupa teks HTML, bukan bagian dari gambar logo. */
+body.jaksa-bg .brand-jaksa-expansion {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 3px;
+    margin-top: -2px;
+    color: rgba(235,248,255,.82);
+    font-size: 6.3px;
+    font-weight: 750;
+    letter-spacing: .015em;
+    line-height: 1.25;
+    text-align: center;
+    white-space: nowrap;
+}
+body.jaksa-bg .brand-jaksa-expansion b { background: none !important; font-weight: 900; -webkit-text-fill-color: currentColor !important; }
+body.jaksa-bg .brand-jaksa-expansion .jaksa-j { color: #d9efff; }
+body.jaksa-bg .brand-jaksa-expansion .jaksa-a-orange { color: #ff7350; }
+body.jaksa-bg .brand-jaksa-expansion .jaksa-k { color: #ffd35d; }
+body.jaksa-bg .brand-jaksa-expansion .jaksa-s { color: #5ed8c5; }
+body.jaksa-bg .brand-jaksa-expansion .jaksa-a-green { color: #44c8b5; }
 body.jaksa-bg .main-nav {
     padding-right: 2px !important;
     -ms-overflow-style: none;
@@ -322,6 +340,10 @@ body.jaksa-bg:not(.landing-page):not(.login-page) .distribution-heading::after {
         width: 64px !important;
         padding-inline: 8px !important;
     }
+    /* A collapsed sidebar is icon-only; submenu arrows must not remain visible. */
+    html.sidebar-collapsed body.jaksa-bg .nav-chevron {
+        display: none !important;
+    }
     html.sidebar-collapsed body.jaksa-bg .content-shell {
         margin-left: 64px !important;
     }
@@ -329,12 +351,12 @@ body.jaksa-bg:not(.landing-page):not(.login-page) .distribution-heading::after {
 
 /* Shared shell controls: identical on every module and responsive to sidebar state. */
 body.jaksa-bg .brand.brand-jaksa {
-    min-height: 70px !important;
+    min-height: 82px !important;
     padding: 4px 5px 13px !important;
 }
 body.jaksa-bg .brand-jaksa-wordmark {
-    width: 164px !important;
-    max-width: 100% !important;
+    width: 120px !important;
+    max-width: 120px !important;
     transform: none !important;
 }
 body.jaksa-bg .menu-toggle {
@@ -412,6 +434,9 @@ body.jaksa-bg .topbar-profile.open .topbar-profile-chevron {
         width: 42px !important;
         max-width: 42px !important;
         transform: none !important;
+    }
+    html.sidebar-collapsed body.jaksa-bg .brand-jaksa-expansion {
+        display: none !important;
     }
 }
 
@@ -588,33 +613,33 @@ body.jaksa-bg.distribution-page .security-register-panel .security-expedition-ch
 }
 
 /* The same compact table scale is used by every menu module. */
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table,
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table {
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .table-wrap > table,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .lr-audit-table-wrap > table {
     font-size: 9px !important;
 }
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table > thead > tr > th,
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table > thead > tr > th {
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .table-wrap > table > thead > tr > th,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .lr-audit-table-wrap > table > thead > tr > th {
     height: 42px !important;
     padding: 8px 9px !important;
     font-size: 8px !important;
 }
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table > tbody > tr > td,
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table > tbody > tr > td {
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .table-wrap > table > tbody > tr > td,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .lr-audit-table-wrap > table > tbody > tr > td {
     min-height: 42px !important;
     padding: 8px 9px !important;
     font-size: 9px !important;
 }
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-actions {
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .table-actions {
     gap: 4px !important;
 }
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-actions .icon-btn {
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .table-actions .icon-btn {
     width: 29px !important;
     min-width: 29px !important;
     height: 29px !important;
     padding: 0 !important;
     font-size: 11px !important;
 }
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) :is(.security-type-chip, .security-expedition-chip, .agenda-source, .pickup-status, .vehicle-status, .vehicle-document-type, .vehicle-action, .vehicle-expiry, .magang-status, .simulation-stat) {
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) :is(.security-type-chip, .security-expedition-chip, .agenda-source, .pickup-status, .vehicle-status, .vehicle-document-type, .vehicle-action, .vehicle-expiry, .magang-status, .simulation-stat) {
     padding: 4px 7px !important;
     font-size: 7px !important;
 }
@@ -630,7 +655,9 @@ body.jaksa-bg .topbar {
     z-index: 110 !important;
     overflow: visible !important;
 }
-body.jaksa-bg .main-content { padding-top: 69px !important; }
+/* The topbar is fixed, so content only needs to clear its 52px height.
+   Keeping the old 69px reserve created a second blank band after a save/reload. */
+body.jaksa-bg .main-content { padding-top: 52px !important; }
 html.sidebar-collapsed body.jaksa-bg .topbar { left: 64px !important; }
 /* Dropdowns belong to the navbar layer, never to the page flow. */
 body.jaksa-bg .content-shell { overflow: visible !important; }
@@ -686,7 +713,7 @@ body.jaksa-bg .topbar-icon { width: 36px !important; height: 36px !important; }
 @media (max-width: 900px) {
     body.jaksa-bg .menu-toggle { margin-right: 0 !important; }
 }
-body.jaksa-bg .main-content { padding: 69px 20px 20px !important; }
+body.jaksa-bg .main-content { padding: 52px 20px 20px !important; }
 body.jaksa-bg .footer {
     display: flex !important;
     align-items: center !important;
@@ -900,20 +927,20 @@ body.jaksa-bg .pks-summary-card-expired::after { border-color: rgba(233,95,120,.
 body.jaksa-bg .pks-summary-grid small { color: #7385a3 !important; font-size: 9px !important; }
 body.jaksa-bg .pks-summary-grid strong { margin-top: 4px !important; color: #0b3d7b !important; font-size: 23px !important; }
 
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table > thead > tr > th,
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table > thead > tr > th {
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .table-wrap > table > thead > tr > th,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .lr-audit-table-wrap > table > thead > tr > th {
     height: 36px !important;
     padding: 7px 8px !important;
     font-size: 7.5px !important;
 }
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .table-wrap > table > tbody > tr > td,
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history, .source-adjustment-panel) .oracle-mapping-table-wrap > table > tbody > tr > td {
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .table-wrap > table > tbody > tr > td,
+body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .lr-audit-table-wrap > table > tbody > tr > td {
     min-height: 38px !important;
     padding: 7px 8px !important;
     font-size: 8.5px !important;
 }
 @media (max-width: 700px) {
-    body.jaksa-bg .main-content { padding: 66px 14px 14px !important; }
+    body.jaksa-bg .main-content { padding: 52px 14px 14px !important; }
     body.jaksa-bg .page-heading,
     body.jaksa-bg .security-page-heading,
     body.jaksa-bg .distribution-heading { margin: -14px -14px 10px !important; padding: 14px !important; }
@@ -922,13 +949,13 @@ body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-pan
 
 /* Continuous navy-to-yellow gradient for every data-list header. */
 body.jaksa-bg .table-wrap > table > thead,
-body.jaksa-bg .oracle-mapping-table-wrap > table > thead,
+body.jaksa-bg .lr-audit-table-wrap > table > thead,
 body.jaksa-bg table.simulation-table > thead,
 body.jaksa-bg .lr-report-table > thead {
     background: linear-gradient(90deg, #123f7e 0%, #1f6fa7 24%, #209cad 47%, #76af93 72%, #f4ca5b 100%) !important;
 }
 body.jaksa-bg .table-wrap > table > thead > tr > th,
-body.jaksa-bg .oracle-mapping-table-wrap > table > thead > tr > th,
+body.jaksa-bg .lr-audit-table-wrap > table > thead > tr > th,
 body.jaksa-bg table.simulation-table > thead > tr > th,
 body.jaksa-bg .lr-report-table > thead > tr > th {
     color: #fff !important;

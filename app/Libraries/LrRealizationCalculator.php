@@ -12,19 +12,12 @@ final class LrRealizationCalculator
     public const PRODUCT_COLUMNS = ['KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF'];
     public const VALUE_COLUMNS = ['KUR', 'PEN', 'NON KUR', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF', 'TOTAL'];
 
-    private LrSourceAdjustmentService $sourceAdjustmentService;
-
-    public function __construct(?LrSourceAdjustmentService $sourceAdjustmentService = null)
-    {
-        $this->sourceAdjustmentService = $sourceAdjustmentService ?? new LrSourceAdjustmentService();
-    }
-
     /**
      * @param array<string,array> $resultsByUnit Parsed Oracle result by source unit.
      * @param array<string,array|null> $rkaCalculatedByUnit RKA calculated_json by unit.
      * @return array<string,array<string,array<string,string>>>
      */
-    public function calculate(array $resultsByUnit, array $rkaCalculatedByUnit = [], array $periodByUnit = []): array
+    public function calculate(array $resultsByUnit, array $rkaCalculatedByUnit = []): array
     {
         if (!extension_loaded('bcmath')) throw new RuntimeException('BCMath diperlukan untuk menghitung realisasi secara presisi.');
 
@@ -54,12 +47,7 @@ final class LrRealizationCalculator
         $states = [];
         foreach (RkaCalculator::SOURCE_UNITS as $unit) {
             if (!isset($resultsByUnit[$unit])) continue;
-            $period = $periodByUnit[$unit] ?? null;
-            $states[$unit] = $this->sourceState(
-                $resultsByUnit[$unit], $unit,
-                is_array($period) ? (int) ($period['year'] ?? 0) : 0,
-                is_array($period) ? (int) ($period['month'] ?? 0) : 0
-            );
+            $states[$unit] = $this->sourceState($resultsByUnit[$unit], $unit);
         }
 
         $valuesByUnit = [];
@@ -103,7 +91,7 @@ final class LrRealizationCalculator
         return false;
     }
 
-    private function sourceState(array $result, string $unit, int $year = 0, int $month = 0): array
+    private function sourceState(array $result, string $unit): array
     {
         $values = [];
         $productZeros = [];
@@ -121,10 +109,7 @@ final class LrRealizationCalculator
             if (isset($seenRows[$rowId])) continue;
             $this->applySourceRow($values, $productZeros, $row, $specialMap, $fallbackMap, $unit, false);
         }
-        $sourceOverrides = $year >= 2000 && $month >= 1
-            ? $this->sourceAdjustmentService->calculateOverrides($result, $unit, $year, $month)
-            : [];
-        return ['values' => $values, 'product_zeros' => $productZeros, 'source_overrides' => $sourceOverrides];
+        return ['values' => $values, 'product_zeros' => $productZeros];
     }
 
     private function applySourceRow(array &$values, array &$productZeros, array $row, array $specialMap, array $fallbackMap, string $unit, bool $mapped): void
@@ -173,13 +158,6 @@ final class LrRealizationCalculator
             if (!isset($values[$key])) continue;
             foreach (self::PRODUCT_COLUMNS as $column) $values[$key][$column] = '0.00';
         }
-        foreach ($state['source_overrides'] ?? [] as $targetKey => $columns) {
-            foreach ($columns as $column => $amount) {
-                if ($amount === null) unset($values[$targetKey][$column]);
-                else $values[$targetKey][$column] = (string) $amount;
-            }
-        }
-
         foreach (array_merge(self::SOURCE_COLUMNS, self::PRODUCT_COLUMNS) as $column) {
             $columnScope = LrFormulaService::columnScopeKey($column);
             if ($columnScope === null) continue;

@@ -32,7 +32,7 @@ final class LrWorkpaperImportParser
     private const PERCENTAGE_COLUMNS = ['S' => 'KUR', 'T' => 'PEN', 'U' => 'KBG/SURETYSHIP', 'V' => 'KONSUMTIF', 'W' => 'PRODUKTIF', 'X' => 'TOTAL'];
 
     /** @return array<string,array<string,mixed>> */
-    public function parse(string $path, int $year, int $month, string $basis): array
+    public function parse(string $path, int $year, int $month, string $basis, bool $manualAdjustmentApproved = false): array
     {
         if (!extension_loaded('bcmath')) throw new RuntimeException('BCMath diperlukan untuk membaca nominal laporan.');
         if (!is_file($path) || filesize($path) > 5 * 1024 * 1024) throw new RuntimeException('Berkas Excel maksimal 5 MB.');
@@ -50,8 +50,9 @@ final class LrWorkpaperImportParser
             foreach (self::UNITS as $unit => $sheetName) {
                 if (!isset($paths[$sheetName])) throw new RuntimeException('Sheet '.$sheetName.' tidak ditemukan. Gunakan hasil terbaru dari Simulasi Hitung.');
                 $cells = $this->sheetCells($zip, $paths[$sheetName], $strings);
-                $this->validateMarker($cells, $sheetName, $year, $month, $basis);
+                $this->validateMarker($cells, $sheetName, $year, $month, $basis, $manualAdjustmentApproved);
                 $output[$unit] = $this->readUnit($cells, $unit, $sheetName, $year, $month, $basis);
+                $output[$unit]['manual_adjustment_approved'] = $manualAdjustmentApproved;
             }
             return $output;
         } finally {
@@ -87,7 +88,13 @@ final class LrWorkpaperImportParser
                 $number = $cells[$column.$row] ?? null;
                 if ($number === null) continue;
                 if ($name === 'TOTAL' && !$number['formula']) {
-                    throw new RuntimeException($sheet.'!'.$column.$row.' harus memakai rumus Total dari Kertas Kerja.');
+                    // Group-heading rows such as "Pendapatan Penjaminan" have
+                    // intentionally blank Total cells in the official template.
+                    // Only a populated Total must be a workpaper formula.
+                    if ($number['value'] === '') continue;
+                    if (!$this->isTemplateZero($number)) {
+                        throw new RuntimeException($sheet.'!'.$column.$row.' harus memakai rumus Total dari Kertas Kerja.');
+                    }
                 }
                 if ($number['formula']) {
                     if ($name === 'TOTAL') $totalFormulaCount++;
@@ -121,10 +128,15 @@ final class LrWorkpaperImportParser
                     $number = $cells[$column.$row] ?? null;
                     if ($number === null) continue;
                     if ($name === 'TOTAL') {
-                        if (!$number['formula']) {
+                        // Heading rows are blank, while some zero-value rows in
+                        // the official template intentionally use a literal 0.
+                        // Both are valid workbook defaults; other populated
+                        // Total-% cells must retain their formula.
+                        if (!$number['formula'] && $number['value'] === '') continue;
+                        if (!$number['formula'] && !$this->isTemplateZero($number)) {
                             throw new RuntimeException($sheet.'!'.$column.$row.' harus memakai rumus Persentase Total dari Kertas Kerja.');
                         }
-                        $totalPercentageFormulaCount++;
+                        if ($number['formula']) $totalPercentageFormulaCount++;
                     }
                     if ($number['formula'] && ($number['value'] === '' || $number['type'] === 'e' || in_array(trim((string) $number['value']), ['-', '—'], true))) {
                         $percentageDetails[$name] = '0.00';
@@ -170,16 +182,62 @@ final class LrWorkpaperImportParser
             'period' => $basis.' · '.self::monthName($month).' '.$year,
             'values' => $values,
             'percentage_column' => $hasTotalPercentage ? 'X' : null,
+            // BOPO is intentionally read from the fixed control cells in the
+            // generated workpaper.  It is kept separate from Laba/Rugi rows so
+            // its source remains traceable in the BOPO report.
+            'bopo' => $this->readBopo($cells, $sheet),
             'read_rows' => count($values),
             'calculated_cells' => $cachedFormulaCount,
         ];
     }
 
-    private function validateMarker(array $cells, string $sheet, int $year, int $month, string $basis): void
+    /** @return array{realisasi:?string,target:?string,pencapaian:?string} */
+    private function readBopo(array $cells, string $sheet): array
+    {
+        $empty = ['realisasi' => null, 'target' => null, 'pencapaian' => null];
+        if (OracleLrSalaryParser::normalizeLabel((string) ($cells['J168']['value'] ?? '')) !== 'bopo') {
+            return $empty;
+        }
+
+        return [
+            // R168 is the BOPO calculation from actual/realisasi figures.
+            'realisasi' => $this->optionalNumber($cells, 'R168', $sheet),
+            // K168 is the BOPO calculation from RKA (target) figures.
+            'target' => $this->optionalNumber($cells, 'K168', $sheet),
+            // X166 remains the optional manual control cell. The official YTD
+            // template calculates achievement per unit in S168; Corporate
+            // Kanwil keeps its control result in X168.
+            'pencapaian' => $this->optionalNumber($cells, 'X166', $sheet)
+                ?? $this->optionalNumber($cells, 'S168', $sheet)
+                ?? $this->optionalNumber($cells, 'X168', $sheet),
+        ];
+    }
+
+    private function optionalNumber(array $cells, string $address, string $sheet): ?string
+    {
+        $cell = $cells[$address] ?? null;
+        if ($cell === null || $cell['value'] === '' || $cell['type'] === 'e') return null;
+        if (!in_array($cell['type'], ['', 'n'], true)) return null;
+        try {
+            return LrMoney::decimal((string) $cell['value']);
+        } catch (\InvalidArgumentException) {
+            log_message('notice', 'Nilai BOPO {sheet}!{address} tidak dapat dibaca.', ['sheet' => $sheet, 'address' => $address]);
+            return null;
+        }
+    }
+
+    /** @param array{value:string,type:string,formula:bool} $cell */
+    private function isTemplateZero(array $cell): bool
+    {
+        return in_array($cell['type'], ['', 'n'], true)
+            && preg_match('/^0(?:\.0+)?$/D', (string) $cell['value']) === 1;
+    }
+
+    private function validateMarker(array $cells, string $sheet, int $year, int $month, string $basis, bool $manualAdjustmentApproved): void
     {
         $marker = trim((string) ($cells['W1']['value'] ?? ''));
         $expected = 'SIMULASI_LR|'.$basis.'|'.$year.'|'.$month;
-        if (!hash_equals($expected, $marker)) {
+        if (!hash_equals($expected, $marker) && !$manualAdjustmentApproved) {
             throw new RuntimeException('Sheet '.$sheet.' bukan hasil Simulasi Hitung untuk '.$basis.' '.self::monthName($month).' '.$year.'. Buat ulang Kertas Kerja dari menu Simulasi Hitung.');
         }
     }

@@ -10,7 +10,7 @@ body.landing-surabaya-page {
     margin: 0;
     overflow: hidden;
     color: #0b3971;
-    background: #eaf8ff url("images/landing-surabaya-background-v2.png") center center / cover no-repeat;
+    background: #eaf8ff url("images/landing-surabaya-background-v2.webp") center center / cover no-repeat;
     font-family: Inter, "Segoe UI", Arial, sans-serif;
 }
 body.landing-surabaya-page::before {
@@ -44,8 +44,11 @@ body.landing-surabaya-page::before {
     box-shadow: 0 16px 35px rgba(27,104,145,.14);
     backdrop-filter: blur(10px);
 }
-.surabaya-landing-brand { display: inline-flex; flex: 0 0 108px; align-items: center; height: 30px; overflow: hidden; }
-.surabaya-landing-brand img { display: block; width: 108px; height: 35px; object-fit: cover; object-position: center; }
+.surabaya-landing-brand { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 1px; height: 36px; overflow: visible; }
+.surabaya-landing-brand img { display: block; width: 108px; height: 35px; object-fit: cover; object-position: center; transform: translateY(-3px); }
+.surabaya-landing-brand-title { position: relative; display: grid; gap: 1px; padding-left: 7px; font-size: 12px; font-weight: 850; letter-spacing: -.28px; line-height: 1.04; white-space: nowrap; }
+.surabaya-landing-brand-title::before { position: absolute; top: -1px; bottom: -1px; left: 0; width: 2px; background: linear-gradient(180deg,#003b70 0%,#005a9d 42%,#00a79d 100%); border-radius: 99px; content: ""; }
+.surabaya-landing-brand-title span { color: #003b70; background: linear-gradient(100deg,#003b70 0%,#005a9d 32%,#00a79d 66%,#e9b12e 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .surabaya-landing-links { display: flex; align-items: center; justify-content: flex-end; gap: clamp(17px,2.7vw,31px); flex: 1; }
 .surabaya-landing-links a {
     padding: 3px 11px;
@@ -169,9 +172,23 @@ body.landing-surabaya-page::before {
     border-radius: 50%;
 }
 .surabaya-login-card > * { position: relative; z-index: 1; }
-.surabaya-login-logo { display: block; width: 164px; height: 57px; margin: 0 auto 2px; object-fit: contain; object-position: center; }
+.surabaya-login-logo { display: block; width: 164px; height: 57px; margin: 0 auto 3px; object-fit: contain; object-position: center; }
+.surabaya-login-title {
+    margin: 0 0 6px;
+    color: #005a9d;
+    background: linear-gradient(100deg,#003b70 0%,#005a9d 32%,#00a79d 66%,#e9b12e 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 9.3px;
+    font-weight: 750;
+    letter-spacing: .035em;
+    line-height: 1.35;
+    text-align: center;
+}
+.surabaya-login-title span { color: inherit; background: none; font-weight: 900; -webkit-text-fill-color: inherit; }
 .surabaya-login-caption {
-    margin: 0 0 11px;
+    margin: 0;
     color: #59699d;
     font-size: 9px;
     font-weight: 700;
@@ -185,7 +202,7 @@ body.landing-surabaya-page::before {
     grid-template-rows: repeat(5, auto);
     align-content: start;
     gap: var(--login-row-gap);
-    margin-top: 21px;
+    margin-top: 14px;
 }
 .surabaya-field {
     display: flex;
@@ -262,8 +279,9 @@ body.landing-surabaya-page::before {
     body.landing-surabaya-page { height: auto; min-height: 100dvh; overflow-y: auto; background-position: 56% center; }
     .surabaya-landing-header { padding: 16px 16px 0; }
     .surabaya-landing-nav { width: min(100% - 32px, 540px); min-height: 46px; padding: 4px 17px; border-radius: 17px; }
-    .surabaya-landing-brand { flex-basis: 108px; height: 36px; }
+    .surabaya-landing-brand { height: 36px; gap: 1px; }
     .surabaya-landing-brand img { width: 108px; height: 38px; }
+    .surabaya-landing-brand-title { padding-left: 7px; font-size: 11px; }
     .surabaya-landing-links { display: none; }
     .surabaya-landing-main { grid-template-columns: 1fr; gap: 30px; width: min(100% - 32px, 540px); height: auto; min-height: auto; padding: 118px 0 68px; }
     .surabaya-landing-copy { text-align: center; transform: none; }
@@ -273,8 +291,14 @@ body.landing-surabaya-page::before {
     .surabaya-landing-copy > p:last-child { margin-top: 19px; font-size: 14px; }
     .surabaya-login-card { width: min(100%, 350px); min-height: 420px; margin-inline: auto; padding: 24px 20px 22px; transform: none; }
     .surabaya-login-logo { width: 192px; height: 70px; }
-    .surabaya-login-caption { margin-bottom: 15px; font-size: 8px; }
+    .surabaya-login-caption { margin: 0; font-size: 8px; }
     .surabaya-login-hint,
     .surabaya-login-secure { font-size: 6px; letter-spacing: .19em; }
     .surabaya-login-secure { gap: 8px; }
+}
+@media (max-width: 390px) {
+    .surabaya-landing-nav { padding-inline: 12px; }
+    .surabaya-landing-brand { gap: 1px; }
+    .surabaya-landing-brand img { width: 90px; height: 34px; }
+    .surabaya-landing-brand-title { padding-left: 7px; border-left-width: 2px; font-size: 9.5px; }
 }

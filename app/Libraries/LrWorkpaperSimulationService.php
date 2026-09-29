@@ -61,8 +61,7 @@ final class LrWorkpaperSimulationService
                 ? $calculator->calculate($calculator->zeros())
                 : json_decode((string) $record['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
         }
-        $periods = array_fill_keys(RkaCalculator::SOURCE_UNITS, ['year' => $year, 'month' => $month]);
-        $realization = (new LrRealizationCalculator())->calculate($parsed, $rka, $periods);
+        $realization = (new LrRealizationCalculator())->calculate($parsed, $rka);
 
         $directory = $this->directory();
         $id = bin2hex(random_bytes(16));

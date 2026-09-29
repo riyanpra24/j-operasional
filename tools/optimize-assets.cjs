@@ -43,12 +43,6 @@ async function main() {
 
     await Promise.all([
         resizeWebp('public/assets/jamkrindo-kanwil-surabaya.png', 'public/assets/jamkrindo-kanwil-surabaya.webp', 520),
-        resizeWebp('public/assets/images/jaksa-wordmark.png', 'public/assets/images/jaksa-wordmark.webp', 1240),
-        resizeWebp('public/assets/images/jaksa-wordmark.png', 'public/assets/images/jaksa-wordmark-sidebar.webp', 224),
-        resizeWebp('public/assets/images/security-policeman.png', 'public/assets/images/security-policeman-64.webp', 64),
-        resizeWebp('public/assets/images/agendaris-agenda.png', 'public/assets/images/agendaris-agenda-64.webp', 64),
-        resizeWebp('public/assets/images/people.png', 'public/assets/images/people-64.webp', 64),
-        resizeWebp('public/assets/images/indonesian-rupiah.png', 'public/assets/images/indonesian-rupiah-64.webp', 64),
     ]);
 
     await Promise.all([

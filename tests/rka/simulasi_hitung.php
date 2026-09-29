@@ -66,9 +66,7 @@ foreach (App\Libraries\OracleLrSalaryParser::IMPORT_UNITS as $unit) {
     $record = getenv('SIMULATION_PRODUCTION_READS') === '1' ? $budgetService->find($unit, 2026) : null;
     $rka[$unit] = $record === null ? $calculator->calculate($calculator->zeros()) : json_decode($record['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
 }
-$periods = getenv('SIMULATION_PRODUCTION_READS') === '1'
-    ? array_fill_keys(App\Libraries\RkaCalculator::SOURCE_UNITS, ['year' => 2026, 'month' => 1]) : [];
-$realization = (new App\Libraries\LrRealizationCalculator())->calculate($parsed, $rka, $periods);
+$realization = (new App\Libraries\LrRealizationCalculator())->calculate($parsed, $rka);
 $output = tempnam(sys_get_temp_dir(), 'lr-simulation-');
 if ($output === false || !copy($template, $output)) throw new RuntimeException('Cannot copy simulation template.');
 try {

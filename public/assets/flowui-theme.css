@@ -937,8 +937,7 @@ body:not(.landing-page):not(.login-page) .table-wrap table thead th {
 .accounting-page .lr-report-tab:not(.is-active) .lr-report-tab-badge { color: #2770ac !important; background: #e4f3ff !important; }
 .accounting-page .lr-report-panel,
 .accounting-page .export-document-panel,
-.accounting-page .simulation-history,
-.accounting-page .source-adjustment-panel { border-top-color: #45c5b8 !important; }
+.accounting-page .simulation-history { border-top-color: #45c5b8 !important; }
 .accounting-page .lr-report-header,
 .accounting-page .simulation-history-heading { background: linear-gradient(100deg, #f0f9ff, #fff 56%, #effcf9) !important; border-bottom-color: #dce9f3 !important; }
 .accounting-page .lr-report-year,
@@ -975,21 +974,6 @@ body:not(.landing-page):not(.login-page) .table-wrap table thead th {
 .accounting-page .export-unit-grid input:checked + span i { color: #fff !important; background: #2faaa2 !important; border-color: #2faaa2 !important; }
 .accounting-page .export-unit-grid input:focus-visible + span { outline-color: #2b8cea !important; }
 
-.accounting-page .source-adjustment-panel { border-top-color: #45c5b8 !important; }
-.accounting-page .source-adjustment-warning,
-.accounting-page .source-adjustment-info,
-.accounting-page .source-adjustment-reason { color: #496b89 !important; border-color: #d3e6f1 !important; background: #f4faff !important; }
-.accounting-page .source-adjustment-warning strong,
-.accounting-page .source-adjustment-info strong { color: #176cae !important; }
-.accounting-page .source-adjustment-card { border-top-color: #79bce9 !important; }
-.accounting-page .source-period-badge { color: #986b13 !important; border-color: #efd99f !important; background: #fff8e5 !important; }
-.accounting-page .formula-status.is-active { color: #177f79 !important; background: #e6faf5 !important; }
-.accounting-page .formula-builder-heading > span,
-.accounting-page .formula-add-button { color: #177f79 !important; border-color: #bdeae0 !important; background: #e6faf5 !important; }
-.accounting-page .formula-term-choice.is-selected { color: #fff !important; border-color: #237bd1 !important; background: #237bd1 !important; box-shadow: 0 3px 8px rgba(35,123,209,.18) !important; }
-.accounting-page .formula-term-connector.is-math { border-left-color: #8dc7ec !important; }
-.accounting-page .formula-term-connector.is-math .formula-term-choice.is-selected { border-color: #45c5b8 !important; background: #45c5b8 !important; box-shadow: 0 3px 8px rgba(69,197,184,.18) !important; }
-.accounting-page .formula-preview-term.is-math b { color: #176cae !important; background: #e5f4ff !important; }
 .accounting-page .lr-lob-picker[open] > summary { border-color: #45c5b8 !important; box-shadow: 0 0 0 3px rgba(69,197,184,.12) !important; }
 .accounting-page .lr-lob-options label:hover { background: #eef9ff !important; }
 .accounting-page .lr-lob-options input,

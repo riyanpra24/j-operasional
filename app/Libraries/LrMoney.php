@@ -87,4 +87,19 @@ final class LrMoney
         $percent=self::multiply($ratio,'100',12);
         return self::reportDisplay($percent).'%';
     }
+
+    /** Display a ratio as a percentage with a fixed number of decimal places. */
+    public static function percentageDisplayFixed(string $ratio, int $precision = 2): string
+    {
+        if ($precision < 0 || $precision > 6) throw new InvalidArgumentException('Presisi persentase tidak valid.');
+        $percent=self::multiply($ratio,'100',$precision + 8);
+        $negative=str_starts_with($percent,'-');
+        $absolute=ltrim($percent,'-');
+        $half='0.'.str_repeat('0',$precision).'5';
+        $rounded=bcadd($absolute,$half,$precision);
+        [$whole,$fraction]=explode('.',self::decimal($rounded));
+        $formatted=preg_replace('/\B(?=(\d{3})+(?!\d))/', '.', $whole);
+        if ($precision === 0) return ($negative && $whole !== '0' ? '-' : '').$formatted.'%';
+        return ($negative && $whole !== '0' ? '-' : '').$formatted.','.str_pad(substr($fraction,0,$precision),$precision,'0').'%';
+    }
 }

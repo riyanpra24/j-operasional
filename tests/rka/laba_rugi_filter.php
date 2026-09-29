@@ -63,11 +63,13 @@ foreach ($cases as $query) {
     }
     if (str_contains($html, 'Laporan laba rugi tahun '.$expectedYear)
         || !str_contains($html, 'Laporan Laba / Rugi')
-        || $xpath->query('//section[contains(@class,"lr-page-heading")]//div[contains(@class,"lr-heading-actions")]/button[@data-lr-upload-open]')->length !== 1
-        || $xpath->query('//section[contains(@class,"lr-page-heading")]//div[contains(@class,"lr-heading-actions")]/button[@data-lr-delete-open]')->length !== 1
+        || $xpath->query('//section[contains(@class,"lr-page-heading")]//details[contains(@class,"lr-action-menu")]//button[@data-lr-upload-open]')->length !== 1
+        || $xpath->query('//section[contains(@class,"lr-page-heading")]//details[contains(@class,"lr-action-menu")]//button[@data-lr-bopo-open]')->length !== 1
+        || $xpath->query('//section[contains(@class,"lr-page-heading")]//details[contains(@class,"lr-action-menu")]//button[@data-lr-export-open]')->length !== 1
+        || $xpath->query('//section[contains(@class,"lr-page-heading")]//details[contains(@class,"lr-action-menu")]//button[@data-lr-delete-open]')->length !== 1
         || $xpath->query('//form[@method="get"]//button[@data-lr-delete-open]')->length !== 0
         || $xpath->query('//form[@method="get"]//a[contains(@class,"btn-ghost") and normalize-space(.)="Reset" and not(contains(@href,"?"))]')->length !== 1) {
-        throw new RuntimeException('The heading must use compact copy and place deletion beside the upload action.');
+        throw new RuntimeException('The heading menu must contain upload, BOPO, export, and deletion actions.');
     }
     $uploadMonth = $xpath->query('//form[@data-lr-upload-form]//select[@id="lrUploadMonth" and @name="bulan" and @required]');
     if ($uploadMonth->length !== 1
@@ -82,6 +84,14 @@ foreach ($cases as $query) {
         || $xpath->query('//form[@data-lr-delete-form]//select[@id="lrDeleteMonth" and @name="bulan" and @required]')->length !== 1
         || $xpath->query('//form[@data-lr-delete-form]//input[@id="lrDeleteYear" and @name="tahun" and @required]')->length !== 1) {
         throw new RuntimeException('Delete button and unit/month/year dialog must be available from every report filter.');
+    }
+    if ($xpath->query('//dialog[@id="lrBopoDialog"]')->length !== 1
+        || $xpath->query('//dialog[@id="lrBopoDialog"]//table[contains(@class,"bopo-table")]')->length !== 2
+        || $xpath->query('//dialog[@id="lrExportDialog"]//form[@data-lr-export-form and @method="post"]')->length !== 1
+        || $xpath->query('//dialog[@id="lrExportDialog"]//select[@name="jenis_laporan"]/option')->length !== 2
+        || $xpath->query('//dialog[@id="lrExportDialog"]//select[@name="bulan"]/option')->length !== 12
+        || $xpath->query('//a[contains(@class,"nav-sublink") and normalize-space(.)="Export Dokumen"]')->length !== 0) {
+        throw new RuntimeException('BOPO and export must be page-menu pop-ups without a duplicated sidebar submenu.');
     }
 }
 $request->setGlobal('post', ['unit_kerja'=>'Kanwil', 'tahun'=>'2026']);

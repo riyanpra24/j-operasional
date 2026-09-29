@@ -46,8 +46,7 @@ def whole(value):
 
 requires = [
     "RkaMoney.php", "LrMoney.php", "LrSignRules.php", "OracleLrSalaryParser.php",
-    "LrReportRows.php", "OracleLrMappingService.php", "RkaCalculator.php",
-    "LrFormulaService.php", "LrSourceAdjustmentService.php", "LrRealizationCalculator.php",
+    "LrReportRows.php", "RkaCalculator.php", "LrFormulaService.php", "LrRealizationCalculator.php",
 ]
 prefix = "".join(f'require "app/Libraries/{name}";' for name in requires)
 code = prefix + (

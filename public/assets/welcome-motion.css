@@ -83,10 +83,12 @@ body.jaksa-bg.welcome-page .footer {
     z-index: 0;
     width: 116%;
     height: 68%;
-    background: url("images/welcome-cloud-overlay.png") center top / 100% auto no-repeat;
+    background: url("images/welcome-cloud-overlay-v2.webp") center top / 100% auto no-repeat;
     content: "";
     opacity: .58;
     pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
     transform: translate3d(0, 0, 0) scale(1.02);
     transform-origin: center top;
     will-change: transform;
@@ -177,35 +179,6 @@ body.jaksa-bg.welcome-page .footer {
     0%, 100% { opacity: .25; transform: translate3d(0, 0, 0) scale(.7); }
     34% { opacity: .94; transform: translate3d(-15px, -39px, 0) scale(1.18); }
     70% { opacity: .48; transform: translate3d(17px, -55px, 0) scale(.82); }
-}
-
-.welcome-ripples {
-    position: absolute;
-    z-index: 1;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.welcome-ripple {
-    position: absolute;
-    left: var(--ripple-x);
-    top: var(--ripple-y);
-    width: 20px;
-    height: 8px;
-    border: 1.5px solid rgba(112, 224, 246, .92);
-    border-radius: 50%;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, .55), 0 0 13px rgba(8, 163, 211, .28);
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(.15);
-    animation: welcome-water-ripple 1.6s cubic-bezier(.18, .56, .3, 1) var(--ripple-delay, 0ms) forwards;
-}
-
-@keyframes welcome-water-ripple {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(.2); }
-    10% { opacity: .92; }
-    72% { opacity: .42; }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(18); }
 }
 
 .welcome-card {
@@ -435,7 +408,6 @@ body.jaksa-bg.welcome-page .footer {
     .welcome-particles { transition: none !important; }
     .welcome-particle,
     .welcome-screen::after,
-    .welcome-ripple,
     .welcome-brand-name,
     .welcome-card h1,
     .welcome-message,

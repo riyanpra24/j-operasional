@@ -28,7 +28,7 @@ with ZipFile(source) as z:
             raw,amount=cells['H']; assert amount.find('s:f',ns) is None and amount.get('t') in (None,'n')
             key=(sheet.get('name'),label); assert key not in expected
             expected[key]=(int(row.get('r')),Decimal(raw),-Decimal(raw))
-prefix='require "app/Libraries/LrMoney.php"; require "app/Libraries/OracleLrSalaryParser.php"; require "app/Libraries/LrReportRows.php"; require "app/Libraries/LrSignRules.php"; require "app/Libraries/OracleLrMappingService.php"; '
+prefix='require "app/Libraries/LrMoney.php"; require "app/Libraries/OracleLrSalaryParser.php"; require "app/Libraries/LrReportRows.php"; require "app/Libraries/LrSignRules.php"; '
 code='$p=(new App\\Libraries\\OracleLrSalaryParser())->parse("'+source+'"); echo json_encode($p["all_sheet_sign_rule_inputs"]);'
 actual=json.loads(subprocess.check_output(['C:/xampp/php/php.exe','-r',prefix+code],text=True))
 assert len(actual)==len(expected)==12

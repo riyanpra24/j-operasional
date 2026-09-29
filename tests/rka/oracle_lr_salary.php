@@ -4,7 +4,6 @@ require __DIR__.'/../../app/Libraries/LrMoney.php';
 require __DIR__.'/../../app/Libraries/OracleLrSalaryParser.php';
 require __DIR__.'/../../app/Libraries/LrReportRows.php';
 require __DIR__.'/../../app/Libraries/LrSignRules.php';
-require __DIR__.'/../../app/Libraries/OracleLrMappingService.php';
 use App\Libraries\OracleLrSalaryParser;
 $parser=new OracleLrSalaryParser(); $checks=0;
 function lrCheck(bool $ok,string $label): void { global $checks; if (!$ok) throw new RuntimeException($label); $checks++; }

@@ -167,6 +167,7 @@ if ($currentRole === 'security') {
         <aside class="sidebar" id="sidebar">
             <a href="<?= site_url('dashboard') ?>" class="brand brand-jaksa" aria-label="Dashboard JAKSA — Jamkrindo Kanwil Surabaya Operasional">
                 <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-sidebar-logo-selected.png') ?>?v=<?= esc($sidebarLogoVersion, 'attr') ?>" width="2138" height="736" alt="JAKSA" decoding="async">
+                <span class="brand-jaksa-expansion" aria-label="Jamkrindo Kanwil Surabaya Operasional"><span><b class="jaksa-j">J</b><b class="jaksa-a-orange">A</b>mkrindo <b class="jaksa-k">K</b>anwil</span><span><b class="jaksa-s">S</b>urabaya oper<b class="jaksa-a-green">A</b>sional</span></span>
             </a>
 
             <nav class="main-nav" aria-label="Navigasi utama">
@@ -336,17 +337,9 @@ if ($currentRole === 'security') {
                             <span aria-hidden="true">●</span>
                             Simulasi Hitung
                         </a>
-                        <a href="<?= site_url('akutansi/laba-rugi') ?>" class="nav-sublink <?= $akutansiPage === 'laba-rugi' ? 'active' : '' ?>">
+                        <a href="<?= site_url('akutansi/laba-rugi') ?>" class="nav-sublink <?= in_array($akutansiPage, ['laba-rugi', 'bopo-ytd', 'bopo-ptd'], true) ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Laporan Laba / Rugi
-                        </a>
-                        <a href="<?= site_url('akutansi/export-dokumen') ?>" class="nav-sublink <?= $akutansiPage === 'export-dokumen' ? 'active' : '' ?>">
-                            <span aria-hidden="true">●</span>
-                            Export Dokumen
-                        </a>
-                        <a href="<?= site_url('akutansi/seting-rumus') ?>" class="nav-sublink <?= $akutansiPage === 'seting-rumus' ? 'active' : '' ?>">
-                            <span aria-hidden="true">●</span>
-                            Penyesuaian Sumber Oracle
                         </a>
                     </div>
                 </div>

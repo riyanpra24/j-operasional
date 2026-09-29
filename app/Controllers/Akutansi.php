@@ -7,11 +7,7 @@ use App\Libraries\RkaCalculator;
 use App\Libraries\RkaWorkbookParser;
 use App\Libraries\OracleLrSalaryParser;
 use App\Libraries\OracleLrImportService;
-use App\Libraries\OracleLrMappingService;
-use App\Libraries\LrReportRows;
 use App\Libraries\LrRealizationService;
-use App\Libraries\LrFormulaService;
-use App\Libraries\LrSourceAdjustmentService;
 use App\Libraries\LrDocumentExportService;
 use App\Libraries\LrWorkpaperSimulationService;
 use App\Libraries\LrWorkpaperImportParser;
@@ -37,6 +33,7 @@ class Akutansi extends BaseController
         $selectedLobs=self::reportLobs($this->request->getGet('lob'));
         $report=(new LrRealizationService())->view($unit,$year,$basis,$requestedMonth);
         $import=$report['import']; $result=$report['result']; $reportValues=$report['values'];
+        $bopoService = new LrRealizationService();
         $flashedUploadMonth=session()->getFlashdata('lr_upload_month');
         $uploadMonth=is_int($flashedUploadMonth) && $flashedUploadMonth>=1 && $flashedUploadMonth<=12
             ? $flashedUploadMonth : (int)$report['month'];
@@ -46,8 +43,35 @@ class Akutansi extends BaseController
             'selectedYear' => $year, 'selectedBasis'=>$basis, 'selectedMonth'=>(int)$report['month'], 'selectedLobs'=>$selectedLobs,
             'lrUploadMonth'=>$uploadMonth,
             'lrImport'=>$import,'lrResult'=>$result,'reportValues'=>$reportValues,
+            'bopoUnits'=>RkaCalculator::UNITS,
+            'bopoYtdValues'=>$bopoService->bopoYtd($year, (int)$report['month']),
+            'bopoPtdValues'=>$bopoService->bopoPtd($year, (int)$report['month']),
             'lrUploadError'=>session()->getFlashdata('lr_upload_error'),
             'isAdmin'=>$this->currentRoleIsAdmin(),
+        ]);
+    }
+
+    public function bopoYtd(): string
+    {
+        $year = $this->request->getGet('tahun');
+        $year = is_string($year) && preg_match('/^\d{4}$/D', $year) && (int) $year >= 2000 && (int) $year <= 2100
+            ? (int) $year
+            : 2026;
+        $month = $this->request->getGet('bulan');
+        $month = is_string($month) && preg_match('/^(?:[1-9]|1[0-2])$/D', $month)
+            ? (int) $month
+            : (int) date('n');
+        $bopoService = new LrRealizationService();
+        $bopoValues = $bopoService->bopoYtd($year, $month);
+        $bopoPtdValues = $bopoService->bopoPtd($year, $month);
+
+        return view('akutansi/bopo_ytd', [
+            'title' => 'BOPO YTD',
+            'selectedYear' => $year,
+            'selectedMonth' => $month,
+            'bopoUnits' => ['Korporat Kanwil', 'Kanwil', 'Surabaya', 'Kediri', 'Malang', 'Madiun', 'Banyuwangi'],
+            'bopoValues' => $bopoValues,
+            'bopoPtdValues' => $bopoPtdValues,
         ]);
     }
 
@@ -68,7 +92,8 @@ class Akutansi extends BaseController
             $basis=strtoupper($postedBasis);
             $file=$this->request->getFile('lr_excel');
             if ($file===null || !$file->isValid() || $file->hasMoved() || strtolower($file->getClientExtension())!=='xlsx' || $file->getSize()>5*1024*1024) throw new RuntimeException('Pilih Excel .xlsx yang valid, maksimal 5 MB.');
-            $parsedByUnit=(new LrWorkpaperImportParser())->parse($file->getTempName(),$year,$month,$basis);
+            $manualAdjustmentApproved=$this->request->getPost('manual_adjustment_approved') === '1';
+            $parsedByUnit=(new LrWorkpaperImportParser())->parse($file->getTempName(),$year,$month,$basis,$manualAdjustmentApproved);
             $hash=hash_file('sha256',$file->getTempName());
             $name=mb_substr(basename($file->getClientName()),0,255);
             $relative='uploads/laba_rugi/'.bin2hex(random_bytes(16)).'.xlsx';
@@ -92,8 +117,10 @@ class Akutansi extends BaseController
                 $db->transRollback(); throw $exception;
             }
             $storedPath=null; // Successfully persisted source must remain even if redirect fails.
-            return redirect()->to(self::labaRugiUrl($redirectUnit,$year,$month,$basis,$selectedLobs))
-                ->with('success','Hasil Simulasi Hitung '.$basis.' periode '.self::monthName($month).' '.$year.' berhasil disalin ke Laporan Laba / Rugi untuk Korporat Kanwil dan enam unit kerja. Angka hasil Kertas Kerja dipakai apa adanya.');
+            $notice=$manualAdjustmentApproved
+                ? 'Kertas Kerja '.$basis.' periode '.self::monthName($month).' '.$year.' dengan penyesuaian manual yang Anda setujui berhasil disalin ke Laporan Laba / Rugi.'
+                : 'Hasil Simulasi Hitung '.$basis.' periode '.self::monthName($month).' '.$year.' berhasil disalin ke Laporan Laba / Rugi untuk Korporat Kanwil dan enam unit kerja. Angka hasil Kertas Kerja dipakai apa adanya.';
+            return redirect()->to(self::labaRugiUrl($redirectUnit,$year,$month,$basis,$selectedLobs))->with('success',$notice);
         } catch (Throwable $exception) {
             // Only the new randomized private upload is removed on failed insert.
             if ($storedPath!==null && is_file($storedPath)) unlink($storedPath);
@@ -159,149 +186,6 @@ class Akutansi extends BaseController
             log_message('warning','Hapus laporan laba rugi gagal: {message}',['message'=>$e->getMessage()]);
             $redirectUnit=$unit===OracleLrImportService::ALL_UNITS?'Korporat Kanwil':$unit;
             return redirect()->to(self::labaRugiUrl($redirectUnit,$year,$month,$basis,$selectedLobs))->with('error',get_class($e)===RuntimeException::class ? $e->getMessage() : 'Laporan belum berhasil dihapus.');
-        }
-    }
-
-    public function oracleMappings(): string|RedirectResponse
-    {
-        if (!$this->currentRoleIsAdmin()) return $this->adminMappingDenied();
-        $service=new OracleLrMappingService();
-        return view('akutansi/oracle_mappings',[
-            'title'=>'Pengaturan Mapping Oracle',
-            'lobMappings'=>$service->lobMappings(false),
-            'accountMappings'=>$service->accountMappings(false),
-            'reportLabels'=>LrReportRows::mappableLabels(),
-            'mappingError'=>session()->getFlashdata('mapping_error'),
-        ]);
-    }
-
-    public function saveOracleAccountMapping(): RedirectResponse
-    {
-        if (!$this->currentRoleIsAdmin()) return $this->adminMappingDenied();
-        try {
-            (new OracleLrMappingService())->saveAccount($this->request->getPost(),(string)session()->get('auth_display_name'));
-            return redirect()->to(site_url('akutansi/pengaturan-mapping-oracle#mapping-coa'))->with('success','Mapping Description COA berhasil disimpan. Upload berikutnya akan memakai aturan terbaru.');
-        } catch (Throwable $e) {
-            return redirect()->to(site_url('akutansi/pengaturan-mapping-oracle#mapping-coa'))->with('mapping_error',$e instanceof RuntimeException ? $e->getMessage() : 'Mapping Description COA belum berhasil disimpan.');
-        }
-    }
-
-    public function deleteOracleAccountMapping(): RedirectResponse
-    {
-        if (!$this->currentRoleIsAdmin()) return $this->adminMappingDenied();
-        try {
-            if ($this->request->getPost('confirm_delete')!=='1') throw new RuntimeException('Konfirmasi penghapusan mapping COA terlebih dahulu.');
-            (new OracleLrMappingService())->deleteAccount($this->request->getPost('id'));
-            return redirect()->to(site_url('akutansi/pengaturan-mapping-oracle#mapping-coa'))->with('success','Mapping Description COA berhasil dihapus.');
-        } catch (Throwable $e) {
-            return redirect()->to(site_url('akutansi/pengaturan-mapping-oracle#mapping-coa'))->with('mapping_error',$e instanceof RuntimeException ? $e->getMessage() : 'Mapping Description COA belum berhasil dihapus.');
-        }
-    }
-
-    public function formulaSettings(): string|RedirectResponse
-    {
-        $role = (string) session()->get('auth_role');
-        if (!in_array($role, ['admin', 'akutansi'], true)) return $this->formulaSettingsDenied();
-        $sourceService = new LrSourceAdjustmentService();
-        $sourceRules = $sourceService->rules();
-        foreach ($sourceRules as &$sourceRule) $sourceRule['formula_lines'] = $sourceService->formulaLines((array) ($sourceRule['terms'] ?? []));
-        unset($sourceRule);
-        return view('akutansi/formula_settings', [
-            'title' => 'Seting Rumus',
-            'formulaScopes' => LrFormulaService::scopeOptions(),
-            'formulaColumnScopes' => LrFormulaService::columnScopeOptions(),
-            'sourceAdjustmentRules' => $sourceRules,
-            'sourceAdjustmentRequests' => $sourceService->requests(),
-            'sourceAdjustmentTargets' => LrSourceAdjustmentService::targetOptions(),
-            'sourceDescriptions' => $sourceService->knownSourceDescriptions(),
-            'sourceAdjustmentError' => session()->getFlashdata('source_adjustment_error'),
-            'canManageSourceAdjustments' => true,
-            'isSourceAdjustmentAdmin' => $role === 'admin',
-        ]);
-    }
-
-    public function saveSourceAdjustmentRule(): RedirectResponse
-    {
-        $role = (string) session()->get('auth_role');
-        if (!in_array($role, ['admin', 'akutansi'], true)) return $this->formulaSettingsDenied();
-        try {
-            $service = new LrSourceAdjustmentService();
-            $actor = (string) session()->get('auth_display_name');
-            if ($role === 'admin') $service->save($this->request->getPost(), $actor);
-            else $service->requestSave($this->request->getPost(), $actor);
-            return redirect()->to(site_url('akutansi/seting-rumus#penyesuaian-sumber'))
-                ->with('success', $role === 'admin'
-                    ? 'Penyesuaian sumber Oracle berhasil disimpan dan langsung berlaku pada periode yang dipilih.'
-                    : 'Pengajuan penyesuaian berhasil dikirim. Perhitungan belum berubah sampai disetujui Administrator.');
-        } catch (Throwable $exception) {
-            return redirect()->to(site_url('akutansi/seting-rumus#penyesuaian-sumber'))
-                ->with('source_adjustment_error', $exception instanceof RuntimeException ? $exception->getMessage() : 'Penyesuaian sumber Oracle belum berhasil disimpan.');
-        }
-    }
-
-    public function deactivateSourceAdjustmentRule(): RedirectResponse
-    {
-        $role = (string) session()->get('auth_role');
-        if (!in_array($role, ['admin', 'akutansi'], true)) return $this->formulaSettingsDenied();
-        try {
-            if ($this->request->getPost('confirm_deactivate') !== '1') throw new RuntimeException('Konfirmasi penonaktifan penyesuaian terlebih dahulu.');
-            $service = new LrSourceAdjustmentService();
-            $actor = (string) session()->get('auth_display_name');
-            if ($role === 'admin') $service->deactivate($this->request->getPost('id'), $actor);
-            else $service->requestDeactivation($this->request->getPost('id'), $actor);
-            return redirect()->to(site_url('akutansi/seting-rumus#penyesuaian-sumber'))->with('success', $role === 'admin'
-                ? 'Penyesuaian sumber Oracle dinonaktifkan.'
-                : 'Pengajuan penonaktifan berhasil dikirim. Aturan tetap aktif sampai disetujui Administrator.');
-        } catch (Throwable $exception) {
-            return redirect()->to(site_url('akutansi/seting-rumus#penyesuaian-sumber'))
-                ->with('source_adjustment_error', $exception instanceof RuntimeException ? $exception->getMessage() : 'Penyesuaian sumber belum berhasil dinonaktifkan.');
-        }
-    }
-
-    public function deleteSourceAdjustmentRule(): RedirectResponse
-    {
-        $role = (string) session()->get('auth_role');
-        if (!in_array($role, ['admin', 'akutansi'], true)) return $this->formulaSettingsDenied();
-        try {
-            if ($this->request->getPost('confirm_delete') !== '1') throw new RuntimeException('Konfirmasi penghapusan penyesuaian terlebih dahulu.');
-            $service = new LrSourceAdjustmentService();
-            $actor = (string) session()->get('auth_display_name');
-            if ($role === 'admin') $service->deleteInactive($this->request->getPost('id'), $actor);
-            else $service->requestDeletion($this->request->getPost('id'), $actor);
-            return redirect()->to(site_url('akutansi/seting-rumus#penyesuaian-sumber'))->with('success', $role === 'admin'
-                ? 'Penyesuaian sumber Oracle yang nonaktif berhasil dihapus. Riwayat audit tetap disimpan.'
-                : 'Pengajuan penghapusan berhasil dikirim. Aturan belum dihapus sampai disetujui Administrator.');
-        } catch (Throwable $exception) {
-            return redirect()->to(site_url('akutansi/seting-rumus#penyesuaian-sumber'))
-                ->with('source_adjustment_error', $exception instanceof RuntimeException ? $exception->getMessage() : 'Penyesuaian sumber belum berhasil dihapus.');
-        }
-    }
-
-    public function approveSourceAdjustmentRequest(): RedirectResponse
-    {
-        if (!$this->currentRoleIsAdmin()) return $this->adminFormulaDenied();
-        try {
-            if ($this->request->getPost('confirm_approve') !== '1') throw new RuntimeException('Konfirmasi persetujuan pengajuan terlebih dahulu.');
-            (new LrSourceAdjustmentService())->approveRequest($this->request->getPost('id'), (string) session()->get('auth_display_name'));
-            return redirect()->to(site_url('akutansi/seting-rumus#pengajuan-sumber'))->with('success', 'Pengajuan disetujui dan perubahan telah diterapkan ke perhitungan.');
-        } catch (Throwable $exception) {
-            return redirect()->to(site_url('akutansi/seting-rumus#pengajuan-sumber'))
-                ->with('source_adjustment_error', $exception instanceof RuntimeException ? $exception->getMessage() : 'Pengajuan belum berhasil disetujui.');
-        }
-    }
-
-    public function rejectSourceAdjustmentRequest(): RedirectResponse
-    {
-        if (!$this->currentRoleIsAdmin()) return $this->adminFormulaDenied();
-        try {
-            if ($this->request->getPost('confirm_reject') !== '1') throw new RuntimeException('Konfirmasi penolakan pengajuan terlebih dahulu.');
-            (new LrSourceAdjustmentService())->rejectRequest(
-                $this->request->getPost('id'), (string) session()->get('auth_display_name'), (string) $this->request->getPost('review_note')
-            );
-            return redirect()->to(site_url('akutansi/seting-rumus#pengajuan-sumber'))->with('success', 'Pengajuan telah ditolak.');
-        } catch (Throwable $exception) {
-            return redirect()->to(site_url('akutansi/seting-rumus#pengajuan-sumber'))
-                ->with('source_adjustment_error', $exception instanceof RuntimeException ? $exception->getMessage() : 'Pengajuan belum berhasil ditolak.');
         }
     }
 
@@ -416,22 +300,15 @@ class Akutansi extends BaseController
     public function downloadExportDokumen(): ResponseInterface|RedirectResponse
     {
         try {
-            $rawUnits = $this->request->getPost('unit_kerja');
             $rawYear = $this->request->getPost('tahun');
             $rawMonth = $this->request->getPost('bulan');
             $rawBasis = $this->request->getPost('jenis_laporan');
-            if (!is_array($rawUnits) || !is_string($rawYear) || !preg_match('/^\d{4}$/D', $rawYear)
+            if (!is_string($rawYear) || !preg_match('/^\d{4}$/D', $rawYear)
                 || !is_string($rawMonth) || !preg_match('/^(?:[1-9]|1[0-2])$/D', $rawMonth)
                 || !is_string($rawBasis)) {
-                throw new RuntimeException('Lengkapi jenis laporan, unit kerja, bulan, dan tahun export.');
+                throw new RuntimeException('Lengkapi jenis laporan, bulan, dan tahun export.');
             }
-            $units = [];
-            foreach ($rawUnits as $unit) {
-                if (!is_string($unit) || !in_array($unit, RkaCalculator::UNITS, true)) {
-                    throw new RuntimeException('Pilihan unit kerja export tidak valid.');
-                }
-                if (!in_array($unit, $units, true)) $units[] = $unit;
-            }
+            $units = RkaCalculator::UNITS;
             $basis = strtoupper($rawBasis);
             if (!in_array($basis, LrRealizationService::BASES, true)) {
                 throw new RuntimeException('Pilih jenis laporan YTD atau PTD yang valid.');
@@ -665,18 +542,4 @@ class Akutansi extends BaseController
         return site_url('akutansi/rka-kanwil-surabaya?' . http_build_query(['unit_kerja' => $unit, 'tahun' => $year]));
     }
 
-    private function adminMappingDenied(): RedirectResponse
-    {
-        return redirect()->to(site_url('akutansi/laba-rugi'))->with('error','Pengaturan Mapping Oracle hanya dapat diakses Administrator.');
-    }
-
-    private function adminFormulaDenied(): RedirectResponse
-    {
-        return redirect()->to(site_url('akutansi/laba-rugi'))->with('error', 'Seting Rumus hanya dapat diakses Administrator.');
-    }
-
-    private function formulaSettingsDenied(): RedirectResponse
-    {
-        return redirect()->to(site_url('dashboard'))->with('error', 'Penyesuaian Sumber Oracle hanya dapat dilihat oleh Administrator dan user Akuntansi.');
-    }
 }

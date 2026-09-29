@@ -4,6 +4,8 @@
 <?php $allLobs = \App\Libraries\LrRealizationService::LOB_COLUMNS;
 $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($selectedLobs) <= 2 ? implode(', ', $selectedLobs) : count($selectedLobs) . ' LOB dipilih'); ?>
 <?php $isSimulatedImport = $lrImport !== null && (($lrResult['rule'] ?? '') === \App\Libraries\LrRealizationCalculator::WORKPAPER_RULE); ?>
+<?php $bopoPercent = static fn (?string $value): string => $value === null ? '—' : \App\Libraries\LrMoney::percentageDisplayFixed($value, 2);
+$bopoAchievement = static fn (?string $value): string => $value === null ? '—' : \App\Libraries\LrMoney::percentageDisplay($value); ?>
 
 
 <section class="page-heading lr-page-heading">
@@ -11,10 +13,16 @@ $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($s
         <p class="eyebrow">AKUTANSI</p>
         <h1>Laporan Laba / Rugi</h1>
     </div>
-    <div class="lr-heading-actions">
-        <button type="button" class="btn btn-primary" data-lr-upload-open aria-haspopup="dialog" aria-controls="lrUploadDialog">Upload Kertas Kerja</button>
-        <button type="button" class="btn btn-danger-outline" data-lr-delete-open aria-haspopup="dialog" aria-controls="lrDeleteDialog">Hapus Laporan</button>
-    </div>
+    <details class="lr-action-menu">
+        <summary class="btn btn-primary" aria-label="Buka menu Laporan Laba Rugi">Menu <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m7 10 5 5 5-5" /></svg></summary>
+        <div class="lr-action-menu-popover" role="menu" aria-label="Menu Laporan Laba Rugi">
+            <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-upload-open aria-haspopup="dialog" aria-controls="lrUploadDialog">Upload Kertas Kerja</button>
+            <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-bopo-open aria-haspopup="dialog" aria-controls="lrBopoDialog">Laporan BOPO</button>
+            <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-export-open aria-haspopup="dialog" aria-controls="lrExportDialog">Export Document</button>
+            <span class="lr-action-menu-divider" aria-hidden="true"></span>
+            <button type="button" role="menuitem" class="lr-action-menu-item is-danger" data-lr-delete-open aria-haspopup="dialog" aria-controls="lrDeleteDialog">Hapus Laporan</button>
+        </div>
+    </details>
 </section>
 
 <nav class="lr-report-tabs" aria-label="Jenis laporan laba rugi">
@@ -69,18 +77,11 @@ $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($s
 
 <?php if ($lrImport !== null): ?>
     <?php if ($isSimulatedImport): ?>
-        <section class="panel lr-rka-filter-panel">
-            <p class="lr-rka-help">Sumber <?= esc($selectedBasis) ?>: hasil <strong>Simulasi Hitung</strong> dari <?= esc($lrImport['source_name']) ?> · <?= esc($lrResult['period'] ?? '') ?> · Sheet <?= esc($lrResult['sheet'] ?? '') ?>. Nilai hasil rumus Kertas Kerja disalin ke sistem tanpa dihitung ulang.</p>
-            <details class="lr-source-audit">
-                <summary>Lihat sumber angka</summary>
-                <p><?= (int) ($lrResult['read_rows'] ?? 0) ?> uraian dan <?= (int) ($lrResult['calculated_cells'] ?? 0) ?> hasil rumus telah dibaca dari sheet ini. Perhitungan, alokasi LOB, total, dan persentase tetap mengikuti Kertas Kerja Simulasi.</p>
-            </details>
-        </section>
     <?php else: ?>
     <?php $lrSourceSheet = $lrResult['sheet'] ?? strtoupper($lrResult['unit'] ?? 'KANWIL'); ?>
     <section class="panel lr-rka-filter-panel">
         <p class="lr-rka-help">Sumber <?= esc($selectedBasis) ?>: <?= esc($lrImport['source_name']) ?> · <?= esc($lrResult['period']) ?> · Sheet <?= esc($lrSourceSheet) ?> · <?= count($lrResult['matches']) ?> baris terpetakan · <?= count($lrResult['unmapped'] ?? []) ?> baris belum terpetakan. Nominal dalam Rupiah (Rp).</p>
-        <div class="lr-audit-actions"><button type="button" class="btn btn-secondary" data-lr-mapping-detail-open aria-haspopup="dialog" aria-controls="lrMappingDetailDialog">Detail Pengelompokan</button><?php if ($isAdmin): ?><a class="btn btn-secondary" href="<?= site_url('akutansi/pengaturan-mapping-oracle') ?>">Atur Mapping Oracle</a><?php endif ?></div>
+        <div class="lr-audit-actions"><button type="button" class="btn btn-secondary" data-lr-mapping-detail-open aria-haspopup="dialog" aria-controls="lrMappingDetailDialog">Detail Pengelompokan</button></div>
         <details class="lr-source-audit">
             <summary>Lihat sumber perhitungan</summary>
             <p>Nilai enam LOB pada Kertas Kerja disalin sebagai angka hasil pengisian. Total dan persentase tetap memakai hasil rumus dari Kertas Kerja. Untuk rincian yang mengikuti pembagian produk, kolom E mengelompokkan NON KUR menjadi KBG/Suretyship, Konsumtif, dan Produktif.</p>
@@ -105,6 +106,53 @@ $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($s
 <?php endif ?>
 
 <?= view('akutansi/partials/report_table', ['reportTitle' => 'Laba / Rugi (' . $selectedBasis . ') ' . ($lrMonths[$selectedMonth] ?? '') . ' ' . $selectedYear, 'selectedUnit' => $selectedUnit, 'selectedYear' => $selectedYear, 'selectedLobs' => $selectedLobs, 'reportValues' => $reportValues]) ?>
+
+<dialog id="lrBopoDialog" class="lr-settings-dialog lr-bopo-dialog" aria-labelledby="lrBopoTitle">
+    <header class="lr-settings-header">
+        <div><p class="eyebrow">AKUTANSI / LAPORAN LABA / RUGI</p><h2 id="lrBopoTitle">Laporan BOPO</h2></div>
+        <button type="button" class="icon-btn" data-lr-bopo-close aria-label="Tutup laporan BOPO">×</button>
+    </header>
+    <div class="lr-settings-body lr-bopo-body">
+        <p class="lr-upload-note">Periode <?= esc($lrMonths[$selectedMonth]) ?> <?= $selectedYear ?> mengikuti filter Laba/Rugi yang sedang aktif.</p>
+        <?php foreach ([
+            ['title' => 'BOPO YTD s/d ' . $lrMonths[$selectedMonth] . ' ' . $selectedYear, 'values' => $bopoYtdValues],
+            ['title' => 'BOPO PTD ' . $lrMonths[$selectedMonth] . ' ' . $selectedYear, 'values' => $bopoPtdValues],
+        ] as $bopoReport): ?>
+            <section class="bopo-report-panel">
+                <header class="bopo-report-header"><div><p>PT JAMKRINDO KANWIL SURABAYA</p><h2><?= esc($bopoReport['title']) ?></h2></div></header>
+                <div class="bopo-table-wrap" tabindex="0" role="region" aria-label="<?= esc($bopoReport['title'], 'attr') ?>">
+                    <table class="bopo-table"><thead><tr><th>Unit Kerja</th><th>Realisasi</th><th>Target</th><th>Pencapaian</th></tr></thead>
+                        <tbody><?php foreach ($bopoUnits as $bopoUnit): ?><?php $bopo = $bopoReport['values'][$bopoUnit] ?? ['realisasi' => null, 'target' => null, 'pencapaian' => null]; ?>
+                            <tr><th scope="row"><?= esc($bopoUnit) ?></th><td class="bopo-realization-cell"><span class="bopo-realization-template">Realisasi</span><span class="bopo-realization-value"><?= esc($bopoPercent($bopo['realisasi'] ?? null)) ?></span></td><td><?= esc($bopoPercent($bopo['target'] ?? null)) ?></td><td><?= esc($bopoAchievement($bopo['pencapaian'] ?? null)) ?></td></tr>
+                        <?php endforeach ?></tbody>
+                    </table>
+                </div>
+            </section>
+        <?php endforeach ?>
+    </div>
+    <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-lr-bopo-close>Tutup</button></footer>
+</dialog>
+
+<dialog id="lrExportDialog" class="lr-settings-dialog lr-export-dialog" aria-labelledby="lrExportTitle">
+    <header class="lr-settings-header">
+        <div><p class="eyebrow">AKUTANSI / LAPORAN LABA / RUGI</p><h2 id="lrExportTitle">Export Dokumen</h2></div>
+        <button type="button" class="icon-btn" data-lr-export-close aria-label="Tutup export dokumen">×</button>
+    </header>
+    <form method="post" action="<?= site_url('akutansi/export-dokumen') ?>" data-lr-export-form>
+        <?= csrf_field() ?>
+        <div class="lr-settings-body">
+            <p>Unduh Realisasi Anggaran dengan seluruh unit dan rumus konsolidasi template Excel.</p>
+            <label class="lr-upload-label" for="lrExportBasis">Jenis Laporan</label>
+            <select id="lrExportBasis" class="lr-upload-select" name="jenis_laporan" required><?php foreach (\App\Libraries\LrRealizationService::BASES as $basis): ?><option value="<?= esc($basis) ?>" <?= $basis === $selectedBasis ? 'selected' : '' ?>><?= esc($basis) ?></option><?php endforeach ?></select>
+            <label class="lr-upload-label" for="lrExportMonth">Bulan</label>
+            <select id="lrExportMonth" class="lr-upload-select" name="bulan" required><?php foreach ($lrMonths as $monthNumber => $monthName): ?><option value="<?= $monthNumber ?>" <?= $monthNumber === $selectedMonth ? 'selected' : '' ?>><?= esc($monthName) ?></option><?php endforeach ?></select>
+            <label class="lr-upload-label" for="lrExportYear">Tahun</label>
+            <input id="lrExportYear" class="lr-upload-select" type="number" name="tahun" min="2000" max="2100" step="1" value="<?= $selectedYear ?>" required>
+            <p class="lr-upload-note">Korporat Kanwil, Kanwil, Surabaya, Kediri, Malang, Madiun, dan Banyuwangi selalu disertakan agar konsolidasi tetap valid.</p>
+        </div>
+        <footer class="lr-settings-footer lr-upload-footer"><button type="button" class="btn btn-secondary" data-lr-export-close>Batal</button><button type="submit" class="btn btn-primary">Export Excel</button></footer>
+    </form>
+</dialog>
 
 <dialog id="lrUploadDialog" class="lr-settings-dialog" aria-labelledby="lrUploadTitle" data-auto-open="<?= $lrUploadError !== null ? 'true' : 'false' ?>">
     <header class="lr-settings-header">
@@ -133,6 +181,10 @@ $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($s
             <label class="lr-upload-label" for="lrUploadFile">Berkas Kertas Kerja Simulasi (.xlsx, maksimal 5 MB)</label>
             <input class="lr-upload-input" id="lrUploadFile" type="file" name="lr_excel" accept=".xlsx" required>
             <p class="lr-upload-note">Gunakan hasil terbaru dari Simulasi Hitung untuk jenis laporan, bulan, dan tahun yang sama. Buka lalu simpan kembali berkas di Excel agar seluruh rumus selesai dihitung sebelum di-upload. Nilai hasil rumus disalin tanpa pemotongan.</p>
+            <label class="lr-upload-manual-approval">
+                <input type="checkbox" name="manual_adjustment_approved" value="1">
+                <span><strong>Setujui penyesuaian manual pada berkas ini</strong><small>Gunakan bila Anda menambahkan input Volume atau penyesuaian data lain. Persetujuan berlaku hanya untuk unggahan ini; rumus dan struktur Kertas Kerja tetap diperiksa.</small></span>
+            </label>
         </div>
         <footer class="lr-settings-footer lr-upload-footer">
             <button type="button" class="btn btn-secondary" data-lr-upload-close>Batal</button>
@@ -150,15 +202,15 @@ $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($s
             </div><button type="button" class="icon-btn" data-lr-mapping-detail-close aria-label="Tutup detail pengelompokan">×</button>
         </header>
         <div class="lr-settings-body lr-mapping-detail-body">
-            <p>Versi mapping saat upload: <strong><?= esc($lrResult['mapping_version'] ?? 'aturan lama') ?></strong>. Rumus baku dan alias sumber yang sudah diverifikasi diterapkan setiap kali laporan dibuka; perubahan mapping khusus oleh Administrator digunakan pada upload berikutnya.</p>
+            <p>Pengelompokan memakai aturan baku dan alias sumber yang sudah diverifikasi pada saat laporan diunggah.</p>
             <div class="lr-mapping-summary">
-                <?php foreach (\App\Libraries\OracleLrMappingService::TARGET_COLUMNS as $column): ?><article><span><?= esc($column) ?></span><strong><?= (int)($lrResult['segment_counts'][$column] ?? 0) ?></strong><small>baris terpetakan</small></article><?php endforeach ?>
+                <?php foreach (['KUR', 'NON KUR', 'PEN'] as $column): ?><article><span><?= esc($column) ?></span><strong><?= (int)($lrResult['segment_counts'][$column] ?? 0) ?></strong><small>baris terpetakan</small></article><?php endforeach ?>
             </div>
             <section class="lr-unmapped-section">
                 <h3>Data belum terpetakan</h3>
-                <?php if (empty($lrResult['unmapped'])): ?><p class="lr-upload-note">Tidak ada baris LOB bernominal yang tertinggal dari mapping aktif.</p>
-                <?php else: ?><div class="oracle-mapping-table-wrap">
-                        <table class="oracle-mapping-table lr-unmapped-table">
+                <?php if (empty($lrResult['unmapped'])): ?><p class="lr-upload-note">Tidak ada baris LOB bernominal yang tertinggal dari aturan baku.</p>
+                <?php else: ?><div class="lr-audit-table-wrap">
+                        <table class="lr-audit-table lr-unmapped-table">
                             <thead>
                                 <tr>
                                     <th>Baris</th>
@@ -185,7 +237,7 @@ $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($s
                     </div><?php endif ?>
             </section>
         </div>
-        <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-lr-mapping-detail-close>Tutup</button><?php if ($isAdmin): ?><a class="btn btn-primary" href="<?= site_url('akutansi/pengaturan-mapping-oracle') ?>">Atur Mapping</a><?php endif ?></footer>
+        <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-lr-mapping-detail-close>Tutup</button></footer>
     </dialog>
 <?php endif ?>
 

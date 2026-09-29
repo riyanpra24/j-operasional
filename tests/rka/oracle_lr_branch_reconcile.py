@@ -16,7 +16,6 @@ PHP_PREFIX = (
     'require "app/Libraries/OracleLrSalaryParser.php"; '
     'require "app/Libraries/LrReportRows.php"; '
     'require "app/Libraries/LrSignRules.php"; '
-    'require "app/Libraries/OracleLrMappingService.php"; '
 )
 getcontext().prec = 180
 

@@ -56,6 +56,7 @@
         <form method="post" action="" class="sdm-document-edit-form" data-sdm-document-edit-form>
             <?= csrf_field() ?>
             <input type="hidden" name="add_disposition" value="0" data-sdm-add-disposition-value>
+            <input type="hidden" name="return_url" value="" data-sdm-document-return-url>
             <div class="modal-alert" data-sdm-document-edit-errors hidden role="alert"></div>
             <div class="outgoing-distribution-steps" aria-label="Tahapan edit Dokumen Masuk">
                 <span class="active" data-sdm-step-indicator="1"><b>01</b> Informasi Surat</span><i></i>
@@ -145,6 +146,7 @@
     const submitStatus = editModal?.querySelector('[data-sdm-edit-status]');
     const addButton = editModal?.querySelector('[data-sdm-add-disposition]');
     const addValue = editModal?.querySelector('[data-sdm-add-disposition-value]');
+    const returnUrlInput = editModal?.querySelector('[data-sdm-document-return-url]');
     const nextSection = editModal?.querySelector('[data-sdm-next-disposition]');
     const capacityMessage = editModal?.querySelector('[data-sdm-disposition-capacity]');
     const editHistorySection = editModal?.querySelector('[data-sdm-edit-history-section]');
@@ -292,6 +294,7 @@
         currentDocument = data;
         editForm.reset();
         editForm.action = data.update_url || '';
+        if (returnUrlInput) returnUrlInput.value = currentDocumentListUrl();
         errorBox.hidden = true;
         addValue.value = '0';
         nextSection.hidden = true;
@@ -340,6 +343,7 @@
 
     editForm?.addEventListener('submit', async (event) => {
         event.preventDefault();
+        if (returnUrlInput) returnUrlInput.value = currentDocumentListUrl();
         errorBox.hidden = true;
         submitButton.disabled = true;
         submitButton.textContent = 'Menyimpan...';
@@ -352,7 +356,7 @@
                 if (csrfField) csrfField.value = result.csrf.hash;
             }
             if (!response.ok || !result.success) throw result;
-            window.location.assign(currentDocumentListUrl());
+            window.location.assign(result.redirect_url || currentDocumentListUrl());
         } catch (error) {
             const errors = Array.isArray(error.errors) ? error.errors : [error.message || 'Perubahan disposisi belum berhasil disimpan.'];
             errorBox.replaceChildren();

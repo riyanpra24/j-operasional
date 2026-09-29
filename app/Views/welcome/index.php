@@ -6,7 +6,7 @@
     <div class="welcome-particles" data-welcome-particles aria-hidden="true"></div>
     <article class="welcome-card" data-welcome-card>
         <div class="welcome-brand" aria-label="JAKSA Operasional">
-            <img class="welcome-brand-logo" src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.png') ?>" alt="JAKSA">
+            <img class="welcome-brand-logo" src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>" alt="JAKSA">
             <p class="welcome-brand-name">JAKSA OPERASIONAL</p>
             <span class="welcome-brand-accent" aria-hidden="true"><i></i><i></i><i></i></span>
         </div>

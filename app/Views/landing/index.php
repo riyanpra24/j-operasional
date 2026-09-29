@@ -22,8 +22,8 @@ $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.mi
 $landingCssVersion = $assetVersion($landingCssAsset);
 $flowuiThemeVersion = $assetVersion('assets/flowui-theme.css');
 $landingSurabayaVersion = $assetVersion('assets/landing-surabaya.css');
-$landingBackgroundVersion = $assetVersion('assets/images/landing-surabaya-background-v2.png');
-$landingLogoVersion = $assetVersion('assets/images/landing-jaksa-logo-photoroom.png');
+$landingBackgroundVersion = $assetVersion('assets/images/landing-surabaya-background-v2.webp');
+$landingLogoVersion = $assetVersion('assets/images/landing-jaksa-logo-photoroom.webp');
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
 $urlMaskVersion = $assetVersion($urlMaskAsset);
 $loginError        = session()->getFlashdata('login_error');
@@ -45,8 +45,8 @@ $openLoginModal = false;
     <meta name="description" content="Jamkrindo Kanwil Surabaya, sistem pengelolaan dokumen operasional.">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
     <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
-    <link rel="preload" as="image" type="image/png" href="<?= base_url('assets/images/landing-surabaya-background-v2.png') ?>?v=<?= esc($landingBackgroundVersion, 'attr') ?>" fetchpriority="high">
-    <link rel="preload" as="image" type="image/png" href="<?= base_url('assets/images/landing-jaksa-logo-photoroom.png') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" fetchpriority="high">
+    <link rel="preload" as="image" type="image/webp" href="<?= base_url('assets/images/landing-surabaya-background-v2.webp') ?>?v=<?= esc($landingBackgroundVersion, 'attr') ?>" fetchpriority="high">
+    <link rel="preload" as="image" type="image/webp" href="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" fetchpriority="high">
     <link rel="stylesheet" href="<?= base_url($landingCssAsset) ?>?v=<?= esc($landingCssVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/flowui-theme.css') ?>?v=<?= esc($flowuiThemeVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/landing-surabaya.css') ?>?v=<?= esc($landingSurabayaVersion, 'attr') ?>">
@@ -60,7 +60,8 @@ $openLoginModal = false;
     <header class="surabaya-landing-header">
         <nav class="surabaya-landing-nav" aria-label="Navigasi utama">
             <a class="surabaya-landing-brand" href="<?= site_url('/') ?>" aria-label="JAKSA">
-                <img src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.png') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" width="2138" height="735" alt="JAKSA" decoding="async">
+                <img src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" width="640" height="220" alt="JAKSA" decoding="async">
+                <span class="surabaya-landing-brand-title"><span>Jamkrindo Kanwil</span><span>Surabaya Operasional</span></span>
             </a>
             <div class="surabaya-landing-links">
                 <a class="active" href="#beranda">Beranda</a>
@@ -74,13 +75,13 @@ $openLoginModal = false;
 
     <main class="surabaya-landing-main" id="beranda">
         <section class="surabaya-landing-copy" aria-labelledby="landingTitle">
-            <p class="surabaya-landing-kicker">Jamkrindo<span>Kanwil Surabaya Application</span></p>
             <h1 id="landingTitle"><span class="landing-title-primary">Satu Sistem,<br>Dukungan untuk</span><br><span class="landing-title-secondary">Kinerja Kanwil Surabaya.</span></h1>
             <p>Mendukung pengelolaan dokumen dan administrasi internal secara lebih terintegrasi, efektif, dan aman.</p>
         </section>
 
         <section class="surabaya-login-card" aria-labelledby="surabayaLoginTitle">
-            <img class="surabaya-login-logo" src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.png') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" width="2138" height="735" alt="JAKSA" decoding="async">
+            <img class="surabaya-login-logo" src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" width="640" height="220" alt="JAKSA" decoding="async">
+            <p class="surabaya-login-title" aria-label="Jamkrindo Kanwil Surabaya Operasional"><span class="title-j">J</span><span class="title-a-orange">A</span>mkrindo <span class="title-k">K</span>anwil <span class="title-s">S</span>urabaya oper<span class="title-a-green">A</span>sional</p>
             <p class="surabaya-login-caption" id="surabayaLoginTitle">MASUK KE AKUN ANDA</p>
 
             <?php if ($loginError): ?><div class="surabaya-login-alert" role="alert"><?= esc($loginError) ?></div><?php endif ?>
