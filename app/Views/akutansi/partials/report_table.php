@@ -76,7 +76,8 @@ $rows = \App\Libraries\LrReportRows::rows();
             </thead>
             <tbody>
                 <?php foreach ($rows as $row): ?>
-                    <?php $expanded = false; foreach ($row['details'] ?? [] as $detail) { if (isset($reportValues[\App\Libraries\OracleLrSalaryParser::normalizeLabel($detail['label'])])) $expanded = true; } ?>
+                    <?php // Seluruh rincian kelompok dimulai tertutup agar tabel Laba/Rugi lebih ringkas saat dibuka. ?>
+                    <?php $expanded = false; ?>
                     <?php $valueLabel=$row['value_label']??$row['label']; ?>
                     <tr class="lr-row-<?= esc($row['type'], 'attr') ?>" <?= isset($row['details']) ? 'data-lr-expandable' : '' ?>>
                         <th scope="row">

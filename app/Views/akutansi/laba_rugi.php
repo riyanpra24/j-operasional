@@ -110,7 +110,6 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
 <style>
 /* Keep both BOPO tables inside their dialog; the table list scrolls vertically. */
 #lrBopoDialog {
-    display: block !important;
     height: auto !important;
     max-height: calc(100dvh - 28px) !important;
     overflow-x: hidden !important;

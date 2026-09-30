@@ -12,6 +12,7 @@ use App\Libraries\LrDocumentExportService;
 use App\Libraries\LrWorkpaperSimulationService;
 use App\Libraries\LrWorkpaperImportParser;
 use App\Models\AccountingLrImportModel;
+use App\Models\AccountingRkaBudgetModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use RuntimeException;
@@ -206,6 +207,211 @@ class Akutansi extends BaseController
     {
         return view('akutansi/index', [
             'title' => 'Akutansi',
+        ]);
+    }
+
+    public function dashboard(): string
+    {
+        $rkaRecords = (new AccountingRkaBudgetModel())
+            ->orderBy('budget_year', 'DESC')
+            ->orderBy('updated_at', 'DESC')
+            ->findAll();
+        $rkaSummary = [
+            'year' => null,
+            'unit_count' => 0,
+            'updated_at' => null,
+            'is_complete' => false,
+        ];
+        if ($rkaRecords !== []) {
+            $year = (int) ($rkaRecords[0]['budget_year'] ?? 0);
+            $units = [];
+            foreach ($rkaRecords as $record) {
+                if ((int) ($record['budget_year'] ?? 0) !== $year) continue;
+                $unit = (string) ($record['unit_name'] ?? '');
+                if (in_array($unit, RkaCalculator::UNITS, true)) $units[$unit] = true;
+            }
+            $rkaSummary = [
+                'year' => $year,
+                'unit_count' => count($units),
+                'updated_at' => $rkaRecords[0]['updated_at'] ?? null,
+                'is_complete' => count($units) === count(RkaCalculator::UNITS),
+            ];
+        }
+
+        $importRows = (new AccountingLrImportModel())->findAll();
+        usort($importRows, static function (array $left, array $right): int {
+            $periodComparison = [(int) ($right['report_year'] ?? 0), (int) ($right['report_month'] ?? 0)]
+                <=> [(int) ($left['report_year'] ?? 0), (int) ($left['report_month'] ?? 0)];
+            return $periodComparison !== 0
+                ? $periodComparison
+                : strcmp((string) ($right['created_at'] ?? ''), (string) ($left['created_at'] ?? ''));
+        });
+        $lrPeriods = [];
+        foreach ($importRows as $row) {
+            $basis = strtoupper((string) ($row['report_basis'] ?? ''));
+            if (!in_array($basis, LrRealizationService::BASES, true) || isset($lrPeriods[$basis])) continue;
+            $year = (int) ($row['report_year'] ?? 0);
+            $month = (int) ($row['report_month'] ?? 0);
+            if ($year < 2000 || $month < 1 || $month > 12) continue;
+            $units = [];
+            foreach ($importRows as $candidate) {
+                if (strtoupper((string) ($candidate['report_basis'] ?? '')) !== $basis
+                    || (int) ($candidate['report_year'] ?? 0) !== $year
+                    || (int) ($candidate['report_month'] ?? 0) !== $month) continue;
+                $unit = (string) ($candidate['unit_name'] ?? '');
+                if (in_array($unit, RkaCalculator::UNITS, true)) $units[$unit] = true;
+            }
+            $lrPeriods[$basis] = [
+                'year' => $year,
+                'month' => $month,
+                'unit_count' => count($units),
+                'created_at' => $row['created_at'] ?? null,
+                'is_complete' => count($units) === count(RkaCalculator::UNITS),
+            ];
+        }
+
+        $dashboardUnit = 'Korporat Kanwil';
+        $dashboardBasis = 'YTD';
+        $dashboardYear = (int) ($lrPeriods['YTD']['year'] ?? $rkaSummary['year'] ?? 2026);
+        $dashboardMonth = null;
+        $realizationService = new LrRealizationService();
+        $selectedReport = $realizationService->view($dashboardUnit, $dashboardYear, $dashboardBasis, $dashboardMonth);
+        $selectedMonth = (int) $selectedReport['month'];
+        $selectedValues = $selectedReport['values'];
+        $valueFor = static function (string $label) use ($selectedValues): array {
+            $key = OracleLrSalaryParser::normalizeLabel($label);
+            return [
+                'total' => (string) ($selectedValues[$key]['TOTAL'] ?? '0.00'),
+                'percentage' => isset($selectedValues[$key]['%']) ? (string) $selectedValues[$key]['%'] : null,
+            ];
+        };
+        $dashboardMetrics = [
+            // Dashboard memakai pendapatan bruto agar angka kartu dan grafik
+            // merepresentasikan pos "Pendapatan Penjaminan" pada laporan.
+            'pendapatan' => $valueFor('Imbal Jasa Penjaminan Bruto'),
+            'klaim' => $valueFor('JUMLAH BEBAN KLAIM'),
+            'penjaminan_bersih' => $valueFor('PENJAMINAN BERSIH'),
+            'beban_usaha' => $valueFor('TOTAL BEBAN USAHA'),
+            'laba_sebelum_pajak' => $valueFor('LABA SEBELUM PAJAK'),
+        ];
+        $insuranceRevenueBreakdown = [];
+        foreach ([
+            'bruto' => 'Imbal Jasa Penjaminan Bruto',
+            'restitusi' => 'Restitusi penjaminan kredit',
+            'premi_ulang' => 'Premi Penjaminan Ulang',
+            'bersih' => 'IMBAL JASA PENJAMINAN BERSIH',
+        ] as $key => $label) {
+            $valueKey = OracleLrSalaryParser::normalizeLabel($label);
+            $row = (array) ($selectedValues[$valueKey] ?? []);
+            $lobValues = [];
+            foreach (LrRealizationService::LOB_COLUMNS as $lob) {
+                $lobValues[$lob] = (string) ($row[$lob] ?? '0.00');
+            }
+            $insuranceRevenueBreakdown[$key] = [
+                'label' => $label,
+                'total' => (string) ($row['TOTAL'] ?? '0.00'),
+                'percentage' => isset($row['%']) ? (string) $row['%'] : null,
+                'lobs' => $lobValues,
+            ];
+        }
+        $expenseComposition = [
+            'Beban Klaim' => $valueFor('JUMLAH BEBAN KLAIM')['total'],
+            'Beban Karyawan' => $valueFor('Total Beban Karyawan')['total'],
+            'Administrasi & Umum' => $valueFor('Total Beban Administrasi & Umum')['total'],
+            'Penyusutan & Amortisasi' => $valueFor('Total Beban Penyusutan & Amortisasi')['total'],
+        ];
+        $lobBreakdown = [];
+        $labaKey = OracleLrSalaryParser::normalizeLabel('LABA SEBELUM PAJAK');
+        foreach (LrRealizationService::LOB_COLUMNS as $lob) {
+            $lobBreakdown[$lob] = (string) ($selectedValues[$labaKey][$lob] ?? '0.00');
+        }
+        $selectedBopoValues = $dashboardBasis === 'YTD'
+            ? $realizationService->bopoYtd($dashboardYear, $selectedMonth)
+            : $realizationService->bopoPtd($dashboardYear, $selectedMonth);
+        $selectedBopo = $selectedBopoValues[$dashboardUnit] ?? ['realisasi' => null, 'target' => null, 'pencapaian' => null];
+
+        $bopoCorporate = ['realisasi' => null, 'target' => null, 'pencapaian' => null];
+        if (isset($lrPeriods['YTD'])) {
+            $period = $lrPeriods['YTD'];
+            $bopoValues = (new LrRealizationService())->bopoYtd((int) $period['year'], (int) $period['month']);
+            $bopoCorporate = $bopoValues['Korporat Kanwil'] ?? $bopoCorporate;
+        }
+
+        $coverageYear = (int) ($lrPeriods['YTD']['year'] ?? $lrPeriods['PTD']['year'] ?? $rkaSummary['year'] ?? date('Y'));
+        $monthlyCoverageUnits = array_fill(1, 12, []);
+        foreach ($importRows as $row) {
+            if (strtoupper((string) ($row['report_basis'] ?? '')) !== 'YTD'
+                || (int) ($row['report_year'] ?? 0) !== $coverageYear) continue;
+            $month = (int) ($row['report_month'] ?? 0);
+            $unit = (string) ($row['unit_name'] ?? '');
+            if ($month >= 1 && $month <= 12 && in_array($unit, RkaCalculator::UNITS, true)) {
+                $monthlyCoverageUnits[$month][$unit] = true;
+            }
+        }
+        $monthlyCoverage = array_map(static fn (array $units): int => count($units), $monthlyCoverageUnits);
+        $coverageCounts = [
+            'rka' => (int) $rkaSummary['unit_count'],
+            'ytd' => (int) ($lrPeriods['YTD']['unit_count'] ?? 0),
+            'ptd' => (int) ($lrPeriods['PTD']['unit_count'] ?? 0),
+        ];
+
+        // Ambil tren dari hasil kertas kerja Korporat Kanwil yang sudah tersimpan.
+        // Tidak dibuatkan angka pengganti ketika suatu bulan belum diunggah.
+        $monthlyTrend = [];
+        foreach ($importRows as $row) {
+            if (strtoupper((string) ($row['report_basis'] ?? '')) !== 'YTD'
+                || (int) ($row['report_year'] ?? 0) !== $dashboardYear
+                || (string) ($row['unit_name'] ?? '') !== $dashboardUnit) {
+                continue;
+            }
+            $month = (int) ($row['report_month'] ?? 0);
+            if ($month < 1 || $month > 12 || isset($monthlyTrend[$month])) continue;
+            try {
+                $result = json_decode((string) ($row['result_json'] ?? ''), true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException) {
+                continue;
+            }
+            $values = (array) ($result['values'] ?? []);
+            $trendValue = static function (string $label) use ($values): ?string {
+                $key = OracleLrSalaryParser::normalizeLabel($label);
+                return isset($values[$key]['TOTAL']) ? (string) $values[$key]['TOTAL'] : null;
+            };
+            $monthlyTrend[$month] = [
+                'volume' => $trendValue('VOLUME'),
+                'pendapatan' => $trendValue('Imbal Jasa Penjaminan Bruto'),
+                'klaim' => $trendValue('JUMLAH BEBAN KLAIM'),
+                'laba' => $trendValue('LABA SEBELUM PAJAK'),
+            ];
+        }
+
+        $simulations = (new LrWorkpaperSimulationService())->history(
+            (int) session()->get('auth_user_id'),
+            $this->currentRoleIsAdmin(),
+        );
+
+        return view('akutansi/dashboard', [
+            'title' => 'Dashboard Akutansi',
+            'rkaSummary' => $rkaSummary,
+            'lrPeriods' => $lrPeriods,
+            'bopoCorporate' => $bopoCorporate,
+            'simulationCount' => count($simulations),
+            'latestSimulation' => $simulations[0] ?? null,
+            'unitCount' => count(RkaCalculator::UNITS),
+            'dashboardYear' => $dashboardYear,
+            'dashboardUnit' => $dashboardUnit,
+            'dashboardBasis' => $dashboardBasis,
+            'dashboardMonth' => $selectedMonth,
+            'dashboardReportAvailable' => $selectedReport['import'] !== null,
+            'dashboardMetrics' => $dashboardMetrics,
+            'insuranceRevenueBreakdown' => $insuranceRevenueBreakdown,
+            'expenseComposition' => $expenseComposition,
+            'lobBreakdown' => $lobBreakdown,
+            'selectedBopo' => $selectedBopo,
+            'reportUnits' => RkaCalculator::UNITS,
+            'monthlyCoverage' => $monthlyCoverage,
+            'coverageCounts' => $coverageCounts,
+            'coverageYear' => $coverageYear,
+            'monthlyTrend' => $monthlyTrend,
         ]);
     }
 

@@ -1616,12 +1616,22 @@
                 throw new Error(result?.message || `Lembar Pengendalian belum dapat dibuat (HTTP ${response.status}).`);
             }
 
-            const contentType = response.headers.get('Content-Type') || '';
-            if (!contentType.includes('application/pdf')) {
-                throw new Error('Respons Lembar Pengendalian bukan berupa PDF. Silakan masuk ulang lalu coba kembali.');
+            const blob = await response.blob();
+            const contentType = (response.headers.get('Content-Type') || '').toLowerCase();
+            const signature = await blob.slice(0, 4).text();
+            const isPdf = contentType.includes('application/pdf')
+                || blob.type.toLowerCase().includes('application/pdf')
+                || signature === '%PDF';
+
+            if (!isPdf) {
+                const responseText = await blob.text();
+                const sessionEnded = response.redirected
+                    || /login|sesi (?:login )?(?:berakhir|tidak aktif)/i.test(responseText);
+                throw new Error(sessionEnded
+                    ? 'Sesi login berakhir. Silakan login kembali, lalu unduh lembar pengendalian.'
+                    : 'Lembar Pengendalian belum dapat dibuat. Silakan coba kembali.');
             }
 
-            const blob = await response.blob();
             const objectUrl = URL.createObjectURL(blob);
             const link = document.createElement('a');
             const disposition = response.headers.get('Content-Disposition') || '';

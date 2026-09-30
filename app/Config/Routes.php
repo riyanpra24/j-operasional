@@ -46,6 +46,7 @@ $routes->post('sdm/data-kehadiran/hapus', 'Sdm::deleteSdmJatimAttendance', ['as'
 $routes->get('sdm/sdm-jatim', 'Sdm::sdmJatim', ['as' => 'sdm.jatim']);
 $routes->post('sdm/dokumen-masuk/(:num)', 'Sdm::updateIncomingDocument/$1', ['as' => 'sdm.dokumen_masuk.update']);
 $routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);
+$routes->get('akutansi/dashboard', 'Akutansi::dashboard', ['as' => 'akutansi.dashboard']);
 $routes->get('akutansi/laba-rugi', 'Akutansi::labaRugi', ['as' => 'akutansi.laba_rugi']);
 $routes->get('akutansi/bopo-ytd', 'Akutansi::bopoYtd', ['as' => 'akutansi.bopo_ytd']);
 $routes->post('akutansi/laba-rugi/upload-excel', 'Akutansi::importLabaRugi', ['as' => 'akutansi.laba_rugi.import']);

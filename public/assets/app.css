@@ -107,7 +107,7 @@ button, select { cursor: pointer; }
 .alert-danger { color: #942d38; background: #fff0f1; border-color: #f2c4c8; }
 .alert-warning { color: #805b13; background: #fff8e5; border-color: #ecd79c; }
 .alert-close { padding: 0; color: inherit; background: none; border: 0; font-size: 17px; }
-.success-toast { position: fixed; top: 14px; right: 18px; z-index: 180; display: grid; grid-template-columns: 30px minmax(0,1fr) 22px; gap: 9px; align-items: center; width: min(390px,calc(100vw - 28px)); padding: 10px 11px; color: #12684f; background: #f0fbf7; border: 1px solid #b6e3d2; border-radius: 10px; box-shadow: 0 10px 28px rgba(28,68,59,.18); animation: success-toast-in .22s ease both; }
+.success-toast { position: fixed; top: 76px; right: 18px; z-index: 10000; display: grid; grid-template-columns: 30px minmax(0,1fr) 22px; gap: 9px; align-items: center; width: min(390px,calc(100vw - 28px)); max-height: calc(100dvh - 96px); padding: 10px 11px; overflow-y: auto; color: #12684f; background: #f0fbf7; border: 1px solid #b6e3d2; border-radius: 10px; box-shadow: 0 10px 28px rgba(28,68,59,.18); isolation: isolate; animation: success-toast-in .22s ease both; }
 .success-toast.closing { animation: success-toast-out .22s ease both; }
 .success-toast-icon { display: grid; place-items: center; width: 30px; height: 30px; color: #fff; background: #13a47d; border-radius: 50%; font-size: 14px; font-weight: 900; }
 .success-toast strong,.success-toast small { display: block; }
@@ -3281,7 +3281,7 @@ input:focus,select:focus,textarea:focus { border-color:#00aaa6;box-shadow:0 0 0 
     .pks-inline-actions .btn { width:100%; }
     .pks-timeline { padding-right:0; }
 
-    .success-toast { top:10px;right:10px;left:10px;width:auto; }
+    .success-toast { top:64px;right:10px;left:10px;width:auto;max-height:calc(100dvh - 80px); }
     .alert { grid-template-columns:auto minmax(0,1fr) auto;padding:10px 11px; }
 }
 
@@ -3943,7 +3943,7 @@ label span.required[hidden] {
 .accounting-page .lr-rka-filter{display:grid!important;grid-template-columns:minmax(170px,1.35fr) minmax(135px,.8fr) minmax(100px,.55fr) minmax(170px,.9fr) auto auto;align-items:end;gap:10px}
 .accounting-page .lr-rka-filter>div,.accounting-page .lr-rka-filter .lr-filter-unit,.accounting-page .lr-rka-filter .lr-filter-month,.accounting-page .lr-rka-filter .lr-filter-year,.accounting-page .lr-rka-filter .lr-filter-lob{width:auto!important;min-width:0!important}
 .accounting-page .lr-rka-filter .lr-upload-select,.accounting-page .lr-rka-filter .lr-lob-picker{width:100%}
-.lr-bopo-dialog,.lr-export-dialog{display:flex;flex-direction:column;overflow:hidden!important}
+.lr-bopo-dialog[open],.lr-export-dialog[open]{display:flex;flex-direction:column;overflow:hidden!important}
 .lr-bopo-dialog{width:min(920px,calc(100% - 28px));max-height:min(760px,calc(100dvh - 28px))}
 .lr-export-dialog{width:min(540px,calc(100% - 28px));max-height:min(680px,calc(100dvh - 28px))}
 .lr-bopo-dialog>.lr-settings-header,.lr-export-dialog>.lr-settings-header{display:flex!important;flex:0 0 auto;flex-flow:row nowrap!important;align-items:flex-start!important}

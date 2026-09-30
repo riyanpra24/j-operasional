@@ -45,13 +45,6 @@ class IncomingControlSheetPdf
             self::PAGE_HEIGHT
         );
 
-        // Perbarui judul dua baris pertama tanpa mengubah gambar template.
-        // Area biru lama ditutup lalu label baru ditulis rata tengah.
-        $content .= "0.000 0.306 0.647 rg 27.50 332.75 92.15 16.65 re f\n";
-        $content .= "0.000 0.306 0.647 rg 27.50 315.50 92.15 16.40 re f\n";
-        $content .= "BT /F2 8.00 Tf 1 1 1 rg 1 0 0 1 37.57 338.50 Tm (Nomor Agendaris) Tj ET\n";
-        $content .= "BT /F2 8.00 Tf 1 1 1 rg 1 0 0 1 37.57 321.25 Tm (Tanggal Agendaris) Tj ET\n";
-
         foreach ($values as [$value, $x, $y, $maxWidth, $multiline]) {
             if (trim((string) $value) === '') {
                 continue;

@@ -235,12 +235,18 @@ body.jaksa-bg .nav-chevron {
     background: transparent !important;
     border: 0;
     border-radius: 0;
-    font-family: Arial, sans-serif;
-    font-size: 17px !important;
-    font-weight: 800;
+    font-size: 0 !important;
     line-height: 1;
     transform: rotate(0deg) !important;
     transition: transform .16s ease, color .16s ease;
+}
+body.jaksa-bg .nav-chevron::before {
+    width: 4px;
+    height: 4px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    content: "";
+    transform: rotate(-45deg);
 }
 body.jaksa-bg .nav-group.open .nav-chevron {
     color: #fff !important;
@@ -1270,4 +1276,20 @@ body.jaksa-bg .sidebar .nav-parent.active .nav-icon {
     color: #fff !important;
     background: linear-gradient(145deg, #032652 0%, #06457f 54%, #0a629f 100%) !important;
     border-color: #fff !important;
+}
+
+/* Flash upload notification is an overlay, not a page element. */
+body.jaksa-bg > .success-toast {
+    position: fixed !important;
+    top: 76px !important;
+    right: 18px !important;
+    left: auto !important;
+    z-index: 10000 !important;
+}
+@media (max-width: 680px) {
+    body.jaksa-bg > .success-toast {
+        top: 64px !important;
+        right: 10px !important;
+        left: 10px !important;
+    }
 }

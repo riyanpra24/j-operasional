@@ -329,6 +329,10 @@ if ($currentRole === 'security') {
                         <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="akutansiSubmenu" data-nav-submenu <?= $akutansiActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('akutansi/dashboard') ?>" class="nav-sublink <?= $akutansiPage === 'dashboard' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dashboard
+                        </a>
                         <a href="<?= site_url('akutansi/rka-kanwil-surabaya') ?>" class="nav-sublink <?= $akutansiPage === 'rka-kanwil-surabaya' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             RKA Kanwil
