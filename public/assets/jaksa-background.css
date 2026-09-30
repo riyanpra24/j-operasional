@@ -74,7 +74,7 @@ body.jaksa-bg .sidebar {
     padding: 12px 10px 14px !important;
     color: #f5fbff !important;
     background:
-        linear-gradient(rgba(3, 39, 77, .74), rgba(4, 58, 91, .74)),
+        linear-gradient(rgba(3, 39, 77, .35), rgba(4, 58, 91, .35)),
         #063664 url("images/jaksa-sidebar-background.png") center center / cover no-repeat !important;
     border: 0 !important;
     box-shadow: 6px 0 22px rgba(6,43,81,.20) !important;
@@ -1247,4 +1247,27 @@ body.jaksa-bg.account-management-page .account-role {
     body.jaksa-bg .pks-delete-modal { padding: 8px !important; }
     body.jaksa-bg .modal-dialog,
     body.jaksa-bg dialog { max-height: calc(100dvh - 16px) !important; border-radius: 14px !important; }
+}
+
+/* Sidebar: use a solid blue palette for icon tiles while keeping white icon lines. */
+body.jaksa-bg .sidebar .nav-icon,
+body.jaksa-bg .sidebar .nav-link .nav-icon,
+body.jaksa-bg .sidebar .nav-icon.image-nav-icon,
+body.jaksa-bg .sidebar .nav-link .nav-icon.image-nav-icon {
+    color: #fff !important;
+    background: linear-gradient(145deg, #052f63 0%, #064986 58%, #0a5c9f 100%) !important;
+    border: 1px solid rgba(255,255,255,.60) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.17), 0 4px 10px rgba(1,34,83,.28) !important;
+}
+body.jaksa-bg .sidebar .nav-link:hover .nav-icon,
+body.jaksa-bg .sidebar .nav-parent:hover .nav-icon {
+    color: #fff !important;
+    background: linear-gradient(145deg, #042750 0%, #053c72 55%, #07518c 100%) !important;
+    border-color: rgba(255,255,255,.82) !important;
+}
+body.jaksa-bg .sidebar .nav-link.active .nav-icon,
+body.jaksa-bg .sidebar .nav-parent.active .nav-icon {
+    color: #fff !important;
+    background: linear-gradient(145deg, #032652 0%, #06457f 54%, #0a629f 100%) !important;
+    border-color: #fff !important;
 }

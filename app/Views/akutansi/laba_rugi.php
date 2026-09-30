@@ -107,6 +107,27 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
 
 <?= view('akutansi/partials/report_table', ['reportTitle' => 'Laba / Rugi (' . $selectedBasis . ') ' . ($lrMonths[$selectedMonth] ?? '') . ' ' . $selectedYear, 'selectedUnit' => $selectedUnit, 'selectedYear' => $selectedYear, 'selectedLobs' => $selectedLobs, 'reportValues' => $reportValues]) ?>
 
+<style>
+/* Keep both BOPO tables inside their dialog; the table list scrolls vertically. */
+#lrBopoDialog {
+    display: block !important;
+    height: auto !important;
+    max-height: calc(100dvh - 28px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+#lrBopoDialog > .lr-bopo-body {
+    display: grid;
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+}
+#lrBopoDialog .bopo-table-wrap {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+</style>
+
 <dialog id="lrBopoDialog" class="lr-settings-dialog lr-bopo-dialog" aria-labelledby="lrBopoTitle">
     <header class="lr-settings-header">
         <div><p class="eyebrow">AKUTANSI / LAPORAN LABA / RUGI</p><h2 id="lrBopoTitle">Laporan BOPO</h2></div>
