@@ -181,7 +181,14 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
     })();
     </script>
 <?php else: ?>
-    <section class="panel sdm-daily-panel"><div class="empty-state sdm-daily-empty"><span aria-hidden="true">▦</span><strong>Belum ada data absensi</strong><p>Rekap absensi perlu tersedia sebelum detail harian dapat ditampilkan.</p></div></section>
+    <section class="panel sdm-daily-panel">
+        <div class="empty-state sdm-daily-empty sdm-daily-upload-empty">
+            <span aria-hidden="true">▦</span>
+            <strong>Belum ada laporan kehadiran yang diunggah</strong>
+            <p>Unggah <b>Employee Attendance Report ESS</b> dari Workplace untuk menampilkan rekap dan detail kehadiran karyawan.</p>
+            <button type="button" class="btn btn-primary" data-open-attendance-upload>Unggah Laporan Kehadiran</button>
+        </div>
+    </section>
 <?php endif ?>
 
 <div class="input-modal attendance-upload-modal" id="attendanceUploadModal" hidden aria-hidden="true">
