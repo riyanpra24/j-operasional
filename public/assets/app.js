@@ -2714,7 +2714,8 @@
 (() => {
     const dialog = document.querySelector('#lrUploadDialog');
     if (!dialog) return;
-    document.querySelectorAll('[data-lr-upload-open]').forEach(button => button.addEventListener('click', () => { if (!dialog.open) dialog.showModal(); }));
+    document.querySelectorAll('[data-lr-upload-open]').forEach(button => button.addEventListener('click', () => { button.closest('details')?.removeAttribute('open'); if (!dialog.open) dialog.showModal(); }));
+    document.querySelectorAll('.lr-action-menu-item').forEach(button => button.addEventListener('click', () => button.closest('details')?.removeAttribute('open')));
     dialog.querySelectorAll('[data-lr-upload-close]').forEach(button => button.addEventListener('click', () => dialog.close()));
     dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
     const form = dialog.querySelector('[data-lr-upload-form]');
@@ -3243,14 +3244,19 @@
 (() => {
     const modalConfigurations = [
         {
+            modal: document.querySelector('#attendanceUploadModal'),
+            openSelector: '[data-open-attendance-upload]',
+            closeSelector: '[data-close-attendance-upload]',
+        },
+        {
+            modal: document.querySelector('#attendanceDeleteModal'),
+            openSelector: '[data-open-attendance-delete]',
+            closeSelector: '[data-close-attendance-delete]',
+        },
+        {
             modal: document.querySelector('#attendanceAnomalyModal'),
             openSelector: '[data-open-attendance-anomaly]',
             closeSelector: '[data-close-attendance-anomaly]',
-        },
-        {
-            modal: document.querySelector('#attendanceRecapDeleteModal'),
-            openSelector: '[data-open-attendance-delete]',
-            closeSelector: '[data-close-attendance-delete]',
         },
         {
             modal: document.querySelector('#attendanceSummaryModal'),
@@ -3290,6 +3296,10 @@
         modal.querySelectorAll(closeSelector).forEach((trigger) => {
             trigger.addEventListener('click', () => closeModal(modal));
         });
+    });
+
+    document.querySelectorAll('[data-open-attendance-upload], [data-open-attendance-delete]').forEach((trigger) => {
+        trigger.addEventListener('click', () => trigger.closest('details')?.removeAttribute('open'));
     });
 
     document.addEventListener('keydown', (event) => {

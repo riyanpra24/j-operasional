@@ -3,11 +3,14 @@
 namespace App\Controllers;
 
 use App\Libraries\EssAttendanceReportParser;
+use App\Libraries\EssOvertimeReportParser;
 use App\Libraries\IndonesianHolidayCalendar;
 use App\Models\AgendarisModel;
 use App\Models\SdmAttendanceCalendarModel;
 use App\Models\SdmAttendanceImportModel;
 use App\Models\SdmAttendanceRecordModel;
+use App\Models\SdmOvertimeImportModel;
+use App\Models\SdmOvertimeRecordModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use Config\Disposition;
@@ -78,11 +81,16 @@ class Sdm extends BaseController
         }
 
         $date = new \DateTimeImmutable($dateValue);
-        $redirectUrl = site_url('sdm/data-kehadiran') . '?' . http_build_query([
-            'import_id'       => (int) $this->request->getPost('import_id'),
-            'kalender'        => 1,
-            'kalender_tahun'  => (int) $date->format('Y'),
-            'kalender_bulan'  => (int) $date->format('n'),
+        $isOvertimeReturn = $this->request->getPost('return_to') === 'data-lembur';
+        $redirectUrl = site_url($isOvertimeReturn ? 'sdm/data-lembur' : 'sdm/data-kehadiran') . '?' . http_build_query($isOvertimeReturn ? [
+            'bulan' => (int) $date->format('n'),
+            'tahun' => (int) $date->format('Y'),
+            'tanggal' => $date->format('Y-m-d'),
+        ] : [
+            'import_id' => (int) $this->request->getPost('import_id'),
+            'kalender' => 1,
+            'kalender_tahun' => (int) $date->format('Y'),
+            'kalender_bulan' => (int) $date->format('n'),
         ]);
         $model = new SdmAttendanceCalendarModel();
         $existing = $model->where('calendar_date', $dateValue)->first();
@@ -119,6 +127,174 @@ class Sdm extends BaseController
         return view('sdm/sdm_jatim', $this->attendancePageData(
             (int) $this->request->getGet('import_id'),
         ));
+    }
+
+    public function attendanceOvertime(): string
+    {
+        $today = new \DateTimeImmutable('now');
+        $selectedMonth = (int) $this->request->getGet('bulan');
+        $selectedYear = (int) $this->request->getGet('tahun');
+        $selectedMonth = $selectedMonth >= 1 && $selectedMonth <= 12 ? $selectedMonth : (int) $today->format('n');
+        $selectedYear = $selectedYear >= 2020 && $selectedYear <= 2100 ? $selectedYear : (int) $today->format('Y');
+
+        $periodStart = new \DateTimeImmutable(sprintf('%04d-%02d-01', $selectedYear, $selectedMonth));
+        $periodEnd = $periodStart->modify('last day of this month');
+        $requestedDate = $this->validAttendanceDate((string) $this->request->getGet('tanggal'));
+        $hasRequestedDate = $requestedDate !== ''
+            && $requestedDate >= $periodStart->format('Y-m-d')
+            && $requestedDate <= $periodEnd->format('Y-m-d');
+        $selectedDate = $requestedDate;
+        if (! $hasRequestedDate) {
+            $selectedDate = $periodStart->format('Y-m-d');
+        }
+
+        $records = (new SdmOvertimeRecordModel())
+            ->where('overtime_date >=', $periodStart->format('Y-m-d'))
+            ->where('overtime_date <=', $periodEnd->format('Y-m-d'))
+            ->orderBy('overtime_date', 'ASC')
+            ->orderBy('employee_name', 'ASC')
+            ->findAll();
+
+        $overtimeImports = db_connect()->table('sdm_overtime_imports')
+            ->distinct()
+            ->select('sdm_overtime_imports.id, sdm_overtime_imports.source_name, sdm_overtime_imports.period_start, sdm_overtime_imports.period_end, sdm_overtime_imports.row_count')
+            ->join('sdm_overtime_records', 'sdm_overtime_records.import_id = sdm_overtime_imports.id')
+            ->where('sdm_overtime_records.overtime_date >=', $periodStart->format('Y-m-d'))
+            ->where('sdm_overtime_records.overtime_date <=', $periodEnd->format('Y-m-d'))
+            ->orderBy('sdm_overtime_imports.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $dailyTotals = [];
+        $overtimeRows = [];
+        foreach ($records as $record) {
+            $date = (string) $record['overtime_date'];
+            $minutes = (int) $record['overtime_minutes'];
+            $dailyTotals[$date] = ($dailyTotals[$date] ?? ['count' => 0, 'minutes' => 0]);
+            $dailyTotals[$date]['count']++;
+            $dailyTotals[$date]['minutes'] += $minutes;
+            $record['overtime_minutes'] = $minutes;
+            $overtimeRows[] = $record;
+        }
+
+        if (! $hasRequestedDate && $dailyTotals !== []) {
+            $selectedDate = (string) array_key_first($dailyTotals);
+        }
+
+        $selectedRecords = array_values(array_filter($overtimeRows, static fn (array $record): bool => $record['overtime_date'] === $selectedDate));
+
+        $holidayCalendar = new IndonesianHolidayCalendar($this->attendanceCalendarOverrides($periodStart, $periodEnd));
+        $calendarDays = [];
+        for ($date = $periodStart; $date <= $periodEnd; $date = $date->modify('+1 day')) {
+            $value = $date->format('Y-m-d');
+            $summary = $dailyTotals[$value] ?? ['count' => 0, 'minutes' => 0];
+            $holiday = $holidayCalendar->info($date);
+            $calendarDays[] = [
+                'date' => $value,
+                'day' => (int) $date->format('j'),
+                'is_non_working' => $holiday['is_non_working'],
+                'holiday_label' => $holiday['label'],
+                'holiday_source' => $holiday['source'],
+                'holiday_mode' => $holiday['is_override'] ? ($holiday['is_non_working'] ? 'holiday' : 'workday') : 'auto',
+                'count' => $summary['count'],
+                'minutes' => $summary['minutes'],
+            ];
+        }
+
+        $selectedTotalMinutes = array_sum(array_map(static fn (array $record): int => (int) $record['overtime_minutes'], $selectedRecords));
+
+        return view('sdm/data_lembur', [
+            'title' => 'Data Lembur | SDM & Teller',
+            'selectedMonth' => $selectedMonth,
+            'selectedYear' => $selectedYear,
+            'availableYears' => range(2020, max((int) $today->format('Y') + 1, $selectedYear)),
+            'monthLabel' => $this->attendanceMonthLabel($selectedMonth) . ' ' . $selectedYear,
+            'selectedDate' => $selectedDate,
+            'selectedDateLabel' => $this->attendanceDateLabel($selectedDate),
+            'calendarDays' => $calendarDays,
+            'calendarLeadingDays' => (int) $periodStart->format('N') - 1,
+            'overtimeRecords' => $selectedRecords,
+            'overtimeCount' => count($selectedRecords),
+            'overtimeMinutes' => $selectedTotalMinutes,
+            'overtimeImports' => $overtimeImports,
+            'importError' => null,
+        ]);
+    }
+
+    public function recapSdmOvertime(): string|RedirectResponse
+    {
+        $file = $this->request->getFile('overtime_file');
+        if ($file === null || ! $file->isValid()) {
+            return redirect()->to(site_url('sdm/data-lembur'))->with('error', 'Pilih file Overtime Report ESS dari Workplace.');
+        }
+        if ($file->getSize() > 5 * 1024 * 1024 || ! in_array(strtolower($file->getClientExtension()), ['xls', 'html', 'htm'], true)) {
+            return redirect()->to(site_url('sdm/data-lembur'))->with('error', 'Unggah file Overtime Report ESS berformat .xls dengan ukuran maksimal 5 MB.');
+        }
+
+        try {
+            $hash = hash_file('sha256', $file->getTempName());
+            if ($hash === false) {
+                throw new RuntimeException('Identitas file Overtime Report ESS tidak dapat dibaca.');
+            }
+            $importModel = new SdmOvertimeImportModel();
+            $existing = $importModel->where('source_hash', $hash)->first();
+            if ($existing !== null) {
+                $existingPeriod = new \DateTimeImmutable($existing['period_start']);
+
+                return redirect()->to(site_url('sdm/data-lembur?' . http_build_query([
+                    'bulan' => (int) $existingPeriod->format('n'),
+                    'tahun' => (int) $existingPeriod->format('Y'),
+                ])))
+                    ->with('success', 'File Overtime Report ESS tersebut sudah tersimpan. Data yang ada ditampilkan kembali.');
+            }
+
+            $report = (new EssOvertimeReportParser())->parse($file->getTempName(), $file->getClientName());
+            $this->saveOvertimeReport($report, $hash);
+            $firstOvertimeDate = $report['records'][0]['overtime_date'] ?? $report['period_start'];
+            $reportPeriod = new \DateTimeImmutable($firstOvertimeDate);
+
+            return redirect()->to(site_url('sdm/data-lembur?' . http_build_query([
+                'bulan' => (int) $reportPeriod->format('n'),
+                'tahun' => (int) $reportPeriod->format('Y'),
+                'tanggal' => $reportPeriod->format('Y-m-d'),
+            ])))
+                ->with('success', 'Overtime Report ESS berhasil dipetakan ke kalender dan rincian lembur.');
+        } catch (\Throwable $exception) {
+            log_message('warning', 'Import Overtime Report ESS gagal: {message}', ['message' => $exception->getMessage()]);
+
+            return redirect()->to(site_url('sdm/data-lembur'))->with('error', $exception->getMessage());
+        }
+    }
+
+    public function deleteSdmOvertime(): RedirectResponse
+    {
+        $importId = (int) $this->request->getPost('import_id');
+        $month = (int) $this->request->getPost('bulan');
+        $year = (int) $this->request->getPost('tahun');
+        $month = $month >= 1 && $month <= 12 ? $month : (int) date('n');
+        $year = $year >= 2020 && $year <= 2100 ? $year : (int) date('Y');
+        $returnUrl = site_url('sdm/data-lembur?' . http_build_query(['bulan' => $month, 'tahun' => $year]));
+
+        $importModel = new SdmOvertimeImportModel();
+        $import = $importId > 0 ? $importModel->find($importId) : null;
+        if ($import === null) {
+            return redirect()->to($returnUrl)->with('error', 'Laporan lembur tidak ditemukan atau sudah dihapus.');
+        }
+
+        $hasRecords = (new SdmOvertimeRecordModel())
+            ->where('import_id', $importId)
+            ->where('overtime_date >=', sprintf('%04d-%02d-01', $year, $month))
+            ->where('overtime_date <=', (new \DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month)))->modify('last day of this month')->format('Y-m-d'))
+            ->first();
+        if ($hasRecords === null) {
+            return redirect()->to($returnUrl)->with('error', 'Laporan yang dipilih tidak memuat data pada periode ini.');
+        }
+
+        if (! $importModel->delete($importId, true)) {
+            return redirect()->to($returnUrl)->with('error', 'Laporan lembur belum dapat dihapus.');
+        }
+
+        return redirect()->to($returnUrl)->with('success', 'Laporan lembur beserta seluruh rincian yang bersumber darinya berhasil dihapus.');
     }
 
     public function sdmJatim(): string
@@ -178,7 +354,7 @@ class Sdm extends BaseController
         if ($file === null || ! $file->isValid()) {
             return view('sdm/sdm_jatim', $this->attendancePageData(
                 null,
-                'Pilih file Employee Attendance Report ESS yang akan direkap.',
+                'Pilih file Employee Attendance Report ESS hasil ekspor Workplace.',
             ));
         }
 
@@ -192,14 +368,14 @@ class Sdm extends BaseController
         if (! in_array(strtolower($file->getClientExtension()), ['xls', 'html', 'htm'], true)) {
             return view('sdm/sdm_jatim', $this->attendancePageData(
                 null,
-                'Format file belum didukung. Gunakan file ESS dengan ekstensi .xls.',
+                'Format file belum didukung. Unggah Employee Attendance Report ESS dari Workplace berformat .xls.',
             ));
         }
 
         try {
             $hash = hash_file('sha256', $file->getTempName());
             if ($hash === false) {
-                throw new RuntimeException('Identitas file ESS tidak dapat dibaca.');
+                throw new RuntimeException('Identitas file Employee Attendance Report ESS tidak dapat dibaca.');
             }
 
             $importModel = new SdmAttendanceImportModel();
@@ -236,9 +412,9 @@ class Sdm extends BaseController
             $importId = $this->saveAttendanceReport($report, $hash);
 
             return redirect()->to(site_url('sdm/data-kehadiran?import_id=' . $importId))
-                ->with('success', 'Rekap absensi berhasil dibuat dan disimpan otomatis.');
+                ->with('success', 'Data Employee Attendance Report ESS berhasil dipetakan dan disimpan otomatis.');
         } catch (\Throwable $exception) {
-            log_message('warning', 'Import rekap ESS gagal: {message}', ['message' => $exception->getMessage()]);
+            log_message('warning', 'Import Employee Attendance Report ESS gagal: {message}', ['message' => $exception->getMessage()]);
 
             return view('sdm/sdm_jatim', $this->attendancePageData(null, $exception->getMessage()));
         }
@@ -258,9 +434,9 @@ class Sdm extends BaseController
         $recordModel = new SdmAttendanceRecordModel();
         $anomalyRecords = $recordModel
             ->where('import_id', $importId)
-            ->whereIn('recap_code', ['A', 'TA', 'TAM', 'TAP'])
+            ->whereIn('recap_code', ['A', 'TA', 'TAM', 'TAP', 'TPA'])
             ->findAll();
-        $allowedCodes = ['H', 'TLBT', 'I', 'A', 'TA', 'TAM', 'TAP', 'OFF'];
+        $allowedCodes = ['H', 'TLBT', 'I', 'A', 'TA', 'TAM', 'TAP', 'TPA', 'OFF'];
         $db = db_connect();
         $updated = 0;
         $db->transBegin();
@@ -280,7 +456,7 @@ class Sdm extends BaseController
 
                 $actualIn = $this->validAttendanceTime((string) ($submitted['actual_in'] ?? ''));
                 $actualOut = $this->validAttendanceTime((string) ($submitted['actual_out'] ?? ''));
-                if (in_array($code, ['TA', 'TAM', 'TAP'], true)) {
+                if (in_array($code, ['TA', 'TAM', 'TAP', 'TPA'], true)) {
                     if ($actualIn !== null && $actualOut === null) {
                         $code = 'TAP';
                     } elseif ($actualIn === null && $actualOut !== null) {
@@ -499,7 +675,7 @@ class Sdm extends BaseController
                 'hadir_count'      => $report['summary']['H'] + $report['summary']['TLBT'],
                 'izin_count'       => $report['summary']['I'],
                 'alpa_count'       => $report['summary']['A'],
-                'incomplete_count' => $report['summary']['TA'] + $report['summary']['TAM'] + $report['summary']['TAP'],
+                'incomplete_count' => $report['summary']['TA'] + $report['summary']['TAM'] + $report['summary']['TAP'] + ($report['summary']['TPA'] ?? 0),
                 'off_count'        => $report['summary']['OFF'],
                 'other_count'      => $report['summary']['OTHER'],
                 'warnings_json'    => json_encode($report['warnings'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
@@ -536,6 +712,47 @@ class Sdm extends BaseController
     }
 
     /**
+     * @param array<string, mixed> $report
+     */
+    private function saveOvertimeReport(array $report, string $hash): int
+    {
+        $db = db_connect();
+        $importModel = new SdmOvertimeImportModel();
+        $recordModel = new SdmOvertimeRecordModel();
+        $db->transBegin();
+
+        try {
+            $importId = $importModel->insert([
+                'source_name' => $report['source_name'], 'source_hash' => $hash,
+                'period_start' => $report['period_start'], 'period_end' => $report['period_end'],
+                'employee_count' => $report['employee_count'], 'row_count' => $report['row_count'],
+                'total_minutes' => $report['total_minutes'],
+                'imported_by' => session()->get('auth_user_id') ?: null,
+                'imported_by_name' => trim((string) session()->get('auth_display_name')) ?: null,
+            ], true);
+            if (! is_int($importId) && ! ctype_digit((string) $importId)) {
+                throw new RuntimeException('Rekap lembur belum dapat disimpan.');
+            }
+
+            $rows = array_map(static fn (array $record): array => ['import_id' => (int) $importId] + $record, $report['records']);
+            foreach (array_chunk($rows, 200) as $chunk) {
+                if ($recordModel->insertBatch($chunk) === false) {
+                    throw new RuntimeException('Rincian lembur belum dapat disimpan.');
+                }
+            }
+            if ($db->transStatus() === false) {
+                throw new RuntimeException('Penyimpanan rekap lembur belum berhasil.');
+            }
+            $db->transCommit();
+
+            return (int) $importId;
+        } catch (\Throwable $exception) {
+            $db->transRollback();
+            throw $exception;
+        }
+    }
+
+    /**
      * @param array<string, mixed> $import
      * @param array{name: string, from: string, to: string, mode: string, employee_key: string} $filters
      * @return array<string, mixed>
@@ -559,7 +776,7 @@ class Sdm extends BaseController
             ->findAll();
         $employees = [];
         $anomalies = [];
-        $summary = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'BL' => 0, 'OTHER' => 0];
+        $summary = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0, 'OTHER' => 0];
         $period = new \DateTimeImmutable($import['period_start']);
         $displayStart = new \DateTimeImmutable($filters['from'] !== '' ? $filters['from'] : $import['period_start']);
         $displayEnd = new \DateTimeImmutable($filters['to'] !== '' ? $filters['to'] : $import['period_end']);
@@ -584,7 +801,7 @@ class Sdm extends BaseController
                     'organization'   => $record['organization'],
                     'days'           => [],
                     'day_details'    => [],
-                    'totals'         => ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'BL' => 0],
+                    'totals'         => ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0],
                     'attendance_rate' => null,
                     'effective_attendance' => 0.0,
                     'punctuality_rate' => null,
@@ -622,7 +839,7 @@ class Sdm extends BaseController
             } else {
                 $summary['OTHER']++;
             }
-            if (in_array($code, ['A', 'TA', 'TAM', 'TAP'], true)) {
+            if (in_array($code, ['A', 'TA', 'TAM', 'TAP', 'TPA'], true)) {
                 $anomalies[] = [
                     'id'              => (int) $record['id'],
                     'employee_no'     => $record['employee_no'] ?: '-',
@@ -663,8 +880,13 @@ class Sdm extends BaseController
                     continue;
                 }
 
-                $employee['totals']['BL']++;
-                $summary['BL']++;
+                $employee['days'][$day] = '-';
+                $employee['day_details'][$day] = [
+                    'recap_code'   => '-',
+                    'actual_in'    => null,
+                    'actual_out'   => null,
+                    'holiday_name' => null,
+                ];
             }
         }
         unset($employee);
@@ -681,12 +903,13 @@ class Sdm extends BaseController
 
         foreach ($employees as &$employee) {
             $presenceSignals = $employee['totals']['H'] + $employee['totals']['TLBT']
-                + $employee['totals']['TA'] + $employee['totals']['TAM'] + $employee['totals']['TAP'];
+                + $employee['totals']['TA'] + $employee['totals']['TAM'] + $employee['totals']['TAP'] + $employee['totals']['TPA'];
             $effectiveAttendance = $employee['totals']['H']
                 + ($employee['totals']['TLBT'] * 0.75)
                 + ($employee['totals']['TAM'] * 0.5)
                 + ($employee['totals']['TAP'] * 0.5)
-                + ($employee['totals']['TA'] * 0.25);
+                + ($employee['totals']['TA'] * 0.25)
+                + ($employee['totals']['TPA'] * 0.25);
             $attendanceRate = $effectiveWorkDays > 0
                 ? round(($effectiveAttendance / $effectiveWorkDays) * 100, 1)
                 : null;
@@ -704,6 +927,7 @@ class Sdm extends BaseController
                 $employee['totals']['TLBT'] >= 3
                 || ($attendanceRate !== null && $attendanceRate < 95)
                 || $employee['totals']['TA'] > 0
+                || $employee['totals']['TPA'] > 0
             ) {
                 $evaluationStatus = 'Perlu Perhatian';
                 $evaluationKey = 'attention';
@@ -775,6 +999,25 @@ class Sdm extends BaseController
         ][$month];
     }
 
+    private function attendanceDateLabel(string $date): string
+    {
+        $value = new \DateTimeImmutable($date);
+
+        return $value->format('j') . ' ' . $this->attendanceMonthLabel((int) $value->format('n')) . ' ' . $value->format('Y');
+    }
+
+    private function overtimePeriodLabel(string $start, string $end): string
+    {
+        $startDate = new \DateTimeImmutable($start);
+        $endDate = new \DateTimeImmutable($end);
+        if ($startDate->format('Y-m') === $endDate->format('Y-m')) {
+            return $this->attendanceMonthLabel((int) $startDate->format('n')) . ' ' . $startDate->format('Y');
+        }
+
+        return $startDate->format('j') . ' ' . $this->attendanceMonthLabel((int) $startDate->format('n'))
+            . ' – ' . $endDate->format('j') . ' ' . $this->attendanceMonthLabel((int) $endDate->format('n')) . ' ' . $endDate->format('Y');
+    }
+
     /**
      * @return array<string, array<string, mixed>>
      */
@@ -830,7 +1073,7 @@ class Sdm extends BaseController
             ->where('import_id', $importId)
             ->findAll();
         $employees = [];
-        $counts = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
+        $counts = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0, 'OTHER' => 0];
 
         foreach ($records as $record) {
             $employees[$record['employee_key']] = true;
@@ -844,7 +1087,7 @@ class Sdm extends BaseController
             'hadir_count'      => $counts['H'] + $counts['TLBT'],
             'izin_count'       => $counts['I'],
             'alpa_count'       => $counts['A'],
-            'incomplete_count' => $counts['TA'] + $counts['TAM'] + $counts['TAP'],
+            'incomplete_count' => $counts['TA'] + $counts['TAM'] + $counts['TAP'] + $counts['TPA'],
             'off_count'        => $counts['OFF'],
             'other_count'      => $counts['OTHER'],
         ]) === false) {

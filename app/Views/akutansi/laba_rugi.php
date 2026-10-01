@@ -13,16 +13,6 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
         <p class="eyebrow">AKUTANSI</p>
         <h1>Laporan Laba / Rugi</h1>
     </div>
-    <details class="lr-action-menu">
-        <summary class="btn btn-primary" aria-label="Buka menu Laporan Laba Rugi">Menu <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m7 10 5 5 5-5" /></svg></summary>
-        <div class="lr-action-menu-popover" role="menu" aria-label="Menu Laporan Laba Rugi">
-            <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-upload-open aria-haspopup="dialog" aria-controls="lrUploadDialog">Upload Kertas Kerja</button>
-            <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-bopo-open aria-haspopup="dialog" aria-controls="lrBopoDialog">Laporan BOPO</button>
-            <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-export-open aria-haspopup="dialog" aria-controls="lrExportDialog">Export Document</button>
-            <span class="lr-action-menu-divider" aria-hidden="true"></span>
-            <button type="button" role="menuitem" class="lr-action-menu-item is-danger" data-lr-delete-open aria-haspopup="dialog" aria-controls="lrDeleteDialog">Hapus Laporan</button>
-        </div>
-    </details>
 </section>
 
 <nav class="lr-report-tabs" aria-label="Jenis laporan laba rugi">
@@ -72,6 +62,18 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
         </div>
         <button type="submit" class="btn btn-secondary">Terapkan</button>
         <a class="btn btn-ghost" href="<?= site_url('akutansi/laba-rugi') ?>">Reset</a>
+        <details class="lr-action-menu lr-filter-menu">
+            <summary class="lr-filter-menu-trigger" aria-label="Menu tindakan Laporan Laba Rugi" title="Menu tindakan">
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><rect x="14" y="14" width="7" height="7" rx="1.4"></rect></svg>
+            </summary>
+            <div class="lr-action-menu-popover" role="menu" aria-label="Menu Laporan Laba Rugi">
+                <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-upload-open aria-haspopup="dialog" aria-controls="lrUploadDialog">Upload Kertas Kerja</button>
+                <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-bopo-open aria-haspopup="dialog" aria-controls="lrBopoDialog">Laporan BOPO</button>
+                <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-export-open aria-haspopup="dialog" aria-controls="lrExportDialog">Export Document</button>
+                <span class="lr-action-menu-divider" aria-hidden="true"></span>
+                <button type="button" role="menuitem" class="lr-action-menu-item is-danger" data-lr-delete-open aria-haspopup="dialog" aria-controls="lrDeleteDialog">Hapus Laporan</button>
+            </div>
+        </details>
     </form>
 </section>
 

@@ -325,6 +325,23 @@ class Akutansi extends BaseController
         foreach (LrRealizationService::LOB_COLUMNS as $lob) {
             $lobBreakdown[$lob] = (string) ($selectedValues[$labaKey][$lob] ?? '0.00');
         }
+        // Peta dashboard hanya menampilkan kantor cabang fisik di Jawa Timur.
+        // Nominal diambil dari baris yang sama pada Laporan Laba/Rugi YTD,
+        // sehingga perubahan laporan langsung tercermin pada peta.
+        $regionalLobData = [];
+        foreach (['Surabaya', 'Kediri', 'Malang', 'Madiun', 'Banyuwangi'] as $unit) {
+            $unitValues = (array) ($selectedReport['values_by_unit'][$unit] ?? []);
+            $labaValues = (array) ($unitValues[$labaKey] ?? []);
+            $regionalLobData[$unit] = [
+                'total' => (string) ($labaValues['TOTAL'] ?? '0.00'),
+                'lobs' => [
+                    'KUR' => (string) ($labaValues['KUR'] ?? '0.00'),
+                    'PEN' => (string) ($labaValues['PEN'] ?? '0.00'),
+                    'NON KUR' => (string) ($labaValues['NON KUR'] ?? '0.00'),
+                ],
+                'available' => $unitValues !== [],
+            ];
+        }
         $selectedBopoValues = $dashboardBasis === 'YTD'
             ? $realizationService->bopoYtd($dashboardYear, $selectedMonth)
             : $realizationService->bopoPtd($dashboardYear, $selectedMonth);
@@ -406,6 +423,7 @@ class Akutansi extends BaseController
             'insuranceRevenueBreakdown' => $insuranceRevenueBreakdown,
             'expenseComposition' => $expenseComposition,
             'lobBreakdown' => $lobBreakdown,
+            'regionalLobData' => $regionalLobData,
             'selectedBopo' => $selectedBopo,
             'reportUnits' => RkaCalculator::UNITS,
             'monthlyCoverage' => $monthlyCoverage,

@@ -306,6 +306,10 @@ if ($currentRole === 'security') {
                             <span aria-hidden="true">●</span>
                             Data Kehadiran
                         </a>
+                        <a href="<?= site_url('sdm/data-lembur') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'data-lembur' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Data Lembur
+                        </a>
                         <a href="<?= site_url('sdm/sdm-jatim') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'sdm-jatim' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             SDM Jatim
