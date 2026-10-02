@@ -2851,13 +2851,13 @@ input:focus,select:focus,textarea:focus { border-color:#00aaa6;box-shadow:0 0 0 
 .session-usage-header h2 { margin:5px 0 0;color:#173b5e;font-size:15px; }
 .session-usage-header p { margin:4px 0 0;color:#74889d;font-size:8px; }
 .session-usage-period { padding:7px 10px;color:#087b69;background:#e8f8f2;border:1px solid #bee5d7;border-radius:999px;font-size:7.5px;font-weight:850;white-space:nowrap; }
-.session-usage-line-panel { height:205px;padding:12px 19px 6px;border-bottom:1px solid #e8eff3;background:linear-gradient(180deg,#fbfdfe,#fff); }
+.session-usage-line-panel { height:270px;padding:12px 19px 6px;border-bottom:1px solid #e8eff3;background:linear-gradient(180deg,#fbfdfe,#fff); }
 .session-usage-line-panel canvas { display:block;width:100%;height:100%; }
 .session-usage-chart { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:14px 19px 19px; }
 .session-usage-row { display:grid;grid-template-columns:minmax(150px,1fr) minmax(150px,.95fr) minmax(86px,.5fr);align-items:center;gap:10px;padding:10px;border:1px solid #e3edf1;border-radius:10px;background:#fff; }
 .session-usage-row.is-active { border-color:#a9dfda;background:linear-gradient(135deg,#f7fdfd,#f1fbfa); }
 .session-usage-account { display:flex;align-items:center;gap:8px;min-width:0; }
-.session-usage-account > span { display:grid;place-items:center;flex:0 0 auto;width:25px;height:25px;color:#fff;background:linear-gradient(145deg,#005aa9,#42c5bf);border-radius:50%;font-size:8px;font-weight:850; }
+.session-usage-account > span { display:grid;place-items:center;flex:0 0 auto;width:25px;height:25px;color:#fff;background:var(--account-color,#168fd1);border-radius:50%;box-shadow:0 4px 8px color-mix(in srgb,var(--account-color,#168fd1) 28%,transparent);font-size:8px;font-weight:850; }
 .session-usage-account div { min-width:0; }
 .session-usage-account strong,.session-usage-account small { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .session-usage-account strong { color:#31506e;font-size:8.5px; }

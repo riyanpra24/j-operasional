@@ -85,6 +85,7 @@ class KelolaAkun extends BaseController
 
     public function sessions(): string
     {
+        $usageYear = (int) date('Y');
         $keyword = trim((string) $this->request->getGet('q'));
         $role    = trim((string) $this->request->getGet('role'));
         $order   = $this->requestedListOrder();
@@ -144,8 +145,12 @@ class KelolaAkun extends BaseController
                 $startedAt = strtotime((string) $usageLog['started_at']) ?: 0;
                 $lastSeenAt = strtotime((string) ($usageLog['ended_at'] ?: $usageLog['last_seen_at'])) ?: $startedAt;
                 $accessedAt = strtotime((string) $usageLog['last_seen_at']) ?: $lastSeenAt;
-                $usageByUser[$userId] ??= ['seconds' => 0, 'last_accessed_at' => null];
+                $usageByUser[$userId] ??= ['seconds' => 0, 'last_accessed_at' => null, 'monthly_seconds' => array_fill(0, 12, 0)];
                 $usageByUser[$userId]['seconds'] += max(0, $lastSeenAt - $startedAt);
+                $monthlySeconds = $this->usageSecondsByMonth($startedAt, $lastSeenAt, $usageYear);
+                foreach ($monthlySeconds as $monthIndex => $seconds) {
+                    $usageByUser[$userId]['monthly_seconds'][$monthIndex] += $seconds;
+                }
                 if ($usageByUser[$userId]['last_accessed_at'] === null || $accessedAt > $usageByUser[$userId]['last_accessed_at']) {
                     $usageByUser[$userId]['last_accessed_at'] = $accessedAt;
                 }
@@ -159,7 +164,7 @@ class KelolaAkun extends BaseController
             $usageByUser
         ) ?: [1]));
         $usageStats = array_map(function (array $user) use ($usageByUser, $activeUserIds, $longestUsageSeconds): array {
-            $usage = $usageByUser[(int) $user['id']] ?? ['seconds' => 0, 'last_accessed_at' => null];
+            $usage = $usageByUser[(int) $user['id']] ?? ['seconds' => 0, 'last_accessed_at' => null, 'monthly_seconds' => array_fill(0, 12, 0)];
             $seconds = (int) $usage['seconds'];
             $lastAccessedAt = $usage['last_accessed_at'];
 
@@ -168,6 +173,7 @@ class KelolaAkun extends BaseController
                 'username'      => (string) $user['username'],
                 'duration'      => $this->formatSessionDuration($seconds),
                 'hours'         => round($seconds / 3600, 2),
+                'monthly_hours' => array_map(static fn (int $monthSeconds): float => round($monthSeconds / 3600, 2), $usage['monthly_seconds']),
                 'last_accessed' => $lastAccessedAt !== null ? $this->formatDate(date('Y-m-d H:i:s', $lastAccessedAt)) : 'Belum pernah diakses',
                 'is_active'     => isset($activeUserIds[(int) $user['id']]),
                 'percentage'    => $seconds > 0 ? max(6, (int) round(($seconds / $longestUsageSeconds) * 100)) : 0,
@@ -468,6 +474,27 @@ class KelolaAkun extends BaseController
         return $hours > 0
             ? $hours . ' jam ' . $minutes . ' menit'
             : $minutes . ' menit';
+    }
+
+    /** @return list<int> */
+    private function usageSecondsByMonth(int $startedAt, int $endedAt, int $year): array
+    {
+        $months = array_fill(0, 12, 0);
+        $cursor = $startedAt;
+
+        while ($cursor < $endedAt) {
+            $nextMonth = strtotime('first day of next month 00:00:00', $cursor);
+            if ($nextMonth === false || $nextMonth <= $cursor) {
+                break;
+            }
+            $segmentEnd = min($endedAt, $nextMonth);
+            if ((int) date('Y', $cursor) === $year) {
+                $months[(int) date('n', $cursor) - 1] += $segmentEnd - $cursor;
+            }
+            $cursor = $segmentEnd;
+        }
+
+        return $months;
     }
 
     private function deviceLabel(string $userAgent): string

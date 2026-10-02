@@ -6,15 +6,20 @@
 /** @var int $activeCount */
 /** @var int $availableCount */
 /** @var int|string $currentUserId */
-/** @var list<array{name: string, username: string, duration: string, hours: float, last_accessed: string, is_active: bool, percentage: int}> $usageStats */
+/** @var list<array{name: string, username: string, duration: string, hours: float, monthly_hours: list<float>, last_accessed: string, is_active: bool, percentage: int}> $usageStats */
 ?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <?php
 $roleLabels = \Config\UserRoles::LABELS;
+$usageColors = ['#168fd1', '#f26a43', '#8d5bd2', '#19a76b', '#db4c6e', '#c99619', '#0fa6ac', '#87563c'];
 $usageChart = [
-    'labels' => array_map(static fn (array $usage): string => (string) $usage['name'], $usageStats),
-    'values' => array_map(static fn (array $usage): float => (float) $usage['hours'], $usageStats),
+    'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+    'datasets' => array_map(static fn (array $usage, int $index): array => [
+        'name' => $usage['name'],
+        'color' => $usageColors[$index % count($usageColors)],
+        'values' => $usage['monthly_hours'],
+    ], $usageStats, array_keys($usageStats)),
 ];
 ?>
 
@@ -38,7 +43,7 @@ $usageChart = [
         <div>
             <span class="eyebrow">PEMAKAIAN SESI</span>
             <h2 id="sessionUsageTitle">Grafik pemakaian seluruh akun</h2>
-            <p>Garis menunjukkan akumulasi jam akses setiap akun. Rincian di bawah memuat tanggal terakhir diakses.</p>
+            <p>Setiap garis menunjukkan jam akses satu akun dalam periode Januari–Desember. Rincian di bawah memuat tanggal terakhir diakses.</p>
         </div>
         <span class="session-usage-period">Semua akun</span>
     </div>
@@ -49,9 +54,9 @@ $usageChart = [
             <canvas id="sessionUsageLineChart" data-chart='<?= esc(json_encode($usageChart, JSON_UNESCAPED_UNICODE), 'attr') ?>' aria-label="Grafik garis akumulasi jam akses per akun" role="img"></canvas>
         </div>
         <div class="session-usage-chart" aria-label="Rincian pemakaian setiap akun">
-            <?php foreach ($usageStats as $usage): ?>
+            <?php foreach ($usageStats as $usageIndex => $usage): ?>
                 <article class="session-usage-row <?= $usage['is_active'] ? 'is-active' : '' ?>">
-                    <div class="session-usage-account"><span><?= esc(strtoupper(substr($usage['name'], 0, 1))) ?></span><div><strong><?= esc($usage['name']) ?></strong><small>@<?= esc($usage['username']) ?><?= $usage['is_active'] ? ' · Aktif' : '' ?></small></div></div>
+                    <div class="session-usage-account"><span style="--account-color:<?= esc($usageColors[$usageIndex % count($usageColors)], 'attr') ?>"><?= esc(strtoupper(substr($usage['name'], 0, 1))) ?></span><div><strong><?= esc($usage['name']) ?></strong><small>@<?= esc($usage['username']) ?><?= $usage['is_active'] ? ' · Aktif' : '' ?></small></div></div>
                     <span class="session-usage-access"><small>Terakhir diakses</small><strong><?= esc($usage['last_accessed']) ?></strong></span>
                     <span class="session-usage-duration"><small>Akumulasi akses</small><strong><?= esc($usage['duration']) ?></strong></span>
                 </article>
@@ -161,6 +166,7 @@ $usageChart = [
     </section>
 </div>
 
+<script src="<?= base_url('assets/vendor/chartjs/chart.umd.min.js') ?>"></script>
 <script>
     (() => {
         const modal = document.getElementById('sessionResetModal');
@@ -192,56 +198,35 @@ $usageChart = [
 
     (() => {
         const canvas = document.getElementById('sessionUsageLineChart');
-        if (!canvas) return;
-        let chart;
-        try { chart = JSON.parse(canvas.dataset.chart || '{}'); } catch (error) { return; }
-        const labels = Array.isArray(chart.labels) ? chart.labels : [];
-        const values = Array.isArray(chart.values) ? chart.values.map(Number) : [];
-        const draw = () => {
-            const context = canvas.getContext('2d');
-            const width = Math.max(320, canvas.clientWidth || 320);
-            const height = 205;
-            const ratio = window.devicePixelRatio || 1;
-            canvas.width = width * ratio;
-            canvas.height = height * ratio;
-            context.setTransform(ratio, 0, 0, ratio, 0, 0);
-            context.clearRect(0, 0, width, height);
-            const padding = {top: 22, right: 18, bottom: 43, left: 43};
-            const plotWidth = width - padding.left - padding.right;
-            const plotHeight = height - padding.top - padding.bottom;
-            const maxValue = Math.max(1, ...values) * 1.12;
-            context.font = '10px Arial';
-            context.fillStyle = '#8aa0b2';
-            context.strokeStyle = '#e7eff3';
-            context.lineWidth = 1;
-            for (let row = 0; row <= 4; row++) {
-                const y = padding.top + (plotHeight * row / 4);
-                context.beginPath(); context.moveTo(padding.left, y); context.lineTo(width - padding.right, y); context.stroke();
-                const value = (maxValue * (4 - row) / 4).toFixed(1).replace('.0', '');
-                context.fillText(`${value}j`, 6, y + 3);
-            }
-            if (!values.length) return;
-            const points = values.map((value, index) => ({
-                x: padding.left + (labels.length === 1 ? plotWidth / 2 : plotWidth * index / (labels.length - 1)),
-                y: padding.top + plotHeight - (Math.max(0, value) / maxValue * plotHeight),
-            }));
-            const fill = context.createLinearGradient(0, padding.top, 0, padding.top + plotHeight);
-            fill.addColorStop(0, 'rgba(31,143,216,.22)'); fill.addColorStop(1, 'rgba(50,197,189,0)');
-            context.beginPath(); context.moveTo(points[0].x, padding.top + plotHeight);
-            points.forEach(point => context.lineTo(point.x, point.y));
-            context.lineTo(points.at(-1).x, padding.top + plotHeight); context.closePath(); context.fillStyle = fill; context.fill();
-            context.beginPath(); points.forEach((point, index) => index ? context.lineTo(point.x, point.y) : context.moveTo(point.x, point.y));
-            context.strokeStyle = '#1e8fd8'; context.lineWidth = 2.5; context.stroke();
-            context.textAlign = 'center'; context.fillStyle = '#668197'; context.font = '9px Arial';
-            points.forEach((point, index) => {
-                context.beginPath(); context.arc(point.x, point.y, 3.5, 0, Math.PI * 2); context.fillStyle = '#fff'; context.fill(); context.lineWidth = 2; context.strokeStyle = '#20acb6'; context.stroke();
-                const label = labels[index].split(' ').slice(0, 2).join(' ');
-                context.fillStyle = '#668197'; context.fillText(label, point.x, height - 17);
-            });
-            context.textAlign = 'start';
-        };
-        draw();
-        new ResizeObserver(draw).observe(canvas);
+        if (!canvas || !window.Chart) return;
+        let payload;
+        try { payload = JSON.parse(canvas.dataset.chart || '{}'); } catch (error) { return; }
+        const labels = Array.isArray(payload.labels) ? payload.labels : [];
+        const datasets = (Array.isArray(payload.datasets) ? payload.datasets : []).map((dataset, index) => ({
+            label: dataset.name || `Akun ${index + 1}`,
+            data: Array.isArray(dataset.values) ? dataset.values.map(Number) : [],
+            borderColor: dataset.color || '#168fd1',
+            backgroundColor: index === 0 ? `${dataset.color || '#168fd1'}1c` : 'transparent',
+            pointBackgroundColor: '#fff', pointBorderColor: dataset.color || '#168fd1', pointBorderWidth: 2,
+            pointRadius: 3, pointHoverRadius: 5, borderWidth: 2.4, tension: .42,
+            fill: index === 0, spanGaps: true,
+        }));
+        new Chart(canvas, {
+            type: 'line', data: {labels, datasets},
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                animation: {duration: 850, easing: 'easeOutQuart'},
+                interaction: {mode: 'index', intersect: false},
+                plugins: {
+                    legend: {position: 'bottom', labels: {usePointStyle: true, pointStyle: 'circle', boxWidth: 7, padding: 16, color: '#567795', font: {size: 10, weight: '700'}}},
+                    tooltip: {backgroundColor: '#092e62', padding: 11, cornerRadius: 9, displayColors: true, callbacks: {label: context => `${context.dataset.label}: ${Number(context.raw || 0).toLocaleString('id-ID', {maximumFractionDigits: 2})} jam`}},
+                },
+                scales: {
+                    x: {grid: {display: false}, border: {display: false}, ticks: {color: '#7893ad', font: {size: 10, weight: '700'}}},
+                    y: {beginAtZero: true, grid: {color: 'rgba(76,134,180,.13)'}, border: {display: false}, ticks: {color: '#7893ad', font: {size: 10}, callback: value => `${value} jam`}},
+                },
+            },
+        });
     })();
 </script>
 <?= $this->endSection() ?>
