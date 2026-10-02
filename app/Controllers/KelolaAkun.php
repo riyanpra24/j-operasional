@@ -127,8 +127,52 @@ class KelolaAkun extends BaseController
 
         foreach ($activeSessions as &$activeSession) {
             $activeSession['device_label'] = $this->deviceLabel((string) $activeSession['user_agent']);
+            $activeSession['last_accessed_label'] = $this->formatDate($activeSession['last_seen_at']);
+            $activeSession['last_accessed_ago'] = $this->relativeSessionTime($activeSession['last_seen_at']);
+            $activeSession['active_since_label'] = $this->formatDate($activeSession['session_started_at']);
         }
         unset($activeSession);
+
+        $usageByUser = [];
+        if (db_connect()->tableExists('user_session_usage_logs')) {
+            $usageLogs = db_connect()->table('user_session_usage_logs')
+                ->select('user_id, started_at, last_seen_at, ended_at')
+                ->get()
+                ->getResultArray();
+            foreach ($usageLogs as $usageLog) {
+                $userId = (int) $usageLog['user_id'];
+                $startedAt = strtotime((string) $usageLog['started_at']) ?: 0;
+                $lastSeenAt = strtotime((string) ($usageLog['ended_at'] ?: $usageLog['last_seen_at'])) ?: $startedAt;
+                $accessedAt = strtotime((string) $usageLog['last_seen_at']) ?: $lastSeenAt;
+                $usageByUser[$userId] ??= ['seconds' => 0, 'last_accessed_at' => null];
+                $usageByUser[$userId]['seconds'] += max(0, $lastSeenAt - $startedAt);
+                if ($usageByUser[$userId]['last_accessed_at'] === null || $accessedAt > $usageByUser[$userId]['last_accessed_at']) {
+                    $usageByUser[$userId]['last_accessed_at'] = $accessedAt;
+                }
+            }
+        }
+
+        $activeUserIds = array_fill_keys(array_map(static fn (array $activeSession): int => (int) $activeSession['user_id'], $activeSessions), true);
+        $allUsers = (new UserModel())->orderBy('display_name', 'ASC')->findAll();
+        $longestUsageSeconds = max(1, max(array_map(
+            static fn (array $usage): int => (int) ($usage['seconds'] ?? 0),
+            $usageByUser
+        ) ?: [1]));
+        $usageStats = array_map(function (array $user) use ($usageByUser, $activeUserIds, $longestUsageSeconds): array {
+            $usage = $usageByUser[(int) $user['id']] ?? ['seconds' => 0, 'last_accessed_at' => null];
+            $seconds = (int) $usage['seconds'];
+            $lastAccessedAt = $usage['last_accessed_at'];
+
+            return [
+                'name'          => (string) $user['display_name'],
+                'username'      => (string) $user['username'],
+                'duration'      => $this->formatSessionDuration($seconds),
+                'hours'         => round($seconds / 3600, 2),
+                'last_accessed' => $lastAccessedAt !== null ? $this->formatDate(date('Y-m-d H:i:s', $lastAccessedAt)) : 'Belum pernah diakses',
+                'is_active'     => isset($activeUserIds[(int) $user['id']]),
+                'percentage'    => $seconds > 0 ? max(6, (int) round(($seconds / $longestUsageSeconds) * 100)) : 0,
+            ];
+        }, $allUsers);
 
         $totalUsers  = $this->model->countAllResults();
         $activeCount = db_connect()->table('user_sessions')
@@ -143,6 +187,7 @@ class KelolaAkun extends BaseController
             'activeCount'    => $activeCount,
             'availableCount' => max(0, $totalUsers - $activeCount),
             'currentUserId'  => (int) session()->get('auth_user_id'),
+            'usageStats'     => $usageStats,
         ]);
     }
 
@@ -388,6 +433,41 @@ class KelolaAkun extends BaseController
     private function formatDate(?string $date): string
     {
         return $date ? date('d-m-Y H:i', strtotime($date)) . ' WIB' : '-';
+    }
+
+    private function relativeSessionTime(?string $date): string
+    {
+        $timestamp = $date ? strtotime($date) : false;
+        if ($timestamp === false) {
+            return 'Belum tersedia';
+        }
+
+        $seconds = max(0, time() - $timestamp);
+        if ($seconds < 60) {
+            return 'Baru saja';
+        }
+        if ($seconds < 3600) {
+            return floor($seconds / 60) . ' menit lalu';
+        }
+        if ($seconds < 86400) {
+            return floor($seconds / 3600) . ' jam lalu';
+        }
+
+        return floor($seconds / 86400) . ' hari lalu';
+    }
+
+    private function formatSessionDuration(int $seconds): string
+    {
+        if ($seconds < 60) {
+            return '< 1 menit';
+        }
+
+        $hours = intdiv($seconds, 3600);
+        $minutes = intdiv($seconds % 3600, 60);
+
+        return $hours > 0
+            ? $hours . ' jam ' . $minutes . ' menit'
+            : $minutes . ' menit';
     }
 
     private function deviceLabel(string $userAgent): string

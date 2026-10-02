@@ -7,25 +7,22 @@
 /** @var list<string> $statusOptions */
 /** @var list<string> $recipientOptions */
 /** @var array<string, mixed> $filters */
-/** @var bool $historyMode */
 /** @var string $pagerGroup */
 /** @var string $listUrl */
 ?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<section class="page-heading <?= ! $historyMode ? 'heading-actions' : '' ?>">
+<section class="page-heading heading-actions">
     <div>
         <p class="eyebrow">SDM &amp; TELLER</p>
-        <h1><?= $historyMode ? 'Riwayat Dokumen Masuk' : 'Dokumen Masuk' ?></h1>
-        <p><?= $historyMode ? 'Dokumen yang pernah diterima dan sudah diteruskan oleh' : 'Dokumen Agendaris dengan disposisi terakhir kepada' ?> <strong><?= esc(($recipientScopeLabel ?? '') !== '' ? $recipientScopeLabel : 'pengguna aktif') ?></strong>.</p>
+        <h1>Dokumen Masuk</h1>
+        <p>Dokumen Agendaris dengan disposisi terakhir kepada <strong><?= esc(($recipientScopeLabel ?? '') !== '' ? $recipientScopeLabel : 'pengguna aktif') ?></strong>.</p>
     </div>
-    <?php if (! $historyMode): ?>
-        <form method="post" action="<?= site_url('sdm/dokumen-masuk/sinkronkan') ?>">
-            <?= csrf_field() ?>
-            <button type="submit" class="btn btn-secondary btn-agendaris-sync" title="Sinkronkan dokumen lama dari Agendaris tanpa membuat data ganda">↻ Sinkronkan Data</button>
-        </form>
-    <?php endif ?>
+    <form method="post" action="<?= site_url('sdm/dokumen-masuk/sinkronkan') ?>">
+        <?= csrf_field() ?>
+        <button type="submit" class="btn btn-secondary btn-agendaris-sync" title="Sinkronkan dokumen lama dari Agendaris tanpa membuat data ganda">↻ Sinkronkan Data</button>
+    </form>
 </section>
 
 <section class="panel filter-panel">
@@ -55,12 +52,12 @@
             <thead><tr><th>Sumber</th><th>Nomor Agendaris</th><th>Tanggal Surat</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tracking Disposisi</th><th>Tanggal Diterima</th><th>Aksi</th></tr></thead>
             <tbody>
             <?php if ($documents === []): ?>
-                <tr><td colspan="9"><div class="empty-state"><span aria-hidden="true">▤</span><strong><?= $historyMode ? 'Belum ada riwayat dokumen masuk' : (($isAdminView ?? false) ? 'Belum ada disposisi aktif ke akun SDM & Teller' : 'Belum ada dokumen masuk untuk Anda') ?></strong><p><?= $historyMode ? 'Dokumen yang sudah diteruskan akan tersimpan di halaman ini.' : (($isAdminView ?? false) ? 'Dokumen lama yang sudah diteruskan dapat diperiksa melalui submenu Riwayat Dokumen.' : 'Dokumen akan muncul otomatis ketika nama Anda menjadi penerima disposisi terakhir.') ?></p></div></td></tr>
+                <tr><td colspan="9"><div class="empty-state"><span aria-hidden="true">▤</span><strong><?= ($isAdminView ?? false) ? 'Belum ada disposisi aktif ke akun SDM & Teller' : 'Belum ada dokumen masuk untuk Anda' ?></strong><p><?= ($isAdminView ?? false) ? 'Dokumen akan muncul setelah disposisi ditujukan ke akun SDM & Teller.' : 'Dokumen akan muncul otomatis ketika nama Anda menjadi penerima disposisi terakhir.' ?></p></div></td></tr>
             <?php else: ?>
                 <?php foreach ($documents as $document): ?>
                     <?php
                     $statusClass = ['Menunggu' => 'pending', 'Diterima' => 'received', 'Diproses' => 'active', 'Diteruskan' => 'forwarded', 'Selesai' => 'completed'][$document['status_disposisi_terakhir']] ?? 'empty';
-                    $canEditDisposition = ! $historyMode && (
+                    $canEditDisposition = (
                         ($isAdminView ?? false)
                         || mb_strtolower(trim((string) $document['disposisi_terakhir'])) === mb_strtolower(trim($recipientName))
                     );

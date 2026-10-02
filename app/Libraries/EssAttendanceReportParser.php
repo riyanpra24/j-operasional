@@ -10,7 +10,7 @@ use RuntimeException;
 final class EssAttendanceReportParser
 {
     private const COLUMN_COUNT = 24;
-    private const LATE_AFTER = '08:00:00';
+    private const LATE_FROM = '08:01:00';
 
     /**
      * Mengubah laporan ESS berbentuk HTML-XLS menjadi rekap absensi bulanan.
@@ -152,7 +152,7 @@ final class EssAttendanceReportParser
         $seenRecords = [];
         $availableDates = [];
         $warnings = [];
-        $summary = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
+        $summary = ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
         $storedRecords = [];
 
         foreach ($records as $record) {
@@ -181,7 +181,7 @@ final class EssAttendanceReportParser
                     'position'      => $record['position'],
                     'organization'  => $record['organization'],
                     'days'          => [],
-                    'totals'        => ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0],
+                    'totals'        => ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0],
                 ];
             }
 
@@ -205,7 +205,11 @@ final class EssAttendanceReportParser
                 'recap_code'      => $code,
             ];
 
-            if (isset($employees[$employeeKey]['totals'][$code])) {
+            $isOdrOnNonWorkingDay = $code === 'ODR' && in_array($record['day_type'], ['OFF', 'PHOFF'], true);
+            if ($isOdrOnNonWorkingDay) {
+                $employees[$employeeKey]['totals']['OFF']++;
+                $summary['OFF']++;
+            } elseif (isset($employees[$employeeKey]['totals'][$code])) {
                 $employees[$employeeKey]['totals'][$code]++;
                 $summary[$code]++;
             } else {
@@ -237,11 +241,11 @@ final class EssAttendanceReportParser
 
         $employeeRows = array_values($employees);
         foreach ($employeeRows as &$employee) {
-            $workDays = $employee['totals']['H'] + $employee['totals']['TLBT'] + $employee['totals']['I']
+            $workDays = $employee['totals']['H'] + $employee['totals']['TLBT'] + $employee['totals']['ODR'] + $employee['totals']['IZ'] + $employee['totals']['CT']
                 + $employee['totals']['A'] + $employee['totals']['TA']
-                + $employee['totals']['TAM'] + $employee['totals']['TAP'];
+                + $employee['totals']['TAM'] + $employee['totals']['TAP'] + $employee['totals']['TLTAP'];
             $employee['attendance_rate'] = $workDays > 0
-                ? round((($employee['totals']['H'] + $employee['totals']['TLBT']) / $workDays) * 100, 1)
+                ? round((($employee['totals']['H'] + $employee['totals']['TLBT'] + $employee['totals']['ODR']) / $workDays) * 100, 1)
                 : null;
         }
         unset($employee);
@@ -267,12 +271,24 @@ final class EssAttendanceReportParser
      */
     private function recapCode(array $record): string
     {
+        if ($this->isOnDutyRequest($record['remark'])) {
+            return 'ODR';
+        }
+
+        if (in_array($record['day_type'], ['OFF', 'PHOFF'], true)) {
+            return 'OFF';
+        }
+
         if ($record['status'] === 'ABS') {
             return 'A';
         }
 
-        if (in_array($record['status'], ['CB2', 'RI', 'CT'], true)) {
-            return 'I';
+        if ($record['status'] === 'IZ') {
+            return 'IZ';
+        }
+
+        if ($record['status'] === 'CT' || $record['status'] === 'RI' || preg_match('/^CB\d+$/', $record['status']) === 1) {
+            return 'CT';
         }
 
         $hasActualIn = $record['actual_in'] !== '';
@@ -281,7 +297,7 @@ final class EssAttendanceReportParser
 
         if ($record['status'] === 'PRS') {
             if ($hasActualIn && ! $hasActualOut) {
-                return 'TAP';
+                return $this->isLateCheckIn($record['actual_in']) ? 'TLTAP' : 'TAP';
             }
             if (! $hasActualIn && $hasActualOut) {
                 return 'TAM';
@@ -301,7 +317,7 @@ final class EssAttendanceReportParser
         // Baris dengan hanya salah satu jam tetap disimpan sebagai presensi
         // tidak lengkap, termasuk ketika kode status dari ESS kosong/tidak dikenal.
         if ($hasActualIn && ! $hasActualOut) {
-            return 'TAP';
+            return $this->isLateCheckIn($record['actual_in']) ? 'TLTAP' : 'TAP';
         }
         if (! $hasActualIn && $hasActualOut) {
             return 'TAM';
@@ -323,11 +339,16 @@ final class EssAttendanceReportParser
         foreach (['!H:i:s', '!H:i'] as $format) {
             $time = DateTimeImmutable::createFromFormat($format, $value);
             if ($time !== false) {
-                return $time->format('H:i:s') > self::LATE_AFTER;
+                return $time->format('H:i:s') >= self::LATE_FROM;
             }
         }
 
         return false;
+    }
+
+    private function isOnDutyRequest(string $remark): bool
+    {
+        return preg_match('/\b(?:on\s*duty\s*request|odr)\b/i', $remark) === 1;
     }
 
     private function normalizeText(string $value): string

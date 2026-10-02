@@ -18,7 +18,7 @@ use RuntimeException;
 
 class Sdm extends BaseController
 {
-    private const LATE_AFTER = '08:00:00';
+    private const LATE_FROM = '08:01:00';
 
     public function index(): string
     {
@@ -29,12 +29,7 @@ class Sdm extends BaseController
 
     public function incomingDocuments(): string
     {
-        return $this->documentList(false);
-    }
-
-    public function incomingDocumentHistory(): string
-    {
-        return $this->documentList(true);
+        return $this->documentList();
     }
 
     public function attendanceDashboard(): string
@@ -434,9 +429,9 @@ class Sdm extends BaseController
         $recordModel = new SdmAttendanceRecordModel();
         $anomalyRecords = $recordModel
             ->where('import_id', $importId)
-            ->whereIn('recap_code', ['A', 'TA', 'TAM', 'TAP', 'TPA'])
+            ->whereIn('recap_code', ['A', 'TA', 'TAM', 'TAP', 'TLTAP', 'TPA'])
             ->findAll();
-        $allowedCodes = ['H', 'TLBT', 'I', 'A', 'TA', 'TAM', 'TAP', 'TPA', 'OFF'];
+        $allowedCodes = ['H', 'TLBT', 'TLTAP', 'ODR', 'IZ', 'CT', 'A', 'TA', 'TAM', 'TAP', 'TPA', 'OFF'];
         $db = db_connect();
         $updated = 0;
         $db->transBegin();
@@ -456,19 +451,19 @@ class Sdm extends BaseController
 
                 $actualIn = $this->validAttendanceTime((string) ($submitted['actual_in'] ?? ''));
                 $actualOut = $this->validAttendanceTime((string) ($submitted['actual_out'] ?? ''));
-                if (in_array($code, ['TA', 'TAM', 'TAP', 'TPA'], true)) {
+                if (in_array($code, ['TA', 'TAM', 'TAP', 'TLTAP', 'TPA'], true)) {
                     if ($actualIn !== null && $actualOut === null) {
-                        $code = 'TAP';
+                        $code = $actualIn >= self::LATE_FROM ? 'TLTAP' : 'TAP';
                     } elseif ($actualIn === null && $actualOut !== null) {
                         $code = 'TAM';
-                    } elseif ($actualIn !== null && $actualOut !== null && in_array($code, ['TAM', 'TAP'], true)) {
+                    } elseif ($actualIn !== null && $actualOut !== null && in_array($code, ['TAM', 'TAP', 'TLTAP'], true)) {
                         $code = 'H';
-                    } elseif ($actualIn === null && $actualOut === null && in_array($code, ['TAM', 'TAP'], true)) {
+                    } elseif ($actualIn === null && $actualOut === null && in_array($code, ['TAM', 'TAP', 'TLTAP'], true)) {
                         $code = 'TA';
                     }
                 }
                 if ($actualIn !== null && $actualOut !== null && in_array($code, ['H', 'TLBT'], true)) {
-                    $code = $actualIn > self::LATE_AFTER ? 'TLBT' : 'H';
+                    $code = $actualIn >= self::LATE_FROM ? 'TLBT' : 'H';
                 }
 
                 $payload = [
@@ -672,10 +667,10 @@ class Sdm extends BaseController
                 'period_end'       => $report['period_end'],
                 'employee_count'   => $report['summary']['EMPLOYEES'],
                 'row_count'        => $report['summary']['ROWS'],
-                'hadir_count'      => $report['summary']['H'] + $report['summary']['TLBT'],
-                'izin_count'       => $report['summary']['I'],
+                'hadir_count'      => $report['summary']['H'] + $report['summary']['TLBT'] + $report['summary']['ODR'],
+                'izin_count'       => $report['summary']['IZ'] + $report['summary']['CT'],
                 'alpa_count'       => $report['summary']['A'],
-                'incomplete_count' => $report['summary']['TA'] + $report['summary']['TAM'] + $report['summary']['TAP'] + ($report['summary']['TPA'] ?? 0),
+                'incomplete_count' => $report['summary']['TA'] + $report['summary']['TAM'] + $report['summary']['TAP'] + $report['summary']['TLTAP'] + ($report['summary']['TPA'] ?? 0),
                 'off_count'        => $report['summary']['OFF'],
                 'other_count'      => $report['summary']['OTHER'],
                 'warnings_json'    => json_encode($report['warnings'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
@@ -776,7 +771,7 @@ class Sdm extends BaseController
             ->findAll();
         $employees = [];
         $anomalies = [];
-        $summary = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0, 'OTHER' => 0];
+        $summary = ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0, 'OTHER' => 0];
         $period = new \DateTimeImmutable($import['period_start']);
         $displayStart = new \DateTimeImmutable($filters['from'] !== '' ? $filters['from'] : $import['period_start']);
         $displayEnd = new \DateTimeImmutable($filters['to'] !== '' ? $filters['to'] : $import['period_end']);
@@ -801,7 +796,7 @@ class Sdm extends BaseController
                     'organization'   => $record['organization'],
                     'days'           => [],
                     'day_details'    => [],
-                    'totals'         => ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0],
+                    'totals'         => ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0],
                     'attendance_rate' => null,
                     'effective_attendance' => 0.0,
                     'punctuality_rate' => null,
@@ -814,14 +809,24 @@ class Sdm extends BaseController
             $recordDate = new \DateTimeImmutable($record['attendance_date']);
             $calendarInfo = $holidayCalendar->info($recordDate);
             $code = $record['recap_code'];
-            if ($calendarInfo['is_non_working']) {
+            $actualIn = $record['actual_in'];
+            $actualOut = $record['actual_out'];
+            if ($code === 'I') {
+                $rawStatus = strtoupper((string) $record['raw_status']);
+                $code = $rawStatus === 'IZ' ? 'IZ' : 'CT';
+            }
+            if ($this->isOnDutyRequestRemark((string) $record['remark'])) {
+                $code = 'ODR';
+            } elseif ($calendarInfo['is_non_working']) {
                 $code = 'OFF';
             } elseif ($calendarInfo['is_override'] && $code === 'OFF') {
-                $actualIn = $record['actual_in'];
-                $actualOut = $record['actual_out'];
                 $code = $actualIn !== null && $actualOut !== null
-                    ? ($actualIn > self::LATE_AFTER ? 'TLBT' : 'H')
-                    : ($actualIn !== null ? 'TAP' : ($actualOut !== null ? 'TAM' : 'TA'));
+                    ? ($actualIn >= self::LATE_FROM ? 'TLBT' : 'H')
+                    : ($actualIn !== null ? ($actualIn >= self::LATE_FROM ? 'TLTAP' : 'TAP') : ($actualOut !== null ? 'TAM' : 'TA'));
+            } elseif ($actualIn !== null && $actualOut !== null && in_array($code, ['H', 'TLBT', 'TLTAP'], true)) {
+                $code = $actualIn >= self::LATE_FROM ? 'TLBT' : 'H';
+            } elseif ($actualIn !== null && $actualOut === null && in_array($code, ['TAP', 'TLTAP'], true)) {
+                $code = $actualIn >= self::LATE_FROM ? 'TLTAP' : 'TAP';
             }
             $day = (int) $recordDate->format('j');
             $employees[$key]['days'][$day] = $code;
@@ -831,15 +836,21 @@ class Sdm extends BaseController
                 'actual_out'   => $record['actual_out'],
                 'holiday_name' => $calendarInfo['is_non_working'] ? $calendarInfo['label'] : null,
             ];
-            if (isset($employees[$key]['totals'][$code])) {
+            $isOdrOnNonWorkingDay = $code === 'ODR' && $calendarInfo['is_non_working'];
+            if ($isOdrOnNonWorkingDay) {
+                $employees[$key]['totals']['OFF']++;
+                $summary['OFF']++;
+            } elseif (isset($employees[$key]['totals'][$code])) {
                 $employees[$key]['totals'][$code]++;
             }
-            if (isset($summary[$code])) {
+            if ($isOdrOnNonWorkingDay) {
+                // ODR tetap ditampilkan pada hari libur, tetapi tidak dihitung sebagai kehadiran.
+            } elseif (isset($summary[$code])) {
                 $summary[$code]++;
             } else {
                 $summary['OTHER']++;
             }
-            if (in_array($code, ['A', 'TA', 'TAM', 'TAP', 'TPA'], true)) {
+            if (in_array($code, ['A', 'TA', 'TAM', 'TAP', 'TLTAP', 'TPA'], true)) {
                 $anomalies[] = [
                     'id'              => (int) $record['id'],
                     'employee_no'     => $record['employee_no'] ?: '-',
@@ -902,19 +913,21 @@ class Sdm extends BaseController
         $effectiveAttendanceTotal = 0.0;
 
         foreach ($employees as &$employee) {
-            $presenceSignals = $employee['totals']['H'] + $employee['totals']['TLBT']
-                + $employee['totals']['TA'] + $employee['totals']['TAM'] + $employee['totals']['TAP'] + $employee['totals']['TPA'];
+            $presenceSignals = $employee['totals']['H'] + $employee['totals']['TLBT'] + $employee['totals']['ODR']
+                + $employee['totals']['TA'] + $employee['totals']['TAM'] + $employee['totals']['TAP'] + $employee['totals']['TLTAP'] + $employee['totals']['TPA'];
             $effectiveAttendance = $employee['totals']['H']
                 + ($employee['totals']['TLBT'] * 0.75)
+                + $employee['totals']['ODR']
                 + ($employee['totals']['TAM'] * 0.5)
                 + ($employee['totals']['TAP'] * 0.5)
+                + ($employee['totals']['TLTAP'] * 0.25)
                 + ($employee['totals']['TA'] * 0.25)
                 + ($employee['totals']['TPA'] * 0.25);
             $attendanceRate = $effectiveWorkDays > 0
                 ? round(($effectiveAttendance / $effectiveWorkDays) * 100, 1)
                 : null;
             $punctualityRate = $presenceSignals > 0
-                ? round(($employee['totals']['H'] / $presenceSignals) * 100, 1)
+                ? round((($employee['totals']['H'] + $employee['totals']['ODR']) / $presenceSignals) * 100, 1)
                 : null;
             $disciplineIndex = $attendanceRate !== null && $punctualityRate !== null
                 ? round(($attendanceRate + $punctualityRate) / 2, 1)
@@ -924,7 +937,7 @@ class Sdm extends BaseController
                 $evaluationStatus = 'Teguran (Alpa)';
                 $evaluationKey = 'warning';
             } elseif (
-                $employee['totals']['TLBT'] >= 3
+                ($employee['totals']['TLBT'] + $employee['totals']['TLTAP']) >= 3
                 || ($attendanceRate !== null && $attendanceRate < 95)
                 || $employee['totals']['TA'] > 0
                 || $employee['totals']['TPA'] > 0
@@ -1069,30 +1082,46 @@ class Sdm extends BaseController
     private function refreshAttendanceImportSummary(int $importId, SdmAttendanceImportModel $importModel): void
     {
         $records = (new SdmAttendanceRecordModel())
-            ->select('employee_key, recap_code')
+            ->select('employee_key, recap_code, raw_status, remark, day_type')
             ->where('import_id', $importId)
             ->findAll();
         $employees = [];
-        $counts = ['H' => 0, 'TLBT' => 0, 'I' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0, 'OTHER' => 0];
+        $counts = ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0, 'OTHER' => 0];
 
         foreach ($records as $record) {
             $employees[$record['employee_key']] = true;
-            $code = $record['recap_code'];
-            isset($counts[$code]) ? $counts[$code]++ : $counts['OTHER']++;
+            $isNonWorkingDay = in_array(strtoupper((string) ($record['day_type'] ?? '')), ['OFF', 'PHOFF'], true);
+            $code = $this->isOnDutyRequestRemark((string) ($record['remark'] ?? ''))
+                    ? 'ODR'
+                    : ($isNonWorkingDay
+                        ? 'OFF'
+                        : ($record['recap_code'] === 'I'
+                            ? (strtoupper((string) ($record['raw_status'] ?? '')) === 'IZ' ? 'IZ' : 'CT')
+                            : $record['recap_code']));
+            if ($code === 'ODR' && $isNonWorkingDay) {
+                $counts['OFF']++;
+            } else {
+                isset($counts[$code]) ? $counts[$code]++ : $counts['OTHER']++;
+            }
         }
 
         if ($importModel->update($importId, [
             'employee_count'   => count($employees),
             'row_count'        => count($records),
-            'hadir_count'      => $counts['H'] + $counts['TLBT'],
-            'izin_count'       => $counts['I'],
+            'hadir_count'      => $counts['H'] + $counts['TLBT'] + $counts['ODR'],
+            'izin_count'       => $counts['IZ'] + $counts['CT'],
             'alpa_count'       => $counts['A'],
-            'incomplete_count' => $counts['TA'] + $counts['TAM'] + $counts['TAP'] + $counts['TPA'],
+            'incomplete_count' => $counts['TA'] + $counts['TAM'] + $counts['TAP'] + $counts['TLTAP'] + $counts['TPA'],
             'off_count'        => $counts['OFF'],
             'other_count'      => $counts['OTHER'],
         ]) === false) {
             throw new RuntimeException('Ringkasan absensi belum dapat diperbarui.');
         }
+    }
+
+    private function isOnDutyRequestRemark(string $remark): bool
+    {
+        return preg_match('/\b(?:on\s*duty\s*request|odr)\b/i', $remark) === 1;
     }
 
     public function synchronizeIncomingDocuments(): RedirectResponse
@@ -1148,7 +1177,7 @@ class Sdm extends BaseController
         return redirect()->to(site_url('sdm/dokumen-masuk'))->with('sync_success', $message);
     }
 
-    private function documentList(bool $historyMode): string
+    private function documentList(): string
     {
         $recipientName = trim((string) session()->get('auth_display_name'));
         $currentRole = (string) session()->get('auth_role');
@@ -1207,22 +1236,6 @@ class Sdm extends BaseController
 
         if ($scopedRecipients === []) {
             $model->where('1 = 0', null, false);
-        } elseif ($historyMode) {
-            $model->groupStart();
-            for ($step = 1; $step <= Disposition::MAX_STEPS; $step++) {
-                $condition = "LOWER(TRIM(agendaris.disposisi_{$step})) IN ({$recipientSqlList})";
-                if ($step === 1) {
-                    $model->where($condition, null, false);
-                } else {
-                    $model->orWhere($condition, null, false);
-                }
-            }
-            $model->groupEnd();
-            $model->where(
-                'LOWER(TRIM(' . $latestRecipientSql . ")) NOT IN ({$recipientSqlList})",
-                null,
-                false,
-            );
         } else {
             $model->groupStart()
                 ->where('agendaris.progres', 'Selesai')
@@ -1249,11 +1262,11 @@ class Sdm extends BaseController
             $model->where($latestStatusSql . ' = ' . db_connect()->escape($status), null, false);
         }
 
-        $pagerGroup = $historyMode ? 'sdm_incoming_history' : 'sdm_incoming_documents';
+        $pagerGroup = 'sdm_incoming_documents';
         $direction = $order === 'terlama' ? 'ASC' : 'DESC';
 
         return view('sdm/dokumen_masuk', [
-            'title' => ($historyMode ? 'Riwayat Dokumen Masuk' : 'Dokumen Masuk') . ' | SDM & Teller',
+            'title' => 'Dokumen Masuk | SDM & Teller',
             'documents' => $model
                 ->orderBy('waktu_disposisi_terakhir', $direction)
                 ->orderBy('agendaris.id', $direction)
@@ -1265,9 +1278,8 @@ class Sdm extends BaseController
             'statusOptions' => $allowedStatuses,
             'recipientOptions' => Disposition::RECIPIENTS,
             'filters' => compact('keyword', 'status', 'perPage', 'order'),
-            'historyMode' => $historyMode,
             'pagerGroup' => $pagerGroup,
-            'listUrl' => site_url($historyMode ? 'sdm/riwayat' : 'sdm/dokumen-masuk'),
+            'listUrl' => site_url('sdm/dokumen-masuk'),
         ]);
     }
 
@@ -1381,11 +1393,8 @@ class Sdm extends BaseController
         }
 
         $incomingPath = rtrim((string) parse_url(site_url('sdm/dokumen-masuk'), PHP_URL_PATH), '/');
-        $historyPath = rtrim((string) parse_url(site_url('sdm/riwayat'), PHP_URL_PATH), '/');
         $requestedPath = rtrim((string) $parts['path'], '/');
-        $route = $requestedPath === $historyPath
-            ? 'sdm/riwayat'
-            : ($requestedPath === $incomingPath ? 'sdm/dokumen-masuk' : $fallbackRoute);
+        $route = $requestedPath === $incomingPath ? 'sdm/dokumen-masuk' : $fallbackRoute;
 
         if ($route === $fallbackRoute && $requestedPath !== $incomingPath) {
             return site_url($fallbackRoute);
@@ -1399,7 +1408,6 @@ class Sdm extends BaseController
             'urutan',
             'per_page',
             'page_sdm_incoming_documents',
-            'page_sdm_incoming_history',
         ];
         $filters = [];
         foreach ($allowedKeys as $key) {

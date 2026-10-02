@@ -10,7 +10,10 @@
 $statusLabels = [
     'H' => 'Hadir tepat waktu',
     'TLBT' => 'Terlambat',
-    'I' => 'Izin / sakit / cuti',
+    'TLTAP' => 'Terlambat dan tidak absen pulang',
+    'ODR' => 'On Duty Request',
+    'IZ' => 'Izin',
+    'CT' => 'Cuti',
     'A' => 'Alpa',
     'TA' => 'Tidak absen masuk dan pulang',
     'TAM' => 'Tidak absen masuk',
@@ -18,7 +21,7 @@ $statusLabels = [
     'TPA' => 'Masuk tidak absen',
     'OFF' => 'Libur / akhir pekan',
 ];
-$displayCodes = ['TLBT' => 'TL'];
+$displayCodes = ['TLBT' => 'TL', 'TLTAP' => 'TL/TAP'];
 $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'Sab', 7 => 'Min'];
 ?>
 
@@ -92,7 +95,7 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
         <div class="sdm-daily-legend" aria-label="Keterangan kode absensi">
             <strong>Keterangan:</strong>
             <?php foreach ($statusLabels as $code => $label): ?>
-                <span><i class="sdm-daily-code sdm-daily-code-<?= esc(strtolower(str_replace('-', 'empty', $code)), 'attr') ?>"><?= esc($displayCodes[$code] ?? $code) ?></i><?= esc($label) ?></span>
+                <span><i class="sdm-daily-code sdm-daily-code-<?= esc(strtolower(str_replace('-', 'empty', $code)), 'attr') ?>"><?= esc($displayCodes[$code] ?? $code) ?></i><?php if ($code === 'TLTAP'): ?><span class="sdm-daily-legend-label-tltap">Terlambat dan<br>tidak absen pulang</span><?php else: ?><?= esc($label) ?><?php endif ?></span>
             <?php endforeach ?>
         </div>
 
@@ -114,7 +117,7 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
                     <tbody>
                         <?php foreach ($report['employees'] as $index => $employee): ?>
                             <?php
-                            $totalPresent = (int) $employee['totals']['H'] + (int) $employee['totals']['TLBT'] + (int) $employee['totals']['TA'] + (int) $employee['totals']['TAM'] + (int) $employee['totals']['TAP'] + (int) ($employee['totals']['TPA'] ?? 0);
+                            $totalPresent = (int) $employee['totals']['H'] + (int) $employee['totals']['TLBT'] + (int) ($employee['totals']['TLTAP'] ?? 0) + (int) ($employee['totals']['ODR'] ?? 0) + (int) $employee['totals']['TA'] + (int) $employee['totals']['TAM'] + (int) $employee['totals']['TAP'] + (int) ($employee['totals']['TPA'] ?? 0);
                             $detailId = 'attendance-staff-' . $index;
                             ?>
                             <tr>

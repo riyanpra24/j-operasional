@@ -35,7 +35,6 @@ $routes->get('sdm/arsip-dokumen-masuk/(:num)', 'Agendaris::show/$1', ['as' => 's
 $routes->get('sdm/arsip-dokumen-keluar', 'DokumenKeluar::index', ['as' => 'sdm.arsip_dokumen_keluar']);
 $routes->get('sdm/arsip-dokumen-keluar/(:num)', 'DokumenKeluar::show/$1', ['as' => 'sdm.arsip_dokumen_keluar.show']);
 $routes->post('sdm/dokumen-masuk/sinkronkan', 'Sdm::synchronizeIncomingDocuments', ['as' => 'sdm.dokumen_masuk.synchronize']);
-$routes->get('sdm/riwayat', 'Sdm::incomingDocumentHistory', ['as' => 'sdm.riwayat']);
 $routes->get('sdm/dashboard-kehadiran', 'Sdm::attendanceDashboard', ['as' => 'sdm.dashboard_kehadiran']);
 $routes->get('sdm/kalender', 'Sdm::attendanceCalendar', ['as' => 'sdm.calendar']);
 $routes->post('sdm/kalender', 'Sdm::updateAttendanceCalendar', ['as' => 'sdm.calendar.update']);

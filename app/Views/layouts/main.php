@@ -290,10 +290,6 @@ if ($currentRole === 'security') {
                             <span aria-hidden="true">●</span>
                             Dispo Dokumen
                         </a>
-                        <a href="<?= site_url('sdm/riwayat') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'riwayat' ? 'active' : '' ?>">
-                            <span aria-hidden="true">●</span>
-                            Riwayat Dispo
-                        </a>
                         <a href="<?= site_url('sdm/arsip-dokumen-masuk') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'arsip-dokumen-masuk' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Dokumen Masuk
