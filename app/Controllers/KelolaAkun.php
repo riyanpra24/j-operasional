@@ -85,7 +85,15 @@ class KelolaAkun extends BaseController
 
     public function sessions(): string
     {
-        $usageYear = (int) date('Y');
+        $usageMonth = (int) $this->request->getGet('usage_month');
+        $usageYear = (int) $this->request->getGet('usage_year');
+        if ($usageMonth < 1 || $usageMonth > 12) {
+            $usageMonth = (int) date('n');
+        }
+        if ($usageYear < 2020 || $usageYear > ((int) date('Y') + 1)) {
+            $usageYear = (int) date('Y');
+        }
+        $usageDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $usageMonth, $usageYear);
         $keyword = trim((string) $this->request->getGet('q'));
         $role    = trim((string) $this->request->getGet('role'));
         $order   = $this->requestedListOrder();
@@ -145,11 +153,11 @@ class KelolaAkun extends BaseController
                 $startedAt = strtotime((string) $usageLog['started_at']) ?: 0;
                 $lastSeenAt = strtotime((string) ($usageLog['ended_at'] ?: $usageLog['last_seen_at'])) ?: $startedAt;
                 $accessedAt = strtotime((string) $usageLog['last_seen_at']) ?: $lastSeenAt;
-                $usageByUser[$userId] ??= ['seconds' => 0, 'last_accessed_at' => null, 'monthly_seconds' => array_fill(0, 12, 0)];
+                $usageByUser[$userId] ??= ['seconds' => 0, 'last_accessed_at' => null, 'daily_seconds' => array_fill(0, $usageDaysInMonth, 0)];
                 $usageByUser[$userId]['seconds'] += max(0, $lastSeenAt - $startedAt);
-                $monthlySeconds = $this->usageSecondsByMonth($startedAt, $lastSeenAt, $usageYear);
-                foreach ($monthlySeconds as $monthIndex => $seconds) {
-                    $usageByUser[$userId]['monthly_seconds'][$monthIndex] += $seconds;
+                $dailySeconds = $this->usageSecondsByDay($startedAt, $lastSeenAt, $usageYear, $usageMonth);
+                foreach ($dailySeconds as $dayIndex => $seconds) {
+                    $usageByUser[$userId]['daily_seconds'][$dayIndex] += $seconds;
                 }
                 if ($usageByUser[$userId]['last_accessed_at'] === null || $accessedAt > $usageByUser[$userId]['last_accessed_at']) {
                     $usageByUser[$userId]['last_accessed_at'] = $accessedAt;
@@ -163,8 +171,8 @@ class KelolaAkun extends BaseController
             static fn (array $usage): int => (int) ($usage['seconds'] ?? 0),
             $usageByUser
         ) ?: [1]));
-        $usageStats = array_map(function (array $user) use ($usageByUser, $activeUserIds, $longestUsageSeconds): array {
-            $usage = $usageByUser[(int) $user['id']] ?? ['seconds' => 0, 'last_accessed_at' => null, 'monthly_seconds' => array_fill(0, 12, 0)];
+        $usageStats = array_map(function (array $user) use ($usageByUser, $activeUserIds, $longestUsageSeconds, $usageDaysInMonth): array {
+            $usage = $usageByUser[(int) $user['id']] ?? ['seconds' => 0, 'last_accessed_at' => null, 'daily_seconds' => array_fill(0, $usageDaysInMonth, 0)];
             $seconds = (int) $usage['seconds'];
             $lastAccessedAt = $usage['last_accessed_at'];
 
@@ -173,7 +181,7 @@ class KelolaAkun extends BaseController
                 'username'      => (string) $user['username'],
                 'duration'      => $this->formatSessionDuration($seconds),
                 'hours'         => round($seconds / 3600, 2),
-                'monthly_hours' => array_map(static fn (int $monthSeconds): float => round($monthSeconds / 3600, 2), $usage['monthly_seconds']),
+                'daily_hours'   => array_map(static fn (int $daySeconds): float => round($daySeconds / 3600, 2), $usage['daily_seconds']),
                 'last_accessed' => $lastAccessedAt !== null ? $this->formatDate(date('Y-m-d H:i:s', $lastAccessedAt)) : 'Belum pernah diakses',
                 'is_active'     => isset($activeUserIds[(int) $user['id']]),
                 'percentage'    => $seconds > 0 ? max(6, (int) round(($seconds / $longestUsageSeconds) * 100)) : 0,
@@ -194,6 +202,7 @@ class KelolaAkun extends BaseController
             'availableCount' => max(0, $totalUsers - $activeCount),
             'currentUserId'  => (int) session()->get('auth_user_id'),
             'usageStats'     => $usageStats,
+            'usagePeriod'    => ['month' => $usageMonth, 'year' => $usageYear, 'days' => $usageDaysInMonth],
         ]);
     }
 
@@ -477,24 +486,24 @@ class KelolaAkun extends BaseController
     }
 
     /** @return list<int> */
-    private function usageSecondsByMonth(int $startedAt, int $endedAt, int $year): array
+    private function usageSecondsByDay(int $startedAt, int $endedAt, int $year, int $month): array
     {
-        $months = array_fill(0, 12, 0);
+        $days = array_fill(0, cal_days_in_month(CAL_GREGORIAN, $month, $year), 0);
         $cursor = $startedAt;
 
         while ($cursor < $endedAt) {
-            $nextMonth = strtotime('first day of next month 00:00:00', $cursor);
-            if ($nextMonth === false || $nextMonth <= $cursor) {
+            $nextDay = strtotime('tomorrow 00:00:00', $cursor);
+            if ($nextDay === false || $nextDay <= $cursor) {
                 break;
             }
-            $segmentEnd = min($endedAt, $nextMonth);
-            if ((int) date('Y', $cursor) === $year) {
-                $months[(int) date('n', $cursor) - 1] += $segmentEnd - $cursor;
+            $segmentEnd = min($endedAt, $nextDay);
+            if ((int) date('Y', $cursor) === $year && (int) date('n', $cursor) === $month) {
+                $days[(int) date('j', $cursor) - 1] += $segmentEnd - $cursor;
             }
             $cursor = $segmentEnd;
         }
 
-        return $months;
+        return $days;
     }
 
     private function deviceLabel(string $userAgent): string

@@ -6,19 +6,22 @@
 /** @var int $activeCount */
 /** @var int $availableCount */
 /** @var int|string $currentUserId */
-/** @var list<array{name: string, username: string, duration: string, hours: float, monthly_hours: list<float>, last_accessed: string, is_active: bool, percentage: int}> $usageStats */
+/** @var list<array{name: string, username: string, duration: string, hours: float, daily_hours: list<float>, last_accessed: string, is_active: bool, percentage: int}> $usageStats */
+/** @var array{month: int, year: int, days: int} $usagePeriod */
 ?>
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <?php
 $roleLabels = \Config\UserRoles::LABELS;
 $usageColors = ['#168fd1', '#f26a43', '#8d5bd2', '#19a76b', '#db4c6e', '#c99619', '#0fa6ac', '#87563c'];
+$monthLabels = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'];
+$usageYears = range((int) date('Y'), max(2020, (int) date('Y') - 4));
 $usageChart = [
-    'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+    'labels' => array_map(static fn (int $day): string => (string) $day, range(1, (int) $usagePeriod['days'])),
     'datasets' => array_map(static fn (array $usage, int $index): array => [
         'name' => $usage['name'],
         'color' => $usageColors[$index % count($usageColors)],
-        'values' => $usage['monthly_hours'],
+        'values' => $usage['daily_hours'],
     ], $usageStats, array_keys($usageStats)),
 ];
 ?>
@@ -43,9 +46,21 @@ $usageChart = [
         <div>
             <span class="eyebrow">PEMAKAIAN SESI</span>
             <h2 id="sessionUsageTitle">Grafik pemakaian seluruh akun</h2>
-            <p>Setiap garis menunjukkan jam akses satu akun dalam periode Januari–Desember. Rincian di bawah memuat tanggal terakhir diakses.</p>
+            <p>Setiap garis menunjukkan jam akses satu akun pada tanggal yang dipilih. Rincian di bawah memuat tanggal terakhir diakses.</p>
         </div>
-        <span class="session-usage-period">Semua akun</span>
+        <form class="session-usage-filter" action="<?= site_url('kelola-akun/session-account') ?>" method="get">
+            <?php if ($filters['keyword'] !== ''): ?><input type="hidden" name="q" value="<?= esc($filters['keyword'], 'attr') ?>"><?php endif ?>
+            <?php if ($filters['role'] !== ''): ?><input type="hidden" name="role" value="<?= esc($filters['role'], 'attr') ?>"><?php endif ?>
+            <?php if ($filters['order'] !== ''): ?><input type="hidden" name="order" value="<?= esc($filters['order'], 'attr') ?>"><?php endif ?>
+            <label for="usageMonth">Periode grafik</label>
+            <select id="usageMonth" name="usage_month">
+                <?php foreach ($monthLabels as $monthNumber => $monthName): ?><option value="<?= $monthNumber ?>" <?= (int) $usagePeriod['month'] === $monthNumber ? 'selected' : '' ?>><?= esc($monthName) ?></option><?php endforeach ?>
+            </select>
+            <select aria-label="Tahun grafik" name="usage_year">
+                <?php foreach ($usageYears as $year): ?><option value="<?= $year ?>" <?= (int) $usagePeriod['year'] === $year ? 'selected' : '' ?>><?= $year ?></option><?php endforeach ?>
+            </select>
+            <button type="submit" class="btn btn-outline">Tampilkan</button>
+        </form>
     </div>
     <?php if ($usageStats === []): ?>
         <div class="empty-state compact session-usage-empty"><span>◷</span><strong>Belum ada pemakaian sesi</strong><p>Grafik akan muncul saat akun masuk ke sistem.</p></div>
@@ -222,7 +237,7 @@ $usageChart = [
                     tooltip: {backgroundColor: '#092e62', padding: 11, cornerRadius: 9, displayColors: true, callbacks: {label: context => `${context.dataset.label}: ${Number(context.raw || 0).toLocaleString('id-ID', {maximumFractionDigits: 2})} jam`}},
                 },
                 scales: {
-                    x: {grid: {display: false}, border: {display: false}, ticks: {color: '#7893ad', font: {size: 10, weight: '700'}}},
+                    x: {grid: {display: false}, border: {display: false}, ticks: {autoSkip: true, maxTicksLimit: 16, color: '#7893ad', font: {size: 10, weight: '700'}}},
                     y: {beginAtZero: true, grid: {color: 'rgba(76,134,180,.13)'}, border: {display: false}, ticks: {color: '#7893ad', font: {size: 10}, callback: value => `${value} jam`}},
                 },
             },
