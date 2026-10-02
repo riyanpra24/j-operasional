@@ -287,7 +287,7 @@ final class EssAttendanceReportParser
             return 'IZ';
         }
 
-        if ($record['status'] === 'CT' || $record['status'] === 'RI' || preg_match('/^CB\d+$/', $record['status']) === 1) {
+        if ($record['status'] === 'CT' || $record['status'] === 'RI' || preg_match('/^CB(?:\d+)?$/', $record['status']) === 1) {
             return 'CT';
         }
 
