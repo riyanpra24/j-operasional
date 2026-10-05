@@ -3,9 +3,11 @@
 <?php $lrMonths = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember']; ?>
 <?php $allLobs = \App\Libraries\LrRealizationService::LOB_COLUMNS;
 $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($selectedLobs) <= 2 ? implode(', ', $selectedLobs) : count($selectedLobs) . ' LOB dipilih'); ?>
-<?php $isSimulatedImport = $lrImport !== null && (($lrResult['rule'] ?? '') === \App\Libraries\LrRealizationCalculator::WORKPAPER_RULE); ?>
 <?php $volumeEditUnits = \App\Libraries\RkaCalculator::SOURCE_UNITS;
-$canEditVolume = $isAdmin && $isSimulatedImport;
+$canEditVolume = $isAdmin && array_filter(
+    (array) $volumeEditReportsByUnit,
+    static fn (mixed $report): bool => is_array($report) && $report !== [],
+) !== [];
 $volumeEditDefaultUnit = in_array($selectedUnit, $volumeEditUnits, true) ? $selectedUnit : $volumeEditUnits[0];
 $volumeEditColumns = ['KUR', 'PEN', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF', 'TOTAL'];
 $volumeEditRows = [];
@@ -306,6 +308,35 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
 <script id="lrVolumeEditReports" type="application/json"><?= json_encode($volumeEditReportsByUnit, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 <script id="lrEditCalculationRules" type="application/json"><?= json_encode($editCalculationRules, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 <script id="lrEditGroupRules" type="application/json"><?= json_encode($editGroupRules, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+<script>
+(() => {
+    const unitDialog = document.getElementById('lrVolumeUnitDialog');
+    const editDialog = document.getElementById('lrVolumeEditDialog');
+    const show = (dialog) => {
+        if (dialog instanceof HTMLDialogElement && !dialog.open) dialog.showModal();
+    };
+    document.querySelectorAll('[data-lr-volume-edit-open]').forEach((button) => {
+        button.addEventListener('click', () => show(unitDialog));
+    });
+    unitDialog?.querySelectorAll('[data-lr-volume-unit-close]').forEach((button) => {
+        button.addEventListener('click', () => unitDialog.close());
+    });
+    editDialog?.querySelectorAll('[data-lr-volume-edit-close]').forEach((button) => {
+        button.addEventListener('click', () => editDialog.close());
+    });
+    unitDialog?.querySelector('[data-lr-volume-unit-continue]')?.addEventListener('click', () => {
+        const month = unitDialog.querySelector('[data-lr-edit-period-month]');
+        const year = unitDialog.querySelector('[data-lr-edit-period-year]');
+        if (!(month instanceof HTMLSelectElement) || !(year instanceof HTMLInputElement) || !year.reportValidity()) return;
+        const url = new URL(window.location.href);
+        url.searchParams.set('bulan', month.value);
+        url.searchParams.set('tahun', year.value);
+        url.searchParams.set('edit', '1');
+        window.location.assign(url.toString());
+    });
+    if (editDialog?.dataset.autoOpen === 'true') show(editDialog);
+})();
+</script>
 <?php endif ?>
 
 <dialog id="lrUploadDialog" class="lr-settings-dialog" aria-labelledby="lrUploadTitle" data-auto-open="<?= $lrUploadError !== null ? 'true' : 'false' ?>">

@@ -331,8 +331,8 @@ class Akutansi extends BaseController
                 throw new RuntimeException('Laporan untuk unit dan periode yang dipilih belum tersedia.');
             }
             $result = json_decode((string) $record['result_json'], true, 512, JSON_THROW_ON_ERROR);
-            if (($result['rule'] ?? '') !== LrRealizationCalculator::WORKPAPER_RULE || ! is_array($result['values'] ?? null)) {
-                throw new RuntimeException('Laporan hanya dapat diubah pada hasil Kertas Kerja Simulasi.');
+            if (! is_array($result)) {
+                throw new RuntimeException('Data laporan yang dipilih tidak dapat diedit.');
             }
 
             foreach ($values as $key => $value) {
