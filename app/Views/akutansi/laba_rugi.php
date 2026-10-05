@@ -7,14 +7,6 @@ $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($s
 $volumeEditUnits = \App\Libraries\RkaCalculator::SOURCE_UNITS;
 $canEditVolume = $isAdmin;
 $volumeEditDefaultUnit = in_array($selectedUnit, $volumeEditUnits, true) ? $selectedUnit : $volumeEditUnits[0];
-$lrEditUrl = site_url('akutansi/laba-rugi?' . http_build_query([
-    'unit_kerja' => $selectedUnit,
-    'jenis_laporan' => $selectedBasis,
-    'bulan' => $selectedMonth,
-    'tahun' => $selectedYear,
-    'lob' => $selectedLobs,
-    'edit' => '1',
-]));
 $volumeEditColumns = ['KUR', 'PEN', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF', 'TOTAL'];
 $volumeEditRows = [];
 $editGroupRules = [];
@@ -103,7 +95,7 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
             </summary>
             <div class="lr-action-menu-popover" role="menu" aria-label="Menu Laporan Laba Rugi">
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-upload-open aria-haspopup="dialog" aria-controls="lrUploadDialog">Upload Kertas Kerja</button>
-                <?php if ($canEditVolume): ?><a href="<?= esc($lrEditUrl, 'attr') ?>" role="menuitem" class="lr-action-menu-item" aria-controls="lrVolumeEditDialog">Edit Laba Rugi</a><?php endif ?>
+                <?php if ($canEditVolume): ?><button type="button" role="menuitem" class="lr-action-menu-item" data-lr-volume-edit-open aria-haspopup="dialog" aria-controls="lrVolumeEditDialog">Edit Laba Rugi</button><?php endif ?>
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-bopo-open aria-haspopup="dialog" aria-controls="lrBopoDialog">Laporan BOPO</button>
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-export-open aria-haspopup="dialog" aria-controls="lrExportDialog">Export Document</button>
                 <span class="lr-action-menu-divider" aria-hidden="true"></span>
@@ -236,7 +228,7 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
     <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-lr-volume-unit-close>Batal</button><button type="button" class="btn btn-primary" data-lr-volume-unit-continue>Lanjutkan</button></footer>
 </dialog>
 
-<dialog id="lrVolumeEditDialog" class="lr-settings-dialog lr-volume-edit-dialog" aria-labelledby="lrVolumeEditTitle" data-auto-open="<?= $lrEditAutoOpen ? 'true' : 'false' ?>" data-lr-volume-edit-period-label="<?= esc($selectedBasis . ' ' . ($lrMonths[$selectedMonth] ?? '') . ' ' . $selectedYear, 'attr') ?>"<?= $lrEditAutoOpen ? ' open' : '' ?>>
+<dialog id="lrVolumeEditDialog" class="lr-settings-dialog lr-volume-edit-dialog" aria-labelledby="lrVolumeEditTitle" data-auto-open="<?= $lrEditAutoOpen ? 'true' : 'false' ?>" data-lr-volume-edit-period-label="<?= esc($selectedBasis . ' ' . ($lrMonths[$selectedMonth] ?? '') . ' ' . $selectedYear, 'attr') ?>">
     <header class="lr-settings-header">
         <div><p class="eyebrow">AKUTANSI / LAPORAN LABA RUGI</p><h2 id="lrVolumeEditTitle">Edit Laba Rugi · <span data-lr-volume-edit-unit-label><?= esc($volumeEditDefaultUnit) ?></span></h2></div>
         <button type="button" class="icon-btn" data-lr-volume-edit-close aria-label="Tutup edit Volume">×</button>
@@ -314,45 +306,8 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
 <script id="lrVolumeEditReports" type="application/json"><?= json_encode($volumeEditReportsByUnit, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 <script id="lrEditCalculationRules" type="application/json"><?= json_encode($editCalculationRules, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 <script id="lrEditGroupRules" type="application/json"><?= json_encode($editGroupRules, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
-<script>
-(() => {
-    const unitDialog = document.getElementById('lrVolumeUnitDialog');
-    const editDialog = document.getElementById('lrVolumeEditDialog');
-    const show = (dialog) => {
-        if (!dialog || dialog.open) return;
-        if (typeof dialog.showModal === 'function') {
-            dialog.showModal();
-            return;
-        }
-        dialog.setAttribute('open', '');
-    };
-    const close = (dialog) => {
-        if (!dialog) return;
-        if (typeof dialog.close === 'function') dialog.close();
-        else dialog.removeAttribute('open');
-    };
-    document.querySelectorAll('[data-lr-volume-edit-open]').forEach((button) => {
-        button.addEventListener('click', () => show(unitDialog));
-    });
-    unitDialog?.querySelectorAll('[data-lr-volume-unit-close]').forEach((button) => {
-        button.addEventListener('click', () => close(unitDialog));
-    });
-    editDialog?.querySelectorAll('[data-lr-volume-edit-close]').forEach((button) => {
-        button.addEventListener('click', () => close(editDialog));
-    });
-    unitDialog?.querySelector('[data-lr-volume-unit-continue]')?.addEventListener('click', () => {
-        const month = unitDialog.querySelector('[data-lr-edit-period-month]');
-        const year = unitDialog.querySelector('[data-lr-edit-period-year]');
-        if (!(month instanceof HTMLSelectElement) || !(year instanceof HTMLInputElement) || !year.reportValidity()) return;
-        const url = new URL(window.location.href);
-        url.searchParams.set('bulan', month.value);
-        url.searchParams.set('tahun', year.value);
-        url.searchParams.set('edit', '1');
-        window.location.assign(url.toString());
-    });
-    if (editDialog?.dataset.autoOpen === 'true') show(editDialog);
-})();
-</script>
+<?php $lrPopupScript = FCPATH . 'assets/lr-volume-editor-popup.js'; $lrPopupVersion = is_file($lrPopupScript) ? (md5_file($lrPopupScript) ?: '1') : '1'; ?>
+<script src="<?= base_url('assets/lr-volume-editor-popup.js') ?>?v=<?= esc($lrPopupVersion, 'attr') ?>" defer></script>
 <?php endif ?>
 
 <dialog id="lrUploadDialog" class="lr-settings-dialog" aria-labelledby="lrUploadTitle" data-auto-open="<?= $lrUploadError !== null ? 'true' : 'false' ?>">
