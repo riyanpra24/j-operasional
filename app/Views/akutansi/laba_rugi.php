@@ -7,6 +7,14 @@ $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($s
 $volumeEditUnits = \App\Libraries\RkaCalculator::SOURCE_UNITS;
 $canEditVolume = $isAdmin;
 $volumeEditDefaultUnit = in_array($selectedUnit, $volumeEditUnits, true) ? $selectedUnit : $volumeEditUnits[0];
+$lrEditUrl = site_url('akutansi/laba-rugi?' . http_build_query([
+    'unit_kerja' => $selectedUnit,
+    'jenis_laporan' => $selectedBasis,
+    'bulan' => $selectedMonth,
+    'tahun' => $selectedYear,
+    'lob' => $selectedLobs,
+    'edit' => '1',
+]));
 $volumeEditColumns = ['KUR', 'PEN', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF', 'TOTAL'];
 $volumeEditRows = [];
 $editGroupRules = [];
@@ -95,7 +103,7 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
             </summary>
             <div class="lr-action-menu-popover" role="menu" aria-label="Menu Laporan Laba Rugi">
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-upload-open aria-haspopup="dialog" aria-controls="lrUploadDialog">Upload Kertas Kerja</button>
-                <?php if ($canEditVolume): ?><button type="button" role="menuitem" class="lr-action-menu-item" data-lr-volume-edit-open aria-haspopup="dialog" aria-controls="lrVolumeEditDialog">Edit Laba Rugi</button><?php endif ?>
+                <?php if ($canEditVolume): ?><a href="<?= esc($lrEditUrl, 'attr') ?>" role="menuitem" class="lr-action-menu-item" aria-controls="lrVolumeEditDialog">Edit Laba Rugi</a><?php endif ?>
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-bopo-open aria-haspopup="dialog" aria-controls="lrBopoDialog">Laporan BOPO</button>
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-export-open aria-haspopup="dialog" aria-controls="lrExportDialog">Export Document</button>
                 <span class="lr-action-menu-divider" aria-hidden="true"></span>
@@ -228,7 +236,7 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
     <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-lr-volume-unit-close>Batal</button><button type="button" class="btn btn-primary" data-lr-volume-unit-continue>Lanjutkan</button></footer>
 </dialog>
 
-<dialog id="lrVolumeEditDialog" class="lr-settings-dialog lr-volume-edit-dialog" aria-labelledby="lrVolumeEditTitle" data-auto-open="<?= $lrEditAutoOpen ? 'true' : 'false' ?>" data-lr-volume-edit-period-label="<?= esc($selectedBasis . ' ' . ($lrMonths[$selectedMonth] ?? '') . ' ' . $selectedYear, 'attr') ?>">
+<dialog id="lrVolumeEditDialog" class="lr-settings-dialog lr-volume-edit-dialog" aria-labelledby="lrVolumeEditTitle" data-auto-open="<?= $lrEditAutoOpen ? 'true' : 'false' ?>" data-lr-volume-edit-period-label="<?= esc($selectedBasis . ' ' . ($lrMonths[$selectedMonth] ?? '') . ' ' . $selectedYear, 'attr') ?>"<?= $lrEditAutoOpen ? ' open' : '' ?>>
     <header class="lr-settings-header">
         <div><p class="eyebrow">AKUTANSI / LAPORAN LABA RUGI</p><h2 id="lrVolumeEditTitle">Edit Laba Rugi · <span data-lr-volume-edit-unit-label><?= esc($volumeEditDefaultUnit) ?></span></h2></div>
         <button type="button" class="icon-btn" data-lr-volume-edit-close aria-label="Tutup edit Volume">×</button>
