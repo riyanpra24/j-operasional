@@ -3,7 +3,8 @@
 <?php $lrMonths = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember']; ?>
 <?php $allLobs = \App\Libraries\LrRealizationService::LOB_COLUMNS;
 $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($selectedLobs) <= 2 ? implode(', ', $selectedLobs) : count($selectedLobs) . ' LOB dipilih'); ?>
-<?php $volumeEditUnits = \App\Libraries\RkaCalculator::SOURCE_UNITS;
+<?php $isSimulatedImport = $lrImport !== null && (($lrResult['rule'] ?? '') === \App\Libraries\LrRealizationCalculator::WORKPAPER_RULE);
+$volumeEditUnits = \App\Libraries\RkaCalculator::SOURCE_UNITS;
 $canEditVolume = $isAdmin && array_filter(
     (array) $volumeEditReportsByUnit,
     static fn (mixed $report): bool => is_array($report) && $report !== [],
