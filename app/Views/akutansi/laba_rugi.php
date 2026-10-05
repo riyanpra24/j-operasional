@@ -5,10 +5,7 @@
 $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($selectedLobs) <= 2 ? implode(', ', $selectedLobs) : count($selectedLobs) . ' LOB dipilih'); ?>
 <?php $isSimulatedImport = $lrImport !== null && (($lrResult['rule'] ?? '') === \App\Libraries\LrRealizationCalculator::WORKPAPER_RULE);
 $volumeEditUnits = \App\Libraries\RkaCalculator::SOURCE_UNITS;
-$canEditVolume = $isAdmin && array_filter(
-    (array) $volumeEditReportsByUnit,
-    static fn (mixed $report): bool => is_array($report) && $report !== [],
-) !== [];
+$canEditVolume = $isAdmin;
 $volumeEditDefaultUnit = in_array($selectedUnit, $volumeEditUnits, true) ? $selectedUnit : $volumeEditUnits[0];
 $volumeEditColumns = ['KUR', 'PEN', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF', 'TOTAL'];
 $volumeEditRows = [];
@@ -314,16 +311,26 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
     const unitDialog = document.getElementById('lrVolumeUnitDialog');
     const editDialog = document.getElementById('lrVolumeEditDialog');
     const show = (dialog) => {
-        if (dialog instanceof HTMLDialogElement && !dialog.open) dialog.showModal();
+        if (!dialog || dialog.open) return;
+        if (typeof dialog.showModal === 'function') {
+            dialog.showModal();
+            return;
+        }
+        dialog.setAttribute('open', '');
+    };
+    const close = (dialog) => {
+        if (!dialog) return;
+        if (typeof dialog.close === 'function') dialog.close();
+        else dialog.removeAttribute('open');
     };
     document.querySelectorAll('[data-lr-volume-edit-open]').forEach((button) => {
         button.addEventListener('click', () => show(unitDialog));
     });
     unitDialog?.querySelectorAll('[data-lr-volume-unit-close]').forEach((button) => {
-        button.addEventListener('click', () => unitDialog.close());
+        button.addEventListener('click', () => close(unitDialog));
     });
     editDialog?.querySelectorAll('[data-lr-volume-edit-close]').forEach((button) => {
-        button.addEventListener('click', () => editDialog.close());
+        button.addEventListener('click', () => close(editDialog));
     });
     unitDialog?.querySelector('[data-lr-volume-unit-continue]')?.addEventListener('click', () => {
         const month = unitDialog.querySelector('[data-lr-edit-period-month]');
