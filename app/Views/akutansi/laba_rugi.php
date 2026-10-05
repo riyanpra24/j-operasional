@@ -4,6 +4,33 @@
 <?php $allLobs = \App\Libraries\LrRealizationService::LOB_COLUMNS;
 $lobSummary = count($selectedLobs) === count($allLobs) ? 'Semua LOB' : (count($selectedLobs) <= 2 ? implode(', ', $selectedLobs) : count($selectedLobs) . ' LOB dipilih'); ?>
 <?php $isSimulatedImport = $lrImport !== null && (($lrResult['rule'] ?? '') === \App\Libraries\LrRealizationCalculator::WORKPAPER_RULE); ?>
+<?php $volumeEditUnits = \App\Libraries\RkaCalculator::SOURCE_UNITS;
+$canEditVolume = $isAdmin && $isSimulatedImport;
+$volumeEditDefaultUnit = in_array($selectedUnit, $volumeEditUnits, true) ? $selectedUnit : $volumeEditUnits[0];
+$volumeEditColumns = ['KUR', 'PEN', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF', 'TOTAL'];
+$volumeEditRows = [];
+$editGroupRules = [];
+$volumeEditSectionKeys = array_map(static fn (string $label): string => \App\Libraries\OracleLrSalaryParser::normalizeLabel($label), ['PENDAPATAN INVESTASI BERSIH', 'BEBAN USAHA']);
+foreach (\App\Libraries\LrReportRows::rows() as $reportRow) {
+    $groupKey = \App\Libraries\OracleLrSalaryParser::normalizeLabel((string) ($reportRow['value_label'] ?? $reportRow['label']));
+    $details = [];
+    foreach ($reportRow['details'] ?? [] as $detailRow) {
+        $details[] = ['label' => $detailRow['label'], 'key' => \App\Libraries\OracleLrSalaryParser::normalizeLabel((string) $detailRow['label']), 'type' => $detailRow['type']];
+    }
+    $volumeEditRows[] = ['label' => $reportRow['label'], 'key' => $groupKey, 'type' => $reportRow['type'], 'group' => $details !== [], 'section' => in_array($groupKey, $volumeEditSectionKeys, true), 'details' => $details];
+    if ($details !== [] && !in_array($groupKey, array_column($details, 'key'), true)) $editGroupRules[$groupKey] = array_column($details, 'key');
+    foreach ($details as $detailRow) $volumeEditRows[] = $detailRow + ['group' => false, 'parent' => $groupKey];
+}
+$schemaKeys = [];
+$automaticEditKeys = [];
+$editCalculationRules = [];
+foreach (\App\Libraries\RkaCalculator::schema()['rows'] as $rowNumber => $definition) $schemaKeys[(int) $rowNumber] = \App\Libraries\OracleLrSalaryParser::normalizeLabel((string) $definition['label']);
+foreach (\App\Libraries\RkaCalculator::schema()['rows'] as $definition) {
+    if ($definition['terms'] === null) continue;
+    $key = \App\Libraries\OracleLrSalaryParser::normalizeLabel((string) $definition['label']);
+    $automaticEditKeys[$key] = true;
+    $editCalculationRules[$key] = array_map(static fn (array $term): array => ['key' => $schemaKeys[(int) $term['row']] ?? '', 'coefficient' => (int) $term['coefficient']], $definition['terms']);
+} ?>
 <?php $bopoPercent = static fn (?string $value): string => $value === null ? '—' : \App\Libraries\LrMoney::percentageDisplayFixed($value, 2);
 $bopoAchievement = static fn (?string $value): string => $value === null ? '—' : \App\Libraries\LrMoney::percentageDisplay($value); ?>
 
@@ -68,6 +95,7 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
             </summary>
             <div class="lr-action-menu-popover" role="menu" aria-label="Menu Laporan Laba Rugi">
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-upload-open aria-haspopup="dialog" aria-controls="lrUploadDialog">Upload Kertas Kerja</button>
+                <?php if ($canEditVolume): ?><button type="button" role="menuitem" class="lr-action-menu-item" data-lr-volume-edit-open aria-haspopup="dialog" aria-controls="lrVolumeEditDialog">Edit Laba Rugi</button><?php endif ?>
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-bopo-open aria-haspopup="dialog" aria-controls="lrBopoDialog">Laporan BOPO</button>
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-lr-export-open aria-haspopup="dialog" aria-controls="lrExportDialog">Export Document</button>
                 <span class="lr-action-menu-divider" aria-hidden="true"></span>
@@ -175,6 +203,110 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
         <footer class="lr-settings-footer lr-upload-footer"><button type="button" class="btn btn-secondary" data-lr-export-close>Batal</button><button type="submit" class="btn btn-primary">Export Excel</button></footer>
     </form>
 </dialog>
+
+<?php if ($canEditVolume): ?>
+<dialog id="lrVolumeUnitDialog" class="lr-settings-dialog lr-volume-unit-dialog" aria-labelledby="lrVolumeUnitTitle">
+    <header class="lr-settings-header">
+        <div><p class="eyebrow">AKUTANSI / LAPORAN LABA RUGI</p><h2 id="lrVolumeUnitTitle">Pilih Periode Laporan</h2></div>
+        <button type="button" class="icon-btn" data-lr-volume-unit-close aria-label="Tutup pilihan periode">×</button>
+    </header>
+    <div class="lr-settings-body">
+        <p>Pilih bulan dan tahun laporan yang akan diedit.</p>
+        <div class="modal-form-grid">
+            <div class="form-group">
+                <label for="lrEditPeriodMonth">Bulan</label>
+                <select class="lr-upload-select" id="lrEditPeriodMonth" data-lr-edit-period-month>
+                    <?php foreach ($lrMonths as $monthNumber => $monthName): ?><option value="<?= $monthNumber ?>"<?= $monthNumber === $selectedMonth ? ' selected' : '' ?>><?= esc($monthName) ?></option><?php endforeach ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="lrEditPeriodYear">Tahun</label>
+                <input class="lr-upload-select" id="lrEditPeriodYear" data-lr-edit-period-year type="number" min="2000" max="2100" step="1" value="<?= (int) $selectedYear ?>">
+            </div>
+        </div>
+    </div>
+    <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-lr-volume-unit-close>Batal</button><button type="button" class="btn btn-primary" data-lr-volume-unit-continue>Lanjutkan</button></footer>
+</dialog>
+
+<dialog id="lrVolumeEditDialog" class="lr-settings-dialog lr-volume-edit-dialog" aria-labelledby="lrVolumeEditTitle" data-auto-open="<?= $lrEditAutoOpen ? 'true' : 'false' ?>" data-lr-volume-edit-period-label="<?= esc($selectedBasis . ' ' . ($lrMonths[$selectedMonth] ?? '') . ' ' . $selectedYear, 'attr') ?>">
+    <header class="lr-settings-header">
+        <div><p class="eyebrow">AKUTANSI / LAPORAN LABA RUGI</p><h2 id="lrVolumeEditTitle">Edit Laba Rugi · <span data-lr-volume-edit-unit-label><?= esc($volumeEditDefaultUnit) ?></span></h2></div>
+        <button type="button" class="icon-btn" data-lr-volume-edit-close aria-label="Tutup edit Volume">×</button>
+    </header>
+    <form method="post" action="<?= site_url('akutansi/laba-rugi/edit-volume') ?>" data-lr-volume-edit-form>
+        <?= csrf_field() ?>
+        <input type="hidden" name="unit_kerja" value="<?= esc($volumeEditDefaultUnit, 'attr') ?>" data-lr-volume-edit-unit-input>
+        <input type="hidden" name="jenis_laporan" value="<?= esc($selectedBasis, 'attr') ?>">
+        <input type="hidden" name="bulan" value="<?= (int) $selectedMonth ?>">
+        <input type="hidden" name="tahun" value="<?= (int) $selectedYear ?>">
+        <?php foreach ($selectedLobs as $lob): ?><input type="hidden" name="lob[]" value="<?= esc($lob, 'attr') ?>"><?php endforeach ?>
+        <div class="lr-settings-body lr-volume-edit-body">
+            <p>Seluruh nilai Laba/Rugi dapat diubah. Kolom <strong>Total</strong> dikunci karena dihitung otomatis dari KUR, PEN, dan NON KUR.</p>
+            <div class="lr-edit-unit-filter">
+                <label for="lrEditUnitFilter">Unit kerja yang diedit</label>
+                <select class="lr-upload-select" id="lrEditUnitFilter" data-lr-edit-unit-filter>
+                    <?php foreach ($volumeEditUnits as $volumeEditUnit): ?><option value="<?= esc($volumeEditUnit, 'attr') ?>"<?= $volumeEditUnit === $volumeEditDefaultUnit ? ' selected' : '' ?>><?= esc($volumeEditUnit) ?></option><?php endforeach ?>
+                </select>
+            </div>
+            <section class="panel lr-report-panel lr-volume-editor-panel" aria-label="Tabel edit Laba Rugi">
+                <header class="lr-report-header">
+                    <div>
+                        <p>PT JAMKRINDO KANWIL SURABAYA · <span data-lr-volume-edit-unit-label><?= esc($volumeEditDefaultUnit) ?></span> · Dalam Rupiah (Rp)</p>
+                        <h2>Laba / Rugi (<?= esc($selectedBasis) ?>) <?= esc($lrMonths[$selectedMonth] ?? '') ?> <?= (int) $selectedYear ?></h2>
+                    </div>
+                    <span class="lr-report-year"><?= (int) $selectedYear ?></span>
+                </header>
+                <div class="lr-report-scroll" tabindex="0" role="region" aria-label="Tabel edit laba rugi, dapat digeser ke samping">
+                    <table class="lr-report-table lr-rka-table lr-rka-editable lr-profitloss-table lr-volume-edit-table">
+                        <caption class="lr-report-caption">Edit Laba Rugi</caption>
+                        <colgroup><col class="lr-description-column"><?php foreach ($volumeEditColumns as $column): ?><col class="lr-rka-number-column"><?php endforeach ?></colgroup>
+                        <thead><tr><th scope="col">URAIAN</th><?php foreach ($volumeEditColumns as $column): ?><th scope="col"><?= esc($column) ?></th><?php endforeach ?></tr></thead>
+                        <tbody>
+                            <?php foreach ($volumeEditRows as $row): ?>
+                                <?php if ($row['section'] ?? false): ?>
+                                    <tr class="lr-row-section lr-profitloss-title-row"><th colspan="<?= count($volumeEditColumns) + 1 ?>" scope="row"><?= esc($row['label']) ?></th></tr>
+                                    <?php continue; ?>
+                                <?php endif ?>
+                                <tr class="lr-row-<?= esc($row['type'], 'attr') ?>" data-lr-edit-row-key="<?= esc($row['key'], 'attr') ?>"<?= $row['group'] ? ' data-lr-expandable' : '' ?><?= isset($row['parent']) ? ' id="lr-edit-' . esc($row['parent'], 'attr') . '-' . esc($row['key'], 'attr') . '" data-lr-detail="' . esc($row['parent'], 'attr') . '" hidden' : '' ?>>
+                                    <th scope="row">
+                                        <?php if ($row['group']): ?>
+                                            <button type="button" class="lr-group-toggle" data-lr-toggle="<?= esc($row['key'], 'attr') ?>" aria-expanded="false" aria-controls="<?= esc(implode(' ', array_map(static fn (array $detail): string => 'lr-edit-' . $row['key'] . '-' . $detail['key'], $row['details'])), 'attr') ?>"><span class="lr-group-chevron" aria-hidden="true">›</span><span><?= esc($row['label']) ?></span></button>
+                                        <?php else: ?>
+                                            <?= esc($row['label']) ?>
+                                        <?php endif ?>
+                                    </th>
+                                    <?php foreach ($volumeEditColumns as $column): ?>
+                                        <?php $calculatedCell = $column === 'TOTAL' || isset($automaticEditKeys[$row['key']]); ?>
+                                        <td<?= $column === 'TOTAL' ? ' data-lr-total' : '' ?><?= $calculatedCell ? ' data-rka-calculated="true"' : '' ?>>
+                                            <?php if ($row['group']): ?>
+                                                <span data-lr-edit-output data-lr-group-output data-lr-expanded="false" aria-hidden="false" data-lr-edit-key="<?= esc($row['key'], 'attr') ?>" data-lr-edit-column="<?= esc($column, 'attr') ?>">—</span>
+                                            <?php elseif ($column !== 'TOTAL' && !isset($automaticEditKeys[$row['key']])): ?>
+                                                <input class="lr-rka-input lr-lr-edit-input" name="values[<?= esc($row['key'], 'attr') ?>][<?= esc($column, 'attr') ?>]" data-lr-edit-input data-lr-edit-key="<?= esc($row['key'], 'attr') ?>" data-lr-edit-column="<?= esc($column, 'attr') ?>" type="text" inputmode="decimal" value="" placeholder="-" maxlength="40" autocomplete="off" aria-label="<?= esc($row['label'] . ' — ' . $column . ' dalam rupiah', 'attr') ?>">
+                                            <?php elseif ($column === 'TOTAL'): ?>
+                                                <span data-lr-edit-total data-lr-edit-key="<?= esc($row['key'], 'attr') ?>">—</span>
+                                            <?php else: ?>
+                                                <span data-lr-edit-output data-lr-edit-key="<?= esc($row['key'], 'attr') ?>" data-lr-edit-column="<?= esc($column, 'attr') ?>">—</span>
+                                            <?php endif ?>
+                                        </td>
+                                    <?php endforeach ?>
+                                </tr>
+                            <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="lr-report-footer">Total dan persentase pencapaian dihitung ulang otomatis saat disimpan.</footer>
+            </section>
+        </div>
+        <div class="lr-volume-edit-confirmation">
+            <label class="lr-rka-confirm"><input type="checkbox" name="confirm_replace" value="1" required data-lr-volume-edit-confirm> <span data-lr-volume-edit-confirm-text>Saya mengonfirmasi Laba/Rugi <?= esc($volumeEditDefaultUnit) ?> periode <?= esc($selectedBasis) ?> <?= esc($lrMonths[$selectedMonth] ?? '') ?> <?= (int) $selectedYear ?>. Menyimpan akan mengganti data laporan pada unit dan periode ini.</span></label>
+        </div>
+        <footer class="lr-settings-footer lr-upload-footer"><button type="button" class="btn btn-secondary" data-lr-volume-edit-back>Ganti Periode</button><button type="submit" class="btn btn-primary">Simpan Perubahan</button></footer>
+    </form>
+</dialog>
+<script id="lrVolumeEditReports" type="application/json"><?= json_encode($volumeEditReportsByUnit, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+<script id="lrEditCalculationRules" type="application/json"><?= json_encode($editCalculationRules, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+<script id="lrEditGroupRules" type="application/json"><?= json_encode($editGroupRules, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+<?php endif ?>
 
 <dialog id="lrUploadDialog" class="lr-settings-dialog" aria-labelledby="lrUploadTitle" data-auto-open="<?= $lrUploadError !== null ? 'true' : 'false' ?>">
     <header class="lr-settings-header">

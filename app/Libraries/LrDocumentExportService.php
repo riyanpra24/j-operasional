@@ -103,6 +103,10 @@ final class LrDocumentExportService
             foreach (RkaCalculator::UNITS as $unit) {
                 $values[strtoupper($unit)] = $this->valueGrid((array) ($rkaByUnit[$unit] ?? []), (array) ($realizationByUnit[$unit] ?? []));
             }
+            // Sheet Korporat pada template adalah konsolidasi. Nilai realisasinya
+            // harus selalu berasal dari penjumlahan unit sumber, bukan dari angka
+            // yang tersimpan pada sheet Korporat di kertas kerja.
+            $this->consolidateCorporateActuals($values);
             $audit = [
                 'formulas_preserved' => 0,
                 'system_values_checked' => 0,
@@ -210,6 +214,34 @@ final class LrDocumentExportService
             $this->assertSameAmount($sum, (string) $corporate, 'KORPORAT KANWIL!' . $reference); $checked++;
         }
         return $checked;
+    }
+
+    /**
+     * @param array<string,array<string,string>> $valuesBySheet
+     */
+    private function consolidateCorporateActuals(array &$valuesBySheet): void
+    {
+        $corporate = strtoupper('Korporat Kanwil');
+        if (! isset($valuesBySheet[$corporate])) return;
+
+        foreach (array_keys(RkaCalculator::schema()['rows']) as $row) {
+            foreach (['L', 'M', 'N'] as $column) {
+                $sum = '0.00';
+                foreach (RkaCalculator::SOURCE_UNITS as $source) {
+                    $sum = LrMoney::add($sum, (string) ($valuesBySheet[strtoupper($source)][$column . $row] ?? '0.00'));
+                }
+                $valuesBySheet[$corporate][$column . $row] = $sum;
+            }
+            $actualTotal = LrMoney::add(
+                LrMoney::add($valuesBySheet[$corporate]['L' . $row], $valuesBySheet[$corporate]['M' . $row]),
+                $valuesBySheet[$corporate]['N' . $row],
+            );
+            $valuesBySheet[$corporate]['O' . $row] = $actualTotal;
+            $budgetTotal = (string) ($valuesBySheet[$corporate]['K' . $row] ?? '0.00');
+            $valuesBySheet[$corporate]['P' . $row] = LrMoney::isZero($budgetTotal)
+                ? '0.00'
+                : (LrMoney::divide($actualTotal, $budgetTotal, 18) ?? '0.00');
+        }
     }
 
     private function assertSameAmount(string $expected, string $actual, string $reference, string $tolerance = '0.01'): void

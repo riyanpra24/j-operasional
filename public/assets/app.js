@@ -2675,6 +2675,16 @@
 
 // Oracle LR: approved expense descriptions, fixed source Kanwil, native upload popup.
 (() => {
+    document.addEventListener('pointerdown', (event) => {
+        document.querySelectorAll('details.lr-action-menu[open]').forEach((menu) => {
+            if (!menu.contains(event.target)) menu.removeAttribute('open');
+        });
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        document.querySelectorAll('details.lr-action-menu[open]').forEach((menu) => menu.removeAttribute('open'));
+    });
+
     const dialog = document.querySelector('#lrUploadDialog');
     if (!dialog) return;
     document.querySelectorAll('[data-lr-upload-open]').forEach(button => button.addEventListener('click', () => { button.closest('details')?.removeAttribute('open'); if (!dialog.open) dialog.showModal(); }));
@@ -2707,6 +2717,174 @@
         return dialog;
     };
     bindDialog('#lrBopoDialog', '[data-lr-bopo-open]', '[data-lr-bopo-close]');
+    const volumeUnitDialog = bindDialog('#lrVolumeUnitDialog', '[data-lr-volume-edit-open]', '[data-lr-volume-unit-close]');
+    const volumeDialog = bindDialog('#lrVolumeEditDialog', '.__lr-volume-edit-dialog-opener', '[data-lr-volume-edit-close]');
+    if (volumeUnitDialog && volumeDialog) {
+        const dataElement = document.querySelector('#lrVolumeEditReports');
+        const calculationElement = document.querySelector('#lrEditCalculationRules');
+        const groupRulesElement = document.querySelector('#lrEditGroupRules');
+        const periodMonthField = volumeUnitDialog.querySelector('[data-lr-edit-period-month]');
+        const periodYearField = volumeUnitDialog.querySelector('[data-lr-edit-period-year]');
+        const editUnitField = volumeDialog.querySelector('[data-lr-edit-unit-filter]');
+        const editUnitInput = volumeDialog.querySelector('[data-lr-volume-edit-unit-input]');
+        const editUnitLabels = volumeDialog.querySelectorAll('[data-lr-volume-edit-unit-label]');
+        const editConfirmation = volumeDialog.querySelector('[data-lr-volume-edit-confirm]');
+        const editConfirmationText = volumeDialog.querySelector('[data-lr-volume-edit-confirm-text]');
+        const editInputs = volumeDialog.querySelectorAll('[data-lr-edit-input]');
+        const outputFields = volumeDialog.querySelectorAll('[data-lr-edit-output]');
+        const totalFields = volumeDialog.querySelectorAll('[data-lr-edit-total]');
+        let reportsByUnit = {};
+        let calculationRules = {};
+        let groupRules = {};
+        try { reportsByUnit = JSON.parse(dataElement?.textContent || '{}'); } catch (_) { reportsByUnit = {}; }
+        try { calculationRules = JSON.parse(calculationElement?.textContent || '{}'); } catch (_) { calculationRules = {}; }
+        try { groupRules = JSON.parse(groupRulesElement?.textContent || '{}'); } catch (_) { groupRules = {}; }
+        const formatValue = (value) => {
+            const raw = String(value ?? '').trim();
+            if (!/^[-+]?\d+(?:\.\d+)?$/.test(raw) || /^[-+]?0(?:\.0+)?$/.test(raw)) return '-';
+            const negative = raw.startsWith('-');
+            const [integer, decimal = ''] = raw.replace(/^[-+]/, '').split('.');
+            const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            const fraction = decimal.replace(/0+$/, '').slice(0, 2);
+            return `${negative ? '-' : ''}${grouped}${fraction ? `,${fraction}` : ''}`;
+        };
+        const normalizeInput = (value) => {
+            const raw = String(value ?? '').trim();
+            if (raw === '') return '0';
+            if (/^[-+]?(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(raw)) return raw.replace(/\./g, '').replace(',', '.');
+            return /^[-+]?\d+(?:\.\d{1,2})?$/.test(raw) ? raw : null;
+        };
+        const addValues = (fields) => {
+            const values = [...fields].map((field) => normalizeInput(field instanceof HTMLInputElement ? field.value : field));
+            if (!values.every((value) => value !== null)) return '0';
+            const precision = Math.max(...values.map((value) => (value.split('.')[1] || '').length));
+            const total = values.reduce((sum, value) => {
+                const negative = value.startsWith('-');
+                const [integer, decimal = ''] = value.replace(/^[-+]/, '').split('.');
+                const scaled = BigInt(integer + decimal.padEnd(precision, '0'));
+                return sum + (negative ? -scaled : scaled);
+            }, 0n);
+            const sign = total < 0n ? '-' : '';
+            const digits = (total < 0n ? -total : total).toString().padStart(precision + 1, '0');
+            if (precision === 0) return `${sign}${digits}`;
+            const decimal = digits.slice(-precision).replace(/0+$/, '');
+            return `${sign}${digits.slice(0, -precision)}${decimal ? `.${decimal}` : ''}`;
+        };
+        const refreshAutomaticFields = () => {
+            const currentValues = new Map();
+            const inputKeys = new Set();
+            let valid = true;
+            editInputs.forEach((field) => {
+                const value = normalizeInput(field.value);
+                field.setCustomValidity(value === null ? 'Gunakan format 1.234.567,89 atau 1234567.89.' : '');
+                if (value === null) valid = false;
+                currentValues.set(`${field.dataset.lrEditKey}|${field.dataset.lrEditColumn}`, value ?? '0');
+                inputKeys.add(field.dataset.lrEditKey);
+            });
+            if (!valid) return;
+            inputKeys.forEach((key) => {
+                currentValues.set(`${key}|NON KUR`, addValues(['KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF'].map((column) => currentValues.get(`${key}|${column}`) ?? '0')));
+            });
+            Object.entries(groupRules).forEach(([targetKey, sourceKeys]) => {
+                if (!Array.isArray(sourceKeys)) return;
+                ['KUR', 'PEN', 'NON KUR', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF'].forEach((column) => {
+                    currentValues.set(`${targetKey}|${column}`, addValues(sourceKeys.map((sourceKey) => currentValues.get(`${sourceKey}|${column}`) ?? '0')));
+                });
+            });
+            Object.entries(calculationRules).forEach(([targetKey, terms]) => {
+                if (!Array.isArray(terms)) return;
+                ['KUR', 'PEN', 'NON KUR', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF'].forEach((column) => {
+                    const sourceValues = terms.map((term) => {
+                        const sourceValue = currentValues.get(`${term.key}|${column}`) ?? '0';
+                        return Number(term.coefficient) === -1 ? `-${sourceValue}` : sourceValue;
+                    });
+                    const calculated = addValues(sourceValues);
+                    currentValues.set(`${targetKey}|${column}`, calculated);
+                });
+            });
+            const totalKeys = new Set([
+                ...inputKeys,
+                ...Object.keys(groupRules),
+                ...Object.keys(calculationRules),
+                ...[...outputFields, ...totalFields].map((field) => field.dataset.lrEditKey).filter(Boolean),
+            ]);
+            totalKeys.forEach((key) => currentValues.set(`${key}|TOTAL`, addValues(['KUR', 'PEN', 'NON KUR'].map((column) => currentValues.get(`${key}|${column}`) ?? '0'))));
+            outputFields.forEach((field) => {
+                const value = currentValues.get(`${field.dataset.lrEditKey}|${field.dataset.lrEditColumn}`) ?? '0';
+                field.textContent = formatValue(value);
+            });
+            totalFields.forEach((totalField) => {
+                const total = currentValues.get(`${totalField.dataset.lrEditKey}|TOTAL`) ?? '0';
+                totalField.textContent = formatValue(total);
+            });
+        };
+        const loadSelectedUnit = () => {
+            if (!(editUnitField instanceof HTMLSelectElement)) return;
+            const report = reportsByUnit[editUnitField.value] || {};
+            if (editUnitInput instanceof HTMLInputElement) editUnitInput.value = editUnitField.value;
+            editUnitLabels.forEach((label) => { label.textContent = editUnitField.value; });
+            if (editConfirmation instanceof HTMLInputElement) editConfirmation.checked = false;
+            if (editConfirmationText) {
+                const period = volumeDialog.dataset.lrVolumeEditPeriodLabel || 'periode yang dipilih';
+                editConfirmationText.textContent = `Saya mengonfirmasi Laba/Rugi ${editUnitField.value} periode ${period}. Menyimpan akan mengganti data laporan pada unit dan periode ini.`;
+            }
+            editInputs.forEach((field) => {
+                if (!(field instanceof HTMLInputElement)) return;
+                const row = report[field.dataset.lrEditKey] || {};
+                const display = formatValue(row[field.dataset.lrEditColumn] ?? '0.00');
+                field.value = display === '-' ? '' : display;
+            });
+            refreshAutomaticFields();
+        };
+        editInputs.forEach((field) => {
+            field.addEventListener('input', refreshAutomaticFields);
+            field.addEventListener('focus', () => field.select());
+            field.addEventListener('blur', () => {
+                const value = normalizeInput(field.value);
+                if (value !== null) {
+                    const display = formatValue(value);
+                    field.value = display === '-' ? '' : display;
+                }
+                refreshAutomaticFields();
+            });
+        });
+        editUnitField?.addEventListener('change', loadSelectedUnit);
+        volumeUnitDialog.querySelector('[data-lr-volume-unit-continue]')?.addEventListener('click', () => {
+            if (!(periodMonthField instanceof HTMLSelectElement) || !(periodYearField instanceof HTMLInputElement)) return;
+            const year = Number(periodYearField.value);
+            if (!Number.isInteger(year) || year < 2000 || year > 2100) {
+                periodYearField.setCustomValidity('Masukkan tahun dari 2000 sampai 2100.');
+                periodYearField.reportValidity();
+                return;
+            }
+            periodYearField.setCustomValidity('');
+            const url = new URL(window.location.href);
+            url.searchParams.set('bulan', periodMonthField.value);
+            url.searchParams.set('tahun', String(year));
+            url.searchParams.set('edit', '1');
+            window.location.assign(url.toString());
+        });
+        volumeDialog.querySelector('[data-lr-volume-edit-back]')?.addEventListener('click', () => {
+            volumeDialog.close();
+            if (!volumeUnitDialog.open) volumeUnitDialog.showModal();
+        });
+        if (volumeDialog.dataset.autoOpen === 'true') {
+            loadSelectedUnit();
+            if (!volumeDialog.open) volumeDialog.showModal();
+            // `edit=1` hanya dipakai sekali untuk membuka editor setelah periode dipilih.
+            // Hapus dari alamat halaman agar refresh tidak membuka pop-up lagi.
+            const url = new URL(window.location.href);
+            if (url.searchParams.get('edit') === '1') {
+                url.searchParams.delete('edit');
+                window.history.replaceState(window.history.state, '', url.toString());
+            }
+            volumeDialog.dataset.autoOpen = 'false';
+        }
+    }
+    volumeDialog?.querySelector('[data-lr-volume-edit-form]')?.addEventListener('submit', () => {
+        const button = volumeDialog.querySelector('button[type="submit"]');
+        if (button instanceof HTMLButtonElement) { button.disabled = true; button.textContent = 'Menyimpan…'; }
+    });
     const exportDialog = bindDialog('#lrExportDialog', '[data-lr-export-open]', '[data-lr-export-close]');
     exportDialog?.querySelector('[data-lr-export-form]')?.addEventListener('submit', () => {
         const button = exportDialog.querySelector('button[type="submit"]');

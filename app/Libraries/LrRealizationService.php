@@ -64,6 +64,48 @@ final class LrRealizationService
             $rka[$unit] = $record === null ? null : json_decode($record['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
         }
         $valuesByUnit = (new LrRealizationCalculator())->calculate($results, $rka);
+        $sourceReportEdited = false;
+        foreach ($results as $unit => $result) {
+            if (! is_array($result) || ! isset($valuesByUnit[$unit])) {
+                continue;
+            }
+            $manualReport = $result['manual_report_override']['values'] ?? null;
+            if (is_array($manualReport)) {
+                foreach ($manualReport as $key => $override) {
+                    if (is_string($key) && is_array($override)) {
+                        $valuesByUnit[$unit][$key] = array_merge((array) ($valuesByUnit[$unit][$key] ?? []), $override);
+                    }
+                }
+                $valuesByUnit[$unit] = $this->refreshManualReportPercentages($valuesByUnit[$unit], $rka[$unit] ?? null);
+                $sourceReportEdited = $sourceReportEdited || in_array($unit, RkaCalculator::SOURCE_UNITS, true);
+                continue;
+            }
+            if (isset($result['manual_volume_override'])) {
+                $valuesByUnit[$unit] = $this->refreshManualReportPercentages($valuesByUnit[$unit], $rka[$unit] ?? null);
+                $sourceReportEdited = $sourceReportEdited || in_array($unit, RkaCalculator::SOURCE_UNITS, true);
+            }
+        }
+        if ($sourceReportEdited && isset($valuesByUnit['Korporat Kanwil'])) {
+            $corporateValues = [];
+            foreach (RkaCalculator::SOURCE_UNITS as $source) {
+                foreach ((array) ($valuesByUnit[$source] ?? []) as $key => $row) {
+                    if (! is_string($key) || ! is_array($row)) continue;
+                    foreach (LrRealizationCalculator::VALUE_COLUMNS as $column) {
+                        $corporateValues[$key][$column] = \App\Libraries\LrMoney::add(
+                            (string) ($corporateValues[$key][$column] ?? '0.00'),
+                            (string) ($row[$column] ?? '0.00'),
+                        );
+                    }
+                }
+            }
+            foreach ($corporateValues as $key => $row) {
+                $valuesByUnit['Korporat Kanwil'][$key] = array_merge((array) ($valuesByUnit['Korporat Kanwil'][$key] ?? []), $row);
+            }
+            $valuesByUnit['Korporat Kanwil'] = $this->refreshManualReportPercentages(
+                $valuesByUnit['Korporat Kanwil'],
+                $rka['Korporat Kanwil'] ?? null,
+            );
+        }
 
         return [
             'import' => $latest[$selectedUnit] ?? null,
@@ -73,6 +115,38 @@ final class LrRealizationService
             'basis' => $basis,
             'month' => $month,
         ];
+    }
+
+    /** Recalculate percentage fields after a manual Laba/Rugi adjustment. */
+    private function refreshManualReportPercentages(array $values, ?array $rkaCalculated): array
+    {
+        if ($rkaCalculated === null) {
+            return $values;
+        }
+        foreach (RkaCalculator::schema()['rows'] as $rowNumber => $definition) {
+            $key = OracleLrSalaryParser::normalizeLabel((string) $definition['label']);
+            $reportRow = $values[$key] ?? null;
+            if (! is_array($reportRow)) continue;
+            $budgets = [
+                'KUR' => (string) ($rkaCalculated['C' . $rowNumber] ?? '0.00'),
+                'PEN' => (string) ($rkaCalculated['D' . $rowNumber] ?? '0.00'),
+                'KBG/SURETYSHIP' => (string) ($rkaCalculated['E' . $rowNumber] ?? '0.00'),
+                'KONSUMTIF' => (string) ($rkaCalculated['F' . $rowNumber] ?? '0.00'),
+                'PRODUKTIF' => (string) ($rkaCalculated['G' . $rowNumber] ?? '0.00'),
+                'TOTAL' => (string) ($rkaCalculated['H' . $rowNumber] ?? '0.00'),
+            ];
+            $total = (string) ($reportRow['TOTAL'] ?? '0.00');
+            $values[$key]['%'] = \App\Libraries\LrMoney::isZero($budgets['TOTAL']) ? '0.00'
+                : (\App\Libraries\LrMoney::divide($total, $budgets['TOTAL'], 18) ?? '0.00');
+            $details = [];
+            foreach (['KUR', 'PEN', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF'] as $column) {
+                $details[$column] = \App\Libraries\LrMoney::isZero($budgets[$column]) ? '0.00'
+                    : (\App\Libraries\LrMoney::divide((string) ($reportRow[$column] ?? '0.00'), $budgets[$column], 18) ?? '0.00');
+            }
+            $details['TOTAL'] = $values[$key]['%'];
+            $values[$key]['percentage_details'] = $details;
+        }
+        return $values;
     }
 
     /**

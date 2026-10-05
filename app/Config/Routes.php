@@ -53,6 +53,7 @@ $routes->get('akutansi/dashboard', 'Akutansi::dashboard', ['as' => 'akutansi.das
 $routes->get('akutansi/laba-rugi', 'Akutansi::labaRugi', ['as' => 'akutansi.laba_rugi']);
 $routes->get('akutansi/bopo-ytd', 'Akutansi::bopoYtd', ['as' => 'akutansi.bopo_ytd']);
 $routes->post('akutansi/laba-rugi/upload-excel', 'Akutansi::importLabaRugi', ['as' => 'akutansi.laba_rugi.import']);
+$routes->post('akutansi/laba-rugi/edit-volume', 'Akutansi::updateLabaRugiVolume', ['as' => 'akutansi.laba_rugi.edit_volume']);
 $routes->post('akutansi/laba-rugi/hapus', 'Akutansi::deleteLabaRugi', ['as' => 'akutansi.laba_rugi.delete']);
 $routes->get('akutansi/simulasi-hitung', 'Akutansi::simulasiHitung', ['as' => 'akutansi.simulasi_hitung']);
 $routes->post('akutansi/simulasi-hitung', 'Akutansi::uploadSimulasiHitung', ['as' => 'akutansi.simulasi_hitung.upload']);

@@ -17,12 +17,14 @@ final class AttendanceDisciplineExportService
     private const MAIN_NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
     private const REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships';
     private const OFFICE_REL_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+    private ?DOMDocument $pendingAttendanceStylesDocument = null;
 
     /** @param array<string, mixed> $import
      * @return array{path:string,filename:string}
      */
     public function create(array $import): array
     {
+        $this->pendingAttendanceStylesDocument = null;
         $template = APPPATH . self::TEMPLATE_FILE;
         if (! is_file($template) || ! is_readable($template)) {
             throw new RuntimeException('Template Rekap Kehadiran belum tersedia.');
@@ -75,6 +77,7 @@ final class AttendanceDisciplineExportService
      */
     public function createForImports(array $imports, int $month, int $year): array
     {
+        $this->pendingAttendanceStylesDocument = null;
         if ($imports === []) {
             throw new RuntimeException('Belum ada laporan kehadiran yang dapat diekspor.');
         }
@@ -160,7 +163,12 @@ final class AttendanceDisciplineExportService
             $this->removeConditionalFormatting($summaryDocument);
             $detailCells = $this->cellMap($detailDocument);
             $attendanceStyles = $this->attendanceStyles($zip, $this->rowStyles($detailCells, 8, 6, 36));
-            $this->writeDetailSheet($detailDocument, $periodStart, $periodEnd, $calendar, $data['employees'], $unitName, $attendanceStyles);
+            $attendanceHeaderStyles = $this->attendanceHeaderStyles(
+                $zip,
+                $this->rowStyles($detailCells, 6, 6, 36),
+                $this->rowStyles($detailCells, 7, 6, 36),
+            );
+            $this->writeDetailSheet($detailDocument, $periodStart, $periodEnd, $calendar, $data['employees'], $unitName, $attendanceStyles, $attendanceHeaderStyles);
             $this->writeSummarySheet($summaryDocument, $periodStart, $periodEnd, $calendar, $data['employees'], $unitName);
 
             $this->discardStaleCalculationChain($zip, $relationships);
@@ -197,6 +205,11 @@ final class AttendanceDisciplineExportService
             $detailDocument = $this->loadXml($zip, $detailSheet['path']);
             $detailCells = $this->cellMap($detailDocument);
             $attendanceStyles = $this->attendanceStyles($zip, $this->rowStyles($detailCells, 8, 6, 36));
+            $attendanceHeaderStyles = $this->attendanceHeaderStyles(
+                $zip,
+                $this->rowStyles($detailCells, 6, 6, 36),
+                $this->rowStyles($detailCells, 7, 6, 36),
+            );
 
             $this->removeWorkbookSheet($workbook, $relationships, $summarySheet['node']);
             $usedNames = [];
@@ -231,7 +244,7 @@ final class AttendanceDisciplineExportService
                 $periodEnd = $entry['period_end'];
                 $calendar = new IndonesianHolidayCalendar($this->calendarOverrides($periodStart, $periodEnd));
                 $data = $this->attendanceData($entry['records'], $periodStart, $periodEnd, $calendar, (string) ($import['work_unit'] ?? 'Unit Kerja'));
-                $this->writeDetailSheet($document, $periodStart, $periodEnd, $calendar, $data['employees'], $unitName, $attendanceStyles);
+                $this->writeDetailSheet($document, $periodStart, $periodEnd, $calendar, $data['employees'], $unitName, $attendanceStyles, $attendanceHeaderStyles);
                 $zip->addFromString($sheetPath, $document->saveXML());
             }
 
@@ -361,8 +374,11 @@ final class AttendanceDisciplineExportService
         return $this->displayCode($code);
     }
 
-    /** @param array<string, string> $attendanceStyles */
-    private function writeDetailSheet(DOMDocument $document, \DateTimeImmutable $periodStart, \DateTimeImmutable $periodEnd, IndonesianHolidayCalendar $calendar, array $employees, string $unitName, array $attendanceStyles): void
+    /**
+     * @param array<string, string> $attendanceStyles
+     * @param array<int, array<int, array<string, string>>> $attendanceHeaderStyles
+     */
+    private function writeDetailSheet(DOMDocument $document, \DateTimeImmutable $periodStart, \DateTimeImmutable $periodEnd, IndonesianHolidayCalendar $calendar, array $employees, string $unitName, array $attendanceStyles, array $attendanceHeaderStyles): void
     {
         $cells = $this->cellMap($document);
         $styles = $this->rowStyles($cells, 8, 1, 37);
@@ -380,6 +396,8 @@ final class AttendanceDisciplineExportService
             if ($day <= $daysInPeriod) {
                 $date = $periodStart->modify('+' . ($day - 1) . ' days');
                 $status = $calendar->isNonWorkingDay($date) ? 'OFF' : 'KRJ';
+                $this->setCellStyle($cells[$column . '6'] ?? null, $attendanceHeaderStyles[6][$columnIndex][$status] ?? null);
+                $this->setCellStyle($cells[$column . '7'] ?? null, $attendanceHeaderStyles[7][$columnIndex][$status] ?? null);
             }
             $this->setInlineString($document, $cells[$column . '7'] ?? null, $status);
         }
@@ -558,9 +576,69 @@ final class AttendanceDisciplineExportService
         $fonts->setAttribute('count', (string) count(iterator_to_array($xpath->query('//m:fonts/m:font') ?: [])));
         $fills->setAttribute('count', (string) count(iterator_to_array($xpath->query('//m:fills/m:fill') ?: [])));
         $cellXfs->setAttribute('count', (string) count($styleNodes));
-        $zip->addFromString('xl/styles.xml', $document->saveXML());
+        $this->pendingAttendanceStylesDocument = $document;
 
         return $styles;
+    }
+
+    /**
+     * Gives the date and work-status headers one consistent colour per day:
+     * blue for KRJ and peach for OFF. Their original border, size and alignment
+     * remain intact so the report still follows the approved template.
+     *
+     * @param array<int, string> $dateBaseStyles
+     * @param array<int, string> $statusBaseStyles
+     * @return array<int, array<int, array<string, string>>>
+     */
+    private function attendanceHeaderStyles(ZipArchive $zip, array $dateBaseStyles, array $statusBaseStyles): array
+    {
+        $document = $this->pendingAttendanceStylesDocument ?? $this->loadXml($zip, 'xl/styles.xml');
+        $xpath = new DOMXPath($document);
+        $xpath->registerNamespace('m', self::MAIN_NS);
+        $fonts = $xpath->query('//m:fonts')?->item(0);
+        $fills = $xpath->query('//m:fills')?->item(0);
+        $cellXfs = $xpath->query('//m:cellXfs')?->item(0);
+        if (! $fonts instanceof DOMElement || ! $fills instanceof DOMElement || ! $cellXfs instanceof DOMElement) {
+            throw new RuntimeException('Gaya header template Rekap Kehadiran tidak dapat dibaca.');
+        }
+
+        $styleNodes = iterator_to_array($xpath->query('//m:cellXfs/m:xf') ?: []);
+        $palettes = [
+            'KRJ' => ['fill' => 'FF295C8D', 'font' => 'FFFFFFFF'],
+            'OFF' => ['fill' => 'FFFFF0E3', 'font' => 'FFF00000'],
+        ];
+        $result = [];
+        foreach ([6 => $dateBaseStyles, 7 => $statusBaseStyles] as $row => $baseStyles) {
+            foreach ($baseStyles as $column => $baseStyle) {
+                $baseXf = ctype_digit($baseStyle) ? ($styleNodes[(int) $baseStyle] ?? null) : null;
+                if (! $baseXf instanceof DOMElement) {
+                    throw new RuntimeException('Gaya dasar header template Rekap Kehadiran tidak ditemukan.');
+                }
+                foreach ($palettes as $code => $palette) {
+                    $fontId = $this->appendAttendanceFont($document, $fonts, $baseXf, $palette['font']);
+                    $fillId = $this->appendAttendanceFill($document, $fills, $palette['fill']);
+                    $style = $baseXf->cloneNode(true);
+                    if (! $style instanceof DOMElement) {
+                        throw new RuntimeException('Gaya header absensi tidak dapat dibuat.');
+                    }
+                    $style->setAttribute('fontId', (string) $fontId);
+                    $style->setAttribute('fillId', (string) $fillId);
+                    $style->setAttribute('applyFont', '1');
+                    $style->setAttribute('applyFill', '1');
+                    $styleId = count($styleNodes);
+                    $cellXfs->appendChild($style);
+                    $styleNodes[] = $style;
+                    $result[$row][$column][$code] = (string) $styleId;
+                }
+            }
+        }
+        $fonts->setAttribute('count', (string) count(iterator_to_array($xpath->query('//m:fonts/m:font') ?: [])));
+        $fills->setAttribute('count', (string) count(iterator_to_array($xpath->query('//m:fills/m:fill') ?: [])));
+        $cellXfs->setAttribute('count', (string) count($styleNodes));
+        $zip->addFromString('xl/styles.xml', $document->saveXML());
+        $this->pendingAttendanceStylesDocument = null;
+
+        return $result;
     }
 
     /** @return array<string, array{fill:string,font:string}> */
@@ -716,6 +794,14 @@ final class AttendanceDisciplineExportService
         $text->appendChild($document->createTextNode($value));
         $inline->appendChild($text);
         $cell->appendChild($inline);
+    }
+
+    private function setCellStyle(?DOMElement $cell, ?string $style): void
+    {
+        if (! $cell instanceof DOMElement || $style === null || ! ctype_digit($style)) {
+            return;
+        }
+        $cell->setAttribute('s', $style);
     }
 
     private function setDimension(DOMDocument $document, string $reference): void

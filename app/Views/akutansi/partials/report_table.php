@@ -41,6 +41,7 @@ $renderPercentageDetailRow = static function (string $label, ?string $groupKey =
     return '<tr id="'.esc($percentageDetailId($label), 'attr').'" class="lr-percentage-detail-row" data-lr-percent-detail'.$groupAttribute.' hidden><td colspan="'.(count($columns) + 1).'"><div class="lr-percentage-detail"><div><strong>% Pencapaian per LOB</strong><span>'.esc($label).'</span></div><dl>'.$items.'</dl></div></td></tr>';
 };
 $rows = \App\Libraries\LrReportRows::rows();
+$sectionTitleKeys = array_map(static fn (string $label): string => \App\Libraries\OracleLrSalaryParser::normalizeLabel($label), ['PENDAPATAN INVESTASI BERSIH', 'BEBAN USAHA']);
 // Pendapatan giro dan pendapatan lainnya tetap dipakai oleh perhitungan
 // subtotal, tetapi tidak ditampilkan sebagai rincian pada menu Laba/Rugi.
 foreach ($rows as &$row) {
@@ -57,7 +58,7 @@ unset($row);
     .lr-report-table .lr-percent-expand[aria-expanded=true] i { transform:rotate(90deg); }
 </style>
 
-<section class="panel lr-report-panel" aria-labelledby="lr-report-title">
+<section class="panel lr-report-panel lr-profitloss-report-panel" aria-labelledby="lr-report-title">
     <header class="lr-report-header">
         <div>
             <p>PT JAMKRINDO KANWIL SURABAYA<?php if (isset($selectedUnit)): ?> · <?= esc($selectedUnit) ?><?php endif ?></p>
@@ -84,6 +85,10 @@ unset($row);
             </thead>
             <tbody>
                 <?php foreach ($rows as $row): ?>
+                    <?php if (in_array(\App\Libraries\OracleLrSalaryParser::normalizeLabel((string) $row['label']), $sectionTitleKeys, true)): ?>
+                        <tr class="lr-row-section lr-profitloss-title-row"><th colspan="<?= count($columns) + 1 ?>" scope="row"><?= esc($row['label']) ?></th></tr>
+                        <?php continue; ?>
+                    <?php endif ?>
                     <?php // Seluruh rincian kelompok dimulai tertutup agar tabel Laba/Rugi lebih ringkas saat dibuka. ?>
                     <?php $expanded = false; ?>
                     <?php $valueLabel=$row['value_label']??$row['label']; ?>
