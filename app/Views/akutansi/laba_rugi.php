@@ -206,26 +206,32 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
 
 <?php if ($canEditVolume): ?>
 <dialog id="lrVolumeUnitDialog" class="lr-settings-dialog lr-volume-unit-dialog" aria-labelledby="lrVolumeUnitTitle">
-    <header class="lr-settings-header">
-        <div><p class="eyebrow">AKUTANSI / LAPORAN LABA RUGI</p><h2 id="lrVolumeUnitTitle">Pilih Periode Laporan</h2></div>
-        <button type="button" class="icon-btn" data-lr-volume-unit-close aria-label="Tutup pilihan periode">×</button>
-    </header>
-    <div class="lr-settings-body">
-        <p>Pilih bulan dan tahun laporan yang akan diedit.</p>
-        <div class="modal-form-grid">
-            <div class="form-group">
-                <label for="lrEditPeriodMonth">Bulan</label>
-                <select class="lr-upload-select" id="lrEditPeriodMonth" data-lr-edit-period-month>
-                    <?php foreach ($lrMonths as $monthNumber => $monthName): ?><option value="<?= $monthNumber ?>"<?= $monthNumber === $selectedMonth ? ' selected' : '' ?>><?= esc($monthName) ?></option><?php endforeach ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="lrEditPeriodYear">Tahun</label>
-                <input class="lr-upload-select" id="lrEditPeriodYear" data-lr-edit-period-year type="number" min="2000" max="2100" step="1" value="<?= (int) $selectedYear ?>">
+    <form method="get" action="<?= site_url('akutansi/laba-rugi') ?>">
+        <input type="hidden" name="unit_kerja" value="<?= esc($selectedUnit, 'attr') ?>">
+        <input type="hidden" name="jenis_laporan" value="<?= esc($selectedBasis, 'attr') ?>">
+        <input type="hidden" name="edit" value="1">
+        <?php foreach ($selectedLobs as $lob): ?><input type="hidden" name="lob[]" value="<?= esc($lob, 'attr') ?>"><?php endforeach ?>
+        <header class="lr-settings-header">
+            <div><p class="eyebrow">AKUTANSI / LAPORAN LABA RUGI</p><h2 id="lrVolumeUnitTitle">Pilih Periode Laporan</h2></div>
+            <button type="button" class="icon-btn" data-lr-volume-unit-close aria-label="Tutup pilihan periode">×</button>
+        </header>
+        <div class="lr-settings-body">
+            <p>Pilih bulan dan tahun laporan yang akan diedit.</p>
+            <div class="modal-form-grid">
+                <div class="form-group">
+                    <label for="lrEditPeriodMonth">Bulan</label>
+                    <select class="lr-upload-select" id="lrEditPeriodMonth" name="bulan" data-lr-edit-period-month>
+                        <?php foreach ($lrMonths as $monthNumber => $monthName): ?><option value="<?= $monthNumber ?>"<?= $monthNumber === $selectedMonth ? ' selected' : '' ?>><?= esc($monthName) ?></option><?php endforeach ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="lrEditPeriodYear">Tahun</label>
+                    <input class="lr-upload-select" id="lrEditPeriodYear" name="tahun" data-lr-edit-period-year type="number" min="2000" max="2100" step="1" value="<?= (int) $selectedYear ?>" required>
+                </div>
             </div>
         </div>
-    </div>
-    <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-lr-volume-unit-close>Batal</button><button type="button" class="btn btn-primary" data-lr-volume-unit-continue>Lanjutkan</button></footer>
+        <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-lr-volume-unit-close>Batal</button><button type="submit" class="btn btn-primary">Lanjutkan</button></footer>
+    </form>
 </dialog>
 
 <dialog id="lrVolumeEditDialog" class="lr-settings-dialog lr-volume-edit-dialog" aria-labelledby="lrVolumeEditTitle" data-auto-open="<?= $lrEditAutoOpen ? 'true' : 'false' ?>" data-lr-volume-edit-period-label="<?= esc($selectedBasis . ' ' . ($lrMonths[$selectedMonth] ?? '') . ' ' . $selectedYear, 'attr') ?>">
@@ -306,8 +312,45 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
 <script id="lrVolumeEditReports" type="application/json"><?= json_encode($volumeEditReportsByUnit, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 <script id="lrEditCalculationRules" type="application/json"><?= json_encode($editCalculationRules, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 <script id="lrEditGroupRules" type="application/json"><?= json_encode($editGroupRules, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
-<?php $lrPopupScript = FCPATH . 'assets/lr-volume-editor-popup.js'; $lrPopupVersion = is_file($lrPopupScript) ? (md5_file($lrPopupScript) ?: '1') : '1'; ?>
-<script src="<?= base_url('assets/lr-volume-editor-popup.js') ?>?v=<?= esc($lrPopupVersion, 'attr') ?>" defer></script>
+<script>
+(() => {
+    const initialiseLabaRugiEditorDialog = () => {
+        const unitDialog = document.getElementById('lrVolumeUnitDialog');
+        const editDialog = document.getElementById('lrVolumeEditDialog');
+        if (!(unitDialog instanceof HTMLDialogElement) || !(editDialog instanceof HTMLDialogElement)) return;
+
+        const show = (dialog) => {
+            if (!dialog.open) dialog.showModal();
+        };
+        const close = (dialog) => {
+            if (dialog.open) dialog.close();
+        };
+
+        document.querySelectorAll('[data-lr-volume-edit-open]').forEach((button) => {
+            button.addEventListener('click', () => show(unitDialog));
+        });
+        unitDialog.querySelectorAll('[data-lr-volume-unit-close]').forEach((button) => {
+            button.addEventListener('click', () => close(unitDialog));
+        });
+        editDialog.querySelectorAll('[data-lr-volume-edit-close]').forEach((button) => {
+            button.addEventListener('click', () => close(editDialog));
+        });
+        [unitDialog, editDialog].forEach((dialog) => {
+            dialog.addEventListener('click', (event) => {
+                if (event.target === dialog) close(dialog);
+            });
+        });
+
+        if (editDialog.dataset.autoOpen === 'true') show(editDialog);
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initialiseLabaRugiEditorDialog, { once: true });
+    } else {
+        initialiseLabaRugiEditorDialog();
+    }
+})();
+</script>
 <?php endif ?>
 
 <dialog id="lrUploadDialog" class="lr-settings-dialog" aria-labelledby="lrUploadTitle" data-auto-open="<?= $lrUploadError !== null ? 'true' : 'false' ?>">

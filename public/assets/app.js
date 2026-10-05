@@ -2723,8 +2723,6 @@
         const dataElement = document.querySelector('#lrVolumeEditReports');
         const calculationElement = document.querySelector('#lrEditCalculationRules');
         const groupRulesElement = document.querySelector('#lrEditGroupRules');
-        const periodMonthField = volumeUnitDialog.querySelector('[data-lr-edit-period-month]');
-        const periodYearField = volumeUnitDialog.querySelector('[data-lr-edit-period-year]');
         const editUnitField = volumeDialog.querySelector('[data-lr-edit-unit-filter]');
         const editUnitInput = volumeDialog.querySelector('[data-lr-volume-edit-unit-input]');
         const editUnitLabels = volumeDialog.querySelectorAll('[data-lr-volume-edit-unit-label]');
@@ -2849,21 +2847,6 @@
             });
         });
         editUnitField?.addEventListener('change', loadSelectedUnit);
-        volumeUnitDialog.querySelector('[data-lr-volume-unit-continue]')?.addEventListener('click', () => {
-            if (!(periodMonthField instanceof HTMLSelectElement) || !(periodYearField instanceof HTMLInputElement)) return;
-            const year = Number(periodYearField.value);
-            if (!Number.isInteger(year) || year < 2000 || year > 2100) {
-                periodYearField.setCustomValidity('Masukkan tahun dari 2000 sampai 2100.');
-                periodYearField.reportValidity();
-                return;
-            }
-            periodYearField.setCustomValidity('');
-            const url = new URL(window.location.href);
-            url.searchParams.set('bulan', periodMonthField.value);
-            url.searchParams.set('tahun', String(year));
-            url.searchParams.set('edit', '1');
-            window.location.assign(url.toString());
-        });
         volumeDialog.querySelector('[data-lr-volume-edit-back]')?.addEventListener('click', () => {
             volumeDialog.close();
             if (!volumeUnitDialog.open) volumeUnitDialog.showModal();
