@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Libraries\EssAttendanceReportParser;
 use App\Libraries\EssOvertimeReportParser;
+use App\Libraries\AttendanceDisciplineExportService;
 use App\Libraries\IndonesianHolidayCalendar;
 use App\Models\AgendarisModel;
 use App\Models\SdmAttendanceCalendarModel;
@@ -127,25 +128,45 @@ class Sdm extends BaseController
     public function attendanceOvertime(): string
     {
         $today = new \DateTimeImmutable('now');
-        $selectedMonth = (int) $this->request->getGet('bulan');
-        $selectedYear = (int) $this->request->getGet('tahun');
-        $selectedMonth = $selectedMonth >= 1 && $selectedMonth <= 12 ? $selectedMonth : (int) $today->format('n');
-        $selectedYear = $selectedYear >= 2020 && $selectedYear <= 2100 ? $selectedYear : (int) $today->format('Y');
-
-        $periodStart = new \DateTimeImmutable(sprintf('%04d-%02d-01', $selectedYear, $selectedMonth));
-        $periodEnd = $periodStart->modify('last day of this month');
         $requestedDate = $this->validAttendanceDate((string) $this->request->getGet('tanggal'));
+        $requestedStart = $this->validAttendanceDate((string) $this->request->getGet('dari'));
+        $requestedEnd = $this->validAttendanceDate((string) $this->request->getGet('sampai'));
+
+        if ($requestedStart !== '' && $requestedEnd !== '') {
+            $periodStart = new \DateTimeImmutable($requestedStart);
+            $periodEnd = new \DateTimeImmutable($requestedEnd);
+            if ($periodEnd < $periodStart) {
+                [$periodStart, $periodEnd] = [$periodEnd, $periodStart];
+            }
+        } elseif ($requestedDate !== '') {
+            // Tanggal yang diklik tetap menjadi sumber periode bila tautan lama
+            // belum membawa rentang tanggal.
+            $periodStart = new \DateTimeImmutable($requestedDate);
+            $periodEnd = $periodStart;
+        } else {
+            $selectedMonth = (int) $this->request->getGet('bulan');
+            $selectedYear = (int) $this->request->getGet('tahun');
+            $selectedMonth = $selectedMonth >= 1 && $selectedMonth <= 12 ? $selectedMonth : (int) $today->format('n');
+            $selectedYear = $selectedYear >= 2020 && $selectedYear <= 2100 ? $selectedYear : (int) $today->format('Y');
+            $periodStart = new \DateTimeImmutable(sprintf('%04d-%02d-01', $selectedYear, $selectedMonth));
+            $periodEnd = $periodStart->modify('last day of this month');
+        }
+
+        $selectedMonth = (int) $periodStart->format('n');
+        $selectedYear = (int) $periodStart->format('Y');
+        $rangeStart = $periodStart->format('Y-m-d');
+        $rangeEnd = $periodEnd->format('Y-m-d');
         $hasRequestedDate = $requestedDate !== ''
-            && $requestedDate >= $periodStart->format('Y-m-d')
-            && $requestedDate <= $periodEnd->format('Y-m-d');
+            && $requestedDate >= $rangeStart
+            && $requestedDate <= $rangeEnd;
         $selectedDate = $requestedDate;
         if (! $hasRequestedDate) {
             $selectedDate = $periodStart->format('Y-m-d');
         }
 
         $records = (new SdmOvertimeRecordModel())
-            ->where('overtime_date >=', $periodStart->format('Y-m-d'))
-            ->where('overtime_date <=', $periodEnd->format('Y-m-d'))
+            ->where('overtime_date >=', $rangeStart)
+            ->where('overtime_date <=', $rangeEnd)
             ->orderBy('overtime_date', 'ASC')
             ->orderBy('employee_name', 'ASC')
             ->findAll();
@@ -154,8 +175,8 @@ class Sdm extends BaseController
             ->distinct()
             ->select('sdm_overtime_imports.id, sdm_overtime_imports.source_name, sdm_overtime_imports.period_start, sdm_overtime_imports.period_end, sdm_overtime_imports.row_count')
             ->join('sdm_overtime_records', 'sdm_overtime_records.import_id = sdm_overtime_imports.id')
-            ->where('sdm_overtime_records.overtime_date >=', $periodStart->format('Y-m-d'))
-            ->where('sdm_overtime_records.overtime_date <=', $periodEnd->format('Y-m-d'))
+            ->where('sdm_overtime_records.overtime_date >=', $rangeStart)
+            ->where('sdm_overtime_records.overtime_date <=', $rangeEnd)
             ->orderBy('sdm_overtime_imports.created_at', 'DESC')
             ->get()
             ->getResultArray();
@@ -202,10 +223,12 @@ class Sdm extends BaseController
             'title' => 'Data Lembur | SDM & Teller',
             'selectedMonth' => $selectedMonth,
             'selectedYear' => $selectedYear,
-            'availableYears' => range(2020, max((int) $today->format('Y') + 1, $selectedYear)),
-            'monthLabel' => $this->attendanceMonthLabel($selectedMonth) . ' ' . $selectedYear,
+            'rangeStart' => $rangeStart,
+            'rangeEnd' => $rangeEnd,
+            'monthLabel' => $this->overtimePeriodLabel($rangeStart, $rangeEnd),
             'selectedDate' => $selectedDate,
             'selectedDateLabel' => $this->attendanceDateLabel($selectedDate),
+            'showSelectedHolidayNote' => $hasRequestedDate,
             'calendarDays' => $calendarDays,
             'calendarLeadingDays' => (int) $periodStart->format('N') - 1,
             'overtimeRecords' => $selectedRecords,
@@ -345,6 +368,17 @@ class Sdm extends BaseController
     public function recapSdmJatimAttendance(): string|RedirectResponse
     {
         $file = $this->request->getFile('attendance_file');
+        $workUnit = trim((string) $this->request->getPost('unit_kerja'));
+        $reportMonth = (int) $this->request->getPost('bulan');
+        $reportYear = (int) $this->request->getPost('tahun');
+
+        if (! in_array($workUnit, $this->attendanceWorkUnitOptions(), true)
+            || $reportMonth < 1 || $reportMonth > 12 || $reportYear < 2020 || $reportYear > 2100) {
+            return view('sdm/sdm_jatim', $this->attendancePageData(
+                null,
+                'Pilih unit kerja, bulan, dan tahun laporan terlebih dahulu.',
+            ));
+        }
 
         if ($file === null || ! $file->isValid()) {
             return view('sdm/sdm_jatim', $this->attendancePageData(
@@ -371,6 +405,30 @@ class Sdm extends BaseController
             $hash = hash_file('sha256', $file->getTempName());
             if ($hash === false) {
                 throw new RuntimeException('Identitas file Employee Attendance Report ESS tidak dapat dibaca.');
+            }
+
+            $report = (new EssAttendanceReportParser())->parse(
+                $file->getTempName(),
+                $file->getClientName(),
+            );
+            $essPeriod = new \DateTimeImmutable((string) ($report['date_period_start'] ?? $report['period_start']));
+            if ((int) $essPeriod->format('n') !== $reportMonth || (int) $essPeriod->format('Y') !== $reportYear) {
+                $essPeriodLabel = $this->attendanceMonthLabel((int) $essPeriod->format('n')) . ' ' . $essPeriod->format('Y');
+                $selectedPeriodLabel = $this->attendanceMonthLabel($reportMonth) . ' ' . $reportYear;
+
+                return redirect()->to(site_url('sdm/data-kehadiran'))->with(
+                    'error',
+                    'Unggahan dibatalkan. Bulan pada kolom Date file ESS adalah ' . $essPeriodLabel
+                    . ', sedangkan periode yang dipilih di sistem adalah ' . $selectedPeriodLabel . '. Pilih periode yang sesuai lalu unggah kembali.'
+                );
+            }
+            $detectedWorkUnit = $report['detected_work_unit'] ?? null;
+            if (is_string($detectedWorkUnit) && $detectedWorkUnit !== '' && $detectedWorkUnit !== $workUnit) {
+                return redirect()->to(site_url('sdm/data-kehadiran'))->with(
+                    'error',
+                    'Unggahan dibatalkan. Kolom Organization Unit pada file ESS terdeteksi sebagai ' . $detectedWorkUnit
+                    . ', sedangkan unit kerja yang dipilih adalah ' . $workUnit . '. Pilih unit kerja yang sesuai lalu unggah kembali.'
+                );
             }
 
             $importModel = new SdmAttendanceImportModel();
@@ -400,11 +458,7 @@ class Sdm extends BaseController
                     ->with('success', 'File yang sama sudah pernah disimpan. Rekap tersimpan ditampilkan kembali.');
             }
 
-            $report = (new EssAttendanceReportParser())->parse(
-                $file->getTempName(),
-                $file->getClientName(),
-            );
-            $importId = $this->saveAttendanceReport($report, $hash);
+            $importId = $this->saveAttendanceReport($report, $hash, $workUnit, $reportMonth, $reportYear);
 
             return redirect()->to(site_url('sdm/data-kehadiran?import_id=' . $importId))
                 ->with('success', 'Data Employee Attendance Report ESS berhasil dipetakan dan disimpan otomatis.');
@@ -412,6 +466,74 @@ class Sdm extends BaseController
             log_message('warning', 'Import Employee Attendance Report ESS gagal: {message}', ['message' => $exception->getMessage()]);
 
             return view('sdm/sdm_jatim', $this->attendancePageData(null, $exception->getMessage()));
+        }
+    }
+
+    public function exportSdmJatimAttendance(): ResponseInterface|RedirectResponse
+    {
+        $workUnit = trim((string) $this->request->getPost('unit_kerja'));
+        $month = (int) $this->request->getPost('bulan');
+        $year = (int) $this->request->getPost('tahun');
+        $returnUrl = site_url('sdm/data-kehadiran');
+        $allWorkUnits = $workUnit === '__all__';
+        $imports = [];
+        if ($month >= 1 && $month <= 12 && $year >= 2020 && $year <= 2100 && ($allWorkUnits || $workUnit !== '')) {
+            $periodStart = sprintf('%04d-%02d-01', $year, $month);
+            $periodEnd = (new \DateTimeImmutable($periodStart))->modify('last day of this month')->format('Y-m-d');
+            $importModel = new SdmAttendanceImportModel();
+            if (! $allWorkUnits) {
+                $importModel->where('work_unit', $workUnit);
+            }
+            $imports = $importModel
+                ->where('period_start >=', $periodStart)
+                ->where('period_start <=', $periodEnd)
+                ->orderBy('work_unit', 'ASC')
+                ->orderBy('id', 'DESC')
+                ->findAll();
+            if ($allWorkUnits) {
+                $seenWorkUnits = [];
+                $imports = array_values(array_filter($imports, static function (array $import) use (&$seenWorkUnits): bool {
+                    $key = mb_strtolower(trim((string) ($import['work_unit'] ?? '')));
+                    if ($key === '' || isset($seenWorkUnits[$key])) {
+                        return false;
+                    }
+                    $seenWorkUnits[$key] = true;
+
+                    return true;
+                }));
+            }
+        }
+        if (! $allWorkUnits && isset($imports[0]['id'])) {
+            $returnUrl .= '?import_id=' . (int) $imports[0]['id'];
+        }
+        if ($imports === []) {
+            return redirect()->to($returnUrl)->with('error', 'Data kehadiran untuk unit kerja dan periode yang dipilih belum tersedia.');
+        }
+
+        try {
+            $exportService = new AttendanceDisciplineExportService();
+            $export = $allWorkUnits
+                ? $exportService->createForImports($imports, $month, $year)
+                : $exportService->create($imports[0]);
+            $contents = file_get_contents($export['path']);
+            if ($contents === false) {
+                throw new RuntimeException('File Rekap Kehadiran belum dapat dibaca.');
+            }
+            unlink($export['path']);
+
+            return $this->response
+                ->setHeader('Cache-Control', 'private, no-store, max-age=0')
+                ->setHeader('X-Content-Type-Options', 'nosniff')
+                ->setHeader('Content-Disposition', 'attachment; filename="' . $export['filename'] . '"')
+                ->setContentType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                ->setBody($contents);
+        } catch (\Throwable $exception) {
+            log_message('warning', 'Export Rekap Kehadiran gagal: {message}', ['message' => $exception->getMessage()]);
+
+            return redirect()->to($returnUrl)->with(
+                'error',
+                $exception instanceof RuntimeException ? $exception->getMessage() : 'Rekap Kehadiran belum dapat diekspor. Silakan coba kembali.'
+            );
         }
     }
 
@@ -524,6 +646,7 @@ class Sdm extends BaseController
     {
         $filters = [
             'name'         => trim((string) $this->request->getGet('nama')),
+            'work_unit'    => trim((string) $this->request->getGet('unit_kerja')),
             'from'         => $this->validAttendanceDate((string) $this->request->getGet('dari')),
             'to'           => $this->validAttendanceDate((string) $this->request->getGet('sampai')),
             'mode'         => $this->request->getGet('mode') === 'detail' ? 'detail' : 'summary',
@@ -533,27 +656,37 @@ class Sdm extends BaseController
         $imports = $importModel
             ->orderBy('period_start', 'DESC')
             ->orderBy('id', 'DESC')
-            ->findAll(24);
+            ->findAll();
+        $workUnits = $this->attendanceWorkUnitOptions($imports);
+        if (! in_array($filters['work_unit'], $workUnits, true)) {
+            $filters['work_unit'] = '';
+        }
         foreach ($imports as &$import) {
             $period = new \DateTimeImmutable($import['period_start']);
-            $import['period_label'] = $this->attendanceMonthLabel((int) $period->format('n')) . ' ' . $period->format('Y');
+            $month = (int) ($import['report_month'] ?? $period->format('n'));
+            $year = (int) ($import['report_year'] ?? $period->format('Y'));
+            $import['period_label'] = $this->attendanceMonthLabel($month) . ' ' . $year;
         }
         unset($import);
 
-        if (($selectedImportId ?? 0) <= 0 && $imports !== []) {
-            $selectedImportId = (int) $imports[0]['id'];
+        $filteredImports = $filters['work_unit'] === ''
+            ? $imports
+            : array_values(array_filter($imports, static fn (array $import): bool => ($import['work_unit'] ?? '') === $filters['work_unit']));
+
+        if (($selectedImportId ?? 0) <= 0 && $filteredImports !== []) {
+            $selectedImportId = (int) $filteredImports[0]['id'];
         }
 
         $selectedImport = null;
-        foreach ($imports as $import) {
+        foreach ($filteredImports as $import) {
             if ((int) $import['id'] === $selectedImportId) {
                 $selectedImport = $import;
                 break;
             }
         }
 
-        if ($selectedImport === null && $imports !== []) {
-            $selectedImport = $imports[0];
+        if ($selectedImport === null && $filteredImports !== []) {
+            $selectedImport = $filteredImports[0];
             $selectedImportId = (int) $selectedImport['id'];
         }
 
@@ -575,7 +708,9 @@ class Sdm extends BaseController
             'title'            => 'Data Kehadiran | SDM & Teller',
             'report'           => $selectedImport !== null ? $this->storedAttendanceReport($selectedImport, $filters) : null,
             'importError'      => $error,
-            'attendanceImports' => $imports,
+            'attendanceImports' => $filteredImports,
+            'attendanceExportImports' => $imports,
+            'attendanceWorkUnits' => $workUnits,
             'selectedImportId' => $selectedImport !== null ? (int) $selectedImport['id'] : null,
             'attendanceFilters' => $filters,
             'attendanceCalendar' => $this->attendanceCalendarPopupData($selectedImport),
@@ -652,7 +787,7 @@ class Sdm extends BaseController
     /**
      * @param array<string, mixed> $report
      */
-    private function saveAttendanceReport(array $report, string $hash): int
+    private function saveAttendanceReport(array $report, string $hash, string $workUnit, int $reportMonth, int $reportYear): int
     {
         $db = db_connect();
         $importModel = new SdmAttendanceImportModel();
@@ -663,8 +798,11 @@ class Sdm extends BaseController
             $importId = $importModel->insert([
                 'source_name'      => $report['source_name'],
                 'source_hash'      => $hash,
+                'work_unit'        => $workUnit,
                 'period_start'     => $report['period_start'],
                 'period_end'       => $report['period_end'],
+                'report_month'     => $reportMonth,
+                'report_year'      => $reportYear,
                 'employee_count'   => $report['summary']['EMPLOYEES'],
                 'row_count'        => $report['summary']['ROWS'],
                 'hadir_count'      => $report['summary']['H'] + $report['summary']['TLBT'] + $report['summary']['ODR'],
@@ -794,6 +932,7 @@ class Sdm extends BaseController
                     'employee_name'  => $record['employee_name'],
                     'position'       => $record['position'],
                     'organization'   => $record['organization'],
+                    'work_unit'      => (string) ($import['work_unit'] ?? 'Kantor Wilayah Surabaya'),
                     'days'           => [],
                     'day_details'    => [],
                     'totals'         => ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'TPA' => 0, 'OFF' => 0],
@@ -989,7 +1128,7 @@ class Sdm extends BaseController
             'source_name'     => $import['source_name'],
             'period_start'    => $import['period_start'],
             'period_end'      => $import['period_end'],
-            'period_label'    => $this->attendanceMonthLabel((int) $period->format('n')) . ' ' . $period->format('Y'),
+            'period_label'    => $this->attendanceMonthLabel((int) ($import['report_month'] ?? $period->format('n'))) . ' ' . (int) ($import['report_year'] ?? $period->format('Y')),
             'days_in_month'   => (int) $period->format('t'),
             'display_start_day' => (int) $displayStart->format('j'),
             'display_end_day' => (int) $displayEnd->format('j'),
@@ -1012,6 +1151,34 @@ class Sdm extends BaseController
         ][$month];
     }
 
+    /**
+     * @param list<array<string, mixed>> $imports
+     * @return list<string>
+     */
+    private function attendanceWorkUnitOptions(array $imports = []): array
+    {
+        $units = [
+            'Kantor Wilayah Surabaya',
+            'Kantor Cabang Surabaya',
+            'Kantor Cabang Kediri',
+            'Kantor Cabang Malang',
+            'Kantor Cabang Madiun',
+            'Kantor Cabang Banyuwangi',
+        ];
+
+        foreach ($imports as $import) {
+            $unit = trim((string) ($import['work_unit'] ?? ''));
+            if ($unit !== '') {
+                $units[] = $unit;
+            }
+        }
+
+        $units = array_values(array_unique($units));
+        sort($units, SORT_NATURAL | SORT_FLAG_CASE);
+
+        return $units;
+    }
+
     private function attendanceDateLabel(string $date): string
     {
         $value = new \DateTimeImmutable($date);
@@ -1023,12 +1190,22 @@ class Sdm extends BaseController
     {
         $startDate = new \DateTimeImmutable($start);
         $endDate = new \DateTimeImmutable($end);
+        if ($startDate->format('Y-m-d') === $endDate->format('Y-m-d')) {
+            return $this->attendanceDateLabel($start);
+        }
         if ($startDate->format('Y-m') === $endDate->format('Y-m')) {
-            return $this->attendanceMonthLabel((int) $startDate->format('n')) . ' ' . $startDate->format('Y');
+            return $startDate->format('j') . ' – ' . $endDate->format('j') . ' '
+                . $this->attendanceMonthLabel((int) $startDate->format('n')) . ' ' . $startDate->format('Y');
+        }
+        if ($startDate->format('Y') === $endDate->format('Y')) {
+            return $startDate->format('j') . ' ' . $this->attendanceMonthLabel((int) $startDate->format('n'))
+                . ' – ' . $endDate->format('j') . ' ' . $this->attendanceMonthLabel((int) $endDate->format('n'))
+                . ' ' . $endDate->format('Y');
         }
 
         return $startDate->format('j') . ' ' . $this->attendanceMonthLabel((int) $startDate->format('n'))
-            . ' – ' . $endDate->format('j') . ' ' . $this->attendanceMonthLabel((int) $endDate->format('n')) . ' ' . $endDate->format('Y');
+            . ' ' . $startDate->format('Y') . ' – ' . $endDate->format('j') . ' '
+            . $this->attendanceMonthLabel((int) $endDate->format('n')) . ' ' . $endDate->format('Y');
     }
 
     /**

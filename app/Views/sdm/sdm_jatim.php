@@ -4,6 +4,8 @@
 <?php
 /** @var array<string, mixed>|null $report */
 /** @var list<array<string, mixed>> $attendanceImports */
+/** @var list<array<string, mixed>> $attendanceExportImports */
+/** @var list<string> $attendanceWorkUnits */
 /** @var int|null $selectedImportId */
 /** @var array<string, string> $attendanceFilters */
 
@@ -23,6 +25,34 @@ $statusLabels = [
 ];
 $displayCodes = ['TLBT' => 'TL', 'TLTAP' => 'TL/TAP'];
 $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'Sab', 7 => 'Min'];
+$monthOptions = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'];
+$uploadYear = (int) date('Y');
+$attendanceExportOptions = [];
+$attendanceExportYears = [];
+$selectedAttendanceImport = null;
+$exportImports = $attendanceExportImports ?? $attendanceImports;
+foreach ($exportImports as $import) {
+    $period = new DateTimeImmutable((string) $import['period_start']);
+    $month = (int) $period->format('n');
+    $year = (int) $period->format('Y');
+    $attendanceExportOptions[] = [
+        'work_unit' => (string) ($import['work_unit'] ?? ''),
+        'month' => $month,
+        'year' => $year,
+    ];
+    $attendanceExportYears[$year] = $year;
+    if ((int) $import['id'] === $selectedImportId) {
+        $selectedAttendanceImport = $import;
+    }
+}
+$attendanceExportYears = array_values($attendanceExportYears);
+rsort($attendanceExportYears, SORT_NUMERIC);
+$exportDefaultUnit = (string) ($selectedAttendanceImport['work_unit'] ?? ($attendanceWorkUnits[0] ?? ''));
+$exportDefaultPeriod = $selectedAttendanceImport !== null
+    ? new DateTimeImmutable((string) $selectedAttendanceImport['period_start'])
+    : null;
+$exportDefaultMonth = (int) ($exportDefaultPeriod?->format('n') ?? date('n'));
+$exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
 ?>
 
 <section class="page-heading sdm-daily-heading">
@@ -49,6 +79,15 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
                 </select>
             </div>
             <div class="form-group">
+                <label for="attendance_work_unit">Unit kerja</label>
+                <select id="attendance_work_unit" name="unit_kerja">
+                    <option value="">Semua unit kerja</option>
+                    <?php foreach ($attendanceWorkUnits as $workUnit): ?>
+                        <option value="<?= esc($workUnit, 'attr') ?>" <?= ($attendanceFilters['work_unit'] ?? '') === $workUnit ? 'selected' : '' ?>><?= esc($workUnit) ?></option>
+                    <?php endforeach ?>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="attendance_name">Nama karyawan</label>
                 <input id="attendance_name" type="search" name="nama" value="<?= esc($attendanceFilters['name'] ?? '', 'attr') ?>" placeholder="Cari nama karyawan" autocomplete="off">
             </div>
@@ -69,6 +108,7 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
                     </summary>
                     <div class="sdm-daily-menu-list">
                         <button type="button" data-open-attendance-upload>Unggah Laporan Kehadiran</button>
+                        <?php if ($attendanceImports !== []): ?><button type="button" data-open-attendance-export>Ekspor Rekap Kehadiran</button><?php endif ?>
                         <span class="sdm-daily-menu-divider" aria-hidden="true"></span>
                         <button type="button" class="is-danger" data-open-attendance-delete>Hapus Laporan Kehadiran</button>
                     </div>
@@ -111,6 +151,7 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
                             <th class="sdm-daily-fixed sdm-daily-name">Nama Karyawan</th>
                             <th class="sdm-daily-fixed sdm-daily-position">Jabatan</th>
                             <th class="sdm-daily-fixed sdm-daily-unit">Bagian</th>
+                            <th class="sdm-daily-fixed sdm-daily-work-unit">Unit Kerja</th>
                             <th class="sdm-daily-total-heading">Total Hadir</th>
                         </tr>
                     </thead>
@@ -126,10 +167,11 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
                                 <td class="sdm-daily-fixed sdm-daily-name"><button type="button" class="sdm-staff-toggle" data-attendance-staff-toggle aria-expanded="false" aria-controls="<?= esc($detailId, 'attr') ?>"><i aria-hidden="true">›</i><span><strong><?= esc($employee['employee_name']) ?></strong><small>Lihat detail kehadiran</small></span></button></td>
                                 <td class="sdm-daily-fixed sdm-daily-position"><?= esc($employee['position'] ?: '-') ?></td>
                                 <td class="sdm-daily-fixed sdm-daily-unit"><?= esc($employee['organization'] ?: '-') ?></td>
+                                <td class="sdm-daily-fixed sdm-daily-work-unit"><?= esc($employee['work_unit'] ?: '-') ?></td>
                                 <td class="sdm-daily-total"><strong><?= $totalPresent ?></strong></td>
                             </tr>
                             <tr id="<?= esc($detailId, 'attr') ?>" class="sdm-staff-detail" hidden>
-                                <td colspan="6">
+                                <td colspan="7">
                                     <div class="sdm-staff-detail-inner">
                                         <div class="sdm-staff-day-table-wrap"><table class="sdm-staff-day-table sdm-staff-horizontal-table"><thead><tr><th>Hari / Tanggal</th>
                                             <?php for ($day = $displayStartDay; $day <= $displayEndDay; $day++): ?>
@@ -211,10 +253,31 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
             <?= csrf_field() ?>
             <div class="modal-body attendance-upload-body">
                 <p>Unggah file <strong>Employee Attendance Report ESS</strong> hasil ekspor Workplace. Sistem akan memetakan data harian secara otomatis.</p>
+                <div class="attendance-upload-meta-grid">
+                    <div class="form-group">
+                        <label for="attendance_upload_unit">Unit kerja <span class="required">*</span></label>
+                        <select id="attendance_upload_unit" name="unit_kerja" required>
+                            <option value="" selected disabled>Pilih unit kerja</option>
+                            <?php foreach ($attendanceWorkUnits as $workUnit): ?><option value="<?= esc($workUnit, 'attr') ?>"><?= esc($workUnit) ?></option><?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="attendance_upload_month">Bulan <span class="required">*</span></label>
+                        <select id="attendance_upload_month" name="bulan" required>
+                            <?php foreach ($monthOptions as $monthNumber => $monthLabel): ?><option value="<?= $monthNumber ?>" <?= $monthNumber === (int) date('n') ? 'selected' : '' ?>><?= esc($monthLabel) ?></option><?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="attendance_upload_year">Tahun <span class="required">*</span></label>
+                        <select id="attendance_upload_year" name="tahun" required>
+                            <?php foreach (range($uploadYear - 2, $uploadYear + 2) as $year): ?><option value="<?= $year ?>" <?= $year === $uploadYear ? 'selected' : '' ?>><?= $year ?></option><?php endforeach ?>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="attendance_file">File Employee Attendance Report ESS <span class="required">*</span></label>
                     <input id="attendance_file" name="attendance_file" type="file" accept=".xls,.html,.htm,application/vnd.ms-excel,text/html" required>
-                    <small>Format .xls dari Workplace, maksimal 5 MB.</small>
+                    <small>Format .xls dari Workplace, maksimal 5 MB. Bulan dan tahun pilihan harus sesuai dengan kolom Date pada file ESS.</small>
                 </div>
             </div>
             <footer class="modal-footer">
@@ -224,6 +287,56 @@ $dayNames = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'S
         </form>
     </section>
 </div>
+
+<?php if ($attendanceImports !== []): ?>
+<div class="input-modal attendance-export-modal" id="attendanceExportModal" hidden aria-hidden="true">
+    <button type="button" class="modal-backdrop" data-close-attendance-export aria-label="Tutup ekspor"></button>
+    <section class="modal-dialog attendance-upload-dialog" role="dialog" aria-modal="true" aria-labelledby="attendanceExportTitle">
+        <header class="modal-header">
+            <div class="modal-title-group">
+                <span class="modal-title-icon" aria-hidden="true">⇩</span>
+                <div>
+                    <p>SDM &amp; TELLER</p>
+                    <h2 id="attendanceExportTitle">Ekspor Rekap Kehadiran</h2>
+                </div>
+            </div>
+            <button class="modal-close" type="button" data-close-attendance-export aria-label="Tutup ekspor">×</button>
+        </header>
+        <form method="post" action="<?= site_url('sdm/data-kehadiran/export') ?>" data-attendance-export-form data-attendance-export-options="<?= esc(json_encode($attendanceExportOptions, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT), 'attr') ?>">
+            <?= csrf_field() ?>
+            <div class="modal-body attendance-upload-body attendance-export-body">
+                <p>Pilih unit kerja dan periode laporan yang ingin diekspor. Pilih semua unit kerja untuk membuat satu file dengan sheet terpisah untuk setiap unit.</p>
+                <div class="attendance-upload-meta-grid">
+                    <div class="form-group">
+                        <label for="attendance_export_unit">Unit kerja <span class="required">*</span></label>
+                        <select id="attendance_export_unit" name="unit_kerja" data-attendance-export-unit required>
+                            <option value="__all__">Semua unit kerja</option>
+                            <?php foreach ($attendanceWorkUnits as $workUnit): ?><option value="<?= esc($workUnit, 'attr') ?>" <?= $workUnit === $exportDefaultUnit ? 'selected' : '' ?>><?= esc($workUnit) ?></option><?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="attendance_export_month">Bulan <span class="required">*</span></label>
+                        <select id="attendance_export_month" name="bulan" data-attendance-export-month required>
+                            <?php foreach ($monthOptions as $monthNumber => $monthLabel): ?><option value="<?= $monthNumber ?>" <?= $monthNumber === $exportDefaultMonth ? 'selected' : '' ?>><?= esc($monthLabel) ?></option><?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="attendance_export_year">Tahun <span class="required">*</span></label>
+                        <select id="attendance_export_year" name="tahun" data-attendance-export-year required>
+                            <?php foreach ($attendanceExportYears as $year): ?><option value="<?= $year ?>" <?= $year === $exportDefaultYear ? 'selected' : '' ?>><?= $year ?></option><?php endforeach ?>
+                        </select>
+                    </div>
+                </div>
+                <p class="attendance-export-note">Pilihan periode disesuaikan otomatis dengan laporan yang tersedia.</p>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-ghost" type="button" data-close-attendance-export>Batal</button>
+                <button class="btn btn-primary" type="submit">Ekspor Dokumen</button>
+            </footer>
+        </form>
+    </section>
+</div>
+<?php endif ?>
 
 <?php if ($selectedImportId !== null): ?>
 <div class="input-modal attendance-delete-modal" id="attendanceDeleteModal" hidden aria-hidden="true">

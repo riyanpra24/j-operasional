@@ -46,13 +46,14 @@ final class LrDocumentExportService
         if (!copy($template, $path)) throw new RuntimeException('Template Realisasi Anggaran belum dapat disiapkan.');
         try {
             $audit = $this->populateWorkbook($path, $year, $rkaByUnit, $realizationByUnit);
+            $this->assertReadyForDownload($path);
         } catch (\Throwable $error) {
             if (is_file($path)) unlink($path);
             throw $error;
         }
         return [
             'path' => $path,
-            'filename' => 'Realisasi_Anggaran_' . $basis . '_' . strtoupper($this->monthName($month)) . '_' . $year . '_SEKANWIL.xlsx',
+            'filename' => 'Realisasi_Anggaran_' . $basis . '_' . strtoupper($this->monthName($month)) . '_' . $year . '_SEKANWIL_' . date('Ymd_His') . '.xlsx',
             'audit' => $audit,
         ];
     }
@@ -123,6 +124,7 @@ final class LrDocumentExportService
             $calc->setAttribute('calcMode', 'auto');
             $calc->setAttribute('fullCalcOnLoad', '1');
             $calc->setAttribute('forceFullCalc', '1');
+            $this->discardStaleCalculationChain($zip, $rels);
             $zip->addFromString('xl/workbook.xml', $workbook->saveXML());
             return $audit;
         } finally {
@@ -262,6 +264,51 @@ final class LrDocumentExportService
     {
         $formula = $cell->getElementsByTagNameNS(self::NS, 'f')->item(0);
         return $formula instanceof DOMElement ? $formula->textContent : null;
+    }
+
+    /**
+     * The template's calculation chain only describes its original cells. Once
+     * values and cached formula results are updated, retaining it makes Excel
+     * repair the exported workbook. Excel will generate a new chain on open.
+     */
+    private function discardStaleCalculationChain(ZipArchive $zip, DOMDocument $relationships): void
+    {
+        $xpath = new DOMXPath($relationships);
+        $xpath->registerNamespace('r', self::REL_NS);
+        foreach ($xpath->query('//r:Relationship[contains(@Type, \'/calcChain\')]') ?: [] as $relationship) {
+            $relationship->parentNode?->removeChild($relationship);
+        }
+
+        $contentTypes = $this->loadXml($zip, '[Content_Types].xml');
+        $contentTypesXPath = new DOMXPath($contentTypes);
+        foreach ($contentTypesXPath->query('//*[local-name() = \'Override\' and @PartName = \'/xl/calcChain.xml\']') ?: [] as $override) {
+            $override->parentNode?->removeChild($override);
+        }
+
+        $zip->deleteName('xl/calcChain.xml');
+        $zip->addFromString('xl/_rels/workbook.xml.rels', $relationships->saveXML());
+        $zip->addFromString('[Content_Types].xml', $contentTypes->saveXML());
+    }
+
+    /** Refuse to deliver a workbook that still contains a stale calculation chain. */
+    private function assertReadyForDownload(string $path): void
+    {
+        $zip = new ZipArchive();
+        if ($zip->open($path, ZipArchive::CHECKCONS) !== true) {
+            throw new RuntimeException('File Excel hasil export tidak valid.');
+        }
+
+        try {
+            $relationships = $zip->getFromName('xl/_rels/workbook.xml.rels') ?: '';
+            $contentTypes = $zip->getFromName('[Content_Types].xml') ?: '';
+            if ($zip->locateName('xl/calcChain.xml') !== false
+                || str_contains($relationships, '/calcChain')
+                || str_contains($contentTypes, '/xl/calcChain.xml')) {
+                throw new RuntimeException('File Excel hasil export masih memuat rantai perhitungan lama.');
+            }
+        } finally {
+            $zip->close();
+        }
     }
 
     private function loadXml(ZipArchive $zip, string $path): DOMDocument

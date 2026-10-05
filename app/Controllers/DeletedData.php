@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\AgendarisModel;
 use App\Models\AccountingRkaBudgetModel;
 use App\Libraries\RkaBudgetService;
+use App\Libraries\LrWorkpaperImportParser;
 use App\Models\DokumenKeluarModel;
 use App\Models\DokumenMasukModel;
 use App\Models\DokumenSpkModel;
@@ -125,6 +126,16 @@ class DeletedData extends BaseController
             }
         }
 
+        if ($type === 'laporan-laba-rugi') {
+            try {
+                $this->restoreLabaRugi($record);
+                return redirect()->to(site_url('data-terhapus'))->with('success', 'Laporan Laba / Rugi berhasil dipulihkan dan dihitung ulang dari file sumber.');
+            } catch (\Throwable $exception) {
+                log_message('warning', 'Pulihkan laporan laba rugi gagal: {message}', ['message' => $exception->getMessage()]);
+                return redirect()->to(site_url('data-terhapus'))->with('error', 'Laporan belum dapat dipulihkan karena file sumber tidak dapat dibaca.');
+            }
+        }
+
         $restored = db_connect()->table($resource['table'])
             ->where('id', $id)
             ->where('deleted_at IS NOT NULL', null, false)
@@ -223,6 +234,52 @@ class DeletedData extends BaseController
         }
 
         return $parts !== [] ? implode(' · ', $parts) : 'Data #' . (int) ($record['id'] ?? 0);
+    }
+
+    /**
+     * Rebuild a deleted report's derived result instead of reviving a stale snapshot.
+     *
+     * @param array<string, mixed> $record
+     */
+    private function restoreLabaRugi(array $record): void
+    {
+        $relativePath = ltrim(str_replace('\\', '/', (string) ($record['source_path'] ?? '')), '/');
+        if (! str_starts_with($relativePath, 'uploads/laba_rugi/')) {
+            throw new \RuntimeException('Lokasi file sumber laporan tidak valid.');
+        }
+
+        $sourcePath = WRITEPATH . str_replace('/', DIRECTORY_SEPARATOR, $relativePath);
+        if (! is_file($sourcePath)) {
+            throw new \RuntimeException('File sumber laporan tidak ditemukan.');
+        }
+
+        $result = (new LrWorkpaperImportParser())->parse(
+            $sourcePath,
+            (int) $record['report_year'],
+            (int) $record['report_month'],
+            (string) $record['report_basis'],
+            true,
+        );
+        $unit = (string) $record['unit_name'];
+        $payload = $result[$unit] ?? null;
+        if (! is_array($payload)) {
+            throw new \RuntimeException('Data unit kerja tidak tersedia di file sumber.');
+        }
+
+        $encoded = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        $restored = db_connect()->table('accounting_lr_imports')
+            ->where('id', (int) $record['id'])
+            ->where('deleted_at IS NOT NULL', null, false)
+            ->update([
+                'result_json' => $encoded,
+                'deleted_at' => null,
+                'deleted_by_role' => null,
+                'deleted_by_name' => null,
+            ]);
+
+        if (! $restored) {
+            throw new \RuntimeException('Data laporan tidak dapat dipulihkan.');
+        }
     }
 
     private function isAdministrator(): bool

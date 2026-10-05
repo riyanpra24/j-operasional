@@ -433,15 +433,9 @@ class Akutansi extends BaseController
         ]);
     }
 
-    public function exportDokumen(): string
+    public function exportDokumen(): RedirectResponse
     {
-        return view('akutansi/export_dokumen', [
-            'title' => 'Export Dokumen',
-            'exportUnits' => RkaCalculator::UNITS,
-            'exportBases' => LrRealizationService::BASES,
-            'selectedYear' => 2026,
-            'selectedMonth' => (int) date('n'),
-        ]);
+        return redirect()->to(site_url('akutansi/laba-rugi'));
     }
 
     public function simulasiHitung(): string
@@ -523,10 +517,23 @@ class Akutansi extends BaseController
 
     public function downloadExportDokumen(): ResponseInterface|RedirectResponse
     {
+        $rawYear = $this->request->getPost('tahun');
+        $rawMonth = $this->request->getPost('bulan');
+        $rawBasis = $this->request->getPost('jenis_laporan');
+        $returnYear = is_string($rawYear) && preg_match('/^\d{4}$/D', $rawYear)
+            && (int) $rawYear >= 2000 && (int) $rawYear <= 2100 ? (int) $rawYear : 2026;
+        $returnMonth = is_string($rawMonth) && preg_match('/^(?:[1-9]|1[0-2])$/D', $rawMonth)
+            ? (int) $rawMonth : 1;
+        $returnBasis = is_string($rawBasis) && in_array(strtoupper($rawBasis), LrRealizationService::BASES, true)
+            ? strtoupper($rawBasis) : 'YTD';
+        $returnUrl = site_url('akutansi/laba-rugi') . '?' . http_build_query([
+            'unit_kerja' => 'Korporat Kanwil',
+            'jenis_laporan' => $returnBasis,
+            'bulan' => $returnMonth,
+            'tahun' => $returnYear,
+        ]);
+
         try {
-            $rawYear = $this->request->getPost('tahun');
-            $rawMonth = $this->request->getPost('bulan');
-            $rawBasis = $this->request->getPost('jenis_laporan');
             if (!is_string($rawYear) || !preg_match('/^\d{4}$/D', $rawYear)
                 || !is_string($rawMonth) || !preg_match('/^(?:[1-9]|1[0-2])$/D', $rawMonth)
                 || !is_string($rawBasis)) {
@@ -552,7 +559,7 @@ class Akutansi extends BaseController
         } catch (Throwable $exception) {
             log_message('warning', 'Export dokumen laba rugi gagal: {message}', ['message' => $exception->getMessage()]);
             $known = $exception instanceof \InvalidArgumentException || get_class($exception) === RuntimeException::class;
-            return redirect()->to(site_url('akutansi/export-dokumen'))->with(
+            return redirect()->to($returnUrl)->with(
                 'error',
                 $known ? $exception->getMessage() : 'Dokumen belum dapat diexport. Silakan coba kembali.'
             );

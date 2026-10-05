@@ -5,7 +5,7 @@
     <div>
         <p class="eyebrow">AKUTANSI</p>
         <h1>Akutansi</h1>
-        <p>Pilih menu laporan, RKA, simulasi hitung, atau export dokumen.</p>
+        <p>Pilih menu laporan, RKA, atau simulasi hitung.</p>
     </div>
 </section>
 
@@ -23,11 +23,6 @@
     <a class="panel accounting-menu-card is-export" href="<?= site_url('akutansi/simulasi-hitung') ?>">
         <span class="accounting-menu-icon" aria-hidden="true">∑</span>
         <span><small>SIMULASI</small><strong>Simulasi Hitung</strong><p>Isi kertas kerja otomatis dari LR Oracle dan unduh hasilnya.</p></span>
-        <b aria-hidden="true">→</b>
-    </a>
-    <a class="panel accounting-menu-card is-export" href="<?= site_url('akutansi/export-dokumen') ?>">
-        <span class="accounting-menu-icon" aria-hidden="true">⇩</span>
-        <span><small>DOKUMEN</small><strong>Export Dokumen</strong><p>Export RKA dan Realisasi dengan format template Deviasi Anggaran.</p></span>
         <b aria-hidden="true">→</b>
     </a>
 </section>

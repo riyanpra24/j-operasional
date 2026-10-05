@@ -30,6 +30,9 @@ final class OracleLrImportService
             $rows=$db->query('SELECT id FROM accounting_lr_imports WHERE unit_name IN ('.$placeholders.') AND report_year = ? AND report_month = ? AND report_basis = ? AND deleted_at IS NULL ORDER BY id DESC FOR UPDATE',[...$units,$year,$month,$basis])->getResultArray();
             if (!$rows) throw new RuntimeException('Data laporan pada bulan dan tahun yang dipilih tidak ditemukan.');
             $ok=$db->table('accounting_lr_imports')->whereIn('id',array_column($rows,'id'))->update([
+                // The report result is a derived snapshot.  Do not retain it after
+                // deletion: a restored report must be rebuilt from its source file.
+                'result_json'=>'{}',
                 'deleted_at'=>date('Y-m-d H:i:s'),'deleted_by_role'=>mb_substr($role,0,80),'deleted_by_name'=>mb_substr($name,0,150),
             ]);
             if (!$ok || !$db->transStatus()) throw new RuntimeException('Laporan belum berhasil dihapus.');

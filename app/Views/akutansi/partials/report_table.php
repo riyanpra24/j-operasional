@@ -41,6 +41,14 @@ $renderPercentageDetailRow = static function (string $label, ?string $groupKey =
     return '<tr id="'.esc($percentageDetailId($label), 'attr').'" class="lr-percentage-detail-row" data-lr-percent-detail'.$groupAttribute.' hidden><td colspan="'.(count($columns) + 1).'"><div class="lr-percentage-detail"><div><strong>% Pencapaian per LOB</strong><span>'.esc($label).'</span></div><dl>'.$items.'</dl></div></td></tr>';
 };
 $rows = \App\Libraries\LrReportRows::rows();
+// Pendapatan giro dan pendapatan lainnya tetap dipakai oleh perhitungan
+// subtotal, tetapi tidak ditampilkan sebagai rincian pada menu Laba/Rugi.
+foreach ($rows as &$row) {
+    if (($row['key'] ?? '') === 'pendapatan-beban-lain') {
+        unset($row['details'], $row['key']);
+    }
+}
+unset($row);
 ?>
 
 <style>

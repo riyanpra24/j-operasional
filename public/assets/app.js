@@ -2582,43 +2582,6 @@
     });
 })();
 
-// Export Dokumen Akuntansi: pilihan unit kerja tetap ringkas dan mudah diperiksa.
-(() => {
-    const form = document.querySelector('[data-export-document-form]');
-    if (!form) return;
-    const units = [...form.querySelectorAll('[data-export-unit]')];
-    const count = form.querySelector('[data-export-unit-count]');
-    const error = form.querySelector('[data-export-unit-error]');
-    const submit = form.querySelector('[data-export-submit]');
-    const sync = () => {
-        const selected = units.filter((unit) => unit.checked).length;
-        if (count) count.textContent = `${selected} unit dipilih`;
-        if (error) error.hidden = selected > 0;
-        return selected;
-    };
-    form.querySelector('[data-export-select-all]')?.addEventListener('click', () => {
-        units.forEach((unit) => { unit.checked = true; });
-        sync();
-    });
-    form.querySelector('[data-export-clear-all]')?.addEventListener('click', () => {
-        units.forEach((unit) => { unit.checked = false; });
-        sync();
-    });
-    units.forEach((unit) => unit.addEventListener('change', sync));
-    form.addEventListener('submit', (event) => {
-        if (sync() === 0) {
-            event.preventDefault();
-            units[0]?.focus();
-            return;
-        }
-        if (!submit) return;
-        const label = submit.textContent;
-        submit.textContent = 'Menyiapkan Excel…';
-        window.setTimeout(() => { submit.textContent = label; }, 2500);
-    });
-    sync();
-})();
-
 (() => {
     const dialog = document.querySelector('#lrMappingDetailDialog');
     if (dialog instanceof HTMLDialogElement) {
@@ -3249,6 +3212,11 @@
             closeSelector: '[data-close-attendance-upload]',
         },
         {
+            modal: document.querySelector('#attendanceExportModal'),
+            openSelector: '[data-open-attendance-export]',
+            closeSelector: '[data-close-attendance-export]',
+        },
+        {
             modal: document.querySelector('#attendanceDeleteModal'),
             openSelector: '[data-open-attendance-delete]',
             closeSelector: '[data-close-attendance-delete]',
@@ -3298,8 +3266,69 @@
         });
     });
 
-    document.querySelectorAll('[data-open-attendance-upload], [data-open-attendance-delete]').forEach((trigger) => {
+    document.querySelectorAll('[data-open-attendance-upload], [data-open-attendance-export], [data-open-attendance-delete]').forEach((trigger) => {
         trigger.addEventListener('click', () => trigger.closest('details')?.removeAttribute('open'));
+    });
+
+    const exportForm = document.querySelector('[data-attendance-export-form]');
+    if (exportForm) {
+        const unitField = exportForm.querySelector('[data-attendance-export-unit]');
+        const monthField = exportForm.querySelector('[data-attendance-export-month]');
+        const yearField = exportForm.querySelector('[data-attendance-export-year]');
+        let exportOptions = [];
+        try {
+            exportOptions = JSON.parse(exportForm.dataset.attendanceExportOptions || '[]');
+        } catch (_) {
+            exportOptions = [];
+        }
+
+        const uniqueNumbers = (values) => [...new Set(values.map(Number))].sort((left, right) => left - right);
+        const replaceOptions = (field, values, labelForValue) => {
+            if (!field || values.length === 0) return;
+            const selected = field.value;
+            field.replaceChildren();
+            values.forEach((value) => {
+                const option = document.createElement('option');
+                option.value = String(value);
+                option.textContent = labelForValue(value);
+                option.selected = String(value) === selected;
+                field.appendChild(option);
+            });
+            if (field.selectedIndex < 0) field.selectedIndex = 0;
+        };
+
+        const refreshYears = () => {
+            if (!unitField || !monthField || !yearField) return;
+            const years = uniqueNumbers(exportOptions
+                .filter((option) => (unitField.value === '__all__' || option.work_unit === unitField.value) && Number(option.month) === Number(monthField.value))
+                .map((option) => option.year));
+            replaceOptions(yearField, years, (year) => String(year));
+        };
+
+        const refreshMonths = () => {
+            if (!unitField || !monthField) return;
+            const months = uniqueNumbers(exportOptions
+                .filter((option) => unitField.value === '__all__' || option.work_unit === unitField.value)
+                .map((option) => option.month));
+            const monthNames = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            replaceOptions(monthField, months, (month) => monthNames[month] || String(month));
+            refreshYears();
+        };
+
+        unitField?.addEventListener('change', refreshMonths);
+        monthField?.addEventListener('change', refreshYears);
+        refreshMonths();
+    }
+
+    // Menu tindakan tidak dibiarkan terbuka ketika pengguna melanjutkan ke area lain.
+    document.addEventListener('click', (event) => {
+        document.querySelectorAll('details.sdm-daily-menu[open]').forEach((menu) => {
+            if (!menu.contains(event.target)) menu.removeAttribute('open');
+        });
+    });
+
+    document.addEventListener('submit', () => {
+        document.querySelectorAll('details.sdm-daily-menu[open]').forEach((menu) => menu.removeAttribute('open'));
     });
 
     document.addEventListener('keydown', (event) => {

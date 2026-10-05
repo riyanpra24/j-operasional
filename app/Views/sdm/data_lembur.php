@@ -10,11 +10,16 @@ $formatDuration = static function (int $minutes): string {
     return intdiv($minutes, 60) . 'j ' . ($minutes % 60) . 'm';
 };
 $dayNames = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-$months = [
-    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
-];
+$selectedOfficialHoliday = null;
+if (! empty($showSelectedHolidayNote)) {
+    foreach ($calendarDays as $calendarDay) {
+        if ($calendarDay['date'] === $selectedDate
+            && in_array((string) ($calendarDay['holiday_source'] ?? ''), ['national', 'collective_leave'], true)) {
+            $selectedOfficialHoliday = $calendarDay;
+            break;
+        }
+    }
+}
 ?>
 
 <section class="page-heading overtime-heading">
@@ -27,24 +32,16 @@ $months = [
 
 <section class="panel overtime-filter-panel">
     <form method="get" action="<?= site_url('sdm/data-lembur') ?>" class="overtime-filter-form">
-        <div class="form-group overtime-month-filter">
-            <label for="overtime_month">Bulan</label>
-            <select id="overtime_month" name="bulan">
-                <?php foreach ($months as $number => $name): ?>
-                    <option value="<?= $number ?>" <?= $selectedMonth === $number ? 'selected' : '' ?>><?= esc($name) ?></option>
-                <?php endforeach ?>
-            </select>
+        <div class="form-group overtime-date-filter">
+            <label for="overtime_from">Dari tanggal</label>
+            <input id="overtime_from" name="dari" type="date" value="<?= esc($rangeStart, 'attr') ?>" required>
         </div>
-        <div class="form-group overtime-year-filter">
-            <label for="overtime_year">Tahun</label>
-            <select id="overtime_year" name="tahun">
-                <?php foreach ($availableYears as $year): ?>
-                    <option value="<?= (int) $year ?>" <?= $selectedYear === (int) $year ? 'selected' : '' ?>><?= (int) $year ?></option>
-                <?php endforeach ?>
-            </select>
+        <div class="form-group overtime-date-filter">
+            <label for="overtime_to">Sampai tanggal</label>
+            <input id="overtime_to" name="sampai" type="date" value="<?= esc($rangeEnd, 'attr') ?>" required>
         </div>
         <button class="btn btn-primary" type="submit">Tampilkan</button>
-        <div class="overtime-filter-copy"><strong><?= esc($monthLabel) ?></strong><span>Kalender nasional dan data lembur ditampilkan sesuai bulan yang dipilih.</span></div>
+        <div class="overtime-filter-copy"><strong><?= esc($monthLabel) ?></strong><span>Kalender dan data lembur mengikuti rentang tanggal yang dipilih.</span></div>
         <a class="btn btn-ghost" href="<?= site_url('sdm/data-lembur') ?>">Reset</a>
         <details class="overtime-action-menu">
             <summary class="overtime-action-trigger" aria-label="Menu tindakan" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><rect x="14" y="14" width="7" height="7" rx="1.4"></rect></svg></summary>
@@ -72,13 +69,15 @@ $months = [
                         default => '',
                     };
                     ?>
-                    <button type="button" class="overtime-calendar-day <?= $day['is_non_working'] ? 'is-holiday' : '' ?> <?= $day['count'] > 0 ? 'has-overtime' : '' ?> <?= $day['date'] === $selectedDate ? 'is-selected' : '' ?>" data-overtime-date="<?= esc($day['date'], 'attr') ?>" data-overtime-calendar-mode="<?= esc($day['holiday_mode'], 'attr') ?>" data-overtime-calendar-label="<?= esc((string) ($day['holiday_label'] ?? ''), 'attr') ?>" aria-pressed="<?= $day['date'] === $selectedDate ? 'true' : 'false' ?>" title="<?= esc(($day['holiday_label'] ? $day['holiday_label'] . ' · ' : '') . ($day['count'] > 0 ? $day['count'] . ' staf lembur' : 'Tidak ada data lembur'), 'attr') ?>">
+                    <a class="overtime-calendar-day <?= $day['is_non_working'] ? 'is-holiday' : '' ?> <?= $day['count'] > 0 ? 'has-overtime' : '' ?> <?= $day['date'] === $selectedDate ? 'is-selected' : '' ?>" href="<?= esc(site_url('sdm/data-lembur') . '?' . http_build_query(['dari' => $rangeStart, 'sampai' => $rangeEnd, 'tanggal' => $day['date']]), 'attr') ?>" data-overtime-date="<?= esc($day['date'], 'attr') ?>" data-overtime-calendar-mode="<?= esc($day['holiday_mode'], 'attr') ?>" data-overtime-calendar-label="<?= esc((string) ($day['holiday_label'] ?? ''), 'attr') ?>" aria-current="<?= $day['date'] === $selectedDate ? 'date' : 'false' ?>" title="<?= esc(($day['holiday_label'] ? $day['holiday_label'] . ' · ' : '') . ($day['count'] > 0 ? $day['count'] . ' staf lembur' : 'Tidak ada data lembur'), 'attr') ?>">
                         <strong><?= (int) $day['day'] ?></strong>
                         <?php if ($day['count'] > 0): ?><small><?= (int) $day['count'] ?> staf</small><?php elseif ($holidayMarker !== ''): ?><small class="overtime-holiday-label"><?= esc($holidayMarker) ?></small><?php endif ?>
-                    </button>
+                    </a>
                 <?php endforeach ?>
             </div>
-            <p class="overtime-calendar-note"><strong>Catatan:</strong> <b>Libur nasional</b> dan <b>cuti bersama</b> mengikuti kalender resmi; akhir pekan serta pengaturan manual juga ditandai pada kalender.</p>
+            <?php if ($selectedOfficialHoliday !== null): ?>
+                <p class="overtime-selected-holiday-note"><strong><?= $selectedOfficialHoliday['holiday_source'] === 'national' ? 'Libur nasional' : 'Cuti bersama' ?>:</strong> <?= esc(preg_replace('/^(Libur nasional|Cuti bersama):\s*/', '', (string) $selectedOfficialHoliday['holiday_label'])) ?></p>
+            <?php endif ?>
         </article>
 
         <article class="panel overtime-detail-panel">
@@ -124,14 +123,6 @@ $months = [
     const upload = setupModal('#overtimeUploadModal', '[data-overtime-upload-open]', '[data-overtime-upload-close]');
     const calendar = setupModal('#overtimeCalendarModal', '[data-overtime-calendar-open]', '[data-overtime-calendar-close]');
     const deletion = setupModal('#overtimeDeleteModal', '[data-overtime-delete-open]', '[data-overtime-delete-close]');
-    document.querySelectorAll('[data-overtime-date]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const url = new URL(window.location.href);
-            url.searchParams.set('tanggal', button.dataset.overtimeDate);
-            window.location.assign(url.toString());
-        });
-    });
-
     document.querySelectorAll('[data-overtime-upload-open]').forEach((button) => button.addEventListener('click', () => button.closest('details')?.removeAttribute('open')));
     document.querySelectorAll('[data-overtime-delete-open]').forEach((button) => button.addEventListener('click', () => button.closest('details')?.removeAttribute('open')));
     document.querySelectorAll('[data-overtime-calendar-open]').forEach((button) => button.addEventListener('click', () => {

@@ -50,18 +50,55 @@ final class EssAttendanceReportParser
             throw new RuntimeException('File ESS tidak berisi data absensi yang dapat direkap.');
         }
 
+        $recordDates = array_values(array_unique(array_column($records, 'date')));
+        sort($recordDates, SORT_STRING);
+        $datePeriodStart = new DateTimeImmutable($recordDates[0]);
+        $datePeriodEnd = new DateTimeImmutable($recordDates[array_key_last($recordDates)]);
+        $detectedWorkUnit = $this->detectWorkUnit($records);
+        if ($datePeriodStart->format('Y-m') !== $datePeriodEnd->format('Y-m')) {
+            throw new RuntimeException('Kolom Date pada file ESS harus memuat satu periode bulan saja.');
+        }
+
         if ($periodStart === null || $periodEnd === null) {
-            $dates = array_column($records, 'date');
-            sort($dates);
-            $periodStart = new DateTimeImmutable($dates[0]);
-            $periodEnd = new DateTimeImmutable($dates[array_key_last($dates)]);
+            $periodStart = $datePeriodStart;
+            $periodEnd = $datePeriodEnd;
         }
 
         if ($periodStart->format('Y-m') !== $periodEnd->format('Y-m')) {
             throw new RuntimeException('Rekap hanya mendukung satu periode bulan dalam satu file ESS.');
         }
 
-        return $this->buildRecap($records, $periodStart, $periodEnd, $sourceName);
+        $recap = $this->buildRecap($records, $periodStart, $periodEnd, $sourceName);
+        $recap['date_period_start'] = $datePeriodStart->format('Y-m-d');
+        $recap['date_period_end'] = $datePeriodEnd->format('Y-m-d');
+        $recap['detected_work_unit'] = $detectedWorkUnit;
+
+        return $recap;
+    }
+
+    /** @param list<array<string, string>> $records */
+    private function detectWorkUnit(array $records): ?string
+    {
+        $organizations = implode(' ', array_filter(array_column($records, 'organization')));
+        $workUnits = [
+            'Kantor Wilayah Surabaya' => ['kantor wilayah surabaya', 'kw surabaya'],
+            'Kantor Cabang Surabaya'  => ['cabang surabaya'],
+            'Kantor Cabang Kediri'    => ['cabang kediri'],
+            'Kantor Cabang Malang'    => ['cabang malang'],
+            'Kantor Cabang Madiun'    => ['cabang madiun'],
+            'Kantor Cabang Banyuwangi'=> ['cabang banyuwangi'],
+        ];
+        $matches = [];
+        foreach ($workUnits as $workUnit => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (stripos($organizations, $keyword) !== false) {
+                    $matches[] = $workUnit;
+                    break;
+                }
+            }
+        }
+
+        return count($matches) === 1 ? $matches[0] : null;
     }
 
     /**

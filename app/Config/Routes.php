@@ -41,6 +41,7 @@ $routes->post('sdm/kalender', 'Sdm::updateAttendanceCalendar', ['as' => 'sdm.cal
 $routes->get('sdm/data-kehadiran', 'Sdm::attendanceRecords', ['as' => 'sdm.attendance_records']);
 $routes->post('sdm/data-kehadiran/rekap', 'Sdm::recapSdmJatimAttendance', ['as' => 'sdm.attendance_records.recap']);
 $routes->post('sdm/data-kehadiran/anomali', 'Sdm::updateSdmJatimAnomalies', ['as' => 'sdm.attendance_records.anomaly.update']);
+$routes->post('sdm/data-kehadiran/export', 'Sdm::exportSdmJatimAttendance', ['as' => 'sdm.attendance_records.export']);
 $routes->post('sdm/data-kehadiran/hapus', 'Sdm::deleteSdmJatimAttendance', ['as' => 'sdm.attendance_records.delete']);
 $routes->get('sdm/data-lembur', 'Sdm::attendanceOvertime', ['as' => 'sdm.attendance_overtime']);
 $routes->post('sdm/data-lembur/upload', 'Sdm::recapSdmOvertime', ['as' => 'sdm.attendance_overtime.upload']);

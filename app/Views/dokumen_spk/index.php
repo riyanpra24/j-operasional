@@ -20,7 +20,7 @@ foreach ($records as $record) {
         'tanggal_dokumen' => $record['tanggal_dokumen'] ?: '',
         'tanggal' => $record['tanggal_label'],
         'tahun' => (int) $record['tahun'],
-        'perihal' => $record['perihal'],5
+        'perihal' => $record['perihal'],
         'kelengkapan' => $record['kelengkapan_label'],
         'kelengkapan_class' => $record['kelengkapan_class'],
         'dibuat_oleh' => $record['created_by_name'] ?: 'Data awal sistem',
