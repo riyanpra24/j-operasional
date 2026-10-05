@@ -748,12 +748,25 @@ class Akutansi extends BaseController
         return $this->response->download(WRITEPATH . 'templates/rka/Template_RKA_JMK_KV_SBY.xlsx', null)->setFileName('Template_RKA_JMK_KV_SBY.xlsx');
     }
 
-    public function rkaManualData(): ResponseInterface
+    public function rkaManualData(): ResponseInterface|RedirectResponse
     {
         $this->response->setHeader('Cache-Control', 'private, no-store');
+        $scope = $this->request->getGet('scope');
+        $requestedUnit = $this->request->getGet('unit_kerja');
+        $requestedYear = $this->request->getGet('tahun');
+
+        // Endpoint ini hanya sumber data untuk pop-up RKA. Jika alamatnya
+        // dibuka langsung, kembalikan pengguna ke halaman RKA, bukan JSON error.
+        $missingSelection = $scope === 'all'
+            ? !is_string($requestedYear)
+            : !is_string($requestedUnit) || !is_string($requestedYear);
+        if ($missingSelection) {
+            return redirect()->to($this->rkaUrl('Kanwil', 2026) . '&manual=1');
+        }
+
         try {
-            if ($this->request->getGet('scope') === 'all') {
-                [, $year] = $this->selection(['unit_kerja' => 'Surabaya', 'tahun' => $this->request->getGet('tahun')]);
+            if ($scope === 'all') {
+                [, $year] = $this->selection(['unit_kerja' => 'Surabaya', 'tahun' => $requestedYear]);
                 $records = [];
                 $service = new RkaBudgetService();
                 foreach (RkaCalculator::UNITS as $unit) {
