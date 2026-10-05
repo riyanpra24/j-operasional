@@ -60,10 +60,10 @@ $resolveOptimizedAsset = static function (string $source, string $optimized): st
     $sourcePath = FCPATH . $source;
     $optimizedPath = FCPATH . $optimized;
 
-    return is_file($optimizedPath)
-        && (! is_file($sourcePath) || filemtime($optimizedPath) >= filemtime($sourcePath))
-            ? $optimized
-            : $source;
+    // Berkas .min yang tertinggal di hosting dapat lebih baru secara waktu,
+    // tetapi isinya belum tentu memuat fitur halaman terbaru. Prioritaskan
+    // sumber yang ikut diterbitkan; versi MD5 di URL tetap mencegah cache lama.
+    return is_file($sourcePath) ? $source : $optimized;
 };
 $assetVersion = static function (string $asset): string {
     $path = FCPATH . $asset;
