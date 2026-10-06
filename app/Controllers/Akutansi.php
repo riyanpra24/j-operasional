@@ -32,6 +32,10 @@ class Akutansi extends BaseController
         $requestedMonth=$this->request->getGet('bulan');
         $requestedMonth=is_string($requestedMonth) && preg_match('/^(?:[1-9]|1[0-2])$/D',$requestedMonth) ? (int)$requestedMonth : null;
         $selectedLobs=self::reportLobs($this->request->getGet('lob'));
+        $requestedBopoUnit = $this->request->getGet('bopo_unit');
+        $bopoSelectedUnit = is_string($requestedBopoUnit) && in_array($requestedBopoUnit, RkaCalculator::UNITS, true)
+            ? $requestedBopoUnit
+            : 'all';
         $report=(new LrRealizationService())->view($unit,$year,$basis,$requestedMonth);
         $import=$report['import']; $result=$report['result']; $reportValues=$report['values'];
         $volumeEditReportsByUnit = [];
@@ -50,7 +54,9 @@ class Akutansi extends BaseController
             'lrUploadMonth'=>$uploadMonth,
             'lrImport'=>$import,'lrResult'=>$result,'reportValues'=>$reportValues,'volumeEditReportsByUnit'=>$volumeEditReportsByUnit,
             'lrEditAutoOpen'=>$this->request->getGet('edit') === '1',
-            'bopoUnits'=>RkaCalculator::UNITS,
+            'bopoUnits'=>$bopoSelectedUnit === 'all' ? RkaCalculator::UNITS : [$bopoSelectedUnit],
+            'bopoFilterUnits'=>RkaCalculator::UNITS,
+            'bopoSelectedUnit'=>$bopoSelectedUnit,
             'bopoYtdValues'=>$bopoService->bopoYtd($year, (int)$report['month']),
             'bopoPtdValues'=>$bopoService->bopoPtd($year, (int)$report['month']),
             'lrUploadError'=>session()->getFlashdata('lr_upload_error'),
@@ -218,10 +224,6 @@ class Akutansi extends BaseController
         $selectedLobs = self::reportLobs($this->request->getPost('lob'));
 
         try {
-            if (! $this->currentRoleIsAdmin()) {
-                throw new RuntimeException('Perubahan Volume hanya dapat dilakukan oleh Administrator.');
-            }
-
             $postedUnit = $this->request->getPost('unit_kerja');
             $postedYear = $this->request->getPost('tahun');
             $postedMonth = $this->request->getPost('bulan');
@@ -353,6 +355,89 @@ class Akutansi extends BaseController
             log_message('warning', 'Ubah Laba/Rugi gagal: {message}', ['message' => $exception->getMessage()]);
             return redirect()->to(self::labaRugiUrl($unit, $year, $month, $basis, $selectedLobs))
                 ->with('error', get_class($exception) === RuntimeException::class ? $exception->getMessage() : 'Laporan Laba/Rugi belum dapat diperbarui.');
+        }
+    }
+
+    /** Supplies one selected reporting period to the in-page Laba/Rugi editor. */
+    public function labaRugiEditorData(): ResponseInterface
+    {
+        try {
+            $rawYear = $this->request->getGet('tahun');
+            $rawMonth = $this->request->getGet('bulan');
+            $rawBasis = $this->request->getGet('jenis_laporan');
+            if (! is_string($rawYear) || ! preg_match('/^\d{4}$/D', $rawYear) || (int) $rawYear < 2000 || (int) $rawYear > 2100
+                || ! is_string($rawMonth) || ! preg_match('/^(?:[1-9]|1[0-2])$/D', $rawMonth)
+                || ! is_string($rawBasis) || ! in_array(strtoupper($rawBasis), LrRealizationService::BASES, true)) {
+                throw new RuntimeException('Periode laporan yang dipilih tidak valid.');
+            }
+
+            $year = (int) $rawYear;
+            $month = (int) $rawMonth;
+            $basis = strtoupper($rawBasis);
+            $report = (new LrRealizationService())->view('Korporat Kanwil', $year, $basis, $month);
+            $reports = [];
+            foreach (RkaCalculator::SOURCE_UNITS as $unit) {
+                $reports[$unit] = (array) ($report['values_by_unit'][$unit] ?? []);
+            }
+
+            return $this->response->setHeader('Cache-Control', 'private, no-store')->setJSON([
+                'reports' => $reports,
+                'basis' => $basis,
+                'month' => $month,
+                'year' => $year,
+                'period_label' => $basis . ' ' . self::monthName($month) . ' ' . $year,
+            ]);
+        } catch (Throwable $exception) {
+            log_message('warning', 'Muat editor Laba/Rugi gagal: {message}', ['message' => $exception->getMessage()]);
+            $known = $exception instanceof \InvalidArgumentException || get_class($exception) === RuntimeException::class;
+            return $this->response->setStatusCode($known ? 400 : 503)->setJSON([
+                'error' => $known ? $exception->getMessage() : 'Editor Laba/Rugi belum dapat dimuat. Silakan coba kembali.',
+            ]);
+        }
+    }
+
+    /** Supplies BOPO values to the dialog without reloading the report page. */
+    public function labaRugiBopoData(): ResponseInterface
+    {
+        try {
+            $rawYear = $this->request->getGet('tahun');
+            $rawMonth = $this->request->getGet('bulan');
+            if (! is_string($rawYear) || ! preg_match('/^\d{4}$/D', $rawYear) || (int) $rawYear < 2000 || (int) $rawYear > 2100
+                || ! is_string($rawMonth) || ! preg_match('/^(?:[1-9]|1[0-2])$/D', $rawMonth)) {
+                throw new RuntimeException('Bulan dan tahun BOPO tidak valid.');
+            }
+
+            $year = (int) $rawYear;
+            $month = (int) $rawMonth;
+            $service = new LrRealizationService();
+            $formatFixed = static fn (?string $value): string => $value === null ? '—' : \App\Libraries\LrMoney::percentageDisplayFixed($value, 2);
+            $formatAchievement = static fn (?string $value): string => $value === null ? '—' : \App\Libraries\LrMoney::percentageDisplay($value);
+            $formatReports = static function (array $reports) use ($formatFixed, $formatAchievement): array {
+                $formatted = [];
+                foreach (RkaCalculator::UNITS as $unit) {
+                    $row = (array) ($reports[$unit] ?? []);
+                    $formatted[$unit] = [
+                        'target' => $formatFixed(isset($row['target']) ? (string) $row['target'] : null),
+                        'realisasi' => $formatFixed(isset($row['realisasi']) ? (string) $row['realisasi'] : null),
+                        'pencapaian' => $formatAchievement(isset($row['pencapaian']) ? (string) $row['pencapaian'] : null),
+                    ];
+                }
+                return $formatted;
+            };
+
+            return $this->response->setHeader('Cache-Control', 'private, no-store')->setJSON([
+                'month' => $month,
+                'year' => $year,
+                'month_label' => self::monthName($month),
+                'ytd' => $formatReports($service->bopoYtd($year, $month)),
+                'ptd' => $formatReports($service->bopoPtd($year, $month)),
+            ]);
+        } catch (Throwable $exception) {
+            log_message('warning', 'Muat BOPO gagal: {message}', ['message' => $exception->getMessage()]);
+            $known = $exception instanceof \InvalidArgumentException || get_class($exception) === RuntimeException::class;
+            return $this->response->setStatusCode($known ? 400 : 503)->setJSON([
+                'error' => $known ? $exception->getMessage() : 'Data BOPO belum dapat dimuat. Silakan coba kembali.',
+            ]);
         }
     }
 

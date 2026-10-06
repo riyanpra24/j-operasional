@@ -12,7 +12,7 @@ class UserRoles extends BaseConfig
         'agendaris' => 'Agendaris',
         'umum_1'    => 'Umum 1',
         'umum_2'    => 'Umum 2',
-        'akutansi'  => 'Akutansi',
+        'akutansi'  => 'Akuntansi',
         'sdm'       => 'SDM & Teller',
     ];
 

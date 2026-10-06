@@ -2713,18 +2713,91 @@
             if (!dialog.open) dialog.showModal();
         }));
         dialog.querySelectorAll(closeSelector).forEach((button) => button.addEventListener('click', () => dialog.close()));
-        dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
         return dialog;
     };
-    bindDialog('#lrBopoDialog', '[data-lr-bopo-open]', '[data-lr-bopo-close]');
+    const bopoDialog = bindDialog('#lrBopoDialog', '[data-lr-bopo-open]', '[data-lr-bopo-close]');
+    const bopoFilter = bopoDialog?.querySelector('[data-lr-bopo-filter]');
+    bopoFilter?.addEventListener('submit', async (event) => {
+        const dataUrl = bopoFilter.dataset.lrBopoDataUrl;
+        const monthField = bopoFilter.querySelector('[name="bulan"]');
+        const yearField = bopoFilter.querySelector('[name="tahun"]');
+        const unitField = bopoFilter.querySelector('[name="bopo_unit"]');
+        const errorField = bopoFilter.querySelector('[data-lr-bopo-filter-error]');
+        if (!(monthField instanceof HTMLSelectElement) || !(yearField instanceof HTMLInputElement) || !(unitField instanceof HTMLSelectElement) || !dataUrl) return;
+        event.preventDefault();
+        if (!bopoFilter.reportValidity()) return;
+
+        const submitButton = bopoFilter.querySelector('button[type="submit"]');
+        const originalText = submitButton?.textContent || 'Terapkan';
+        if (submitButton instanceof HTMLButtonElement) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Memuat…';
+        }
+        if (errorField) {
+            errorField.hidden = true;
+            errorField.textContent = '';
+        }
+        try {
+            const url = new URL(dataUrl, window.location.href);
+            url.searchParams.set('bulan', monthField.value);
+            url.searchParams.set('tahun', yearField.value);
+            const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } });
+            const data = await response.json();
+            if (!response.ok || !data || typeof data !== 'object' || !data.ytd || !data.ptd) {
+                throw new Error(typeof data?.error === 'string' ? data.error : 'Data BOPO belum dapat dimuat.');
+            }
+            const selectedUnit = unitField.value;
+            bopoDialog.querySelectorAll('[data-lr-bopo-report]').forEach((report) => {
+                const basis = report.dataset.lrBopoReport;
+                const values = basis === 'PTD' ? data.ptd : data.ytd;
+                const title = basis === 'PTD'
+                    ? `BOPO PTD ${data.month_label} ${data.year}`
+                    : `BOPO YTD s/d ${data.month_label} ${data.year}`;
+                const titleElement = report.querySelector('[data-lr-bopo-report-title]');
+                if (titleElement) titleElement.textContent = title;
+                report.querySelector('.bopo-table-wrap')?.setAttribute('aria-label', title);
+                report.querySelectorAll('[data-lr-bopo-unit]').forEach((row) => {
+                    const unit = row.dataset.lrBopoUnit;
+                    const rowValues = values[unit] || { target: '—', realisasi: '—', pencapaian: '—' };
+                    row.hidden = selectedUnit !== 'all' && unit !== selectedUnit;
+                    const target = row.querySelector('[data-lr-bopo-target]');
+                    const realization = row.querySelector('[data-lr-bopo-realization]');
+                    const achievement = row.querySelector('[data-lr-bopo-achievement]');
+                    if (target) target.textContent = rowValues.target;
+                    if (realization) realization.textContent = rowValues.realisasi;
+                    if (achievement) achievement.textContent = rowValues.pencapaian;
+                });
+            });
+        } catch (error) {
+            if (errorField) {
+                errorField.textContent = error instanceof Error ? error.message : 'Data BOPO belum dapat dimuat.';
+                errorField.hidden = false;
+            }
+        } finally {
+            if (submitButton instanceof HTMLButtonElement) {
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        }
+    });
     const volumeUnitDialog = bindDialog('#lrVolumeUnitDialog', '[data-lr-volume-edit-open]', '[data-lr-volume-unit-close]');
     const volumeDialog = bindDialog('#lrVolumeEditDialog', '.__lr-volume-edit-dialog-opener', '[data-lr-volume-edit-close]');
     if (volumeUnitDialog && volumeDialog) {
         const dataElement = document.querySelector('#lrVolumeEditReports');
         const calculationElement = document.querySelector('#lrEditCalculationRules');
         const groupRulesElement = document.querySelector('#lrEditGroupRules');
+        const periodForm = volumeUnitDialog.querySelector('[data-lr-editor-period-form]');
+        const editorDataUrl = periodForm?.dataset.lrEditorDataUrl;
+        const periodMonthField = volumeUnitDialog.querySelector('[data-lr-edit-period-month]');
+        const periodYearField = volumeUnitDialog.querySelector('[data-lr-edit-period-year]');
+        const periodError = volumeUnitDialog.querySelector('[data-lr-editor-period-error]');
         const editUnitField = volumeDialog.querySelector('[data-lr-edit-unit-filter]');
         const editUnitInput = volumeDialog.querySelector('[data-lr-volume-edit-unit-input]');
+        const editMonthInput = volumeDialog.querySelector('[data-lr-volume-edit-month-input]');
+        const editYearInput = volumeDialog.querySelector('[data-lr-volume-edit-year-input]');
+        const editReportTitle = volumeDialog.querySelector('[data-lr-volume-edit-report-title]');
+        const editYearLabel = volumeDialog.querySelector('[data-lr-volume-edit-year-label]');
+        const editCaption = volumeDialog.querySelector('[data-lr-volume-edit-caption]');
         const editUnitLabels = volumeDialog.querySelectorAll('[data-lr-volume-edit-unit-label]');
         const editConfirmation = volumeDialog.querySelector('[data-lr-volume-edit-confirm]');
         const editConfirmationText = volumeDialog.querySelector('[data-lr-volume-edit-confirm-text]');
@@ -2847,6 +2920,60 @@
             });
         });
         editUnitField?.addEventListener('change', loadSelectedUnit);
+        periodForm?.addEventListener('submit', async (event) => {
+            if (!(periodMonthField instanceof HTMLSelectElement) || !(periodYearField instanceof HTMLInputElement) || !editorDataUrl) return;
+            event.preventDefault();
+            if (!periodForm.reportValidity()) return;
+
+            const submitButton = periodForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton?.textContent || 'Lanjutkan';
+            if (submitButton instanceof HTMLButtonElement) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Memuat…';
+            }
+            if (periodError) {
+                periodError.hidden = true;
+                periodError.textContent = '';
+            }
+
+            try {
+                const url = new URL(editorDataUrl, window.location.href);
+                url.searchParams.set('bulan', periodMonthField.value);
+                url.searchParams.set('tahun', periodYearField.value);
+                url.searchParams.set('jenis_laporan', volumeDialog.querySelector('[name="jenis_laporan"]')?.value || 'YTD');
+                const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } });
+                const data = await response.json();
+                if (!response.ok || !data || typeof data !== 'object' || !data.reports || typeof data.reports !== 'object') {
+                    throw new Error(typeof data?.error === 'string' ? data.error : 'Data editor belum dapat dimuat.');
+                }
+
+                reportsByUnit = data.reports;
+                const month = Number(data.month);
+                const year = Number(data.year);
+                const basis = String(data.basis || 'YTD');
+                const monthLabels = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                const periodLabel = `${basis} ${monthLabels[month] || ''} ${year}`.trim();
+                volumeDialog.dataset.lrVolumeEditPeriodLabel = periodLabel;
+                if (editMonthInput instanceof HTMLInputElement) editMonthInput.value = String(month);
+                if (editYearInput instanceof HTMLInputElement) editYearInput.value = String(year);
+                if (editReportTitle) editReportTitle.textContent = `Laba / Rugi (${basis}) ${monthLabels[month] || ''} ${year}`.trim();
+                if (editYearLabel) editYearLabel.textContent = String(year);
+                if (editCaption) editCaption.textContent = `Edit Laba Rugi ${periodLabel}`;
+                loadSelectedUnit();
+                volumeUnitDialog.close();
+                if (!volumeDialog.open) volumeDialog.showModal();
+            } catch (error) {
+                if (periodError) {
+                    periodError.textContent = error instanceof Error ? error.message : 'Data editor belum dapat dimuat.';
+                    periodError.hidden = false;
+                }
+            } finally {
+                if (submitButton instanceof HTMLButtonElement) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                }
+            }
+        });
         volumeDialog.querySelector('[data-lr-volume-edit-back]')?.addEventListener('click', () => {
             volumeDialog.close();
             if (!volumeUnitDialog.open) volumeUnitDialog.showModal();

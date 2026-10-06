@@ -58,15 +58,15 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
             <caption>BOPO YTD per unit kerja</caption>
             <colgroup>
                 <col class="bopo-unit-column">
-                <col class="bopo-month-column">
                 <col class="bopo-target-column">
+                <col class="bopo-month-column">
                 <col class="bopo-achievement-column">
             </colgroup>
             <thead>
                 <tr>
                     <th scope="col">UNIT KERJA</th>
-                    <th scope="col"><?= esc(strtoupper($months[$selectedMonth])) ?></th>
                     <th scope="col">TARGET</th>
+                    <th scope="col"><?= esc(strtoupper($months[$selectedMonth])) ?></th>
                     <th scope="col">PENCAPAIAN</th>
                 </tr>
             </thead>
@@ -75,8 +75,8 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
                     <?php $bopo = $bopoValues[$unit] ?? ['realisasi' => null, 'target' => null, 'pencapaian' => null]; ?>
                     <tr>
                         <th scope="row"><?= esc($unit) ?></th>
-                        <td class="bopo-realization-cell"><span class="bopo-realization-template">Realisasi</span><span class="bopo-realization-value"><?= esc($bopoPercent($bopo['realisasi'] ?? null)) ?></span></td>
                         <td><?= esc($bopoPercent($bopo['target'] ?? null)) ?></td>
+                        <td class="bopo-realization-cell"><span class="bopo-realization-value"><?= esc($bopoPercent($bopo['realisasi'] ?? null)) ?></span></td>
                         <td><?= esc($bopoAchievement($bopo['pencapaian'] ?? null)) ?></td>
                     </tr>
                 <?php endforeach ?>
@@ -98,15 +98,15 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
             <caption>BOPO PTD per unit kerja</caption>
             <colgroup>
                 <col class="bopo-unit-column">
-                <col class="bopo-month-column">
                 <col class="bopo-target-column">
+                <col class="bopo-month-column">
                 <col class="bopo-achievement-column">
             </colgroup>
             <thead>
                 <tr>
                     <th scope="col">UNIT KERJA</th>
-                    <th scope="col"><?= esc(strtoupper($months[$selectedMonth])) ?></th>
                     <th scope="col">TARGET</th>
+                    <th scope="col"><?= esc(strtoupper($months[$selectedMonth])) ?></th>
                     <th scope="col">PENCAPAIAN</th>
                 </tr>
             </thead>
@@ -115,8 +115,8 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
                     <?php $bopo = $bopoPtdValues[$unit] ?? ['realisasi' => null, 'target' => null, 'pencapaian' => null]; ?>
                     <tr>
                         <th scope="row"><?= esc($unit) ?></th>
-                        <td class="bopo-realization-cell"><span class="bopo-realization-template">Realisasi</span><span class="bopo-realization-value"><?= esc($bopoPercent($bopo['realisasi'] ?? null)) ?></span></td>
                         <td><?= esc($bopoPercent($bopo['target'] ?? null)) ?></td>
+                        <td class="bopo-realization-cell"><span class="bopo-realization-value"><?= esc($bopoPercent($bopo['realisasi'] ?? null)) ?></span></td>
                         <td><?= esc($bopoAchievement($bopo['pencapaian'] ?? null)) ?></td>
                     </tr>
                 <?php endforeach ?>

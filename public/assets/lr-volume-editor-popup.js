@@ -27,12 +27,6 @@
         editDialog.querySelectorAll('[data-lr-volume-edit-close]').forEach((button) => {
             button.addEventListener('click', () => close(editDialog));
         });
-        unitDialog.addEventListener('click', (event) => {
-            if (event.target === unitDialog) close(unitDialog);
-        });
-        editDialog.addEventListener('click', (event) => {
-            if (event.target === editDialog) close(editDialog);
-        });
         unitDialog.querySelector('[data-lr-volume-unit-continue]')?.addEventListener('click', () => {
             const month = unitDialog.querySelector('[data-lr-edit-period-month]');
             const year = unitDialog.querySelector('[data-lr-edit-period-year]');
