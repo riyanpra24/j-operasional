@@ -2444,7 +2444,7 @@
         resizeLiquidCanvas();
         new ResizeObserver(resizeLiquidCanvas).observe(scene);
         scene.addEventListener('pointerdown', (event) => {
-            if (event.button > 0 || event.target.closest('[data-welcome-drag], .welcome-start')) return;
+            if (event.button > 0 || event.target.closest('[data-welcome-drag], .welcome-start, .welcome-balloon')) return;
             ripplePointerId = event.pointerId;
             scene.setPointerCapture?.(event.pointerId);
             createLiquidRipple(event);
@@ -2469,16 +2469,74 @@
         scene.addEventListener('pointercancel', stopRipples);
     }
 
-    if (particleLayer && !reduceMotion) {
+    if (particleLayer) {
+        const sparkColors = ['#dff7ff', '#55c9ff', '#6ee3bc', '#ffe58b'];
+        const placeBalloon = (balloon, index, generation) => {
+            balloon.style.setProperty('--x', `${5 + ((index * 37 + generation * 23) % 89)}%`);
+            balloon.style.setProperty('--y', `${7 + ((index * 53 + generation * 31) % 80)}%`);
+            balloon.style.setProperty('--size', `${15 + ((index * 7 + generation * 3) % 18)}px`);
+            balloon.style.setProperty('--delay', `${(index % 8) * -0.65}s`);
+            balloon.style.setProperty('--duration', `${7.6 + ((index * 11) % 34) / 10}s`);
+        };
+
+        const createPopEffect = (balloon) => {
+            const layerBounds = particleLayer.getBoundingClientRect();
+            const balloonBounds = balloon.getBoundingClientRect();
+            const x = balloonBounds.left - layerBounds.left + (balloonBounds.width / 2);
+            const y = balloonBounds.top - layerBounds.top + (balloonBounds.height / 2);
+            const ring = document.createElement('i');
+            ring.className = 'welcome-balloon-pop-ring';
+            ring.style.setProperty('--x', `${x}px`);
+            ring.style.setProperty('--y', `${y}px`);
+            particleLayer.appendChild(ring);
+
+            Array.from({ length: 10 }).forEach((_, index) => {
+                const angle = (Math.PI * 2 * index / 10) + (Math.random() * .35);
+                const distance = 30 + Math.random() * 46;
+                const spark = document.createElement('i');
+                spark.className = 'welcome-balloon-spark';
+                spark.style.setProperty('--x', `${x}px`);
+                spark.style.setProperty('--y', `${y}px`);
+                spark.style.setProperty('--burst-x', `${Math.cos(angle) * distance}px`);
+                spark.style.setProperty('--burst-y', `${Math.sin(angle) * distance}px`);
+                spark.style.setProperty('--color', sparkColors[index % sparkColors.length]);
+                particleLayer.appendChild(spark);
+                window.setTimeout(() => spark.remove(), 720);
+            });
+            window.setTimeout(() => ring.remove(), 640);
+        };
+
+        const createBalloon = (index, generation = 0) => {
+            const balloon = document.createElement('button');
+            balloon.type = 'button';
+            balloon.className = 'welcome-balloon';
+            balloon.setAttribute('aria-label', 'Pecahkan balon');
+            balloon.dataset.balloonTone = ['gold', 'blue', 'mint'][index % 3];
+            balloon.dataset.balloonMotion = ['one', 'two', 'three', 'four'][index % 4];
+            placeBalloon(balloon, index, generation);
+            if (generation > 0 && !reduceMotion) {
+                balloon.classList.add('is-entering');
+                window.setTimeout(() => balloon.classList.remove('is-entering'), 800);
+            }
+
+            balloon.addEventListener('pointerdown', (event) => event.stopPropagation());
+            balloon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                if (balloon.classList.contains('is-popped')) return;
+
+                balloon.classList.add('is-popped');
+                if (!reduceMotion) createPopEffect(balloon);
+
+                window.setTimeout(() => {
+                    balloon.remove();
+                    if (particleLayer.isConnected) particleLayer.appendChild(createBalloon(index, generation + 1));
+                }, reduceMotion ? 80 : 560);
+            });
+            return balloon;
+        };
+
         Array.from({ length: 16 }).forEach((_, index) => {
-            const particle = document.createElement('i');
-            particle.className = 'welcome-particle';
-            particle.style.setProperty('--x', `${6 + ((index * 37) % 88)}%`);
-            particle.style.setProperty('--y', `${8 + ((index * 53) % 78)}%`);
-            particle.style.setProperty('--size', `${8 + ((index * 7) % 13)}px`);
-            particle.style.setProperty('--delay', `${(index % 8) * -0.65}s`);
-            particle.style.setProperty('--duration', `${5.5 + ((index * 11) % 32) / 10}s`);
-            particleLayer.appendChild(particle);
+            particleLayer.appendChild(createBalloon(index));
         });
     }
 

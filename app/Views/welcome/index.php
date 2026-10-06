@@ -3,7 +3,7 @@
 
 <section class="welcome-screen" data-welcome-scene aria-labelledby="welcome-title">
     <canvas class="welcome-liquid-canvas" data-welcome-fluid aria-hidden="true"></canvas>
-    <div class="welcome-particles" data-welcome-particles aria-hidden="true"></div>
+    <div class="welcome-particles" data-welcome-particles role="group" aria-label="Balon interaktif. Klik balon untuk memecahkannya."></div>
     <article class="welcome-card" data-welcome-card>
         <div class="welcome-brand" aria-label="JAKSA Operasional">
             <img class="welcome-brand-logo" src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>" alt="JAKSA">
