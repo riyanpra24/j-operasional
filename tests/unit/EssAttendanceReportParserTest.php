@@ -45,7 +45,7 @@ final class EssAttendanceReportParserTest extends CIUnitTestCase
         $this->assertSame(0, $report['summary']['TAM']);
         $this->assertSame(1, $report['summary']['TAP']);
         $this->assertSame(1, $report['summary']['A']);
-        $this->assertSame(1, $report['summary']['I']);
+        $this->assertSame(1, $report['summary']['CT']);
         $this->assertCount(4, $report['records']);
         $this->assertSame('H', $report['records'][0]['recap_code']);
         $this->assertSame('TAP', $report['records'][1]['recap_code']);
@@ -56,7 +56,22 @@ final class EssAttendanceReportParserTest extends CIUnitTestCase
         $this->assertSame('H', $employees['90873']['days'][3]);
         $this->assertSame('TAP', $employees['90873']['days'][4]);
         $this->assertSame('A', $employees['90870']['days'][3]);
-        $this->assertSame('I', $employees['90870']['days'][4]);
+        $this->assertSame('CT', $employees['90870']['days'][4]);
+    }
+
+    public function testNormalizesEssLeaveCodesToCt(): void
+    {
+        file_put_contents($this->fixturePath, $this->reportHtml([
+            $this->row('46237', 'Cuti CS', '90871', 'CS', 'CS', '', ''),
+            $this->row('46238', 'Cuti CBR', '90872', 'CBR', 'CBR', '', ''),
+            $this->row('46239', 'Cuti CK', '90873', 'CK', 'CK', '', ''),
+            $this->row('46240', 'Cuti SD', '90874', 'SD', 'SD', '', ''),
+        ]));
+
+        $report = (new EssAttendanceReportParser())->parse($this->fixturePath, 'attendance.xls');
+
+        $this->assertSame(4, $report['summary']['CT']);
+        $this->assertSame(['CT', 'CT', 'CT', 'CT'], array_column($report['records'], 'recap_code'));
     }
 
     public function testKeepsASingleScanWhenEssStatusIsEmpty(): void

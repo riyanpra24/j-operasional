@@ -31,7 +31,7 @@
     </form>
 </section>
 
-<section class="panel register-panel security-register-panel">
+<section class="panel register-panel security-register-panel document-archive-table async-table-card" id="securityIncomingTableArea" aria-live="polite">
     <div class="table-wrap">
         <table>
             <thead>
@@ -68,9 +68,10 @@
         </table>
     </div>
     <div class="table-list-footer">
-        <form method="get" action="<?= site_url('dokumen-masuk') ?>" class="table-length-form"><input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="jenis" value="<?= esc($filters['jenis']) ?>"><input type="hidden" name="dari" value="<?= esc($filters['from']) ?>"><input type="hidden" name="sampai" value="<?= esc($filters['to']) ?>"><input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>"><label for="dokumen_per_page">Tampilkan</label><select id="dokumen_per_page" name="per_page" aria-label="Jumlah baris per halaman" data-table-length><?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select><span>data</span></form><?php if ($dokumen !== []): ?><div class="pagination-wrap"><?= $pager->links('dokumen_masuk', 'default_full') ?></div><?php endif ?>
+        <form method="get" action="<?= site_url('dokumen-masuk') ?>" class="table-length-form"><input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>"><input type="hidden" name="jenis" value="<?= esc($filters['jenis']) ?>"><input type="hidden" name="dari" value="<?= esc($filters['from']) ?>"><input type="hidden" name="sampai" value="<?= esc($filters['to']) ?>"><input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>"><label for="dokumen_per_page">Tampilkan</label><select id="dokumen_per_page" name="per_page" aria-label="Jumlah baris per halaman" data-async-table-length><?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select><span>data</span></form><?php if ($dokumen !== []): ?><div class="pagination-wrap"><?= $pager->links('dokumen_masuk', 'table_full') ?></div><?php endif ?>
     </div>
 </section>
+<?= view('components/async_table_card', ['cardId' => 'securityIncomingTableArea']) ?>
 <?= view('components/reopen_progress_modal', [
     'reopenTitle'       => 'Kembalikan ke Distribusi Dokumen?',
     'reopenDescription' => 'akan hilang dari arsip dan kembali ke Distribusi Dokumen agar dapat diedit.',

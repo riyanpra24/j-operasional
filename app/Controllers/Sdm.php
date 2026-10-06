@@ -644,6 +644,9 @@ class Sdm extends BaseController
      */
     private function attendancePageData(?int $selectedImportId = null, ?string $error = null): array
     {
+        $perPage = (int) $this->request->getGet('per_page');
+        $perPage = in_array($perPage, [10, 20, 50, 100], true) ? $perPage : 10;
+        $requestedPage = max(1, (int) $this->request->getGet('halaman'));
         $filters = [
             'name'         => trim((string) $this->request->getGet('nama')),
             'work_unit'    => trim((string) $this->request->getGet('unit_kerja')),
@@ -704,15 +707,39 @@ class Sdm extends BaseController
             }
         }
 
+        $report = $selectedImport !== null ? $this->storedAttendanceReport($selectedImport, $filters) : null;
+        $attendancePagination = [
+            'per_page'     => $perPage,
+            'current_page' => 1,
+            'last_page'    => 1,
+            'total'        => 0,
+            'offset'       => 0,
+        ];
+        if ($report !== null) {
+            $total = count($report['employees']);
+            $lastPage = max(1, (int) ceil($total / $perPage));
+            $currentPage = min($requestedPage, $lastPage);
+            $offset = ($currentPage - 1) * $perPage;
+            $report['employees'] = array_slice($report['employees'], $offset, $perPage);
+            $attendancePagination = [
+                'per_page'     => $perPage,
+                'current_page' => $currentPage,
+                'last_page'    => $lastPage,
+                'total'        => $total,
+                'offset'       => $offset,
+            ];
+        }
+
         return [
             'title'            => 'Data Kehadiran | SDM & Teller',
-            'report'           => $selectedImport !== null ? $this->storedAttendanceReport($selectedImport, $filters) : null,
+            'report'           => $report,
             'importError'      => $error,
             'attendanceImports' => $filteredImports,
             'attendanceExportImports' => $imports,
             'attendanceWorkUnits' => $workUnits,
             'selectedImportId' => $selectedImport !== null ? (int) $selectedImport['id'] : null,
             'attendanceFilters' => $filters,
+            'attendancePagination' => $attendancePagination,
             'attendanceCalendar' => $this->attendanceCalendarPopupData($selectedImport),
         ];
     }
@@ -947,7 +974,7 @@ class Sdm extends BaseController
 
             $recordDate = new \DateTimeImmutable($record['attendance_date']);
             $calendarInfo = $holidayCalendar->info($recordDate);
-            $code = $record['recap_code'];
+            $code = $this->normalizeAttendanceLeaveCode((string) $record['recap_code']);
             $actualIn = $record['actual_in'];
             $actualOut = $record['actual_out'];
             if ($code === 'I') {
@@ -1274,7 +1301,7 @@ class Sdm extends BaseController
                         ? 'OFF'
                         : ($record['recap_code'] === 'I'
                             ? (strtoupper((string) ($record['raw_status'] ?? '')) === 'IZ' ? 'IZ' : 'CT')
-                            : $record['recap_code']));
+                            : $this->normalizeAttendanceLeaveCode((string) $record['recap_code'])));
             if ($code === 'ODR' && $isNonWorkingDay) {
                 $counts['OFF']++;
             } else {
@@ -1299,6 +1326,15 @@ class Sdm extends BaseController
     private function isOnDutyRequestRemark(string $remark): bool
     {
         return preg_match('/\b(?:on\s*duty\s*request|odr)\b/i', $remark) === 1;
+    }
+
+    private function normalizeAttendanceLeaveCode(string $code): string
+    {
+        $code = strtoupper(trim($code));
+
+        return in_array($code, ['CT', 'RI', 'CS', 'CBR', 'CK', 'SD'], true) || preg_match('/^CB(?:\d+)?$/', $code) === 1
+            ? 'CT'
+            : $code;
     }
 
     public function synchronizeIncomingDocuments(): RedirectResponse

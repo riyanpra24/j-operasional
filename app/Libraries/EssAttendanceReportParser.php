@@ -11,6 +11,7 @@ final class EssAttendanceReportParser
 {
     private const COLUMN_COUNT = 24;
     private const LATE_FROM = '08:01:00';
+    private const LEAVE_STATUSES = ['CT', 'RI', 'CS', 'CBR', 'CK', 'SD'];
 
     /**
      * Mengubah laporan ESS berbentuk HTML-XLS menjadi rekap absensi bulanan.
@@ -324,7 +325,7 @@ final class EssAttendanceReportParser
             return 'IZ';
         }
 
-        if ($record['status'] === 'CT' || $record['status'] === 'RI' || preg_match('/^CB(?:\d+)?$/', $record['status']) === 1) {
+        if (in_array($record['status'], self::LEAVE_STATUSES, true) || preg_match('/^CB(?:\d+)?$/', $record['status']) === 1) {
             return 'CT';
         }
 

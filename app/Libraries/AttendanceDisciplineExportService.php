@@ -17,6 +17,7 @@ final class AttendanceDisciplineExportService
     private const MAIN_NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
     private const REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships';
     private const OFFICE_REL_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+    private const LEAVE_CODES = ['CT', 'RI', 'CS', 'CBR', 'CK', 'SD'];
     private ?DOMDocument $pendingAttendanceStylesDocument = null;
 
     /** @param array<string, mixed> $import
@@ -359,7 +360,7 @@ final class AttendanceDisciplineExportService
             return 'OFF';
         }
 
-        $code = strtoupper((string) ($record['recap_code'] ?? ''));
+        $code = $this->normalizeLeaveCode((string) ($record['recap_code'] ?? ''));
         if ($code === 'I') {
             $code = strtoupper((string) ($record['raw_status'] ?? '')) === 'IZ' ? 'IZ' : 'CT';
         }
@@ -706,6 +707,15 @@ final class AttendanceDisciplineExportService
             'TLTAP' => 'TL/TAP',
             default => $code,
         };
+    }
+
+    private function normalizeLeaveCode(string $code): string
+    {
+        $code = strtoupper(trim($code));
+
+        return in_array($code, self::LEAVE_CODES, true) || preg_match('/^CB(?:\d+)?$/', $code) === 1
+            ? 'CT'
+            : $code;
     }
 
     private function sheetData(DOMDocument $document): DOMElement

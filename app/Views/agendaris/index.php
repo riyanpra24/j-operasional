@@ -38,7 +38,7 @@ $detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
     </form>
 </section>
 
-<section class="panel register-panel agendaris-table-panel">
+<section class="panel register-panel agendaris-table-panel async-table-card" id="agendarisIncomingTableArea" aria-live="polite">
     <div class="table-wrap">
         <table>
             <thead>
@@ -103,12 +103,14 @@ $detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
             <input type="hidden" name="sampai" value="<?= esc($filters['to']) ?>">
             <input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">
             <label for="agenda_per_page">Tampilkan</label>
-            <select id="agenda_per_page" name="per_page" aria-label="Jumlah baris per halaman" data-table-length><?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select>
+            <select id="agenda_per_page" name="per_page" aria-label="Jumlah baris per halaman" data-async-table-length><?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select>
             <span>data</span>
         </form>
-        <?php if ($agenda !== []): ?><div class="pagination-wrap"><?= $pager->links('agendaris', 'default_full') ?></div><?php endif ?>
+        <?php if ($agenda !== []): ?><div class="pagination-wrap"><?= $pager->links('agendaris', 'table_full') ?></div><?php endif ?>
     </div>
 </section>
+
+<?= view('components/async_table_card', ['cardId' => 'agendarisIncomingTableArea']) ?>
 
 <?= view('agendaris/detail_modal', ['readOnly' => true, 'contextLabel' => 'DETAIL ' . $contextLabel]) ?>
 <?php if (! $archiveView): ?><?= view('components/reopen_progress_modal') ?><?php endif ?>

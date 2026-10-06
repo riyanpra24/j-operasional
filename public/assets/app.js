@@ -750,11 +750,11 @@
         window.setTimeout(() => { detailModal.hidden = true; }, 180);
     };
 
-    document.querySelectorAll('[data-open-detail-modal]').forEach((trigger) => {
-        trigger.addEventListener('click', (event) => {
-            event.preventDefault();
-            openDetailModal(trigger.dataset.detailUrl || trigger.href);
-        });
+    document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-open-detail-modal]');
+        if (!trigger) return;
+        event.preventDefault();
+        openDetailModal(trigger.dataset.detailUrl || trigger.href);
     });
 
     detailModal?.querySelectorAll('[data-detail-close]').forEach((trigger) => trigger.addEventListener('click', closeDetailModal));
@@ -1760,7 +1760,10 @@
         }
     };
 
-    document.querySelectorAll('[data-agendaris-view]').forEach((button) => button.addEventListener('click', () => openAgendaDetail(button.dataset.agendarisUrl)));
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-agendaris-view]');
+        if (button) openAgendaDetail(button.dataset.agendarisUrl);
+    });
     agendaDetailModal?.querySelectorAll('[data-agendaris-detail-close]').forEach((button) => button.addEventListener('click', closeAgendaDetail));
     agendaDetailEdit?.addEventListener('click', () => {
         closeAgendaDetail();
@@ -1976,7 +1979,10 @@
         }
     };
 
-    document.querySelectorAll('[data-dokumen-keluar-view]').forEach((button) => button.addEventListener('click', () => openDokumenKeluarDetail(button.dataset.dokumenKeluarUrl)));
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-dokumen-keluar-view]');
+        if (button) openDokumenKeluarDetail(button.dataset.dokumenKeluarUrl);
+    });
     dokumenKeluarDetailModal?.querySelectorAll('[data-dokumen-keluar-detail-close]').forEach((button) => button.addEventListener('click', closeDokumenKeluarDetail));
     dokumenKeluarDetailEdit?.addEventListener('click', () => { closeDokumenKeluarDetail(); openDokumenKeluarEdit(currentDokumenKeluarUrl); });
 
@@ -2236,7 +2242,9 @@
         window.setTimeout(() => { reopenProgressModal.hidden = true; }, 180);
     };
 
-    document.querySelectorAll('[data-reopen-progress]').forEach((button) => button.addEventListener('click', () => {
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-reopen-progress]');
+        if (!button) return;
         if (!reopenProgressModal || !reopenProgressForm) return;
         const lockedMessage = button.dataset.reopenLockedMessage || '';
         reopenProgressForm.action = button.dataset.reopenUrl;
@@ -2258,7 +2266,7 @@
         reopenProgressModal.setAttribute('aria-hidden', 'false');
         requestAnimationFrame(() => reopenProgressModal.classList.add('open'));
         document.body.style.overflow = 'hidden';
-    }));
+    });
 
     reopenProgressModal?.querySelectorAll('[data-reopen-progress-close]').forEach((button) => button.addEventListener('click', closeReopenProgress));
     reopenProgressForm?.addEventListener('submit', async (event) => {

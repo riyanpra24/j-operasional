@@ -8,6 +8,7 @@
 /** @var list<string> $attendanceWorkUnits */
 /** @var int|null $selectedImportId */
 /** @var array<string, string> $attendanceFilters */
+/** @var array{per_page:int,current_page:int,last_page:int,total:int,offset:int} $attendancePagination */
 
 $statusLabels = [
     'H' => 'Hadir tepat waktu',
@@ -99,6 +100,7 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
                 <label for="attendance_to">Sampai tanggal</label>
                 <input id="attendance_to" type="date" name="sampai" value="<?= esc($attendanceFilters['to'] ?? '', 'attr') ?>" min="<?= esc($report['period_start'] ?? '', 'attr') ?>" max="<?= esc($report['period_end'] ?? '', 'attr') ?>">
             </div>
+            <input type="hidden" name="per_page" value="<?= (int) $attendancePagination['per_page'] ?>">
             <div class="sdm-daily-filter-actions">
                 <button type="submit" class="btn btn-primary">Tampilkan</button>
                 <a href="<?= site_url('sdm/data-kehadiran' . ($selectedImportId !== null ? '?import_id=' . (int) $selectedImportId : '')) ?>" class="btn btn-ghost">Reset</a>
@@ -123,8 +125,17 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
     $displayStartDay = (int) $report['display_start_day'];
     $displayEndDay = (int) $report['display_end_day'];
     $periodPrefix = substr((string) $report['period_start'], 0, 7);
+    $attendancePageQuery = array_filter([
+        'import_id'  => $selectedImportId,
+        'unit_kerja' => $attendanceFilters['work_unit'] ?? '',
+        'nama'       => $attendanceFilters['name'] ?? '',
+        'dari'       => $attendanceFilters['from'] ?? '',
+        'sampai'     => $attendanceFilters['to'] ?? '',
+        'per_page'   => $attendancePagination['per_page'],
+    ], static fn ($value): bool => $value !== null && $value !== '');
+    $attendancePageUrl = static fn (int $page): string => site_url('sdm/data-kehadiran') . '?' . http_build_query(array_merge($attendancePageQuery, ['halaman' => $page]));
     ?>
-    <section class="panel sdm-daily-panel">
+    <section class="panel sdm-daily-panel" id="attendanceTableArea" aria-live="polite">
         <header class="sdm-daily-panel-header">
             <div>
                 <h2>Data Kehadiran Karyawan</h2>
@@ -156,13 +167,14 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($report['employees'] as $index => $employee): ?>
+                        <?php $rowNumber = (int) $attendancePagination['offset'] + 1; ?>
+                        <?php foreach ($report['employees'] as $employee): ?>
                             <?php
                             $totalPresent = (int) $employee['totals']['H'] + (int) $employee['totals']['TLBT'] + (int) ($employee['totals']['TLTAP'] ?? 0) + (int) ($employee['totals']['ODR'] ?? 0) + (int) $employee['totals']['TA'] + (int) $employee['totals']['TAM'] + (int) $employee['totals']['TAP'] + (int) ($employee['totals']['TPA'] ?? 0);
-                            $detailId = 'attendance-staff-' . $index;
+                            $detailId = 'attendance-staff-' . $rowNumber;
                             ?>
                             <tr>
-                                <td class="sdm-daily-fixed sdm-daily-no"><?= $index + 1 ?></td>
+                                <td class="sdm-daily-fixed sdm-daily-no"><?= $rowNumber++ ?></td>
                                 <td class="sdm-daily-fixed sdm-daily-npp"><?= esc($employee['employee_no']) ?></td>
                                 <td class="sdm-daily-fixed sdm-daily-name"><button type="button" class="sdm-staff-toggle" data-attendance-staff-toggle aria-expanded="false" aria-controls="<?= esc($detailId, 'attr') ?>"><i aria-hidden="true">›</i><span><strong><?= esc($employee['employee_name']) ?></strong><small>Lihat detail kehadiran</small></span></button></td>
                                 <td class="sdm-daily-fixed sdm-daily-position"><?= esc($employee['position'] ?: '-') ?></td>
@@ -207,24 +219,38 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
             </div>
         <?php endif ?>
 
-        <footer class="sdm-daily-footer">
-            <span><strong><?= count($report['employees']) ?></strong> karyawan ditampilkan</span>
-            <span>Sumber: <?= esc($report['source_name']) ?></span>
+        <footer class="table-list-footer sdm-daily-table-footer">
+            <form method="get" action="<?= site_url('sdm/data-kehadiran') ?>" class="table-length-form">
+                <?php foreach (['import_id' => $selectedImportId, 'unit_kerja' => $attendanceFilters['work_unit'] ?? '', 'nama' => $attendanceFilters['name'] ?? '', 'dari' => $attendanceFilters['from'] ?? '', 'sampai' => $attendanceFilters['to'] ?? ''] as $name => $value): ?>
+                    <?php if ($value !== null && $value !== ''): ?><input type="hidden" name="<?= esc($name, 'attr') ?>" value="<?= esc((string) $value, 'attr') ?>"><?php endif ?>
+                <?php endforeach ?>
+                <label for="attendance_per_page">Tampilkan</label>
+                <select id="attendance_per_page" name="per_page" aria-label="Jumlah karyawan per halaman" data-attendance-page-size>
+                    <?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $attendancePagination['per_page'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?>
+                </select>
+                <span>data</span>
+            </form>
+            <?php if ($attendancePagination['last_page'] > 1): ?>
+                <?php
+                $firstPage = max(1, $attendancePagination['current_page'] - 2);
+                $lastPage = min($attendancePagination['last_page'], $attendancePagination['current_page'] + 2);
+                ?>
+                <div class="pagination-wrap">
+                    <nav aria-label="Navigasi halaman data kehadiran"><ul class="pagination">
+                        <?php if ($attendancePagination['current_page'] > 1): ?>
+                            <li><a href="<?= esc($attendancePageUrl(1), 'attr') ?>">First</a></li>
+                            <li><a href="<?= esc($attendancePageUrl($attendancePagination['current_page'] - 1), 'attr') ?>">Previous</a></li>
+                        <?php endif ?>
+                        <?php for ($page = $firstPage; $page <= $lastPage; $page++): ?><li <?= $page === $attendancePagination['current_page'] ? 'class="active"' : '' ?>><a href="<?= esc($attendancePageUrl($page), 'attr') ?>"><?= $page ?></a></li><?php endfor ?>
+                        <?php if ($attendancePagination['current_page'] < $attendancePagination['last_page']): ?>
+                            <li><a href="<?= esc($attendancePageUrl($attendancePagination['current_page'] + 1), 'attr') ?>">Next</a></li>
+                            <li><a href="<?= esc($attendancePageUrl($attendancePagination['last_page']), 'attr') ?>">Last</a></li>
+                        <?php endif ?>
+                    </ul></nav>
+                </div>
+            <?php endif ?>
         </footer>
     </section>
-    <script>
-    (() => {
-        document.querySelectorAll('[data-attendance-staff-toggle]').forEach((button) => {
-            button.addEventListener('click', () => {
-                const detail = document.getElementById(button.getAttribute('aria-controls'));
-                if (!detail) return;
-                const expanded = button.getAttribute('aria-expanded') === 'true';
-                button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-                detail.hidden = expanded;
-            });
-        });
-    })();
-    </script>
 <?php else: ?>
     <section class="panel sdm-daily-panel">
         <div class="empty-state sdm-daily-empty sdm-daily-upload-empty">
@@ -235,6 +261,77 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
         </div>
     </section>
 <?php endif ?>
+
+<script>
+(() => {
+    const cardSelector = '#attendanceTableArea';
+    let pendingRequest = null;
+
+    const replaceTableCard = async (url, updateHistory = true) => {
+        const currentCard = document.querySelector(cardSelector);
+        if (!currentCard) {
+            window.location.assign(url);
+            return;
+        }
+
+        pendingRequest?.abort();
+        const request = new AbortController();
+        pendingRequest = request;
+        currentCard.classList.add('is-loading');
+
+        try {
+            const response = await fetch(url, {
+                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                signal: request.signal,
+            });
+            if (!response.ok) throw new Error('Attendance table request failed.');
+
+            const documentResponse = new DOMParser().parseFromString(await response.text(), 'text/html');
+            const nextCard = documentResponse.querySelector(cardSelector);
+            if (!nextCard) throw new Error('Attendance table card is unavailable.');
+
+            currentCard.replaceWith(nextCard);
+            if (updateHistory) history.pushState({attendanceTable: true}, '', url);
+        } catch (error) {
+            if (error.name !== 'AbortError') window.location.assign(url);
+        } finally {
+            if (pendingRequest === request) pendingRequest = null;
+            currentCard.classList.remove('is-loading');
+        }
+    };
+
+    document.addEventListener('click', (event) => {
+        const toggle = event.target.closest('[data-attendance-staff-toggle]');
+        if (toggle) {
+            const detail = document.getElementById(toggle.getAttribute('aria-controls'));
+            if (!detail) return;
+            const expanded = toggle.getAttribute('aria-expanded') === 'true';
+            toggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+            detail.hidden = expanded;
+            return;
+        }
+
+        const link = event.target.closest(`${cardSelector} .pagination a`);
+        if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        replaceTableCard(link.href);
+    });
+
+    document.addEventListener('change', (event) => {
+        const select = event.target.closest('[data-attendance-page-size]');
+        if (!select) return;
+        const form = select.form;
+        if (!form) return;
+        const url = new URL(form.action, window.location.href);
+        const query = new URLSearchParams(new FormData(form));
+        query.delete('halaman');
+        url.search = query.toString();
+        replaceTableCard(url.toString());
+    });
+
+    window.addEventListener('popstate', () => replaceTableCard(window.location.href, false));
+})();
+</script>
 
 <div class="input-modal attendance-upload-modal" id="attendanceUploadModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-close-attendance-upload aria-label="Tutup unggahan"></button>

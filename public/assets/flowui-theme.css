@@ -1072,6 +1072,10 @@ body:not(.landing-page):not(.login-page) .table-wrap table thead th {
 .progress-page .security-register-panel .agenda-source.manual { color: #4165a8 !important; background: #eef3ff !important; border-color: #d2dfff !important; }
 .progress-page .security-register-panel .agenda-incomplete { color: #9a6915 !important; background: #fff4d9 !important; border-color: #f2d491 !important; }
 
+/* Isi tabel arsip Dokumen Masuk dan Dokumen Keluar dibuat lebih tegas. */
+.document-archive-table .table-wrap > table > tbody > tr > td,
+.document-archive-table .table-wrap > table > tbody > tr > td strong { color: #111827 !important; }
+
 @media (max-width: 1000px) {
     .progress-page .agendaris-filter-form { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     .progress-page .agendaris-filter-form .search-group { grid-column: span 2; }
