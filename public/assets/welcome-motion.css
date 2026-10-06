@@ -129,6 +129,8 @@ body.jaksa-bg.welcome-page .footer {
     width: var(--size);
     height: var(--size);
     padding: 0;
+    -webkit-appearance: none;
+    appearance: none;
     border: 1px solid rgba(255, 255, 255, .92);
     border-radius: 50% 50% 48% 48%;
     background: radial-gradient(circle at 31% 28%, #fff 0 9%, #8ed8ff 12% 35%, #087ee7 57%, rgba(8, 126, 231, .12) 72%);
@@ -140,6 +142,7 @@ body.jaksa-bg.welcome-page .footer {
     animation: welcome-bubble-float var(--duration) ease-in-out var(--delay) infinite;
 }
 
+.welcome-balloon:focus { outline: none; }
 .welcome-balloon:focus-visible {
     outline: 3px solid rgba(255, 255, 255, .94);
     outline-offset: 4px;
@@ -203,15 +206,15 @@ body.jaksa-bg.welcome-page .footer {
 }
 
 @keyframes welcome-balloon-pop {
-    0% { opacity: 1; filter: brightness(1); transform: scale(1); }
-    35% { opacity: 1; filter: brightness(1.8); transform: scale(1.45); }
-    100% { opacity: 0; filter: brightness(2); transform: scale(.12); }
+    0% { opacity: 1; transform: scale(1); }
+    35% { opacity: .98; transform: scale(1.38); }
+    100% { opacity: 0; transform: scale(.12); }
 }
 
 @keyframes welcome-balloon-enter {
-    0% { opacity: 0; filter: brightness(1.45); transform: scale(.48); }
-    62% { opacity: .92; filter: brightness(1.1); transform: scale(1.07); }
-    100% { opacity: .94; filter: brightness(1); transform: scale(1); }
+    0% { opacity: 0; transform: scale(.48); }
+    62% { opacity: .92; transform: scale(1.07); }
+    100% { opacity: .94; transform: scale(1); }
 }
 
 @keyframes welcome-balloon-spark {
