@@ -4,10 +4,14 @@
 
 $fieldId = $id ?? 'list_order';
 $selectedOrder = $value ?? '';
+$orderLabel = $label ?? 'Urutan tanggal';
+$defaultLabel = $defaultLabel ?? 'Urutan awal';
+$newestLabel = $newestLabel ?? 'Terbaru ke terlama';
+$oldestLabel = $oldestLabel ?? 'Terlama ke terbaru';
 $selectedLabel = [
-    'terbaru' => 'Terbaru ke terlama',
-    'terlama' => 'Terlama ke terbaru',
-][$selectedOrder] ?? 'Atur urutan tanggal';
+    'terbaru' => $newestLabel,
+    'terlama' => $oldestLabel,
+][$selectedOrder] ?? $orderLabel;
 ?>
 <div class="form-group list-order-filter <?= $selectedOrder !== '' ? 'is-active' : '' ?>">
     <details class="list-order-menu">
@@ -17,11 +21,11 @@ $selectedLabel = [
             </svg>
         </summary>
         <div class="list-order-popover">
-            <label for="<?= esc($fieldId, 'attr') ?>">Urutan tanggal</label>
+            <label for="<?= esc($fieldId, 'attr') ?>"><?= esc($orderLabel) ?></label>
             <select id="<?= esc($fieldId, 'attr') ?>" name="urutan">
-                <option value="" <?= $selectedOrder === '' ? 'selected' : '' ?>>Urutan awal</option>
-                <option value="terbaru" <?= $selectedOrder === 'terbaru' ? 'selected' : '' ?>>Terbaru ke terlama</option>
-                <option value="terlama" <?= $selectedOrder === 'terlama' ? 'selected' : '' ?>>Terlama ke terbaru</option>
+                <option value="" <?= $selectedOrder === '' ? 'selected' : '' ?>><?= esc($defaultLabel) ?></option>
+                <option value="terbaru" <?= $selectedOrder === 'terbaru' ? 'selected' : '' ?>><?= esc($newestLabel) ?></option>
+                <option value="terlama" <?= $selectedOrder === 'terlama' ? 'selected' : '' ?>><?= esc($oldestLabel) ?></option>
             </select>
             <small>Klik Terapkan untuk mengurutkan tabel.</small>
         </div>

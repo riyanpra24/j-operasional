@@ -6,6 +6,7 @@ use App\Libraries\MagangWorkbookParser;
 use App\Models\MagangModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\RedirectResponse;
+use CodeIgniter\HTTP\ResponseInterface;
 use RuntimeException;
 
 final class Magang extends BaseController
@@ -70,23 +71,29 @@ final class Magang extends BaseController
         }
         $this->applyStatusFilter($model, $status, $today);
 
-        if ($order === 'terlama') {
-            $model->orderBy('tanggal_mulai', 'ASC')->orderBy('id', 'ASC');
-        } else {
-            $model->orderBy('tanggal_mulai', 'DESC')->orderBy('id', 'DESC');
-        }
+        $this->applyContractNumberOrder($model, $order);
 
         $savedUnits = (new MagangModel())->select('unit_kerja')->distinct()->orderBy('unit_kerja', 'ASC')->findColumn('unit_kerja') ?: [];
         $units = array_values(array_unique(array_merge(self::UNIT_OPTIONS, $savedUnits)));
         $savedTypes = (new MagangModel())->select('jenis_magang')->distinct()->orderBy('jenis_magang', 'ASC')->findColumn('jenis_magang') ?: [];
         $types = array_values(array_unique(array_merge(self::TYPE_OPTIONS, $savedTypes)));
         $total = (new MagangModel())->countAllResults();
+        $activeTotal = (new MagangModel())
+            ->where('tanggal_mulai <=', $today)
+            ->where('tanggal_selesai >=', $today)
+            ->countAllResults();
+        $completedTotal = (new MagangModel())
+            ->where('tanggal_selesai <', $today)
+            ->where('tanggal_mulai IS NOT NULL', null, false)
+            ->countAllResults();
 
         return view('sdm/data_magang', [
             'title' => 'Data Magang | SDM & Teller',
             'records' => $this->decorate($model->paginate($perPage, 'data_magang'), $today),
             'pager' => $model->pager,
             'total' => $total,
+            'activeTotal' => $activeTotal,
+            'completedTotal' => $completedTotal,
             'units' => $units,
             'types' => $types,
             'nextContractSequence' => $this->nextContractSequence(),
@@ -153,6 +160,99 @@ final class Magang extends BaseController
         return $this->returnToList()->with('success', 'Data ' . $record['nama_magang'] . ' berhasil dihapus.');
     }
 
+    /** Download every active record matching the current list filters. */
+    public function export(): ResponseInterface
+    {
+        $keyword = trim((string) $this->request->getGet('q'));
+        $unit = trim((string) $this->request->getGet('unit_kerja'));
+        $status = trim((string) $this->request->getGet('status'));
+        $type = trim((string) $this->request->getGet('jenis'));
+        $order = $this->requestedListOrder();
+        $today = date('Y-m-d');
+
+        if (! in_array($status, self::STATUSES, true)) {
+            $status = '';
+        }
+
+        $model = new MagangModel();
+        if ($keyword !== '') {
+            $model->groupStart()
+                ->like('nama_magang', $keyword)
+                ->orLike('nomor_kontrak_kerja', $keyword)
+                ->orLike('unit_kerja', $keyword)
+                ->orLike('jenis_magang', $keyword)
+                ->groupEnd();
+        }
+        if ($unit !== '') {
+            $model->where('unit_kerja', $unit);
+        }
+        if ($type !== '') {
+            $model->where('jenis_magang', $type);
+        }
+        $this->applyStatusFilter($model, $status, $today);
+        $this->applyContractNumberOrder($model, $order);
+
+        $records = $this->decorate($model->findAll(), $today);
+        $rows = [
+            ['No.', 'Nama Peserta', 'Nomor Kontrak Kerja', 'Unit Kerja', 'Jenis Magang', 'Awal Magang', 'Selesai Magang', 'Status', 'Link PKK', 'Keterangan'],
+        ];
+        foreach ($records as $index => $record) {
+            $rows[] = [
+                (string) ($index + 1),
+                (string) ($record['nama_magang'] ?? ''),
+                (string) ($record['nomor_kontrak_kerja'] ?? ''),
+                (string) ($record['unit_kerja'] ?? ''),
+                (string) ($record['jenis_magang'] ?? ''),
+                (string) ($record['tanggal_mulai'] ?? ''),
+                (string) ($record['tanggal_selesai'] ?? ''),
+                (string) ($record['status'] ?? ''),
+                (string) ($record['link_pkk'] ?? ''),
+                (string) ($record['keterangan'] ?? ''),
+            ];
+        }
+
+        return $this->response
+            ->setHeader('Cache-Control', 'private, no-store, max-age=0')
+            ->setHeader('Content-Disposition', 'attachment; filename="Data_Magang_' . date('Ymd_His') . '.xls"')
+            ->setContentType('application/vnd.ms-excel; charset=UTF-8')
+            ->setBody($this->spreadsheetXml($rows));
+    }
+
+    /** Permanently remove active Magang records. Restricted to Administrator. */
+    public function destroyAll(): RedirectResponse
+    {
+        if (! $this->currentRoleIsAdmin()) {
+            return $this->returnToList()->with('error', 'Hapus semua data magang hanya tersedia untuk Administrator.');
+        }
+        if ($this->request->getPost('confirm_delete_all') !== '1') {
+            return $this->returnToList()->with('error', 'Konfirmasi hapus semua data terlebih dahulu.');
+        }
+
+        $ids = array_map(
+            static fn (array $row): int => (int) $row['id'],
+            $this->records->select('id')->findAll(),
+        );
+        if ($ids === []) {
+            return $this->returnToList()->with('success', 'Tidak ada data magang aktif untuk dihapus.');
+        }
+
+        $db = db_connect();
+        $db->transBegin();
+        try {
+            $deleted = $db->table('sdm_magang')->whereIn('id', $ids)->delete();
+            if (! $deleted || ! $db->transStatus()) {
+                throw new RuntimeException('Seluruh data magang belum dapat dihapus.');
+            }
+            $db->transCommit();
+        } catch (\Throwable $exception) {
+            $db->transRollback();
+            log_message('error', 'Hapus seluruh data magang gagal: {message}', ['message' => $exception->getMessage()]);
+            return $this->returnToList()->with('error', 'Seluruh data magang belum dapat dihapus.');
+        }
+
+        return $this->returnToList()->with('success', count($ids) . ' data magang berhasil dihapus permanen.');
+    }
+
     public function import(): RedirectResponse
     {
         $file = $this->request->getFile('magang_excel');
@@ -187,6 +287,30 @@ final class Magang extends BaseController
         } catch (RuntimeException $exception) {
             return $this->returnToList()->with('error', $exception->getMessage());
         }
+    }
+
+    /** @param list<list<string>> $rows */
+    private function spreadsheetXml(array $rows): string
+    {
+        $escape = static fn (string $value): string => htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+        $xml = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<?mso-application progid="Excel.Sheet"?>',
+            '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">',
+            '<Styles><Style ss:ID="header"><Font ss:Bold="1"/><Interior ss:Color="#DCEFF3" ss:Pattern="Solid"/></Style></Styles>',
+            '<Worksheet ss:Name="Data Magang"><Table>',
+        ];
+        foreach ($rows as $rowIndex => $row) {
+            $style = $rowIndex === 0 ? ' ss:StyleID="header"' : '';
+            $cells = '';
+            foreach ($row as $value) {
+                $cells .= '<Cell><Data ss:Type="String">' . $escape($value) . '</Data></Cell>';
+            }
+            $xml[] = '<Row' . $style . '>' . $cells . '</Row>';
+        }
+        $xml[] = '</Table></Worksheet></Workbook>';
+
+        return implode('', $xml);
     }
 
     /** @return array<string, string|int|null> */
@@ -267,6 +391,20 @@ final class Magang extends BaseController
         } elseif ($status === 'Selesai') {
             $model->where('tanggal_selesai <', $today)->where('tanggal_mulai IS NOT NULL', null, false);
         }
+    }
+
+    /**
+     * Urutkan daftar dengan nomor yang terlihat pada kontrak, bukan tanggal.
+     * Kolom id menjadi pemutus urutan agar setiap halaman paginasi stabil.
+     */
+    private function applyContractNumberOrder(MagangModel $model, string $order): void
+    {
+        // Urutan awal menampilkan nomor kontrak terbaru terlebih dahulu.
+        // Pilihan "terlama" digunakan bila pengguna ingin melihat nomor kecil lebih dulu.
+        $direction = $order === 'terlama' ? 'ASC' : 'DESC';
+        $model
+            ->orderBy("CAST(SUBSTRING_INDEX(nomor_kontrak_kerja, '/', 1) AS UNSIGNED)", $direction, false)
+            ->orderBy('id', $direction);
     }
 
     /** @param list<array<string, mixed>> $records
