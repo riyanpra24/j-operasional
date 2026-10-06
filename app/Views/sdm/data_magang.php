@@ -184,7 +184,7 @@ $formatDate = static fn(?string $value): string => $value ? date('d-m-Y', strtot
                 </div>
                 <div>
                     <dt>PKK</dt>
-                    <dd><a data-magang-view-pkk href="#" target="_blank" rel="noopener noreferrer">Buka dokumen PKK</a><span data-magang-view-no-pkk>Belum ada PKK</span></dd>
+                    <dd><a class="magang-pkk-link" data-magang-view-pkk href="#" target="_blank" rel="noopener noreferrer" hidden>Buka dokumen</a><span class="magang-pkk-empty" data-magang-view-no-pkk>Belum ada PKK</span></dd>
                 </div>
                 <div class="modal-span-2">
                     <dt>Keterangan</dt>

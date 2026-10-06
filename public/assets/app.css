@@ -4161,7 +4161,9 @@ body:not(.landing-page):not(.login-page) .page-heading.sdm-daily-heading{align-i
 .magang-table th:nth-child(2),.magang-table td:nth-child(2){width:155px;min-width:155px;max-width:155px}
 .magang-table th:nth-child(6),.magang-table td:nth-child(6){width:76px;min-width:76px;max-width:76px;padding-inline:5px}.magang-table th:nth-child(7),.magang-table td:nth-child(7){width:105px;min-width:105px;max-width:105px;padding-inline:5px}.magang-table th:nth-child(8),.magang-table td:nth-child(8){width:115px;min-width:115px;max-width:115px;padding-inline:5px}
 .magang-name{min-width:0}.magang-name strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.magang-pkk-link,.magang-pkk-empty{font-weight:850;background:linear-gradient(100deg,#079b83 0%,#0879b6 100%);-webkit-background-clip:text;background-clip:text;color:transparent}.magang-pkk-link{display:inline-flex;align-items:center;text-decoration:none}.magang-pkk-link[hidden]{display:none!important}.magang-pkk-link:hover{text-decoration:underline;filter:brightness(.9)}.magang-pkk-link:focus-visible{outline:2px solid #66b9b2;outline-offset:3px;border-radius:2px}
 .magang-contract{min-width:0;max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.magang-view-list{gap:0 24px}.magang-view-list>div{padding:12px 0;border:0;border-bottom:1px solid #e2eaf0;border-radius:0;background:transparent}.magang-view-list>div.modal-span-2{grid-column:1/-1}
 .magang-table .magang-note-header{width:125px;min-width:125px;text-align:center!important}
 .magang-note-cell{width:125px;min-width:125px;max-width:125px;padding-inline:8px!important;color:#62788f;font-size:8.5px;line-height:1.45;text-align:center!important;overflow-wrap:anywhere}
 .magang-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 14px}
