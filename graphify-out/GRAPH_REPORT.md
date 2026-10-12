@@ -1,17 +1,17 @@
 # Graph Report - operasional  (2026-10-12)
 
 ## Corpus Check
-- 1039 files · ~1,939,778 words
+- 1039 files · ~1,939,903 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 54 file(s) not represented in the graph (top: (none) 19, .css 13, .tpl 9)
 
 ## Summary
-- 8937 nodes · 18930 edges · 574 communities (149 shown, 425 thin omitted)
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 1277 edges (avg confidence: 0.85)
+- 8937 nodes · 18934 edges · 574 communities (150 shown, 424 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 1279 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `628f47fa`
+- Built from commit: `cd2f7096`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -21,7 +21,7 @@
 - BaseContext
 - chart.umd.min.js
 - RequestInterface
-- RedirectResponse
+- .view
 - service
 - .date
 - RkaWorkbookParser
@@ -83,7 +83,7 @@
 - OCI8/Builder.php
 - selection.cjs
 - Parser
-- site_url
+- html_helper.php
 - Builder
 - Filters
 - BaseCast
@@ -293,7 +293,7 @@
 - ResourceController
 - ResourcePresenter
 - DotEnv
-- BaseController
+- site_url
 - NormalizeVehicleServiceBudget
 - CreateSdmAttendanceCalendar
 - RequestTrait
@@ -463,7 +463,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (574 total, 425 thin omitted)
+## Communities (574 total, 424 thin omitted)
 
 ### Community 0 - "tn"
 Cohesion: 0.04
@@ -485,17 +485,17 @@ Nodes (62): ai(), at(), average(), b(), buildLookupTable(), cn(), dataset(), dn(
 Cohesion: 0.06
 Nodes (16): Filters, AuthFilter, FriendlyCsrfFilter, PreserveListFiltersFilter, RoleAccessFilter, Filters, Cors, CSRF (+8 more)
 
-### Community 5 - "RedirectResponse"
+### Community 5 - ".view"
 Cohesion: 0.06
-Nodes (11): Akutansi, {closure#1}(), {closure#10}(), {closure#3}(), {closure#8}(), LrRealizationService, RkaBudgetService, AccountingLrImportModel (+3 more)
+Nodes (10): {closure#1}(), {closure#10}(), {closure#3}(), {closure#8}(), BagianUmum2, BaseController, NonBelanjaModal, PengadaanBarangJasa (+2 more)
 
 ### Community 6 - "service"
 Cohesion: 0.05
 Nodes (37): {closure#1}(), {closure#1}(), {closure#1}(), cache(), class_uses_recursive(), command(), cookies(), csp_script_nonce() (+29 more)
 
 ### Community 7 - ".date"
-Cohesion: 0.09
-Nodes (8): Auth, AccountSessionManager, OracleLrImportService, {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), log_message()
+Cohesion: 0.04
+Nodes (14): UserRoles, Auth, Dashboard, {closure#3}(), KelolaAkun, Welcome, AccountSessionManager, OracleLrImportService (+6 more)
 
 ### Community 9 - "Parser/Parser.php"
 Cohesion: 0.07
@@ -530,7 +530,7 @@ Cohesion: 0.10
 Nodes (4): FsPathPlugin, SplFileInfoPlugin, SplFileInfoRepresentation, SplFileInfoValue
 
 ### Community 21 - "Sdm"
-Cohesion: 0.07
+Cohesion: 0.08
 Nodes (5): {closure#10}(), {closure#8}(), Sdm, SdmAttendanceImportModel, SdmEmployeeProfileModel
 
 ### Community 22 - "s"
@@ -591,7 +591,7 @@ Nodes (6): {closure#2}(), MonitoringKendaraan, VehicleActivityLogModel, VehicleD
 
 ### Community 41 - "Model"
 Cohesion: 0.05
-Nodes (9): PksDokumenModel, PksItemModel, PksMitraModel, SdmAttendanceCalendarModel, SdmOvertimeImportModel, SdmOvertimeRecordModel, DataException, ExceptionInterface (+1 more)
+Nodes (7): AccountingLrRecapOverrideModel, SdmAttendanceCalendarModel, SdmOvertimeImportModel, SdmOvertimeRecordModel, DataException, ExceptionInterface, Model
 
 ### Community 42 - "EncryptionException"
 Cohesion: 0.13
@@ -616,6 +616,10 @@ Nodes (8): AssetRendererTrait, PlainRenderer, AbstractPlugin, MicrotimePlugin, P
 ### Community 48 - "system/Config/Services.php"
 Cohesion: 0.07
 Nodes (12): Format, Honeypot, Toolbar, Validation, {closure#1}(), FormatException, Format, FormatterInterface (+4 more)
+
+### Community 49 - "PksBarangJasa"
+Cohesion: 0.10
+Nodes (5): PksBarangJasa, PksDokumenModel, PksItemModel, PksKerjasamaModel, PksMitraModel
 
 ### Community 50 - "IncomingRequest"
 Cohesion: 0.07
@@ -649,9 +653,9 @@ Nodes (6): Builder, {closure#1}(), {closure#10}(), {closure#16}(), {closure#21}(
 Cohesion: 0.05
 Nodes (33): assert, back, confirmation, editExisting, editTrigger, element(), existingAlert, existingMessage (+25 more)
 
-### Community 67 - "site_url"
-Cohesion: 0.11
-Nodes (23): DocTypes, DeletedData, {closure#2}(), slash_item(), _solidus(), audio(), doctype(), embed() (+15 more)
+### Community 67 - "html_helper.php"
+Cohesion: 0.19
+Nodes (20): DocTypes, slash_item(), _solidus(), audio(), doctype(), embed(), _has_protocol(), img() (+12 more)
 
 ### Community 70 - "BaseCast"
 Cohesion: 0.07
@@ -734,8 +738,8 @@ Cohesion: 0.07
 Nodes (9): Migrations, CLIException, MigrationRunner, ConfigException, CriticalError, DebugTraceableTrait, RuntimeException, FileNotFoundException (+1 more)
 
 ### Community 111 - "db_connect"
-Cohesion: 0.11
-Nodes (3): AgendarisNotificationService, SecurityNotificationService, db_connect()
+Cohesion: 0.10
+Nodes (5): AgendarisNotificationService, RkaBudgetService, SecurityNotificationService, AccountingRkaBudgetModel, db_connect()
 
 ### Community 115 - "CLIRequest"
 Cohesion: 0.08
@@ -993,9 +997,9 @@ Nodes (5): HTTPExceptionInterface, BadRequestException, ExceptionInterface, Redi
 Cohesion: 0.09
 Nodes (6): GenerateKey, Environment, env(), is_windows(), {closure#1}(), DotEnv
 
-### Community 284 - "BaseController"
-Cohesion: 0.05
-Nodes (11): UserRoles, BagianUmum2, BaseController, Dashboard, {closure#3}(), KelolaAkun, Landing, NonBelanjaModal (+3 more)
+### Community 284 - "site_url"
+Cohesion: 0.08
+Nodes (6): Akutansi, DeletedData, Landing, {closure#2}(), site_url(), RedirectResponse
 
 ### Community 288 - "TestException"
 Cohesion: 0.40
@@ -1064,7 +1068,7 @@ Nodes (5): ForeignCharacters, ForeignCharacters, convert_accented_characters(), 
 ## Knowledge Gaps
 - **255 isolated node(s):** `toggle`, `password`, `name`, `description`, `license` (+250 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2945 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **425 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **424 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

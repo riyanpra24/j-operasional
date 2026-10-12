@@ -11,9 +11,11 @@
 /** @var array<string, array<string, array<string, int>>> $compositionStatusCounts */
 /** @var list<array<string, mixed>> $employeesNeedingReview */
 /** @var \CodeIgniter\Pager\PagerInterface $pager */
-$canDeleteAllSdm = (string) session()->get('auth_role') === 'admin';
-$canImportSdm = (string) session()->get('auth_role') === 'admin';
-$canExportSdm = in_array((string) session()->get('auth_role'), ['admin', 'sdm'], true);
+$sdmRole = (string) session()->get('auth_role');
+$canReviewSdm = in_array($sdmRole, ['admin', 'sdm'], true);
+$canDeleteAllSdm = $sdmRole === 'admin';
+$canImportSdm = $sdmRole === 'admin';
+$canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
 ?>
 
 <?= $this->extend('layouts/main') ?>
@@ -70,7 +72,7 @@ $canExportSdm = in_array((string) session()->get('auth_role'), ['admin', 'sdm'],
                     <button type="button" role="menuitem" class="lr-action-menu-item" data-sdm-profile-create aria-haspopup="dialog" aria-controls="sdmProfileDialog">Tambah SDM</button>
                     <?php if ($canImportSdm): ?><button type="button" role="menuitem" class="lr-action-menu-item" data-sdm-profile-import aria-haspopup="dialog" aria-controls="sdmProfileImportDialog">Import Excel</button><?php endif ?>
                     <?php if ($canExportSdm): ?><a href="<?= site_url('sdm/sdm-jatim/export') ?>" role="menuitem" class="lr-action-menu-item">Export Dokumen</a><?php endif ?>
-                    <?php if ($canImportSdm): ?><button type="button" role="menuitem" class="lr-action-menu-item" data-sdm-profile-validation aria-haspopup="dialog" aria-controls="sdmProfileValidationDialog">Data Perlu Dilengkapi (<?= count($employeesNeedingReview) ?>)</button><?php endif ?>
+                    <?php if ($canReviewSdm): ?><button type="button" role="menuitem" class="lr-action-menu-item" data-sdm-profile-validation aria-haspopup="dialog" aria-controls="sdmProfileValidationDialog">Data Perlu Dilengkapi (<?= count($employeesNeedingReview) ?>)</button><?php endif ?>
                     <?php if ($canDeleteAllSdm): ?><button type="button" role="menuitem" class="lr-action-menu-item is-danger" data-sdm-profile-delete-all aria-haspopup="dialog" aria-controls="sdmProfileDeleteAllDialog">Hapus seluruh data SDM</button><?php endif ?>
                 </div>
             </details>
