@@ -26,7 +26,7 @@
 </section>
 
 <section class="panel filter-panel">
-    <form method="get" action="<?= esc($listUrl, 'attr') ?>" class="agendaris-filter-form sdm-list-filter-form">
+    <form method="get" action="<?= esc($listUrl, 'attr') ?>" class="agendaris-filter-form sdm-list-filter-form sdm-document-filter-form">
         <div class="form-group search-group">
             <label for="sdm_document_q">Cari dokumen</label>
             <div class="input-with-icon"><span>⌕</span><input id="sdm_document_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor surat, perihal, pengirim, atau jenis..."></div>

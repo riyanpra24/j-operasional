@@ -4285,6 +4285,7 @@ html:has([aria-hidden="false"] [role="dialog"][aria-modal="true"]),body:has([ari
 
 /* SDM Jatim: enam kolom ringkas, termasuk Unit Kerja. */
 .agendaris-filter-form.sdm-list-filter-form{grid-template-columns:minmax(250px,1.5fr) minmax(170px,.7fr) minmax(170px,.7fr) auto}
+.agendaris-filter-form.sdm-document-filter-form{grid-template-columns:minmax(250px,1.5fr) minmax(170px,.7fr) 44px auto}
 /* Standar global: tombol menu tindakan di samping Reset pada area filter. */
 .filter-actions .lr-filter-menu{position:relative;z-index:35;flex:0 0 37px;align-self:end}
 .filter-actions .lr-filter-menu-trigger{display:grid;place-items:center;box-sizing:border-box;width:37px;min-width:37px;height:37px;padding:0!important;color:#1768a8!important;border:1px solid #c5e1f4!important;border-radius:8px!important;background:#f7fcff!important;box-shadow:0 3px 9px rgba(28,98,151,.08)!important;cursor:pointer;list-style:none}
