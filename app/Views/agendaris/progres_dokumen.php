@@ -81,7 +81,7 @@
     </div>
 </section>
 
-<?= view('agendaris/progres_form_modal') ?>
+<?= view('agendaris/progres_form_modal', ['workUnitOptions' => $workUnitOptions]) ?>
 <?= view('agendaris/progres_detail_modal') ?>
 <?= view('agendaris/progres_delete_modal') ?>
 <?= $this->endSection() ?>

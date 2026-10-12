@@ -1,12 +1,23 @@
 <?php
 
 /** @var string $cardId */
+/** @var string|null $filterFormSelector */
 $cardSelector = '#' . $cardId;
 ?>
 <script>
 (() => {
     const cardSelector = <?= json_encode($cardSelector, JSON_THROW_ON_ERROR) ?>;
+    const filterFormSelector = <?= json_encode($filterFormSelector ?? '', JSON_THROW_ON_ERROR) ?>;
     let pendingRequest = null;
+
+    const tableUrlFromForm = form => {
+        const url = new URL(form.action, window.location.href);
+        const query = new URLSearchParams(new FormData(form));
+        query.delete('page');
+        [...query.keys()].filter(key => key.startsWith('page_')).forEach(key => query.delete(key));
+        url.search = query.toString();
+        return url.toString();
+    };
 
     const replaceTableCard = async (url, updateHistory = true) => {
         const currentCard = document.querySelector(cardSelector);
@@ -53,11 +64,15 @@ $cardSelector = '#' . $cardId;
         if (!select) return;
         const form = select.form;
         if (!form) return;
-        const url = new URL(form.action, window.location.href);
-        const query = new URLSearchParams(new FormData(form));
-        query.delete('page');
-        url.search = query.toString();
-        replaceTableCard(url.toString());
+        replaceTableCard(tableUrlFromForm(form));
+    });
+
+    document.addEventListener('submit', (event) => {
+        if (filterFormSelector === '') return;
+        const form = event.target.closest(filterFormSelector);
+        if (!form) return;
+        event.preventDefault();
+        replaceTableCard(tableUrlFromForm(form));
     });
 
     window.addEventListener('popstate', () => replaceTableCard(window.location.href, false));

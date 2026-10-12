@@ -17,7 +17,7 @@ final class AttendanceDisciplineExportService
     private const MAIN_NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
     private const REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships';
     private const OFFICE_REL_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
-    private const LEAVE_CODES = ['CT', 'RI', 'CS', 'CBR', 'CK', 'SD'];
+    private const LEAVE_CODES = ['CT', 'RI', 'CS', 'CBR', 'CK'];
     private ?DOMDocument $pendingAttendanceStylesDocument = null;
 
     /** @param array<string, mixed> $import
@@ -360,7 +360,9 @@ final class AttendanceDisciplineExportService
             return 'OFF';
         }
 
-        $code = $this->normalizeLeaveCode((string) ($record['recap_code'] ?? ''));
+        $code = strtoupper((string) ($record['raw_status'] ?? '')) === 'SD'
+            ? 'S'
+            : $this->normalizeLeaveCode((string) ($record['recap_code'] ?? ''));
         if ($code === 'I') {
             $code = strtoupper((string) ($record['raw_status'] ?? '')) === 'IZ' ? 'IZ' : 'CT';
         }
@@ -488,7 +490,7 @@ final class AttendanceDisciplineExportService
             $this->appendCell($document, $row, 'F' . $summaryRow, $styles[6] ?? null, 'number', $effectiveDays);
             $this->appendCell($document, $row, 'G' . $summaryRow, $styles[7] ?? null, 'formula', '=COUNTIF(' . $range . ',"H")+COUNTIF(' . $range . ',"ODR")');
             $this->appendCell($document, $row, 'H' . $summaryRow, $styles[8] ?? null, 'formula', '=COUNTIF(' . $range . ',"TL")+COUNTIF(' . $range . ',"TL/TAP")');
-            $this->appendCell($document, $row, 'I' . $summaryRow, $styles[9] ?? null, 'formula', '=COUNTIF(' . $range . ',"IZ")+COUNTIF(' . $range . ',"CT")');
+            $this->appendCell($document, $row, 'I' . $summaryRow, $styles[9] ?? null, 'formula', '=COUNTIF(' . $range . ',"IZ")+COUNTIF(' . $range . ',"CT")+COUNTIF(' . $range . ',"S")');
             $this->appendCell($document, $row, 'J' . $summaryRow, $styles[10] ?? null, 'formula', '=COUNTIF(' . $range . ',"A")');
             $this->appendCell($document, $row, 'K' . $summaryRow, $styles[11] ?? null, 'formula', '=COUNTIF(' . $range . ',"TAM")');
             $this->appendCell($document, $row, 'L' . $summaryRow, $styles[12] ?? null, 'formula', '=COUNTIF(' . $range . ',"TAP")+COUNTIF(' . $range . ',"TL/TAP")');
@@ -652,6 +654,7 @@ final class AttendanceDisciplineExportService
             'ODR'    => ['fill' => 'FF0F766E', 'font' => 'FFFFFFFF'],
             'IZ'     => ['fill' => 'FFCFF3D3', 'font' => 'FF147F35'],
             'CT'     => ['fill' => 'FF5F7111', 'font' => 'FFFFFFFF'],
+            'S'      => ['fill' => 'FF1F4E78', 'font' => 'FFFFFFFF'],
             'A'      => ['fill' => 'FFFFD9D9', 'font' => 'FFD90000'],
             'TA'     => ['fill' => 'FFF7DADA', 'font' => 'FF9E3939'],
             'TAM'    => ['fill' => 'FF9C3D3B', 'font' => 'FFFFFFFF'],

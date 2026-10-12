@@ -25,6 +25,17 @@ class UserRoles extends BaseConfig
         'sdm'       => ['sdm'],
     ];
 
+    /** Halaman pertama yang dituju setelah pengguna memilih Mulai. */
+    public const DEFAULT_ROUTES = [
+        'admin'     => 'dashboard',
+        'security'  => 'dokumen-masuk',
+        'agendaris' => 'agendaris/surat-masuk',
+        'umum_1'    => 'bagian-umum-1/pks-barang-jasa',
+        'umum_2'    => 'bagian-umum-2/monitoring-kendaraan/data-kendaraan',
+        'akutansi'  => 'akutansi/laba-rugi',
+        'sdm'       => 'sdm/dokumen-masuk',
+    ];
+
     public static function label(string $role): string
     {
         return self::LABELS[$role] ?? ucfirst($role);
@@ -33,5 +44,10 @@ class UserRoles extends BaseConfig
     public static function isValid(string $role): bool
     {
         return array_key_exists($role, self::LABELS);
+    }
+
+    public static function defaultRoute(string $role): string
+    {
+        return self::DEFAULT_ROUTES[$role] ?? self::DEFAULT_ROUTES['admin'];
     }
 }

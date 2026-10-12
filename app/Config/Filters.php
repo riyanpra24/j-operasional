@@ -12,6 +12,7 @@ use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
 use App\Filters\AuthFilter;
 use App\Filters\FriendlyCsrfFilter;
+use App\Filters\PreserveListFiltersFilter;
 use App\Filters\RoleAccessFilter;
 
 class Filters extends BaseFilters
@@ -36,6 +37,7 @@ class Filters extends BaseFilters
         'performance'   => PerformanceMetrics::class,
         'auth'          => AuthFilter::class,
         'roleaccess'    => RoleAccessFilter::class,
+        'preservelistfilters' => PreserveListFiltersFilter::class,
     ];
 
     /**
@@ -82,6 +84,7 @@ class Filters extends BaseFilters
         'after' => [
             // 'honeypot',
             // 'secureheaders',
+            'preservelistfilters',
         ],
     ];
 

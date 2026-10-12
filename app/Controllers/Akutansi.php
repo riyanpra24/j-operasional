@@ -8,10 +8,12 @@ use App\Libraries\RkaWorkbookParser;
 use App\Libraries\OracleLrSalaryParser;
 use App\Libraries\OracleLrImportService;
 use App\Libraries\LrRealizationService;
+use App\Libraries\LrMoney;
 use App\Libraries\LrDocumentExportService;
 use App\Libraries\LrWorkpaperSimulationService;
 use App\Libraries\LrWorkpaperImportParser;
 use App\Models\AccountingLrImportModel;
+use App\Models\AccountingLrRecapOverrideModel;
 use App\Models\AccountingRkaBudgetModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -62,6 +64,217 @@ class Akutansi extends BaseController
             'lrUploadError'=>session()->getFlashdata('lr_upload_error'),
             'isAdmin'=>$this->currentRoleIsAdmin(),
         ]);
+    }
+
+    public function rekapLabaRugi(): string
+    {
+        $unit = $this->request->getGet('unit_kerja');
+        $unit = is_string($unit) && in_array($unit, RkaCalculator::UNITS, true) ? $unit : 'Korporat Kanwil';
+
+        $year = $this->request->getGet('tahun');
+        $year = is_string($year) && preg_match('/^\d{4}$/D', $year) && (int) $year >= 2000 && (int) $year <= 2100
+            ? (int) $year
+            : 2026;
+
+        $month = $this->request->getGet('bulan');
+        $month = is_string($month) && preg_match('/^(?:[1-9]|1[0-2])$/D', $month)
+            ? (int) $month
+            : 8;
+
+        $recapIndicators = self::recapIndicatorDefinitions();
+        $rkaAvailable = false;
+        $rkaCalculated = [];
+
+        try {
+            $rkaRecord = (new RkaBudgetService())->find($unit, $year);
+            if ($rkaRecord !== null) {
+                $decoded = json_decode((string) $rkaRecord['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
+                if (is_array($decoded)) {
+                    $rkaCalculated = $decoded;
+                    $rkaAvailable = true;
+                }
+            }
+        } catch (\JsonException) {
+            $rkaCalculated = [];
+        }
+
+        $previousMonth = $month === 1 ? 12 : $month - 1;
+        $previousYear = $month === 1 ? $year - 1 : $year;
+        $reportService = new LrRealizationService();
+        $reportUnits = $unit === 'Korporat Kanwil' ? RkaCalculator::SOURCE_UNITS : [$unit];
+        $loadReportTotals = static function (int $reportYear, string $basis, int $reportMonth) use ($reportService, $reportUnits): array {
+            $totals = [];
+            foreach ($reportUnits as $reportUnit) {
+                try {
+                    $values = (array) ($reportService->view($reportUnit, $reportYear, $basis, $reportMonth)['values'] ?? []);
+                } catch (\Throwable) {
+                    continue;
+                }
+                foreach ($values as $label => $row) {
+                    $amount = is_array($row) ? ($row['TOTAL'] ?? null) : null;
+                    if (! is_string($label) || ! is_string($amount)) continue;
+                    // Nilai Laba/Rugi disimpan memakai label yang sudah
+                    // dinormalisasi. Rekap harus menggunakan kunci yang sama
+                    // sebelum mencocokkannya dengan indikator tabel.
+                    $key = OracleLrSalaryParser::normalizeLabel($label);
+                    $totals[$key] = LrMoney::add((string) ($totals[$key] ?? '0.00'), $amount);
+                }
+            }
+            return $totals;
+        };
+        // Excel: E = YTD previous month, F = PTD selected month, G = E + F.
+        // Corporate mirrors KONSOL by adding its six source-unit sheets.
+        $realisasiTotals = $loadReportTotals($previousYear, 'YTD', $previousMonth);
+        $prognosaTotals = $loadReportTotals($year, 'PTD', $month);
+        $recapOverrides = self::recapOverrides($unit, $year, $month);
+
+        foreach ($recapIndicators as &$indicator) {
+            $cell = $indicator['rka_cell'];
+            $amount = is_string($cell) ? ($rkaCalculated[$cell] ?? null) : null;
+            $indicator['rka'] = is_string($amount) ? $amount : null;
+            $realisasiLabel = $indicator['lr_label'];
+            $realisasiKey = is_string($realisasiLabel) ? OracleLrSalaryParser::normalizeLabel($realisasiLabel) : null;
+            $realisasiAmount = $realisasiKey === null ? null : ($realisasiTotals[$realisasiKey] ?? null);
+            $indicator['realisasi'] = is_string($realisasiAmount) ? $realisasiAmount : null;
+            $prognosaAmount = $realisasiKey === null ? null : ($prognosaTotals[$realisasiKey] ?? null);
+            $indicator['prognosa'] = is_string($prognosaAmount) ? $prognosaAmount : null;
+            $manualValues = (array) ($recapOverrides[$indicator['label']] ?? []);
+            // RKA selalu berasal dari RKA Kanwil; hanya salinan nilai laporan
+            // yang boleh disesuaikan di Rekap.
+            foreach (['realisasi', 'prognosa'] as $field) {
+                if (isset($manualValues[$field]) && is_string($manualValues[$field])) {
+                    $indicator[$field] = $manualValues[$field];
+                }
+            }
+            // IJP Cash Basis tidak tersedia pada RKA Kanwil, sehingga nilainya
+            // dapat dicatat manual hanya pada Rekap.
+            if ($indicator['label'] === 'IJP CASH BASIS' && isset($manualValues['rka']) && is_string($manualValues['rka'])) {
+                $indicator['rka'] = $manualValues['rka'];
+            }
+            $hasCalculation = $indicator['realisasi'] !== null || $indicator['prognosa'] !== null;
+            $indicator['prognosa_ytd'] = $hasCalculation
+                ? LrMoney::add((string) ($indicator['realisasi'] ?? '0.00'), (string) ($indicator['prognosa'] ?? '0.00'))
+                : null;
+            $indicator['persentase_rka'] = $indicator['prognosa_ytd'] !== null && is_string($indicator['rka']) && ! LrMoney::isZero($indicator['rka'])
+                ? LrMoney::divide($indicator['prognosa_ytd'], $indicator['rka'], 18)
+                : null;
+        }
+        unset($indicator);
+
+        return view('akutansi/rekap_laba_rugi', [
+            'title' => 'Rekap Laba Rugi',
+            'reportUnits' => RkaCalculator::UNITS,
+            'selectedUnit' => $unit,
+            'selectedYear' => $year,
+            'selectedMonth' => $month,
+            'recapIndicators' => $recapIndicators,
+            'rkaAvailable' => $rkaAvailable,
+            'recapEditAutoOpen' => $this->request->getGet('edit') === '1',
+        ]);
+    }
+
+    /** Saves only manual recap adjustments; calculated columns remain formula-driven. */
+    public function updateRekapLabaRugi(): RedirectResponse
+    {
+        $unit = 'Korporat Kanwil';
+        $year = 2026;
+        $month = 8;
+        try {
+            $rawUnit = $this->request->getPost('unit_kerja');
+            $rawYear = $this->request->getPost('tahun');
+            $rawMonth = $this->request->getPost('bulan');
+            if (! is_string($rawUnit) || ! in_array($rawUnit, RkaCalculator::UNITS, true)
+                || ! is_string($rawYear) || ! preg_match('/^\d{4}$/D', $rawYear) || (int) $rawYear < 2000 || (int) $rawYear > 2100
+                || ! is_string($rawMonth) || ! preg_match('/^(?:[1-9]|1[0-2])$/D', $rawMonth)) {
+                throw new RuntimeException('Unit kerja dan periode rekap tidak valid.');
+            }
+            $unit = $rawUnit;
+            $year = (int) $rawYear;
+            $month = (int) $rawMonth;
+            $rawValues = $this->request->getPost('values');
+            if (! is_array($rawValues)) {
+                throw new RuntimeException('Tabel rekap belum dapat dibaca.');
+            }
+
+            $values = [];
+            foreach (self::recapIndicatorDefinitions() as $definition) {
+                $label = $definition['label'];
+                $rawRow = $rawValues[$label] ?? null;
+                if (! is_array($rawRow)) continue;
+                $editableFields = ['realisasi', 'prognosa'];
+                if ($label === 'IJP CASH BASIS') array_unshift($editableFields, 'rka');
+                foreach ($editableFields as $field) {
+                    $rawAmount = $rawRow[$field] ?? '';
+                    if (! is_string($rawAmount)) throw new RuntimeException('Isian ' . $label . ' tidak valid.');
+                    $amount = self::recapEditorAmount($rawAmount);
+                    if ($amount !== null) $values[$label][$field] = $amount;
+                }
+            }
+
+            $model = new AccountingLrRecapOverrideModel();
+            $record = $model->where('unit_name', $unit)->where('report_year', $year)->where('report_month', $month)->first();
+            $payload = [
+                'values_json' => json_encode($values, JSON_THROW_ON_ERROR),
+                'updated_by_name' => (string) session()->get('auth_display_name'),
+            ];
+            if (is_array($record)) {
+                if (! $model->update((int) $record['id'], $payload)) throw new RuntimeException('Perubahan rekap belum dapat disimpan.');
+            } elseif ($model->insert($payload + ['unit_name' => $unit, 'report_year' => $year, 'report_month' => $month]) === false) {
+                throw new RuntimeException('Perubahan rekap belum dapat disimpan.');
+            }
+
+            return redirect()->to(self::rekapLabaRugiUrl($unit, $year, $month))
+                ->with('success', 'Rekap Laba/Rugi berhasil diperbarui.');
+        } catch (Throwable $exception) {
+            log_message('warning', 'Ubah rekap laba rugi gagal: {message}', ['message' => $exception->getMessage()]);
+            return redirect()->to(self::rekapLabaRugiUrl($unit, $year, $month))
+                ->with('error', $exception instanceof RuntimeException ? $exception->getMessage() : 'Rekap Laba/Rugi belum dapat diperbarui.');
+        }
+    }
+
+    /** @return list<array{label:string,rka_cell:?string,lr_label:?string}> */
+    private static function recapIndicatorDefinitions(): array
+    {
+        return [
+            ['label' => 'VOLUME', 'rka_cell' => 'H8', 'lr_label' => 'VOLUME'],
+            ['label' => 'IJP CASH BASIS', 'rka_cell' => null, 'lr_label' => null],
+            ['label' => 'IJP BRUTO', 'rka_cell' => 'H11', 'lr_label' => 'Imbal Jasa Penjaminan Bruto'],
+            ['label' => 'BEBAN KLAIM', 'rka_cell' => 'H17', 'lr_label' => 'JUMLAH BEBAN KLAIM'],
+            ['label' => 'CADANGAN KLAIM', 'rka_cell' => 'H18', 'lr_label' => 'Kenaikan (Penurunan) Cadangan Klaim'],
+            ['label' => 'SUBROGASI', 'rka_cell' => 'H19', 'lr_label' => 'Pendapatan Subrogasi'],
+            ['label' => 'PENJAMINAN BERSIH', 'rka_cell' => 'H23', 'lr_label' => 'PENJAMINAN BERSIH'],
+            ['label' => 'BEBAN USAHA', 'rka_cell' => 'H162', 'lr_label' => 'TOTAL BEBAN USAHA'],
+            ['label' => 'EBT', 'rka_cell' => 'H166', 'lr_label' => 'LABA SEBELUM PAJAK'],
+        ];
+    }
+
+    /** @return array<string,array<string,string>> */
+    private static function recapOverrides(string $unit, int $year, int $month): array
+    {
+        $record = (new AccountingLrRecapOverrideModel())
+            ->where('unit_name', $unit)->where('report_year', $year)->where('report_month', $month)->first();
+        if (! is_array($record)) return [];
+        try {
+            $values = json_decode((string) ($record['values_json'] ?? '{}'), true, 512, JSON_THROW_ON_ERROR);
+            return is_array($values) ? $values : [];
+        } catch (\JsonException) {
+            return [];
+        }
+    }
+
+    private static function recapEditorAmount(string $raw): ?string
+    {
+        if (trim($raw) === '') return null;
+        try {
+            return self::lrEditorAmount($raw);
+        } catch (\InvalidArgumentException $exception) {
+            throw new RuntimeException($exception->getMessage());
+        }
+    }
+
+    private static function rekapLabaRugiUrl(string $unit, int $year, int $month): string
+    {
+        return site_url('akutansi/rekap-laba-rugi?' . http_build_query(['unit_kerja' => $unit, 'tahun' => $year, 'bulan' => $month]));
     }
 
     public function bopoYtd(): string

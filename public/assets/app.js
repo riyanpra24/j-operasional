@@ -2093,7 +2093,7 @@
         return result.dokumen;
     };
     const fillProgressForm = (data) => {
-        ['nomor_surat','jenis_surat','jumlah_dokumen','pemohon','pelaksana','up','tanggal_pengiriman','nomor_resi','tanggal_diterima','penerima','alamat_penerima','dokumen_link','security','tanggal_security','progres','status_agendaris'].forEach((name) => {
+        ['nomor_surat','jenis_surat','jumlah_dokumen','unit_kerja','pemohon','pelaksana','up','tanggal_pengiriman','nomor_resi','tanggal_diterima','penerima','alamat_penerima','dokumen_link','security','tanggal_security','progres','status_agendaris'].forEach((name) => {
             const valueKey = `${name}_value`;
             progressForm.elements[name].value = Object.prototype.hasOwnProperty.call(data, valueKey) ? data[valueKey] : (data[name] === '-' ? '' : data[name]);
         });
@@ -2340,6 +2340,79 @@
         if (reopenProgressModal?.classList.contains('open')) closeReopenProgress();
         if (incomingProgressModal?.classList.contains('open')) closeIncomingProgress();
     });
+})();
+
+// Rekap Laba/Rugi: edit nilai dalam tabel pop-up, lalu hitung ulang kolom formula secara langsung.
+(() => {
+    const dialog = document.querySelector('#lrRecapEditDialog');
+    if (!(dialog instanceof HTMLDialogElement)) return;
+    const form = dialog.querySelector('[data-recap-edit-form]');
+    const unitSelect = form?.querySelector('[data-recap-edit-unit]');
+
+    const amount = (value) => {
+        const raw = String(value || '').trim();
+        if (raw === '') return null;
+        const normalized = raw.includes(',')
+            ? raw.replace(/\./g, '').replace(',', '.')
+            : raw;
+        const parsed = Number(normalized);
+        return Number.isFinite(parsed) ? parsed : null;
+    };
+    const display = (value) => new Intl.NumberFormat('id-ID', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    }).format(value);
+    const updateRow = (row) => {
+        const rkaElement = row.querySelector('[data-recap-field="rka"]');
+        const rka = amount(rkaElement instanceof HTMLInputElement ? rkaElement.value : rkaElement?.dataset.recapAmount);
+        const realisasi = amount(row.querySelector('[data-recap-field="realisasi"]')?.value);
+        const prognosa = amount(row.querySelector('[data-recap-field="prognosa"]')?.value);
+        const hasValue = realisasi !== null || prognosa !== null;
+        const prognosisYtd = hasValue ? (realisasi || 0) + (prognosa || 0) : null;
+        const ytdOutput = row.querySelector('[data-recap-prognosa-ytd]');
+        const percentOutput = row.querySelector('[data-recap-percentage]');
+        if (ytdOutput) ytdOutput.textContent = prognosisYtd === null ? '—' : display(prognosisYtd);
+        if (percentOutput) percentOutput.textContent = prognosisYtd === null || rka === null || rka === 0
+            ? '—'
+            : `${display((prognosisYtd / rka) * 100)}%`;
+    };
+    const updateRows = () => dialog.querySelectorAll('[data-recap-edit-row]').forEach(updateRow);
+
+    document.querySelectorAll('[data-recap-edit-open]').forEach((button) => button.addEventListener('click', () => {
+        button.closest('details')?.removeAttribute('open');
+        updateRows();
+        if (!dialog.open) dialog.showModal();
+    }));
+    dialog.querySelectorAll('[data-recap-edit-close]').forEach((button) => button.addEventListener('click', () => dialog.close()));
+    dialog.querySelectorAll('[data-recap-edit-input]').forEach((input) => input.addEventListener('input', () => {
+        const row = input.closest('[data-recap-edit-row]');
+        if (row) updateRow(row);
+    }));
+    unitSelect?.addEventListener('change', () => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('unit_kerja', unitSelect.value);
+        url.searchParams.set('bulan', String(form?.querySelector('[name="bulan"]')?.value || ''));
+        url.searchParams.set('tahun', String(form?.querySelector('[name="tahun"]')?.value || ''));
+        url.searchParams.set('edit', '1');
+        window.location.assign(url.toString());
+    });
+    dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+    });
+    form?.addEventListener('submit', () => {
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton instanceof HTMLButtonElement) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Menyimpan…';
+        }
+    });
+    if (dialog.dataset.autoOpen === 'true') {
+        updateRows();
+        if (!dialog.open) dialog.showModal();
+        const url = new URL(window.location.href);
+        url.searchParams.delete('edit');
+        window.history.replaceState(window.history.state, '', url.toString());
+    }
 })();
 
 (() => {

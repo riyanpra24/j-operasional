@@ -43,7 +43,7 @@ class RoleAccessFilter implements FilterInterface
                 ]);
         }
 
-        return redirect()->to(site_url('dashboard'))->with('error', $message);
+        return redirect()->to(site_url(UserRoles::defaultRoute($role)))->with('error', $message);
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

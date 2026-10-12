@@ -912,6 +912,19 @@ body:not(.landing-page):not(.login-page) .table-wrap table thead th {
     color: #fff !important;
 }
 
+/* Rekap komposisi SDM Kanwil: pita warna khusus, bukan gradasi tabel global. */
+#sdmCompositionSummaryDialog .kanwil-sdm-summary-table thead {
+    background: linear-gradient(90deg, #2a4f7f 0%, #294e7d 71%, #149da9 71%, #27b2b0 94%, #ffd365 94% 100%) !important;
+}
+#sdmCompositionSummaryDialog .kanwil-sdm-summary-table thead tr,
+#sdmCompositionSummaryDialog .kanwil-sdm-summary-table thead th {
+    border: 0 !important;
+    background: transparent !important;
+}
+#sdmCompositionSummaryDialog .kanwil-sdm-summary-table thead th:last-child {
+    color: #172b3f !important;
+}
+
 /* Accounting has several dedicated components; all of them use the shared Distribusi palette. */
 .accounting-page .accounting-menu-card {
     --accounting-tone: #237bd1;

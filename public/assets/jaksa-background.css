@@ -1293,3 +1293,37 @@ body.jaksa-bg > .success-toast {
         left: 10px !important;
     }
 }
+
+/* Keep the Rekap Laba Rugi frame visible above the shared panel theme. */
+body.jaksa-bg.accounting-page .lr-rekap-panel {
+    border: 0 !important;
+    background: transparent !important;
+}
+
+body.jaksa-bg.accounting-page .lr-rekap-header {
+    box-sizing: border-box;
+    border: 2px solid transparent !important;
+    border-bottom: 0 !important;
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(100deg, #f2fbfd 0%, #fff 58%, #f4fbf8 100%) padding-box,
+        linear-gradient(90deg, #133f83 0%, #1d9caf 52%, #ffd05d 100%) border-box !important;
+}
+
+body.jaksa-bg.accounting-page .lr-rekap-table thead th:first-child {
+    border-left: 0 !important;
+}
+
+body.jaksa-bg.accounting-page .lr-rekap-table thead th:last-child {
+    border-right: 0 !important;
+}
+
+body.jaksa-bg.accounting-page .lr-rekap-table,
+body.jaksa-bg.accounting-page .lr-rekap-table tbody th,
+body.jaksa-bg.accounting-page .lr-rekap-table tbody td {
+    background: #fff !important;
+}
+
+body.jaksa-bg.accounting-page .lr-rekap-table tbody tr:nth-child(even) > th,
+body.jaksa-bg.accounting-page .lr-rekap-table tbody tr:nth-child(even) > td {
+    background: #fbfdfe !important;
+}

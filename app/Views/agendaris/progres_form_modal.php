@@ -1,3 +1,4 @@
+<?php /** @var list<string> $workUnitOptions */ ?>
 <div class="agendaris-form-modal" id="progressDocumentFormModal" hidden aria-hidden="true">
     <button type="button" class="modal-backdrop" data-progress-form-close aria-label="Tutup form"></button>
     <section class="modal-dialog agendaris-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="progressDocumentFormTitle">
@@ -18,6 +19,7 @@
                     <div class="form-group"><label>Nomor Surat <span class="required">*</span></label><input name="nomor_surat" maxlength="150" required></div>
                     <div class="form-group"><label>Jenis Dokumen <span class="required">*</span></label><input name="jenis_surat" maxlength="100" required></div>
                     <div class="form-group"><label>Jumlah Dokumen <span class="required">*</span></label><input name="jumlah_dokumen" maxlength="100" value="1" placeholder="Contoh: 2 berkas atau 1 amplop" required></div><?= view('components/ekspedisi_selector', ['prefix' => 'progress_outgoing', 'label' => 'Nama Ekspedisi', 'required' => true]) ?>
+                    <div class="form-group"><label>Unit Kerja</label><select name="unit_kerja"><option value="">Pilih unit kerja</option><?php foreach ($workUnitOptions as $workUnit): ?><option value="<?= esc($workUnit, 'attr') ?>"><?= esc($workUnit) ?></option><?php endforeach ?></select></div>
                     <div class="form-group"><label>Pemohon</label><input name="pemohon" maxlength="255"></div>
                     <div class="form-group"><label>Pelaksana</label><input name="pelaksana" maxlength="255"></div>
                     <div class="form-group"><label>UP</label><input name="up" maxlength="255"></div>

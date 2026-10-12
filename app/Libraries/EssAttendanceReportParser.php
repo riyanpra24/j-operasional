@@ -11,7 +11,7 @@ final class EssAttendanceReportParser
 {
     private const COLUMN_COUNT = 24;
     private const LATE_FROM = '08:01:00';
-    private const LEAVE_STATUSES = ['CT', 'RI', 'CS', 'CBR', 'CK', 'SD'];
+    private const LEAVE_STATUSES = ['CT', 'RI', 'CS', 'CBR', 'CK'];
 
     /**
      * Mengubah laporan ESS berbentuk HTML-XLS menjadi rekap absensi bulanan.
@@ -190,7 +190,7 @@ final class EssAttendanceReportParser
         $seenRecords = [];
         $availableDates = [];
         $warnings = [];
-        $summary = ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
+        $summary = ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'S' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0, 'OTHER' => 0];
         $storedRecords = [];
 
         foreach ($records as $record) {
@@ -219,7 +219,7 @@ final class EssAttendanceReportParser
                     'position'      => $record['position'],
                     'organization'  => $record['organization'],
                     'days'          => [],
-                    'totals'        => ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0],
+                    'totals'        => ['H' => 0, 'TLBT' => 0, 'TLTAP' => 0, 'ODR' => 0, 'IZ' => 0, 'CT' => 0, 'S' => 0, 'A' => 0, 'TA' => 0, 'TAM' => 0, 'TAP' => 0, 'OFF' => 0],
                 ];
             }
 
@@ -279,7 +279,7 @@ final class EssAttendanceReportParser
 
         $employeeRows = array_values($employees);
         foreach ($employeeRows as &$employee) {
-            $workDays = $employee['totals']['H'] + $employee['totals']['TLBT'] + $employee['totals']['ODR'] + $employee['totals']['IZ'] + $employee['totals']['CT']
+            $workDays = $employee['totals']['H'] + $employee['totals']['TLBT'] + $employee['totals']['ODR'] + $employee['totals']['IZ'] + $employee['totals']['CT'] + $employee['totals']['S']
                 + $employee['totals']['A'] + $employee['totals']['TA']
                 + $employee['totals']['TAM'] + $employee['totals']['TAP'] + $employee['totals']['TLTAP'];
             $employee['attendance_rate'] = $workDays > 0
@@ -323,6 +323,10 @@ final class EssAttendanceReportParser
 
         if ($record['status'] === 'IZ') {
             return 'IZ';
+        }
+
+        if ($record['status'] === 'SD') {
+            return 'S';
         }
 
         if (in_array($record['status'], self::LEAVE_STATUSES, true) || preg_match('/^CB(?:\d+)?$/', $record['status']) === 1) {

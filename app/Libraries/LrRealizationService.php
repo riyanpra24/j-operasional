@@ -107,6 +107,8 @@ final class LrRealizationService
             );
         }
 
+        $this->synchronizeCorporateVolume($valuesByUnit, $rka['Korporat Kanwil'] ?? null);
+
         return [
             'import' => $latest[$selectedUnit] ?? null,
             'result' => $results[$selectedUnit] ?? null,
@@ -115,6 +117,57 @@ final class LrRealizationService
             'basis' => $basis,
             'month' => $month,
         ];
+    }
+
+    /**
+     * Volume Korporat is a roll-up only: never retain an independently imported
+     * Corporate figure when none of the six source units provides a Volume row.
+     *
+     * @param array<string,array<string,array<string,string>>> $valuesByUnit
+     */
+    private function synchronizeCorporateVolume(array &$valuesByUnit, ?array $corporateRka): void
+    {
+        $corporateUnit = 'Korporat Kanwil';
+        if (! isset($valuesByUnit[$corporateUnit])) {
+            return;
+        }
+
+        $volumeKey = OracleLrSalaryParser::normalizeLabel('VOLUME');
+        $storedCorporateVolume = (array) ($valuesByUnit[$corporateUnit][$volumeKey] ?? []);
+        $volume = [];
+        $hasSourceVolume = false;
+
+        foreach (RkaCalculator::SOURCE_UNITS as $unit) {
+            $sourceVolume = $valuesByUnit[$unit][$volumeKey] ?? null;
+            if (! is_array($sourceVolume)) {
+                continue;
+            }
+
+            $hasSourceVolume = true;
+            foreach (LrRealizationCalculator::VALUE_COLUMNS as $column) {
+                $volume[$column] = LrMoney::add(
+                    (string) ($volume[$column] ?? '0.00'),
+                    (string) ($sourceVolume[$column] ?? '0.00'),
+                );
+            }
+        }
+
+        if (! $hasSourceVolume) {
+            unset($valuesByUnit[$corporateUnit][$volumeKey]);
+            return;
+        }
+
+        // Roll-up replaces nominal values only. Restore the percentage from the
+        // Corporate RKA so a summed Volume never makes the % column disappear.
+        $percentageRow = $this->refreshManualReportPercentages([$volumeKey => $volume], $corporateRka);
+        $volume = (array) ($percentageRow[$volumeKey] ?? $volume);
+        if (! isset($volume['%'])) {
+            $volume['%'] = (string) ($storedCorporateVolume['%'] ?? '0.00');
+        }
+        if (! isset($volume['percentage_details']) && isset($storedCorporateVolume['percentage_details'])) {
+            $volume['percentage_details'] = $storedCorporateVolume['percentage_details'];
+        }
+        $valuesByUnit[$corporateUnit][$volumeKey] = $volume;
     }
 
     /** Recalculate percentage fields after a manual Laba/Rugi adjustment. */

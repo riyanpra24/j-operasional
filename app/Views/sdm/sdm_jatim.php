@@ -17,6 +17,7 @@ $statusLabels = [
     'ODR' => 'On Duty Request',
     'IZ' => 'Izin',
     'CT' => 'Cuti',
+    'S' => 'Sakit',
     'A' => 'Alpa',
     'TA' => 'Tidak absen masuk dan pulang',
     'TAM' => 'Tidak absen masuk',
@@ -56,16 +57,11 @@ $exportDefaultMonth = (int) ($exportDefaultPeriod?->format('n') ?? date('n'));
 $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
 ?>
 
-<section class="page-heading sdm-daily-heading">
-    <div>
-        <p class="eyebrow">SDM &amp; TELLER</p>
-        <h1>Data Kehadiran</h1>
-        <p>Detail kode kehadiran seluruh karyawan dalam satu periode.</p>
-    </div>
-</section>
 
 <?php if ($importError !== null): ?>
-    <div class="alert alert-danger" role="alert"><strong>Data belum dapat ditampilkan.</strong><p><?= esc($importError) ?></p></div>
+    <div class="alert alert-danger" role="alert"><strong>Data belum dapat ditampilkan.</strong>
+        <p><?= esc($importError) ?></p>
+    </div>
 <?php endif ?>
 
 <?php if ($attendanceImports !== []): ?>
@@ -106,7 +102,12 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
                 <a href="<?= site_url('sdm/data-kehadiran' . ($selectedImportId !== null ? '?import_id=' . (int) $selectedImportId : '')) ?>" class="btn btn-ghost">Reset</a>
                 <details class="sdm-daily-menu">
                     <summary class="sdm-daily-menu-trigger" aria-label="Menu tindakan" title="Menu tindakan">
-                        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><rect x="14" y="14" width="7" height="7" rx="1.4"></rect></svg>
+                        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                            <rect x="3" y="3" width="7" height="7" rx="1.4"></rect>
+                            <rect x="14" y="3" width="7" height="7" rx="1.4"></rect>
+                            <rect x="3" y="14" width="7" height="7" rx="1.4"></rect>
+                            <rect x="14" y="14" width="7" height="7" rx="1.4"></rect>
+                        </svg>
                     </summary>
                     <div class="sdm-daily-menu-list">
                         <button type="button" data-open-attendance-upload>Unggah Laporan Kehadiran</button>
@@ -132,8 +133,8 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
         'dari'       => $attendanceFilters['from'] ?? '',
         'sampai'     => $attendanceFilters['to'] ?? '',
         'per_page'   => $attendancePagination['per_page'],
-    ], static fn ($value): bool => $value !== null && $value !== '');
-    $attendancePageUrl = static fn (int $page): string => site_url('sdm/data-kehadiran') . '?' . http_build_query(array_merge($attendancePageQuery, ['halaman' => $page]));
+    ], static fn($value): bool => $value !== null && $value !== '');
+    $attendancePageUrl = static fn(int $page): string => site_url('sdm/data-kehadiran') . '?' . http_build_query(array_merge($attendancePageQuery, ['halaman' => $page]));
     ?>
     <section class="panel sdm-daily-panel" id="attendanceTableArea" aria-live="polite">
         <header class="sdm-daily-panel-header">
@@ -151,7 +152,9 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
         </div>
 
         <?php if ($report['employees'] === []): ?>
-            <div class="empty-state sdm-daily-empty"><span aria-hidden="true">⌕</span><strong>Data tidak ditemukan</strong><p>Ubah filter nama atau rentang tanggal, lalu coba kembali.</p></div>
+            <div class="empty-state sdm-daily-empty"><span aria-hidden="true">⌕</span><strong>Data tidak ditemukan</strong>
+                <p>Ubah filter nama atau rentang tanggal, lalu coba kembali.</p>
+            </div>
         <?php else: ?>
             <div class="sdm-daily-table-wrap">
                 <table class="sdm-daily-table sdm-staff-attendance-table">
@@ -185,31 +188,42 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
                             <tr id="<?= esc($detailId, 'attr') ?>" class="sdm-staff-detail" hidden>
                                 <td colspan="7">
                                     <div class="sdm-staff-detail-inner">
-                                        <div class="sdm-staff-day-table-wrap"><table class="sdm-staff-day-table sdm-staff-horizontal-table"><thead><tr><th>Hari / Tanggal</th>
-                                            <?php for ($day = $displayStartDay; $day <= $displayEndDay; $day++): ?>
-                                                <?php
-                                                $date = new DateTimeImmutable($periodPrefix . '-' . str_pad((string) $day, 2, '0', STR_PAD_LEFT));
-                                                $calendarDay = $report['calendar_days'][$day] ?? [];
-                                                $isOff = (bool) ($calendarDay['is_non_working'] ?? false);
-                                                $calendarLabel = (string) ($calendarDay['label'] ?? ($isOff ? 'Libur' : 'Hari kerja'));
-                                                ?>
-                                                <th class="<?= $isOff ? 'is-off' : '' ?>" title="<?= esc($calendarLabel, 'attr') ?>"><strong><?= esc($dayNames[(int) $date->format('N')]) ?></strong><small><?= esc($date->format('d-m')) ?></small></th>
-                                            <?php endfor ?>
-                                        </tr></thead><tbody><tr><th>Status / Jam</th>
-                                            <?php for ($day = $displayStartDay; $day <= $displayEndDay; $day++): ?>
-                                                <?php
-                                                $date = new DateTimeImmutable($periodPrefix . '-' . str_pad((string) $day, 2, '0', STR_PAD_LEFT));
-                                                $calendarDay = $report['calendar_days'][$day] ?? [];
-                                                $isOff = (bool) ($calendarDay['is_non_working'] ?? false);
-                                                $dayDetail = $employee['day_details'][$day] ?? null;
-                                                $code = (string) ($dayDetail['recap_code'] ?? '-');
-                                                $actualIn = ! empty($dayDetail['actual_in']) ? substr((string) $dayDetail['actual_in'], 0, 5) : '—';
-                                                $actualOut = ! empty($dayDetail['actual_out']) ? substr((string) $dayDetail['actual_out'], 0, 5) : '—';
-                                                $note = (string) ($dayDetail['holiday_name'] ?? ($calendarDay['label'] ?? ($statusLabels[$code] ?? 'Data belum tersedia')));
-                                                ?>
-                                                <td class="sdm-staff-day-cell <?= $isOff ? 'is-off' : '' ?>" title="<?= esc($note, 'attr') ?>"><span class="sdm-staff-status sdm-daily-code-<?= esc(strtolower(str_replace('-', 'empty', $code)), 'attr') ?>"><?= esc($displayCodes[$code] ?? $code) ?></span><small>↑ <?= esc($actualIn) ?></small><small>↓ <?= esc($actualOut) ?></small></td>
-                                            <?php endfor ?>
-                                        </tr></tbody></table></div>
+                                        <div class="sdm-staff-day-table-wrap">
+                                            <table class="sdm-staff-day-table sdm-staff-horizontal-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Hari / Tanggal</th>
+                                                        <?php for ($day = $displayStartDay; $day <= $displayEndDay; $day++): ?>
+                                                            <?php
+                                                            $date = new DateTimeImmutable($periodPrefix . '-' . str_pad((string) $day, 2, '0', STR_PAD_LEFT));
+                                                            $calendarDay = $report['calendar_days'][$day] ?? [];
+                                                            $isOff = (bool) ($calendarDay['is_non_working'] ?? false);
+                                                            $calendarLabel = (string) ($calendarDay['label'] ?? ($isOff ? 'Libur' : 'Hari kerja'));
+                                                            ?>
+                                                            <th class="<?= $isOff ? 'is-off' : '' ?>" title="<?= esc($calendarLabel, 'attr') ?>"><strong><?= esc($dayNames[(int) $date->format('N')]) ?></strong><small><?= esc($date->format('d-m')) ?></small></th>
+                                                        <?php endfor ?>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Status / Jam</th>
+                                                        <?php for ($day = $displayStartDay; $day <= $displayEndDay; $day++): ?>
+                                                            <?php
+                                                            $date = new DateTimeImmutable($periodPrefix . '-' . str_pad((string) $day, 2, '0', STR_PAD_LEFT));
+                                                            $calendarDay = $report['calendar_days'][$day] ?? [];
+                                                            $isOff = (bool) ($calendarDay['is_non_working'] ?? false);
+                                                            $dayDetail = $employee['day_details'][$day] ?? null;
+                                                            $code = (string) ($dayDetail['recap_code'] ?? '-');
+                                                            $actualIn = ! empty($dayDetail['actual_in']) ? substr((string) $dayDetail['actual_in'], 0, 5) : '—';
+                                                            $actualOut = ! empty($dayDetail['actual_out']) ? substr((string) $dayDetail['actual_out'], 0, 5) : '—';
+                                                            $note = (string) ($dayDetail['holiday_name'] ?? ($calendarDay['label'] ?? ($statusLabels[$code] ?? 'Data belum tersedia')));
+                                                            ?>
+                                                            <td class="sdm-staff-day-cell <?= $isOff ? 'is-off' : '' ?>" title="<?= esc($note, 'attr') ?>"><span class="sdm-staff-status sdm-daily-code-<?= esc(strtolower(str_replace('-', 'empty', $code)), 'attr') ?>"><?= esc($displayCodes[$code] ?? $code) ?></span><small>↑ <?= esc($actualIn) ?></small><small>↓ <?= esc($actualOut) ?></small></td>
+                                                        <?php endfor ?>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -236,17 +250,19 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
                 $lastPage = min($attendancePagination['last_page'], $attendancePagination['current_page'] + 2);
                 ?>
                 <div class="pagination-wrap">
-                    <nav aria-label="Navigasi halaman data kehadiran"><ul class="pagination">
-                        <?php if ($attendancePagination['current_page'] > 1): ?>
-                            <li><a href="<?= esc($attendancePageUrl(1), 'attr') ?>">First</a></li>
-                            <li><a href="<?= esc($attendancePageUrl($attendancePagination['current_page'] - 1), 'attr') ?>">Previous</a></li>
-                        <?php endif ?>
-                        <?php for ($page = $firstPage; $page <= $lastPage; $page++): ?><li <?= $page === $attendancePagination['current_page'] ? 'class="active"' : '' ?>><a href="<?= esc($attendancePageUrl($page), 'attr') ?>"><?= $page ?></a></li><?php endfor ?>
-                        <?php if ($attendancePagination['current_page'] < $attendancePagination['last_page']): ?>
-                            <li><a href="<?= esc($attendancePageUrl($attendancePagination['current_page'] + 1), 'attr') ?>">Next</a></li>
-                            <li><a href="<?= esc($attendancePageUrl($attendancePagination['last_page']), 'attr') ?>">Last</a></li>
-                        <?php endif ?>
-                    </ul></nav>
+                    <nav aria-label="Navigasi halaman data kehadiran">
+                        <ul class="pagination">
+                            <?php if ($attendancePagination['current_page'] > 1): ?>
+                                <li><a href="<?= esc($attendancePageUrl(1), 'attr') ?>">First</a></li>
+                                <li><a href="<?= esc($attendancePageUrl($attendancePagination['current_page'] - 1), 'attr') ?>">Previous</a></li>
+                            <?php endif ?>
+                            <?php for ($page = $firstPage; $page <= $lastPage; $page++): ?><li <?= $page === $attendancePagination['current_page'] ? 'class="active"' : '' ?>><a href="<?= esc($attendancePageUrl($page), 'attr') ?>"><?= $page ?></a></li><?php endfor ?>
+                            <?php if ($attendancePagination['current_page'] < $attendancePagination['last_page']): ?>
+                                <li><a href="<?= esc($attendancePageUrl($attendancePagination['current_page'] + 1), 'attr') ?>">Next</a></li>
+                                <li><a href="<?= esc($attendancePageUrl($attendancePagination['last_page']), 'attr') ?>">Last</a></li>
+                            <?php endif ?>
+                        </ul>
+                    </nav>
                 </div>
             <?php endif ?>
         </footer>
@@ -263,74 +279,78 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
 <?php endif ?>
 
 <script>
-(() => {
-    const cardSelector = '#attendanceTableArea';
-    let pendingRequest = null;
+    (() => {
+        const cardSelector = '#attendanceTableArea';
+        let pendingRequest = null;
 
-    const replaceTableCard = async (url, updateHistory = true) => {
-        const currentCard = document.querySelector(cardSelector);
-        if (!currentCard) {
-            window.location.assign(url);
-            return;
-        }
+        const replaceTableCard = async (url, updateHistory = true) => {
+            const currentCard = document.querySelector(cardSelector);
+            if (!currentCard) {
+                window.location.assign(url);
+                return;
+            }
 
-        pendingRequest?.abort();
-        const request = new AbortController();
-        pendingRequest = request;
-        currentCard.classList.add('is-loading');
+            pendingRequest?.abort();
+            const request = new AbortController();
+            pendingRequest = request;
+            currentCard.classList.add('is-loading');
 
-        try {
-            const response = await fetch(url, {
-                headers: {'X-Requested-With': 'XMLHttpRequest'},
-                signal: request.signal,
-            });
-            if (!response.ok) throw new Error('Attendance table request failed.');
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    signal: request.signal,
+                });
+                if (!response.ok) throw new Error('Attendance table request failed.');
 
-            const documentResponse = new DOMParser().parseFromString(await response.text(), 'text/html');
-            const nextCard = documentResponse.querySelector(cardSelector);
-            if (!nextCard) throw new Error('Attendance table card is unavailable.');
+                const documentResponse = new DOMParser().parseFromString(await response.text(), 'text/html');
+                const nextCard = documentResponse.querySelector(cardSelector);
+                if (!nextCard) throw new Error('Attendance table card is unavailable.');
 
-            currentCard.replaceWith(nextCard);
-            if (updateHistory) history.pushState({attendanceTable: true}, '', url);
-        } catch (error) {
-            if (error.name !== 'AbortError') window.location.assign(url);
-        } finally {
-            if (pendingRequest === request) pendingRequest = null;
-            currentCard.classList.remove('is-loading');
-        }
-    };
+                currentCard.replaceWith(nextCard);
+                if (updateHistory) history.pushState({
+                    attendanceTable: true
+                }, '', url);
+            } catch (error) {
+                if (error.name !== 'AbortError') window.location.assign(url);
+            } finally {
+                if (pendingRequest === request) pendingRequest = null;
+                currentCard.classList.remove('is-loading');
+            }
+        };
 
-    document.addEventListener('click', (event) => {
-        const toggle = event.target.closest('[data-attendance-staff-toggle]');
-        if (toggle) {
-            const detail = document.getElementById(toggle.getAttribute('aria-controls'));
-            if (!detail) return;
-            const expanded = toggle.getAttribute('aria-expanded') === 'true';
-            toggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-            detail.hidden = expanded;
-            return;
-        }
+        document.addEventListener('click', (event) => {
+            const toggle = event.target.closest('[data-attendance-staff-toggle]');
+            if (toggle) {
+                const detail = document.getElementById(toggle.getAttribute('aria-controls'));
+                if (!detail) return;
+                const expanded = toggle.getAttribute('aria-expanded') === 'true';
+                toggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                detail.hidden = expanded;
+                return;
+            }
 
-        const link = event.target.closest(`${cardSelector} .pagination a`);
-        if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        event.preventDefault();
-        replaceTableCard(link.href);
-    });
+            const link = event.target.closest(`${cardSelector} .pagination a`);
+            if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            replaceTableCard(link.href);
+        });
 
-    document.addEventListener('change', (event) => {
-        const select = event.target.closest('[data-attendance-page-size]');
-        if (!select) return;
-        const form = select.form;
-        if (!form) return;
-        const url = new URL(form.action, window.location.href);
-        const query = new URLSearchParams(new FormData(form));
-        query.delete('halaman');
-        url.search = query.toString();
-        replaceTableCard(url.toString());
-    });
+        document.addEventListener('change', (event) => {
+            const select = event.target.closest('[data-attendance-page-size]');
+            if (!select) return;
+            const form = select.form;
+            if (!form) return;
+            const url = new URL(form.action, window.location.href);
+            const query = new URLSearchParams(new FormData(form));
+            query.delete('halaman');
+            url.search = query.toString();
+            replaceTableCard(url.toString());
+        });
 
-    window.addEventListener('popstate', () => replaceTableCard(window.location.href, false));
-})();
+        window.addEventListener('popstate', () => replaceTableCard(window.location.href, false));
+    })();
 </script>
 
 <div class="input-modal attendance-upload-modal" id="attendanceUploadModal" hidden aria-hidden="true">
@@ -386,74 +406,80 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
 </div>
 
 <?php if ($attendanceImports !== []): ?>
-<div class="input-modal attendance-export-modal" id="attendanceExportModal" hidden aria-hidden="true">
-    <button type="button" class="modal-backdrop" data-close-attendance-export aria-label="Tutup ekspor"></button>
-    <section class="modal-dialog attendance-upload-dialog" role="dialog" aria-modal="true" aria-labelledby="attendanceExportTitle">
-        <header class="modal-header">
-            <div class="modal-title-group">
-                <span class="modal-title-icon" aria-hidden="true">⇩</span>
-                <div>
-                    <p>SDM &amp; TELLER</p>
-                    <h2 id="attendanceExportTitle">Ekspor Rekap Kehadiran</h2>
-                </div>
-            </div>
-            <button class="modal-close" type="button" data-close-attendance-export aria-label="Tutup ekspor">×</button>
-        </header>
-        <form method="post" action="<?= site_url('sdm/data-kehadiran/export') ?>" data-attendance-export-form data-attendance-export-options="<?= esc(json_encode($attendanceExportOptions, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT), 'attr') ?>">
-            <?= csrf_field() ?>
-            <div class="modal-body attendance-upload-body attendance-export-body">
-                <p>Pilih unit kerja dan periode laporan yang ingin diekspor. Pilih semua unit kerja untuk membuat satu file dengan sheet terpisah untuk setiap unit.</p>
-                <div class="attendance-upload-meta-grid">
-                    <div class="form-group">
-                        <label for="attendance_export_unit">Unit kerja <span class="required">*</span></label>
-                        <select id="attendance_export_unit" name="unit_kerja" data-attendance-export-unit required>
-                            <option value="__all__">Semua unit kerja</option>
-                            <?php foreach ($attendanceWorkUnits as $workUnit): ?><option value="<?= esc($workUnit, 'attr') ?>" <?= $workUnit === $exportDefaultUnit ? 'selected' : '' ?>><?= esc($workUnit) ?></option><?php endforeach ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="attendance_export_month">Bulan <span class="required">*</span></label>
-                        <select id="attendance_export_month" name="bulan" data-attendance-export-month required>
-                            <?php foreach ($monthOptions as $monthNumber => $monthLabel): ?><option value="<?= $monthNumber ?>" <?= $monthNumber === $exportDefaultMonth ? 'selected' : '' ?>><?= esc($monthLabel) ?></option><?php endforeach ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="attendance_export_year">Tahun <span class="required">*</span></label>
-                        <select id="attendance_export_year" name="tahun" data-attendance-export-year required>
-                            <?php foreach ($attendanceExportYears as $year): ?><option value="<?= $year ?>" <?= $year === $exportDefaultYear ? 'selected' : '' ?>><?= $year ?></option><?php endforeach ?>
-                        </select>
+    <div class="input-modal attendance-export-modal" id="attendanceExportModal" hidden aria-hidden="true">
+        <button type="button" class="modal-backdrop" data-close-attendance-export aria-label="Tutup ekspor"></button>
+        <section class="modal-dialog attendance-upload-dialog" role="dialog" aria-modal="true" aria-labelledby="attendanceExportTitle">
+            <header class="modal-header">
+                <div class="modal-title-group">
+                    <span class="modal-title-icon" aria-hidden="true">⇩</span>
+                    <div>
+                        <p>SDM &amp; TELLER</p>
+                        <h2 id="attendanceExportTitle">Ekspor Rekap Kehadiran</h2>
                     </div>
                 </div>
-                <p class="attendance-export-note">Pilihan periode disesuaikan otomatis dengan laporan yang tersedia.</p>
-            </div>
-            <footer class="modal-footer">
-                <button class="btn btn-ghost" type="button" data-close-attendance-export>Batal</button>
-                <button class="btn btn-primary" type="submit">Ekspor Dokumen</button>
-            </footer>
-        </form>
-    </section>
-</div>
+                <button class="modal-close" type="button" data-close-attendance-export aria-label="Tutup ekspor">×</button>
+            </header>
+            <form method="post" action="<?= site_url('sdm/data-kehadiran/export') ?>" data-attendance-export-form data-attendance-export-options="<?= esc(json_encode($attendanceExportOptions, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT), 'attr') ?>">
+                <?= csrf_field() ?>
+                <div class="modal-body attendance-upload-body attendance-export-body">
+                    <p>Pilih unit kerja dan periode laporan yang ingin diekspor. Pilih semua unit kerja untuk membuat satu file dengan sheet terpisah untuk setiap unit.</p>
+                    <div class="attendance-upload-meta-grid">
+                        <div class="form-group">
+                            <label for="attendance_export_unit">Unit kerja <span class="required">*</span></label>
+                            <select id="attendance_export_unit" name="unit_kerja" data-attendance-export-unit required>
+                                <option value="__all__">Semua unit kerja</option>
+                                <?php foreach ($attendanceWorkUnits as $workUnit): ?><option value="<?= esc($workUnit, 'attr') ?>" <?= $workUnit === $exportDefaultUnit ? 'selected' : '' ?>><?= esc($workUnit) ?></option><?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="attendance_export_month">Bulan <span class="required">*</span></label>
+                            <select id="attendance_export_month" name="bulan" data-attendance-export-month required>
+                                <?php foreach ($monthOptions as $monthNumber => $monthLabel): ?><option value="<?= $monthNumber ?>" <?= $monthNumber === $exportDefaultMonth ? 'selected' : '' ?>><?= esc($monthLabel) ?></option><?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="attendance_export_year">Tahun <span class="required">*</span></label>
+                            <select id="attendance_export_year" name="tahun" data-attendance-export-year required>
+                                <?php foreach ($attendanceExportYears as $year): ?><option value="<?= $year ?>" <?= $year === $exportDefaultYear ? 'selected' : '' ?>><?= $year ?></option><?php endforeach ?>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="attendance-export-note">Pilihan periode disesuaikan otomatis dengan laporan yang tersedia.</p>
+                </div>
+                <footer class="modal-footer">
+                    <button class="btn btn-ghost" type="button" data-close-attendance-export>Batal</button>
+                    <button class="btn btn-primary" type="submit">Ekspor Dokumen</button>
+                </footer>
+            </form>
+        </section>
+    </div>
 <?php endif ?>
 
 <?php if ($selectedImportId !== null): ?>
-<div class="input-modal attendance-delete-modal" id="attendanceDeleteModal" hidden aria-hidden="true">
-    <button type="button" class="modal-backdrop" data-close-attendance-delete aria-label="Tutup konfirmasi hapus"></button>
-    <section class="modal-dialog delete-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="attendanceDeleteTitle">
-        <header class="modal-header">
-            <div class="modal-title-group">
-                <span class="modal-title-icon" aria-hidden="true">×</span>
-                <div><p>SDM &amp; TELLER</p><h2 id="attendanceDeleteTitle">Hapus Laporan Kehadiran</h2></div>
-            </div>
-            <button class="modal-close" type="button" data-close-attendance-delete aria-label="Tutup konfirmasi">×</button>
-        </header>
-        <form method="post" action="<?= site_url('sdm/data-kehadiran/hapus') ?>">
-            <?= csrf_field() ?>
-            <input type="hidden" name="import_id" value="<?= (int) $selectedImportId ?>">
-            <div class="modal-body"><p>Hapus rekap kehadiran periode yang sedang dipilih beserta seluruh detail hariannya?</p><p class="attendance-delete-note">Tindakan ini memengaruhi Data Kehadiran dan Data Lembur pada periode tersebut.</p></div>
-            <footer class="modal-footer"><button class="btn btn-ghost" type="button" data-close-attendance-delete>Batal</button><button class="btn btn-danger" type="submit">Hapus Laporan</button></footer>
-        </form>
-    </section>
-</div>
+    <div class="input-modal attendance-delete-modal" id="attendanceDeleteModal" hidden aria-hidden="true">
+        <button type="button" class="modal-backdrop" data-close-attendance-delete aria-label="Tutup konfirmasi hapus"></button>
+        <section class="modal-dialog delete-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="attendanceDeleteTitle">
+            <header class="modal-header">
+                <div class="modal-title-group">
+                    <span class="modal-title-icon" aria-hidden="true">×</span>
+                    <div>
+                        <p>SDM &amp; TELLER</p>
+                        <h2 id="attendanceDeleteTitle">Hapus Laporan Kehadiran</h2>
+                    </div>
+                </div>
+                <button class="modal-close" type="button" data-close-attendance-delete aria-label="Tutup konfirmasi">×</button>
+            </header>
+            <form method="post" action="<?= site_url('sdm/data-kehadiran/hapus') ?>">
+                <?= csrf_field() ?>
+                <input type="hidden" name="import_id" value="<?= (int) $selectedImportId ?>">
+                <div class="modal-body">
+                    <p>Hapus rekap kehadiran periode yang sedang dipilih beserta seluruh detail hariannya?</p>
+                    <p class="attendance-delete-note">Tindakan ini memengaruhi Data Kehadiran dan Data Lembur pada periode tersebut.</p>
+                </div>
+                <footer class="modal-footer"><button class="btn btn-ghost" type="button" data-close-attendance-delete>Batal</button><button class="btn btn-danger" type="submit">Hapus Laporan</button></footer>
+            </form>
+        </section>
+    </div>
 <?php endif ?>
 
 <?= $this->endSection() ?>

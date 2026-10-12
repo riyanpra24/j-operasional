@@ -10,6 +10,15 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class ProgresDokumen extends BaseController
 {
+    private const WORK_UNIT_OPTIONS = [
+        'Kantor Wilayah Surabaya',
+        'Kantor Cabang Surabaya',
+        'Kantor Cabang Kediri',
+        'Kantor Cabang Malang',
+        'Kantor Cabang Madiun',
+        'Kantor Cabang Banyuwangi',
+    ];
+
     private DokumenKeluarModel $model;
     private DokumenMasukModel $dokumenMasukModel;
     private AgendarisModel $agendarisModel;
@@ -171,6 +180,7 @@ class ProgresDokumen extends BaseController
             'dokumen' => $this->model->paginate($perPage, 'progres_dokumen'),
             'pager'   => $this->model->pager,
             'filters' => compact('keyword', 'progres', 'perPage', 'order'),
+            'workUnitOptions' => self::WORK_UNIT_OPTIONS,
         ]);
     }
 
@@ -233,6 +243,8 @@ class ProgresDokumen extends BaseController
                 'jumlah_dokumen_value'       => ($dokumen['jumlah_dokumen'] ?? null) ?: '',
                 'nama_ekspedisi'             => ($dokumen['nama_ekspedisi'] ?? null) ?: '-',
                 'nama_ekspedisi_value'       => ($dokumen['nama_ekspedisi'] ?? null) ?: '',
+                'unit_kerja'                  => ($dokumen['unit_kerja'] ?? null) ?: '-',
+                'unit_kerja_value'            => ($dokumen['unit_kerja'] ?? null) ?: '',
                 'pemohon'                    => $dokumen['pemohon'] ?: '-',
                 'pemohon_value'              => $dokumen['pemohon'] ?: '',
                 'pelaksana'                  => $dokumen['pelaksana'] ?: '-',
@@ -327,6 +339,7 @@ class ProgresDokumen extends BaseController
             'jenis_surat'        => trim((string) $this->request->getPost('jenis_surat')),
             'jumlah_dokumen'     => trim((string) $this->request->getPost('jumlah_dokumen')),
             'nama_ekspedisi'     => $namaEkspedisi,
+            'unit_kerja'         => $this->nullIfEmpty($this->request->getPost('unit_kerja')),
             'pemohon'            => $this->nullIfEmpty($this->request->getPost('pemohon')),
             'pelaksana'          => $this->nullIfEmpty($this->request->getPost('pelaksana')),
             'up'                 => $this->nullIfEmpty($this->request->getPost('up')),
@@ -355,6 +368,7 @@ class ProgresDokumen extends BaseController
             'jenis_surat'        => 'required|max_length[100]',
             'jumlah_dokumen'     => 'required|max_length[100]',
             'nama_ekspedisi'     => 'required|max_length[150]',
+            'unit_kerja'         => 'permit_empty|in_list[' . implode(',', self::WORK_UNIT_OPTIONS) . ']',
             'pemohon'            => 'permit_empty|max_length[255]',
             'pelaksana'          => 'permit_empty|max_length[255]',
             'up'                 => 'permit_empty|max_length[255]',

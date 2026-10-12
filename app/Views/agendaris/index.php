@@ -110,7 +110,7 @@ $detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
     </div>
 </section>
 
-<?= view('components/async_table_card', ['cardId' => 'agendarisIncomingTableArea']) ?>
+<?= view('components/async_table_card', ['cardId' => 'agendarisIncomingTableArea', 'filterFormSelector' => '.agendaris-filter-form']) ?>
 
 <?= view('agendaris/detail_modal', ['readOnly' => true, 'contextLabel' => 'DETAIL ' . $contextLabel]) ?>
 <?php if (! $archiveView): ?><?= view('components/reopen_progress_modal') ?><?php endif ?>

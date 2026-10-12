@@ -102,7 +102,7 @@ $contextLabel = $tellerArchiveView ? 'SDM & TELLER' : ($generalSectionView ? 'BA
     </div>
 </section>
 
-<?= view('components/async_table_card', ['cardId' => 'agendarisOutgoingTableArea']) ?>
+<?= view('components/async_table_card', ['cardId' => 'agendarisOutgoingTableArea', 'filterFormSelector' => '.agendaris-filter-form']) ?>
 
 <?php if (! $readOnly): ?><?= view('dokumen_keluar/form_modal') ?><?php endif ?>
 <?= view('dokumen_keluar/detail_modal', ['readOnly' => $readOnly, 'securityView' => $securityView ?? false, 'contextLabel' => 'DETAIL ' . $contextLabel]) ?>

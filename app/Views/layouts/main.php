@@ -45,7 +45,7 @@ $canAccessGeneralSection = in_array($currentRole, ['admin', 'umum_1'], true);
 $canAccessGeneralSectionTwo = in_array($currentRole, ['admin', 'umum_2'], true);
 $canAccessSdm = in_array($currentRole, ['admin', 'sdm'], true);
 $canAccessAkutansi = in_array($currentRole, ['admin', 'akutansi'], true);
-$showDashboardMenu = ! in_array($currentRole, ['umum_1', 'umum_2', 'sdm', 'akutansi'], true);
+$showDashboardMenu = $currentRole === 'admin';
 $incomingArchive = $segment === 'dokumen-masuk';
 $incomingWorkspace = in_array($segment, ['dashboard', 'dokumen-masuk', 'distribusi-dokumen'], true);
 $roleLabel = \Config\UserRoles::label($currentRole);
@@ -165,7 +165,7 @@ if ($currentRole === 'security') {
     <div class="app-shell">
         <?php if (! $isWelcomePage): ?>
         <aside class="sidebar" id="sidebar">
-            <a href="<?= site_url('dashboard') ?>" class="brand brand-jaksa" aria-label="Dashboard JAKSA — Jamkrindo Kanwil Surabaya Operasional">
+            <a href="<?= site_url(\Config\UserRoles::defaultRoute($currentRole)) ?>" class="brand brand-jaksa" aria-label="Halaman awal JAKSA — Jamkrindo Kanwil Surabaya Operasional">
                 <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-sidebar-logo-selected.png') ?>?v=<?= esc($sidebarLogoVersion, 'attr') ?>" width="2138" height="736" alt="JAKSA" decoding="async">
                 <span class="brand-jaksa-expansion" aria-label="Jamkrindo Kanwil Surabaya Operasional"><span><b class="jaksa-j">J</b><b class="jaksa-a-orange">A</b>mkrindo <b class="jaksa-k">K</b>anwil</span><span><b class="jaksa-s">S</b>urabaya oper<b class="jaksa-a-green">A</b>sional</span></span>
             </a>
@@ -344,6 +344,10 @@ if ($currentRole === 'security') {
                         <a href="<?= site_url('akutansi/laba-rugi') ?>" class="nav-sublink <?= in_array($akutansiPage, ['laba-rugi', 'bopo-ytd', 'bopo-ptd'], true) ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Laporan Laba / Rugi
+                        </a>
+                        <a href="<?= site_url('akutansi/rekap-laba-rugi') ?>" class="nav-sublink <?= $akutansiPage === 'rekap-laba-rugi' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Rekap Laba Rugi
                         </a>
                     </div>
                 </div>
@@ -536,6 +540,41 @@ if ($currentRole === 'security') {
                     document.body.append(popup);
                 }
             });
+        })();
+
+        /* Aturan global pop-up: backdrop dan tombol Esc tidak boleh menutup dialog.
+           Penutupan dilakukan dari kontrol eksplisit di dalam pop-up, terutama tombol ×. */
+        (() => {
+            const popupIsVisible = () => Array.from(document.querySelectorAll('dialog[open], [role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]'))
+                .some((popup) => popup instanceof HTMLDialogElement ? popup.open : !popup.closest('[hidden]'));
+
+            document.addEventListener('click', (event) => {
+                const target = event.target;
+                if (target instanceof HTMLDialogElement && target.open) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    return;
+                }
+
+                if (target instanceof Element && target.closest('.modal-backdrop')) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                }
+            }, true);
+
+            document.addEventListener('cancel', (event) => {
+                if (event.target instanceof HTMLDialogElement) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                }
+            }, true);
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && popupIsVisible()) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                }
+            }, true);
         })();
     </script>
     <script src="<?= base_url($appJsAsset) ?>?v=<?= esc($appJsVersion, 'attr') ?>"></script>

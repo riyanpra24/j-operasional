@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use CodeIgniter\HTTP\RedirectResponse;
+use Config\UserRoles;
 
 class Landing extends BaseController
 {
@@ -11,7 +12,12 @@ class Landing extends BaseController
         if (session()->get('auth_user_id') !== null) {
             $lastRoute = (string) session()->get('auth_last_route');
 
-            return redirect()->to(site_url($lastRoute !== '' ? $lastRoute : 'dashboard'));
+            $role = (string) session()->get('auth_role');
+            $route = $lastRoute !== '' && $lastRoute !== 'dashboard'
+                ? $lastRoute
+                : UserRoles::defaultRoute($role);
+
+            return redirect()->to(site_url($route));
         }
 
         return view('landing/index', [

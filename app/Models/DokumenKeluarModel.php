@@ -16,6 +16,7 @@ class DokumenKeluarModel extends Model
         'jenis_surat',
         'jumlah_dokumen',
         'nama_ekspedisi',
+        'unit_kerja',
         'pemohon',
         'pelaksana',
         'up',
