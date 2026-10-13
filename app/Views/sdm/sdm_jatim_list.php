@@ -258,7 +258,7 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
 </dialog>
 <?php endif ?>
 
-<?php if ($canImportSdm): ?>
+<?php if ($canReviewSdm): ?>
 <dialog id="sdmProfileValidationDialog" class="lr-settings-dialog sdm-profile-validation-dialog" aria-labelledby="sdmProfileValidationTitle">
     <header class="lr-settings-header">
         <div>
