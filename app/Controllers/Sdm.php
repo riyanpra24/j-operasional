@@ -49,8 +49,174 @@ class Sdm extends BaseController
 
     public function attendanceDashboard(): string
     {
+        $workUnitOptions = [
+            'Kantor Wilayah Surabaya',
+            'Kantor Cabang Surabaya',
+            'Kantor Cabang Malang',
+            'Kantor Cabang Kediri',
+            'Kantor Cabang Madiun',
+            'Kantor Cabang Banyuwangi',
+            'Kantor Unit Pelayanan Bojonegoro',
+            'Kantor Unit Pelayanan Pamekasan',
+            'Kantor Unit Pelayanan Jember',
+        ];
+        $statusMeta = [
+            ['key' => 'Karyawan Tetap', 'label' => 'Karyawan Tetap', 'color' => '#176fc1'],
+            ['key' => 'Calon Karyawan', 'label' => 'Calon Karyawan', 'color' => '#6952c6'],
+            ['key' => 'PKWT Umum', 'label' => 'PKWT Umum', 'color' => '#e59726'],
+            ['key' => 'PKWT ELH', 'label' => 'PKWT ELH', 'color' => '#de5d6f'],
+            ['key' => 'Magang', 'label' => 'Magang', 'color' => '#2f9b8e'],
+            ['key' => 'Outsourcing', 'label' => 'Outsourcing', 'color' => '#1ca9bd'],
+        ];
+        $emptySummary = static function () use ($statusMeta): array {
+            return [
+                'total' => 0,
+                'organic' => 0,
+                'outsourcing' => 0,
+                'incomplete' => 0,
+                'status' => array_fill_keys(array_column($statusMeta, 'key'), 0),
+            ];
+        };
+        $dashboardData = ['Semua Unit' => $emptySummary()];
+        foreach ($workUnitOptions as $unit) {
+            $dashboardData[$unit] = $emptySummary();
+        }
+
+        foreach ((new SdmEmployeeProfileModel())->findAll() as $employee) {
+            $workUnit = trim((string) ($employee['work_unit'] ?? ''));
+            $status = $this->normalizeEmploymentStatus((string) ($employee['employment_status'] ?? ''));
+            $needsReview = $this->sdmEmployeeValidationIssues($employee) !== [];
+            $targets = ['Semua Unit'];
+            if (isset($dashboardData[$workUnit])) {
+                $targets[] = $workUnit;
+            }
+
+            foreach ($targets as $target) {
+                $dashboardData[$target]['total']++;
+                if ($status === 'Outsourcing') {
+                    $dashboardData[$target]['outsourcing']++;
+                } elseif ($status !== '') {
+                    $dashboardData[$target]['organic']++;
+                }
+                if (isset($dashboardData[$target]['status'][$status])) {
+                    $dashboardData[$target]['status'][$status]++;
+                }
+                if ($needsReview) {
+                    $dashboardData[$target]['incomplete']++;
+                }
+            }
+        }
+
+        // Satu impor terbaru dipakai untuk setiap unit kerja agar laporan
+        // presensi periode lama tidak ikut terakumulasi pada dashboard.
+        $latestAttendanceImports = [];
+        foreach ((new SdmAttendanceImportModel())
+            ->orderBy('period_start', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->findAll() as $import) {
+            $unitKey = trim((string) ($import['work_unit'] ?? ''));
+            $unitKey = $unitKey !== '' ? $unitKey : '__tanpa_unit__';
+            if (! isset($latestAttendanceImports[$unitKey])) {
+                $latestAttendanceImports[$unitKey] = $import;
+            }
+        }
+
+        $attendanceStatusMeta = [
+            ['key' => 'H', 'label' => 'Hadir tepat waktu', 'color' => '#0066c9'],
+            ['key' => 'TLBT', 'label' => 'Terlambat', 'color' => '#e94700'],
+            ['key' => 'TLTAP', 'label' => 'Terlambat dan tidak absen pulang', 'color' => '#e9a400'],
+            ['key' => 'ODR', 'label' => 'On Duty Request', 'color' => '#0f766e'],
+            ['key' => 'IZ', 'label' => 'Izin', 'color' => '#006a32'],
+            ['key' => 'CT', 'label' => 'Cuti', 'color' => '#5f7111'],
+            ['key' => 'S', 'label' => 'Sakit', 'color' => '#173d64'],
+            ['key' => 'A', 'label' => 'Alpa', 'color' => '#b90016'],
+            ['key' => 'TA', 'label' => 'Tidak absen masuk dan pulang', 'color' => '#c8175a'],
+            ['key' => 'TAM', 'label' => 'Tidak absen masuk', 'color' => '#322079'],
+            ['key' => 'TAP', 'label' => 'Tidak absen pulang', 'color' => '#0087cd'],
+            ['key' => 'TPA', 'label' => 'Masuk tidak absen', 'color' => '#6c300d'],
+            ['key' => 'OFF', 'label' => 'Libur / akhir pekan', 'color' => '#f7bfc7'],
+        ];
+        $attendanceByWorkUnit = [];
+        $attendanceImportUnits = [];
+        $attendanceSourceLabels = [];
+        foreach ($latestAttendanceImports as $unitKey => $import) {
+            $workUnit = $unitKey === '__tanpa_unit__' ? 'Unit kerja belum diisi' : $unitKey;
+            $attendanceImportUnits[(int) $import['id']] = $workUnit;
+            $attendanceByWorkUnit[$workUnit] = [];
+            $period = new \DateTimeImmutable((string) $import['period_start']);
+            $month = (int) ($import['report_month'] ?? $period->format('n'));
+            $year = (int) ($import['report_year'] ?? $period->format('Y'));
+            $attendanceSourceLabels[$workUnit] = 'Periode ' . $this->attendanceMonthLabel($month) . ' ' . $year . '.';
+        }
+        $attendanceImportIds = array_map(
+            static fn (array $import): int => (int) $import['id'],
+            array_values($latestAttendanceImports),
+        );
+        if ($attendanceImportIds !== []) {
+            $attendanceRecords = (new SdmAttendanceRecordModel())
+                ->select('import_id, organization, recap_code, raw_status, remark, day_type')
+                ->whereIn('import_id', $attendanceImportIds)
+                ->findAll();
+
+            foreach ($attendanceRecords as $record) {
+                $workUnit = $attendanceImportUnits[(int) ($record['import_id'] ?? 0)] ?? null;
+                if ($workUnit === null) {
+                    continue;
+                }
+                $organization = trim((string) ($record['organization'] ?? '')) ?: 'Bagian belum diisi';
+                if (! isset($attendanceByWorkUnit[$workUnit][$organization])) {
+                    $attendanceByWorkUnit[$workUnit][$organization] = array_fill_keys(
+                        array_column($attendanceStatusMeta, 'key'),
+                        0,
+                    );
+                }
+
+                $isNonWorkingDay = in_array(strtoupper((string) ($record['day_type'] ?? '')), ['OFF', 'PHOFF'], true);
+                $rawStatus = strtoupper((string) ($record['raw_status'] ?? ''));
+                $code = $this->isOnDutyRequestRemark((string) ($record['remark'] ?? ''))
+                    ? 'ODR'
+                    : ($isNonWorkingDay
+                        ? 'OFF'
+                        : ($rawStatus === 'SD'
+                            ? 'S'
+                            : ((string) ($record['recap_code'] ?? '') === 'I'
+                                ? ($rawStatus === 'IZ' ? 'IZ' : 'CT')
+                                : $this->normalizeAttendanceLeaveCode((string) ($record['recap_code'] ?? '')))));
+
+                if ($code === 'ODR' && $isNonWorkingDay) {
+                    $code = 'OFF';
+                }
+                if (isset($attendanceByWorkUnit[$workUnit][$organization][$code])) {
+                    $attendanceByWorkUnit[$workUnit][$organization][$code]++;
+                }
+            }
+        }
+        $attendanceWorkUnitOptions = array_keys($attendanceByWorkUnit);
+        sort($attendanceWorkUnitOptions, SORT_NATURAL | SORT_FLAG_CASE);
+        $attendanceDataByWorkUnit = [];
+        foreach ($attendanceWorkUnitOptions as $workUnit) {
+            ksort($attendanceByWorkUnit[$workUnit], SORT_NATURAL | SORT_FLAG_CASE);
+            $attendanceDataByWorkUnit[$workUnit] = [
+                'labels' => array_keys($attendanceByWorkUnit[$workUnit]),
+                'values' => array_map(
+                    static fn (array $status): array => array_column($attendanceByWorkUnit[$workUnit], $status['key']),
+                    $attendanceStatusMeta,
+                ),
+                'sourceLabel' => $attendanceSourceLabels[$workUnit] ?? 'Belum ada data kehadiran yang diimpor.',
+            ];
+        }
+        $attendanceDepartmentChart = [
+            'statusMeta' => $attendanceStatusMeta,
+            'byWorkUnit' => $attendanceDataByWorkUnit,
+        ];
+
         return view('sdm/dashboard_kehadiran', [
-            'title' => 'Dashboard Kehadiran | SDM & Teller',
+            'title' => 'Dashboard | SDM & Teller',
+            'workUnitOptions' => $workUnitOptions,
+            'dashboardData' => $dashboardData,
+            'statusMeta' => $statusMeta,
+            'attendanceDepartmentChart' => $attendanceDepartmentChart,
+            'attendanceWorkUnitOptions' => $attendanceWorkUnitOptions,
         ]);
     }
 
@@ -477,6 +643,7 @@ class Sdm extends BaseController
             'compositionPositions' => $compositionPositions,
             'compositionColumns' => $compositionColumns,
             'compositionStatusCounts' => $compositionStatusCounts,
+            'jatimCompositionUnits' => $workUnitOptions,
             'employeesNeedingReview' => $employeesNeedingReview,
         ]);
     }
@@ -665,20 +832,33 @@ class Sdm extends BaseController
     private function saveSdmJatim(?int $id = null): RedirectResponse
     {
         $returnUrl = $this->sdmJatimReturnUrl();
+        $workUnit = $this->systemSdmWorkUnit((string) $this->request->getPost('work_unit'));
+        $status = $this->systemSdmEmploymentStatus((string) $this->request->getPost('employment_status'));
+        $gender = $this->systemSdmGender((string) $this->request->getPost('gender'));
+        $employmentDate = $this->systemSdmDate((string) $this->request->getPost('employment_date'));
+        $corporateEmail = $this->systemSdmCorporateEmail((string) $this->request->getPost('corporate_email'));
+        $organization = trim((string) $this->request->getPost('organization'));
+        if ($organization !== '' && ! $this->isSystemSdmOrganization($organization, (string) $workUnit)) {
+            $organization = null;
+        }
+        $position = $this->normalizeSdmPositionTitle((string) $this->request->getPost('position'));
+        if ($position !== '' && ! $this->isSystemSdmPosition($position, (string) $status, (string) $workUnit)) {
+            $position = null;
+        }
         $data = [
             'employee_no' => trim((string) $this->request->getPost('employee_no')),
             'employee_name' => trim((string) $this->request->getPost('employee_name')),
-            'gender' => $this->normalizeSdmGender((string) $this->request->getPost('gender')),
-            'work_unit' => trim((string) $this->request->getPost('work_unit')),
-            'organization' => trim((string) $this->request->getPost('organization')),
-            'position' => trim((string) $this->request->getPost('position')),
+            'gender' => $gender,
+            'work_unit' => $workUnit,
+            'organization' => $organization,
+            'position' => $position,
             // Posisi rekap dan kategori outsourcing kini ditentukan dari Bagian + Posisi.
             'composition_position' => null,
             'outsourcing_category' => null,
-            'employment_status' => $this->normalizeEmploymentStatus((string) $this->request->getPost('employment_status')),
-            'employment_date' => trim((string) $this->request->getPost('employment_date')),
+            'employment_status' => $status,
+            'employment_date' => $employmentDate,
             'phone_number' => trim((string) $this->request->getPost('phone_number')),
-            'corporate_email' => trim((string) $this->request->getPost('corporate_email')),
+            'corporate_email' => $corporateEmail,
         ];
         foreach (['gender', 'work_unit', 'organization', 'position', 'employment_status', 'employment_date', 'phone_number', 'corporate_email'] as $field) {
             if ($data[$field] === '') $data[$field] = null;
@@ -712,25 +892,33 @@ class Sdm extends BaseController
      */
     private function importedSdmEmployeeData(array $row): array
     {
-        $status = $this->normalizeEmploymentStatus((string) ($row['employment_status'] ?? ''));
-        $gender = $this->normalizeSdmGender((string) ($row['gender'] ?? ''));
-        $date = trim((string) ($row['employment_date'] ?? ''));
-        $email = trim((string) ($row['corporate_email'] ?? ''));
-        $position = $this->normalizeImportedSdmPosition((string) ($row['position'] ?? ''), $status);
+        $status = $this->systemSdmEmploymentStatus((string) ($row['employment_status'] ?? ''));
+        $gender = $this->systemSdmGender((string) ($row['gender'] ?? ''));
+        $date = $this->systemSdmDate((string) ($row['employment_date'] ?? ''));
+        $email = $this->systemSdmCorporateEmail((string) ($row['corporate_email'] ?? ''));
+        $workUnit = $this->systemSdmWorkUnit((string) ($row['work_unit'] ?? ''));
+        $organization = $this->nullableImportedValue($row['organization'] ?? null);
+        if ($organization !== null && ! $this->isSystemSdmOrganization($organization, (string) $workUnit)) {
+            $organization = null;
+        }
+        $position = $this->normalizeImportedSdmPosition((string) ($row['position'] ?? ''), (string) $status);
+        if ($position !== null && ! $this->isSystemSdmPosition($position, (string) $status, (string) $workUnit)) {
+            $position = null;
+        }
 
         return [
             'employee_no' => $this->importedSdmEmployeeNo($row),
             'employee_name' => trim((string) ($row['employee_name'] ?? '')),
-            'gender' => $gender === '' ? null : $gender,
-            'work_unit' => trim((string) ($row['work_unit'] ?? '')),
-            'organization' => $this->nullableImportedValue($row['organization'] ?? null),
+            'gender' => $gender,
+            'work_unit' => $workUnit,
+            'organization' => $organization,
             'position' => $position,
             'composition_position' => null,
             'outsourcing_category' => null,
             'employment_status' => $status,
-            'employment_date' => $date === '' ? null : $date,
+            'employment_date' => $date,
             'phone_number' => $this->nullableImportedValue($row['phone_number'] ?? null),
-            'corporate_email' => $email === '' ? null : $email,
+            'corporate_email' => $email,
         ];
     }
 
@@ -797,7 +985,7 @@ class Sdm extends BaseController
 
     private function normalizeImportedSdmPosition(string $position, string $status): ?string
     {
-        $position = trim($position);
+        $position = $this->normalizeSdmPositionTitle($position);
         $key = $this->compositionText($position);
         if ($key === '' || $key === '-') {
             return null;
@@ -822,6 +1010,108 @@ class Sdm extends BaseController
             'rro' => 'Risk Officer',
             default => $position,
         };
+    }
+
+    /** Keeps the Indonesian spelling of the management title consistent. */
+    private function normalizeSdmPositionTitle(string $position): string
+    {
+        $position = trim($position);
+
+        return preg_replace('/^manager(?=\s|$)/iu', 'Manajer', $position) ?? $position;
+    }
+
+    private function systemSdmWorkUnit(string $workUnit): ?string
+    {
+        $workUnit = trim($workUnit);
+
+        return in_array($workUnit, [
+            'Kantor Wilayah Surabaya',
+            'Kantor Cabang Surabaya',
+            'Kantor Cabang Malang',
+            'Kantor Cabang Kediri',
+            'Kantor Cabang Madiun',
+            'Kantor Cabang Banyuwangi',
+            'Kantor Unit Pelayanan Bojonegoro',
+            'Kantor Unit Pelayanan Pamekasan',
+            'Kantor Unit Pelayanan Jember',
+        ], true) ? $workUnit : null;
+    }
+
+    private function systemSdmEmploymentStatus(string $status): ?string
+    {
+        $status = $this->normalizeEmploymentStatus($status);
+
+        return in_array($status, self::EMPLOYMENT_STATUSES, true) ? $status : null;
+    }
+
+    private function systemSdmGender(string $gender): ?string
+    {
+        $gender = $this->normalizeSdmGender($gender);
+
+        return in_array($gender, ['L', 'P'], true) ? $gender : null;
+    }
+
+    private function systemSdmDate(string $date): ?string
+    {
+        $date = trim($date);
+
+        return $date !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/D', $date) ? $date : null;
+    }
+
+    private function systemSdmCorporateEmail(string $email): ?string
+    {
+        $email = trim($email);
+
+        return $email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
+    }
+
+    private function isSystemSdmOrganization(string $organization, string $workUnit): bool
+    {
+        $organization = trim($organization);
+        $leadership = match (true) {
+            $workUnit === 'Kantor Wilayah Surabaya' => ['Pimpinan Wilayah', 'Wakil Pimpinan Wilayah'],
+            str_starts_with($workUnit, 'Kantor Unit Pelayanan ') => ['Kepala KUP'],
+            str_starts_with($workUnit, 'Kantor Cabang ') => ['Pemimpin Cabang', 'Wakil Pemimpin Cabang'],
+            default => [],
+        };
+
+        return in_array($organization, array_merge($leadership, [
+            'Staff Risk Officer', 'Klaim dan Subrogasi', 'Bisnis', 'Operasional', 'IT Helpdesk',
+        ]), true);
+    }
+
+    /**
+     * Accepts only positions provided by the SDM form for the selected work unit
+     * and employee category. Other imported titles are kept blank for review.
+     */
+    private function isSystemSdmPosition(string $position, string $status, string $workUnit): bool
+    {
+        if ($status === 'Outsourcing') {
+            return $this->isAllowedOutsourcingPosition($position);
+        }
+
+        $staffPositions = [
+            'Staff RM CBC', 'Staff RM CAC', 'Staff RM Subrogasi', 'Staff Bisnis',
+            'Staff Klaim', 'Staff Operasional', 'Staff Fungsional',
+            'Staff Risk Officer', 'IT Helpdesk', 'Magang',
+        ];
+        $leadershipPositions = match (true) {
+            $workUnit === 'Kantor Wilayah Surabaya' => [
+                'Pimpinan Wilayah', 'Wakil Pimpinan Wilayah', 'Kepala Bagian Klaim & Subro',
+                'Kepala Bagian Bisnis', 'Kepala Bagian Operasional',
+            ],
+            str_starts_with($workUnit, 'Kantor Unit Pelayanan ') => [
+                'Kepala Kantor Unit Pelayanan', 'Manajer Klaim & Subro', 'Manajer Bisnis I',
+                'Manajer Bisnis II', 'Manajer Operasional',
+            ],
+            str_starts_with($workUnit, 'Kantor Cabang ') => [
+                'Pemimpin Cabang', 'Manajer Klaim & Subro', 'Manajer Bisnis I',
+                'Manajer Bisnis II', 'Manajer Operasional',
+            ],
+            default => [],
+        };
+
+        return in_array($position, array_merge($leadershipPositions, $staffPositions), true);
     }
 
     /**
@@ -937,15 +1227,21 @@ class Sdm extends BaseController
         )) return 'Manajemen Unit Kerja';
         if (str_starts_with($workUnit, 'kantor cabang ') && (
             in_array($position, ['pemimpin cabang', 'wakil pemimpin cabang'], true)
-            || $position === 'manager'
-            || str_starts_with($position, 'manager ')
+            || $position === 'manajer'
+            || str_starts_with($position, 'manajer ')
         )) return 'Manajemen Unit Kerja';
+        if (str_starts_with($workUnit, 'kantor unit pelayanan ') && str_starts_with($position, 'kepala kantor unit')) {
+            return 'Manajemen Unit Kerja';
+        }
         if ($position === 'staff rm cbc') return 'RM CBC';
         if ($position === 'staff rm cac') return 'RM CAC';
         if ($position === 'staff rm subrogasi') return 'RM Subrogasi';
-        if ($position === 'staff risk officer' || $position === 'risk officer') return 'Risk Officer (RO)';
-        if ($position === 'it helpdesk' || $position === 'helpdesk ti') return 'Helpdesk TI';
-        if ($position === 'staff fungsional' || $position === 'fungsional') return 'Fungsional';
+        // Tiga baris berikut mengikuti struktur data SDM: Bagian dan Posisi harus
+        // sesuai untuk Risk Officer serta Helpdesk, sementara Fungsional ditentukan
+        // langsung dari Posisi Staff Fungsional.
+        if ($organization === 'staff risk officer' && $position === 'staff risk officer') return 'Risk Officer (RO)';
+        if ($organization === 'it helpdesk' && $position === 'it helpdesk') return 'Helpdesk TI';
+        if ($position === 'staff fungsional') return 'Fungsional';
         if ($position === 'staff bisnis') return 'Bagian Bisnis';
         if ($this->outsourcingCategoryFromPosition($position) !== null) {
             if ($this->normalizeEmploymentStatus((string) ($employee['employment_status'] ?? '')) !== 'Outsourcing') return null;

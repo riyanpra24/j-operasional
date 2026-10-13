@@ -286,6 +286,10 @@ if ($currentRole === 'security') {
                         <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="sdmSubmenu" data-nav-submenu <?= $sdmActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('sdm/dashboard-kehadiran') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'dashboard-kehadiran' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dashboard
+                        </a>
                         <a href="<?= site_url('sdm/dokumen-masuk') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'dokumen-masuk' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Dispo Dokumen
@@ -313,10 +317,6 @@ if ($currentRole === 'security') {
                         <a href="<?= site_url('sdm/data-magang') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'data-magang' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Data Magang
-                        </a>
-                        <a href="<?= site_url('sdm/dashboard-kehadiran') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'dashboard-kehadiran' ? 'active' : '' ?>">
-                            <span aria-hidden="true">●</span>
-                            Dashboard Kehadiran
                         </a>
                     </div>
                 </div>

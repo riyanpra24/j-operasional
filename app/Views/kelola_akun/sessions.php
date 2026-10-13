@@ -181,7 +181,7 @@ $usageChart = [
     </section>
 </div>
 
-<script src="<?= base_url('assets/vendor/chartjs/chart.umd.min.js') ?>"></script>
+<?= view('components/chartjs_asset') ?>
 <script>
     (() => {
         const modal = document.getElementById('sessionResetModal');

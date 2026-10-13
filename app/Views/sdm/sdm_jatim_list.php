@@ -9,6 +9,7 @@
 /** @var list<string> $compositionPositions */
 /** @var list<string> $compositionColumns */
 /** @var array<string, array<string, array<string, int>>> $compositionStatusCounts */
+/** @var list<string> $jatimCompositionUnits */
 /** @var list<array<string, mixed>> $employeesNeedingReview */
 /** @var \CodeIgniter\Pager\PagerInterface $pager */
 $sdmRole = (string) session()->get('auth_role');
@@ -23,7 +24,6 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
 
 <section class="sdm-unit-overview" aria-labelledby="sdmUnitOverviewTitle">
     <header class="sdm-unit-overview-heading">
-        <span class="sdm-unit-overview-icon"><img src="https://cdn-icons-png.flaticon.com/512/236/236842.png" alt=""></span>
         <div>
             <h2 id="sdmUnitOverviewTitle">Ringkasan Pegawai per Cabang</h2>
             <p>Jumlah pegawai di setiap kantor cabang dan wilayah <a href="https://www.flaticon.com/free-icon/team_236842" target="_blank" rel="noreferrer">· Ikon: Vectors Market / Flaticon</a></p>
@@ -31,6 +31,10 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
         </div>
     </header>
     <div class="sdm-unit-summary" aria-label="Jumlah pegawai per unit kerja">
+        <button type="button" class="sdm-unit-summary-card sdm-jatim-summary-card" data-sdm-jatim-summary-open aria-haspopup="dialog" aria-controls="sdmJatimCompositionSummaryDialog" aria-label="Buka Rekap SDM Jatim">
+            <span class="sdm-unit-card-head"><strong>Rekap SDM Jatim</strong><i aria-hidden="true">›</i></span>
+            <span class="sdm-unit-card-metric"><span class="sdm-unit-card-icon" aria-hidden="true"></span><span><b><?= number_format(array_sum($workUnitCounts), 0, ',', '.') ?></b><small>Pegawai</small></span></span>
+        </button>
         <?php foreach ($summaryWorkUnitOptions as $unit): ?>
             <a class="sdm-unit-summary-card<?= $unit === 'Kantor Cabang Banyuwangi' ? ' has-banyuwangi-background' : '' ?><?= $unit === 'Kantor Cabang Kediri' ? ' has-kediri-background' : '' ?><?= $unit === 'Kantor Cabang Malang' ? ' has-malang-background' : '' ?><?= $unit === 'Kantor Cabang Madiun' ? ' has-madiun-background' : '' ?><?= $unit === 'Kantor Cabang Surabaya' ? ' has-surabaya-background' : '' ?><?= $unit === 'Kantor Wilayah Surabaya' ? ' has-kanwil-surabaya-background' : '' ?><?= $filters['workUnit'] === $unit ? ' is-selected' : '' ?>" href="<?= esc(site_url('sdm/sdm-jatim?unit_kerja=' . rawurlencode($unit) . '&per_page=' . (int) $filters['perPage']), 'attr') ?>" data-sdm-composition-open data-work-unit="<?= esc($unit, 'attr') ?>" aria-haspopup="dialog" aria-controls="sdmCompositionSummaryDialog" aria-label="Buka rekap komposisi SDM <?= esc($unit, 'attr') ?>">
                 <span class="sdm-unit-card-head"><strong><?= esc($unit) ?></strong><i aria-hidden="true">›</i></span>
@@ -237,80 +241,91 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
 </dialog>
 
 <?php if ($canImportSdm): ?>
-<dialog id="sdmProfileImportDialog" class="lr-settings-dialog" aria-labelledby="sdmProfileImportTitle">
-    <header class="lr-settings-header">
-        <div>
-            <p class="eyebrow">SDM &amp; TELLER</p>
-            <h2 id="sdmProfileImportTitle">Import Data SDM</h2>
-        </div><button type="button" class="icon-btn" data-sdm-profile-import-close aria-label="Tutup">×</button>
-    </header>
-    <form method="post" action="<?= site_url('sdm/sdm-jatim/import') ?>" enctype="multipart/form-data" data-sdm-profile-import-form>
-        <div class="lr-settings-body">
-            <p>Gunakan template Excel per unit kerja. NPP yang sudah ada akan diperbarui; data dengan NPP baru akan ditambahkan.</p>
-            <p><a href="<?= site_url('sdm/sdm-jatim/template') ?>">Unduh template import Excel</a></p>
-            <?= csrf_field() ?>
-            <input type="hidden" name="return_query" value="">
-            <div class="form-group"><label for="sdmProfileImportFile">File Excel <span class="required">*</span></label><input id="sdmProfileImportFile" type="file" name="sdm_excel" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required></div>
-            <label class="lr-upload-manual-approval"><input type="checkbox" name="confirm_import" value="yes" required><span><strong>Saya memahami proses import</strong><small>Data lama tidak dihapus otomatis oleh proses ini.</small></span></label>
-        </div>
-        <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-sdm-profile-import-close>Batal</button><button type="submit" class="btn btn-secondary">Import Data</button></footer>
-    </form>
-</dialog>
+    <dialog id="sdmProfileImportDialog" class="lr-settings-dialog" aria-labelledby="sdmProfileImportTitle">
+        <header class="lr-settings-header">
+            <div>
+                <p class="eyebrow">SDM &amp; TELLER</p>
+                <h2 id="sdmProfileImportTitle">Import Data SDM</h2>
+            </div><button type="button" class="icon-btn" data-sdm-profile-import-close aria-label="Tutup">×</button>
+        </header>
+        <form method="post" action="<?= site_url('sdm/sdm-jatim/import') ?>" enctype="multipart/form-data" data-sdm-profile-import-form>
+            <div class="lr-settings-body">
+                <p>Gunakan template Excel per unit kerja. NPP yang sudah ada akan diperbarui; data dengan NPP baru akan ditambahkan.</p>
+                <p><a href="<?= site_url('sdm/sdm-jatim/template') ?>">Unduh template import Excel</a></p>
+                <?= csrf_field() ?>
+                <input type="hidden" name="return_query" value="">
+                <div class="form-group"><label for="sdmProfileImportFile">File Excel <span class="required">*</span></label><input id="sdmProfileImportFile" type="file" name="sdm_excel" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required></div>
+                <label class="lr-upload-manual-approval"><input type="checkbox" name="confirm_import" value="yes" required><span><strong>Saya memahami proses import</strong><small>Data lama tidak dihapus otomatis oleh proses ini.</small></span></label>
+            </div>
+            <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-sdm-profile-import-close>Batal</button><button type="submit" class="btn btn-secondary">Import Data</button></footer>
+        </form>
+    </dialog>
 <?php endif ?>
 
 <?php if ($canReviewSdm): ?>
-<dialog id="sdmProfileValidationDialog" class="lr-settings-dialog sdm-profile-validation-dialog" aria-labelledby="sdmProfileValidationTitle">
-    <header class="lr-settings-header">
-        <div>
-            <p class="eyebrow">SDM &amp; TELLER</p>
-            <h2 id="sdmProfileValidationTitle">Data Perlu Dilengkapi</h2>
-        </div><button type="button" class="icon-btn" data-sdm-profile-validation-close aria-label="Tutup">×</button>
-    </header>
-    <div class="lr-settings-body">
-        <?php if ($employeesNeedingReview === []): ?>
-            <p>Semua data SDM sudah sesuai dengan aturan sistem.</p>
-        <?php else: ?>
-            <p>Data berikut perlu dilengkapi atau diperbaiki agar dapat dipetakan ke sistem dan rekap.</p>
-            <div class="table-wrap sdm-jatim-table-wrap">
-                <table class="sdm-jatim-table">
-                    <thead><tr><th>Nama Karyawan</th><th>NPP</th><th>Posisi</th><th>Unit Kerja</th><th>Status Karyawan</th><th>Perlu Dilengkapi</th><th>Aksi</th></tr></thead>
-                    <tbody><?php foreach ($employeesNeedingReview as $employee): ?>
-                        <?php $profile = ['id' => (int) $employee['id'], 'employee_no' => $employee['employee_no'], 'employee_name' => $employee['employee_name'], 'gender' => $employee['gender'], 'work_unit' => $employee['work_unit'], 'organization' => $employee['organization'], 'position' => $employee['position'], 'employment_status' => $employee['employment_status'], 'employment_date' => $employee['employment_date'], 'phone_number' => $employee['phone_number'], 'corporate_email' => $employee['corporate_email']]; ?>
-                        <tr>
-                            <td><strong><?= esc($employee['employee_name'] ?: 'Tanpa nama') ?></strong></td>
-                            <td><?= esc($employee['employee_no'] ?: '-') ?></td>
-                            <td><?= esc($employee['position'] ?: '-') ?></td>
-                            <td><?= esc($employee['work_unit'] ?: '—') ?></td>
-                            <td><?= esc($employee['employment_status'] ?: '—') ?></td>
-                            <td><?= esc(implode(', ', $employee['validation_issues'])) ?></td>
-                            <td class="sdm-jatim-actions"><button type="button" class="icon-btn" data-sdm-profile-validation-edit='<?= esc(json_encode($profile, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), 'attr') ?>' aria-label="Edit <?= esc($employee['employee_name'] ?: 'data SDM', 'attr') ?>">✎</button></td>
-                        </tr>
-                    <?php endforeach ?></tbody>
-                </table>
-            </div>
-        <?php endif ?>
-    </div>
-    <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-sdm-profile-validation-close>Tutup</button></footer>
-</dialog>
+    <dialog id="sdmProfileValidationDialog" class="lr-settings-dialog sdm-profile-validation-dialog" aria-labelledby="sdmProfileValidationTitle">
+        <header class="lr-settings-header">
+            <div>
+                <p class="eyebrow">SDM &amp; TELLER</p>
+                <h2 id="sdmProfileValidationTitle">Data Perlu Dilengkapi</h2>
+            </div><button type="button" class="icon-btn" data-sdm-profile-validation-close aria-label="Tutup">×</button>
+        </header>
+        <div class="lr-settings-body">
+            <?php if ($employeesNeedingReview === []): ?>
+                <p>Semua data SDM sudah sesuai dengan aturan sistem.</p>
+            <?php else: ?>
+                <p>Data berikut perlu dilengkapi atau diperbaiki agar dapat dipetakan ke sistem dan rekap.</p>
+                <div class="table-wrap sdm-jatim-table-wrap">
+                    <table class="sdm-jatim-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Karyawan</th>
+                                <th>NPP</th>
+                                <th>Posisi</th>
+                                <th>Unit Kerja</th>
+                                <th>Status Karyawan</th>
+                                <th>Perlu Dilengkapi</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody><?php foreach ($employeesNeedingReview as $employee): ?>
+                                <?php $profile = ['id' => (int) $employee['id'], 'employee_no' => $employee['employee_no'], 'employee_name' => $employee['employee_name'], 'gender' => $employee['gender'], 'work_unit' => $employee['work_unit'], 'organization' => $employee['organization'], 'position' => $employee['position'], 'employment_status' => $employee['employment_status'], 'employment_date' => $employee['employment_date'], 'phone_number' => $employee['phone_number'], 'corporate_email' => $employee['corporate_email']]; ?>
+                                <tr>
+                                    <td><strong><?= esc($employee['employee_name'] ?: 'Tanpa nama') ?></strong></td>
+                                    <td><?= esc($employee['employee_no'] ?: '-') ?></td>
+                                    <td><?= esc($employee['position'] ?: '-') ?></td>
+                                    <td><?= esc($employee['work_unit'] ?: '—') ?></td>
+                                    <td><?= esc($employee['employment_status'] ?: '—') ?></td>
+                                    <td><?= esc(implode(', ', $employee['validation_issues'])) ?></td>
+                                    <td class="sdm-jatim-actions"><button type="button" class="icon-btn" data-sdm-profile-validation-edit='<?= esc(json_encode($profile, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), 'attr') ?>' aria-label="Edit <?= esc($employee['employee_name'] ?: 'data SDM', 'attr') ?>">✎</button></td>
+                                </tr>
+                            <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif ?>
+        </div>
+        <footer class="lr-settings-footer"><button type="button" class="btn btn-secondary" data-sdm-profile-validation-close>Tutup</button></footer>
+    </dialog>
 <?php endif ?>
 
 <?php if ($canDeleteAllSdm): ?>
-<dialog id="sdmProfileDeleteAllDialog" class="lr-settings-dialog" aria-labelledby="sdmProfileDeleteAllTitle">
-    <header class="lr-settings-header">
-        <div>
-            <p class="eyebrow">SDM &amp; TELLER</p>
-            <h2 id="sdmProfileDeleteAllTitle">Hapus Seluruh Data SDM</h2>
-        </div><button type="button" class="icon-btn" data-sdm-profile-delete-all-close aria-label="Tutup">×</button>
-    </header>
-    <form method="post" action="<?= site_url('sdm/sdm-jatim/hapus-semua') ?>">
-        <div class="lr-settings-body">
-            <p>Seluruh profil SDM akan dihapus permanen dan tidak dapat dipulihkan.</p>
-            <?= csrf_field() ?>
-            <label class="lr-upload-manual-approval"><input type="checkbox" name="confirm_delete" value="yes" required><span><strong>Saya memahami tindakan ini</strong><small>Hapus seluruh data hanya setelah Anda yakin.</small></span></label>
-        </div>
-        <footer class="lr-settings-footer"><button type="submit" class="btn btn-danger">Hapus Seluruh Data</button></footer>
-    </form>
-</dialog>
+    <dialog id="sdmProfileDeleteAllDialog" class="lr-settings-dialog" aria-labelledby="sdmProfileDeleteAllTitle">
+        <header class="lr-settings-header">
+            <div>
+                <p class="eyebrow">SDM &amp; TELLER</p>
+                <h2 id="sdmProfileDeleteAllTitle">Hapus Seluruh Data SDM</h2>
+            </div><button type="button" class="icon-btn" data-sdm-profile-delete-all-close aria-label="Tutup">×</button>
+        </header>
+        <form method="post" action="<?= site_url('sdm/sdm-jatim/hapus-semua') ?>">
+            <div class="lr-settings-body">
+                <p>Seluruh profil SDM akan dihapus permanen dan tidak dapat dipulihkan.</p>
+                <?= csrf_field() ?>
+                <label class="lr-upload-manual-approval"><input type="checkbox" name="confirm_delete" value="yes" required><span><strong>Saya memahami tindakan ini</strong><small>Hapus seluruh data hanya setelah Anda yakin.</small></span></label>
+            </div>
+            <footer class="lr-settings-footer"><button type="submit" class="btn btn-danger">Hapus Seluruh Data</button></footer>
+        </form>
+    </dialog>
 <?php endif ?>
 
 <dialog id="sdmCompositionSummaryDialog" class="lr-settings-dialog kanwil-sdm-summary-dialog" aria-labelledby="sdmCompositionSummaryTitle">
@@ -355,6 +370,38 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
     </div>
 </dialog>
 
+<dialog id="sdmJatimCompositionSummaryDialog" class="lr-settings-dialog kanwil-sdm-summary-dialog sdm-jatim-summary-dialog" aria-labelledby="sdmJatimCompositionSummaryTitle">
+    <header class="lr-settings-header">
+        <div>
+            <p class="eyebrow">SDM &amp; TELLER</p>
+            <h2 id="sdmJatimCompositionSummaryTitle">Rekap SDM Jatim</h2>
+        </div>
+        <button type="button" class="icon-btn" data-sdm-jatim-summary-close aria-label="Tutup">×</button>
+    </header>
+    <div class="kanwil-sdm-summary-body">
+        <p class="kanwil-sdm-summary-note">Rekap ini menjumlahkan komposisi SDM dari seluruh unit kerja secara otomatis.</p>
+        <div class="table-wrap kanwil-sdm-summary-table-wrap">
+            <table class="kanwil-sdm-summary-table sdm-jatim-summary-table">
+                <thead>
+                    <tr><?php foreach (array_merge(['Unit Kerja'], $compositionPositions, ['Jumlah']) as $header): ?><th><?= esc($header) ?></th><?php endforeach ?></tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($jatimCompositionUnits as $unit): ?>
+                        <tr data-sdm-jatim-summary-unit="<?= esc($unit, 'attr') ?>">
+                            <th scope="row"><?= esc($unit) ?></th><?php foreach ($compositionPositions as $position): ?><td data-sdm-jatim-summary-position="<?= esc($position, 'attr') ?>">-</td><?php endforeach ?><td data-sdm-jatim-summary-row-total>-</td>
+                        </tr>
+                    <?php endforeach ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Jumlah SDM Jatim</th><?php foreach ($compositionPositions as $position): ?><td data-sdm-jatim-summary-position-total="<?= esc($position, 'attr') ?>">-</td><?php endforeach ?><td data-sdm-jatim-summary-grand-total>-</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</dialog>
+
 <script>
     (() => {
         const baseUrl = <?= json_encode(site_url('sdm/sdm-jatim')) ?>;
@@ -365,6 +412,7 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
         const importDialog = document.getElementById('sdmProfileImportDialog');
         const validationDialog = document.getElementById('sdmProfileValidationDialog');
         const compositionSummaryDialog = document.getElementById('sdmCompositionSummaryDialog');
+        const jatimCompositionSummaryDialog = document.getElementById('sdmJatimCompositionSummaryDialog');
         const compositionStatusCounts = <?= json_encode($compositionStatusCounts, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
         const form = formDialog?.querySelector('[data-sdm-profile-form]');
         const workUnitField = form?.elements.work_unit;
@@ -391,9 +439,11 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
         const outsourcingStaffPositions = ['Staff RM CBC', 'Staff RM CAC', 'Staff Bisnis', 'Staff Klaim', 'Staff Operasional'];
         const outsourcingPositions = [...outsourcingCategoryPositions, ...outsourcingStaffPositions];
         const organizationOptionsForUnit = workUnit => {
-            const leadership = workUnit.startsWith('Kantor Cabang ')
-                ? ['Pemimpin Cabang', 'Wakil Pemimpin Cabang']
-                : ['Pimpinan Wilayah', 'Wakil Pimpinan Wilayah'];
+            const leadership = workUnit.startsWith('Kantor Unit Pelayanan ') ?
+                ['Kepala KUP'] :
+                (workUnit.startsWith('Kantor Cabang ') ?
+                    ['Pemimpin Cabang', 'Wakil Pemimpin Cabang'] :
+                    ['Pimpinan Wilayah', 'Wakil Pimpinan Wilayah']);
 
             return [
                 ...leadership,
@@ -423,11 +473,11 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
         const organicPositionOptionsForUnit = workUnit => {
             const isKanwil = workUnit === 'Kantor Wilayah Surabaya';
             const isKup = workUnit.startsWith('Kantor Unit Pelayanan ');
-            const leadership = isKanwil
-                ? ['Pimpinan Wilayah', 'Wakil Pimpinan Wilayah', 'Kepala Bagian Klaim & Subro', 'Kepala Bagian Bisnis', 'Kepala Bagian Operasional']
-                : [
+            const leadership = isKanwil ?
+                ['Pimpinan Wilayah', 'Wakil Pimpinan Wilayah', 'Kepala Bagian Klaim & Subro', 'Kepala Bagian Bisnis', 'Kepala Bagian Operasional'] :
+                [
                     ...(isKup ? ['Kepala Kantor Unit Pelayanan'] : ['Pemimpin Cabang']),
-                    'Manager Klaim & Subro', 'Manager Bisnis I', 'Manager Bisnis II', 'Manager Operasional',
+                    'Manajer Klaim & Subro', 'Manajer Bisnis I', 'Manajer Bisnis II', 'Manajer Operasional',
                 ];
             return [...leadership, ...organicStaffPositions];
         };
@@ -443,9 +493,9 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
             syncLockIndicator(positionField);
             if (positionField.disabled) return;
 
-            const options = positionGroup === 'outsourcing'
-                ? outsourcingPositions
-                : organicPositionOptionsForUnit(workUnit);
+            const options = positionGroup === 'outsourcing' ?
+                outsourcingPositions :
+                organicPositionOptionsForUnit(workUnit);
             options.forEach(value => positionField.append(new Option(value, value)));
             if (selectedPosition && !Array.from(positionField.options).some(option => option.value === selectedPosition)) {
                 positionField.append(new Option(selectedPosition, selectedPosition));
@@ -467,7 +517,7 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
             syncLockIndicator(positionGroupField);
             populatePositionOptions(selectedPosition);
         };
-        const syncPageScroll = () => document.body.classList.toggle('sdm-profile-modal-open', [formDialog, viewDialog, deleteDialog, deleteAllDialog, importDialog, validationDialog, compositionSummaryDialog].some(dialog => dialog?.open));
+        const syncPageScroll = () => document.body.classList.toggle('sdm-profile-modal-open', [formDialog, viewDialog, deleteDialog, deleteAllDialog, importDialog, validationDialog, compositionSummaryDialog, jatimCompositionSummaryDialog].some(dialog => dialog?.open));
         const genderLabel = value => value === 'L' ? 'Laki-laki' : (value === 'P' ? 'Perempuan' : value);
         const validationRequested = new URLSearchParams(window.location.search).get('review_data') === '1';
         const open = dialog => {
@@ -525,8 +575,35 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
             });
             compositionSummaryDialog.querySelector('[data-sdm-composition-grand-total]').textContent = formatCompositionCount(grandTotal);
         };
+        const renderJatimCompositionSummary = () => {
+            const positionTotals = {};
+            let grandTotal = 0;
+            jatimCompositionSummaryDialog.querySelectorAll('[data-sdm-jatim-summary-unit]').forEach(row => {
+                const counts = compositionStatusCounts[row.dataset.sdmJatimSummaryUnit] || {};
+                let rowTotal = 0;
+                row.querySelectorAll('[data-sdm-jatim-summary-position]').forEach(cell => {
+                    const position = cell.dataset.sdmJatimSummaryPosition;
+                    const count = Object.values(counts[position] || {}).reduce((total, value) => total + Number(value || 0), 0);
+                    cell.textContent = formatCompositionCount(count);
+                    rowTotal += count;
+                    positionTotals[position] = (positionTotals[position] || 0) + count;
+                });
+                row.querySelector('[data-sdm-jatim-summary-row-total]').textContent = formatCompositionCount(rowTotal);
+                grandTotal += rowTotal;
+            });
+            jatimCompositionSummaryDialog.querySelectorAll('[data-sdm-jatim-summary-position-total]').forEach(cell => {
+                cell.textContent = formatCompositionCount(positionTotals[cell.dataset.sdmJatimSummaryPositionTotal] || 0);
+            });
+            jatimCompositionSummaryDialog.querySelector('[data-sdm-jatim-summary-grand-total]').textContent = formatCompositionCount(grandTotal);
+        };
         kupSelect?.addEventListener('change', () => renderCompositionSummary(kupSelect.value || activeCompositionPrimaryUnit));
         document.addEventListener('click', event => {
+            const jatimCompositionSummaryButton = event.target.closest('[data-sdm-jatim-summary-open]');
+            if (jatimCompositionSummaryButton) {
+                renderJatimCompositionSummary();
+                open(jatimCompositionSummaryDialog);
+                return;
+            }
             const compositionSummaryButton = event.target.closest('[data-sdm-composition-open]');
             if (compositionSummaryButton) {
                 event.preventDefault();
@@ -622,6 +699,7 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
         document.querySelectorAll('[data-sdm-profile-import-close]').forEach(button => button.addEventListener('click', () => close(importDialog)));
         document.querySelectorAll('[data-sdm-profile-validation-close]').forEach(button => button.addEventListener('click', () => close(validationDialog)));
         document.querySelectorAll('[data-sdm-composition-close]').forEach(button => button.addEventListener('click', () => close(compositionSummaryDialog)));
+        document.querySelectorAll('[data-sdm-jatim-summary-close]').forEach(button => button.addEventListener('click', () => close(jatimCompositionSummaryDialog)));
         [viewDialog, deleteDialog].forEach(dialog => {
             dialog?.addEventListener('click', event => {
                 if (event.target === dialog) close(dialog);
@@ -640,6 +718,8 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
         formDialog?.addEventListener('close', syncPageScroll);
         compositionSummaryDialog?.addEventListener('cancel', event => event.preventDefault());
         compositionSummaryDialog?.addEventListener('close', syncPageScroll);
+        jatimCompositionSummaryDialog?.addEventListener('cancel', event => event.preventDefault());
+        jatimCompositionSummaryDialog?.addEventListener('close', syncPageScroll);
         deleteAllDialog?.addEventListener('cancel', event => event.preventDefault());
         deleteAllDialog?.addEventListener('close', syncPageScroll);
         importDialog?.addEventListener('cancel', event => event.preventDefault());
