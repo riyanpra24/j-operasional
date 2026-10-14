@@ -53,6 +53,7 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
         </div>
         <span><?= esc($months[$selectedMonth]) ?> <?= $selectedYear ?></span>
     </header>
+    <div class="table-title-join" aria-hidden="true"></div>
     <div class="bopo-table-wrap" tabindex="0" role="region" aria-label="Tabel BOPO YTD per unit kerja">
         <table class="bopo-table">
             <caption>BOPO YTD per unit kerja</caption>
@@ -93,6 +94,7 @@ $bopoAchievement = static fn (?string $value): string => $value === null ? '—'
         </div>
         <span><?= esc($months[$selectedMonth]) ?> <?= $selectedYear ?></span>
     </header>
+    <div class="table-title-join" aria-hidden="true"></div>
     <div class="bopo-table-wrap" tabindex="0" role="region" aria-label="Tabel BOPO PTD per unit kerja">
         <table class="bopo-table">
             <caption>BOPO PTD per unit kerja</caption>

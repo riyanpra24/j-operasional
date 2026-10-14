@@ -27,21 +27,21 @@ foreach ($schema['groups'] as $group) {
 }
 ?>
 
-<section class="panel lr-report-panel" aria-labelledby="<?= esc($idPrefix, 'attr') ?>-report-title">
+<section class="panel lr-report-panel table-title-flat" aria-labelledby="<?= esc($idPrefix, 'attr') ?>-report-title">
     <?php if ($editable): ?>
         <?php foreach (['C', 'D', 'E', 'F', 'G'] as $column): ?>
             <?php $cell = $column . '25'; $raw = $rawInputs !== null ? ($rawInputs[$cell] ?? '') : $formatAmount($inputs[$cell]); ?>
             <input type="hidden" name="cells[<?= $cell ?>]" value="<?= esc(is_string($raw) ? $raw : '', 'attr') ?>" data-rka-input="<?= $cell ?>">
         <?php endforeach ?>
     <?php endif ?>
-    <header class="lr-report-header">
+    <header class="lr-report-header table-title-flat__header">
         <div>
             <p>PT JAMKRINDO KANWIL SURABAYA · <?= esc($selectedUnit) ?> · Dalam Rupiah (Rp)</p>
             <h2 id="<?= esc($idPrefix, 'attr') ?>-report-title">RKA <?= esc($selectedUnit) ?> Tahun <?= $selectedYear ?></h2>
         </div>
         <span class="lr-report-year"><?= $selectedYear ?></span>
     </header>
-    <div class="lr-report-scroll" tabindex="0" role="region" aria-label="Tabel RKA <?= esc($selectedUnit, 'attr') ?>, dapat digeser ke samping">
+    <div class="lr-report-scroll table-title-flat__table" tabindex="0" role="region" aria-label="Tabel RKA <?= esc($selectedUnit, 'attr') ?>, dapat digeser ke samping">
         <table class="lr-report-table lr-rka-table <?= $editable ? 'lr-rka-editable' : '' ?>">
             <caption class="lr-report-caption">RKA <?= esc($selectedUnit) ?> Tahun <?= $selectedYear ?></caption>
             <colgroup><col class="lr-description-column"><?php foreach ($visibleColumns as $column): ?><col class="lr-rka-number-column"><?php endforeach ?></colgroup>

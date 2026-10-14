@@ -16,14 +16,6 @@ $editAmount = static function (?string $amount): string {
 };
 ?>
 
-<section class="page-heading lr-page-heading">
-    <div>
-        <p class="eyebrow">AKUTANSI</p>
-        <h1>Rekap Laba Rugi</h1>
-        <p class="lr-rekap-intro">Ringkasan indikator Laba/Rugi per unit kerja dan periode pelaporan.</p>
-    </div>
-</section>
-
 <section class="panel lr-rka-filter-panel lr-rekap-filter-panel">
     <form method="get" action="<?= site_url('akutansi/rekap-laba-rugi') ?>" class="lr-rka-filter lr-rekap-filter">
         <div class="lr-filter-unit">
@@ -50,7 +42,12 @@ $editAmount = static function (?string $amount): string {
         <a class="btn btn-ghost" href="<?= site_url('akutansi/rekap-laba-rugi') ?>">Reset</a>
         <details class="lr-action-menu lr-filter-menu">
             <summary class="lr-filter-menu-trigger" aria-label="Menu tindakan Rekap Laba Rugi" title="Menu tindakan">
-                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><rect x="14" y="14" width="7" height="7" rx="1.4"></rect></svg>
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                    <rect x="3" y="3" width="7" height="7" rx="1.4"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1.4"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1.4"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1.4"></rect>
+                </svg>
             </summary>
             <div class="lr-action-menu-popover" role="menu" aria-label="Menu Rekap Laba Rugi">
                 <button type="button" role="menuitem" class="lr-action-menu-item" data-recap-edit-open aria-haspopup="dialog" aria-controls="lrRecapEditDialog">Edit Rekap</button>
@@ -105,7 +102,11 @@ $editAmount = static function (?string $amount): string {
                             <?php if ($label === 'IJP CASH BASIS'): ?>
                                 <td><input type="text" inputmode="decimal" name="values[<?= esc($label, 'attr') ?>][rka]" value="<?= esc($editAmount($indicator['rka'])) ?>" data-recap-edit-input data-recap-field="rka" aria-label="<?= esc($label) ?> rka"></td>
                             <?php else: ?>
-                                <td class="lr-rekap-readonly-cell"><span class="lr-rekap-readonly" data-recap-field="rka" data-recap-amount="<?= esc((string) ($indicator['rka'] ?? ''), 'attr') ?>" title="Nilai RKA dari RKA Kanwil; tidak dapat diedit"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10"></path><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M12 14v2"></path></svg><?= $indicator['rka'] === null ? '—' : esc(\App\Libraries\RkaMoney::reportDisplay($indicator['rka'])) ?></span></td>
+                                <td class="lr-rekap-readonly-cell"><span class="lr-rekap-readonly" data-recap-field="rka" data-recap-amount="<?= esc((string) ($indicator['rka'] ?? ''), 'attr') ?>" title="Nilai RKA dari RKA Kanwil; tidak dapat diedit"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                                            <path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10"></path>
+                                            <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+                                            <path d="M12 14v2"></path>
+                                        </svg><?= $indicator['rka'] === null ? '—' : esc(\App\Libraries\RkaMoney::reportDisplay($indicator['rka'])) ?></span></td>
                             <?php endif ?>
                             <?php foreach (['realisasi', 'prognosa'] as $field): ?>
                                 <td><input type="text" inputmode="decimal" name="values[<?= esc($label, 'attr') ?>][<?= $field ?>]" value="<?= esc($editAmount($indicator[$field])) ?>" data-recap-edit-input data-recap-field="<?= $field ?>" aria-label="<?= esc($label) ?> <?= $field ?>"></td>
@@ -124,15 +125,15 @@ $editAmount = static function (?string $amount): string {
     </form>
 </dialog>
 
-<section class="panel lr-rekap-panel" aria-labelledby="lrRecapTitle">
-    <header class="lr-rekap-header">
+<section class="panel lr-rekap-panel table-title-flat" aria-labelledby="lrRecapTitle">
+    <header class="lr-rekap-header table-title-flat__header">
         <div>
             <p>REKAP LABA / RUGI</p>
             <h2 id="lrRecapTitle"><?= esc($selectedUnit) ?> · <?= esc($months[$selectedMonth]) ?> <?= $selectedYear ?></h2>
         </div>
         <span><?= $rkaAvailable ? 'RKA tersedia' : 'RKA belum tersedia' ?></span>
     </header>
-    <div class="lr-rekap-table-wrap" tabindex="0" role="region" aria-label="Tabel rekap Laba Rugi">
+    <div class="lr-rekap-table-wrap table-title-flat__table" tabindex="0" role="region" aria-label="Tabel rekap Laba Rugi">
         <table class="lr-rekap-table">
             <caption>Rekap Laba Rugi <?= esc($selectedUnit) ?> periode <?= esc($months[$selectedMonth]) ?> <?= $selectedYear ?></caption>
             <thead>

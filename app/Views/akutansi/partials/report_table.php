@@ -3,6 +3,8 @@ $selectedLobs=$selectedLobs??\App\Libraries\LrRealizationService::LOB_COLUMNS;
 $columns=array_values(array_filter(\App\Libraries\LrRealizationService::LOB_COLUMNS,static fn(string $column): bool => in_array($column,$selectedLobs,true)));
 $columns=array_merge($columns,['TOTAL','%']);
 $reportValues = $reportValues ?? [];
+$reportPeriod = $reportPeriod ?? trim((string) ($reportTitle ?? ''));
+$hasRka = $reportValues !== [];
 $isCorporatePercentageView = ($selectedUnit ?? '') === 'Korporat Kanwil';
 $percentageDetailColumns = ['KUR', 'PEN', 'KBG/SURETYSHIP', 'KONSUMTIF', 'PRODUKTIF', 'TOTAL'];
 $percentageDetailsFor = static function (string $label) use ($reportValues, $isCorporatePercentageView, $percentageDetailColumns): array {
@@ -58,15 +60,15 @@ unset($row);
     .lr-report-table .lr-percent-expand[aria-expanded=true] i { transform:rotate(90deg); }
 </style>
 
-<section class="panel lr-report-panel lr-profitloss-report-panel" aria-labelledby="lr-report-title">
-    <header class="lr-report-header">
+<section class="panel lr-report-panel lr-profitloss-report-panel table-title-flat" aria-labelledby="lr-report-title">
+    <header class="lr-report-header table-title-flat__header">
         <div>
-            <p>PT JAMKRINDO KANWIL SURABAYA<?php if (isset($selectedUnit)): ?> · <?= esc($selectedUnit) ?><?php endif ?></p>
-            <h2 id="lr-report-title"><?= esc($reportTitle) ?></h2>
+            <p class="lr-report-kicker">REKAP LABA / RUGI</p>
+            <h2 id="lr-report-title"><?= esc($selectedUnit ?? 'Korporat Kanwil') ?> · <?= esc($reportPeriod) ?></h2>
         </div>
-        <span class="lr-report-year"><?= $selectedYear ?? 2026 ?></span>
+        <span class="lr-report-status <?= $hasRka ? 'is-available' : 'is-unavailable' ?>"><?= $hasRka ? 'RKA tersedia' : 'RKA belum tersedia' ?></span>
     </header>
-    <div class="lr-report-scroll" tabindex="0" role="region" aria-label="<?= esc($reportTitle . ', dapat digeser ke samping', 'attr') ?>">
+    <div class="lr-report-scroll table-title-flat__table" tabindex="0" role="region" aria-label="<?= esc($reportTitle . ', dapat digeser ke samping', 'attr') ?>">
         <table class="lr-report-table lr-profitloss-table">
             <caption class="lr-report-caption"><?= esc($reportTitle) ?> — PT Jamkrindo Kanwil Surabaya</caption>
             <colgroup>

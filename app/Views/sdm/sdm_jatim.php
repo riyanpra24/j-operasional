@@ -136,19 +136,20 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
     ], static fn($value): bool => $value !== null && $value !== '');
     $attendancePageUrl = static fn(int $page): string => site_url('sdm/data-kehadiran') . '?' . http_build_query(array_merge($attendancePageQuery, ['halaman' => $page]));
     ?>
-    <section class="panel sdm-daily-panel" id="attendanceTableArea" aria-live="polite">
-        <header class="sdm-daily-panel-header">
-            <div>
-                <h2>Data Kehadiran Karyawan</h2>
-                <p><?= date('d-m-Y', strtotime($report['period_start'])) ?> sampai <?= date('d-m-Y', strtotime($report['period_end'])) ?></p>
+    <section class="panel sdm-daily-panel table-title-flat" id="attendanceTableArea" aria-live="polite">
+        <div class="sdm-daily-title-area table-title-flat__header">
+            <header class="sdm-daily-panel-header">
+                <div>
+                    <h2>Data Kehadiran Karyawan</h2>
+                    <p><?= date('d-m-Y', strtotime($report['period_start'])) ?> sampai <?= date('d-m-Y', strtotime($report['period_end'])) ?></p>
+                </div>
+            </header>
+            <div class="sdm-daily-legend" aria-label="Keterangan kode absensi">
+                <strong>Keterangan:</strong>
+                <?php foreach ($statusLabels as $code => $label): ?>
+                    <span><i class="sdm-daily-code sdm-daily-code-<?= esc(strtolower(str_replace('-', 'empty', $code)), 'attr') ?>"><?= esc($displayCodes[$code] ?? $code) ?></i><?php if ($code === 'TLTAP'): ?><span class="sdm-daily-legend-label-tltap">Terlambat dan<br>tidak absen pulang</span><?php else: ?><?= esc($label) ?><?php endif ?></span>
+                <?php endforeach ?>
             </div>
-        </header>
-
-        <div class="sdm-daily-legend" aria-label="Keterangan kode absensi">
-            <strong>Keterangan:</strong>
-            <?php foreach ($statusLabels as $code => $label): ?>
-                <span><i class="sdm-daily-code sdm-daily-code-<?= esc(strtolower(str_replace('-', 'empty', $code)), 'attr') ?>"><?= esc($displayCodes[$code] ?? $code) ?></i><?php if ($code === 'TLTAP'): ?><span class="sdm-daily-legend-label-tltap">Terlambat dan<br>tidak absen pulang</span><?php else: ?><?= esc($label) ?><?php endif ?></span>
-            <?php endforeach ?>
         </div>
 
         <?php if ($report['employees'] === []): ?>
@@ -156,7 +157,7 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
                 <p>Ubah filter nama atau rentang tanggal, lalu coba kembali.</p>
             </div>
         <?php else: ?>
-            <div class="sdm-daily-table-wrap">
+            <div class="sdm-daily-table-wrap table-title-flat__table">
                 <table class="sdm-daily-table sdm-staff-attendance-table">
                     <thead>
                         <tr>

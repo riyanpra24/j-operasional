@@ -13,8 +13,8 @@
     </div>
 </section>
 
-<section class="panel simulation-history" style="width:100%;max-width:none;margin-inline:0">
-    <header class="simulation-history-heading">
+<section class="panel simulation-history table-title-flat" style="width:100%;max-width:none;margin-inline:0">
+    <header class="simulation-history-heading table-title-flat__header">
         <div>
             <p class="eyebrow">HASIL PENGISIAN</p>
             <h2>Unduh Kertas Kerja</h2>
@@ -24,7 +24,7 @@
     <?php if (!$simulations): ?>
         <p class="simulation-empty">Belum ada hasil simulasi. Unggah LR Oracle untuk membuat kertas kerja pertama.</p>
     <?php else: ?>
-        <div class="lr-audit-table-wrap" role="region" aria-label="Daftar hasil simulasi hitung" tabindex="0">
+        <div class="lr-audit-table-wrap table-title-flat__table" role="region" aria-label="Daftar hasil simulasi hitung" tabindex="0">
             <table class="lr-audit-table simulation-table">
                 <thead>
                     <tr>

@@ -79,14 +79,14 @@ $formatDate = static fn(?string $value): string => $value ? date('d-m-Y', strtot
     </form>
 </section>
 
-<section class="panel register-panel magang-register-panel" id="magangTableArea" aria-live="polite">
-    <header class="panel-header magang-register-header">
+<section class="panel register-panel magang-register-panel table-title-flat" id="magangTableArea" aria-live="polite">
+    <header class="panel-header magang-register-header table-title-flat__header">
         <div>
             <h2>Database Peserta Magang</h2>
             <p>Status dihitung otomatis dari tanggal awal dan selesai magang.</p>
         </div><span><?= number_format($total, 0, ',', '.') ?> peserta</span>
     </header>
-    <div class="table-wrap">
+    <div class="table-wrap table-title-flat__table">
         <table class="magang-table">
             <colgroup>
                 <col class="magang-col-participant">
