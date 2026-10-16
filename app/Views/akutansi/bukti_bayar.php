@@ -24,10 +24,6 @@ $rangeLabel = $filters['tanggal_dari'] !== '' || $filters['tanggal_sampai'] !== 
     : 'Pilih rentang tanggal';
 ?>
 
-
-<?php if (session()->getFlashdata('success')): ?>
-    <div class="alert alert-success" role="status"><?= esc((string) session()->getFlashdata('success')) ?></div>
-<?php endif ?>
 <?php if ($filterError !== null || session()->getFlashdata('bukti_bayar_error')): ?>
     <div class="alert alert-danger" role="alert"><?= esc($filterError ?? (string) session()->getFlashdata('bukti_bayar_error')) ?></div>
 <?php endif ?>
@@ -252,7 +248,7 @@ $rangeLabel = $filters['tanggal_dari'] !== '' || $filters['tanggal_sampai'] !== 
                 <dt>Kategori</dt>
                 <dd data-bukti-detail="kategori">—</dd>
             </div>
-            <div class="bukti-bayar-detail-wide">
+            <div>
                 <dt>Berkas</dt>
                 <dd><a data-bukti-detail-file href="#" target="_blank" rel="noopener" hidden></a><span data-bukti-detail-file-empty>—</span></dd>
             </div>
