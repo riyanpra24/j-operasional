@@ -53,6 +53,7 @@ $syncSuccess = session()->getFlashdata('sync_success');
 $successToast = $syncSuccess ?: $success;
 $successToastTitle = $syncSuccess ? 'Sinkronisasi berhasil' : 'Berhasil';
 $welcomeModal = (bool) session()->getFlashdata('welcome_modal');
+$showWelcomeModal = false;
 $error   = session()->getFlashdata('error');
 $errors  = session()->getFlashdata('errors') ?? [];
 $resolveOptimizedAsset = static function (string $source, string $optimized): string {
@@ -155,7 +156,7 @@ if ($currentRole === 'security') {
             <button type="button" data-success-toast-close aria-label="Tutup notifikasi">×</button>
         </div>
     <?php endif ?>
-    <?php if ($welcomeModal): ?>
+    <?php if ($showWelcomeModal && $welcomeModal): ?>
         <div class="welcome-modal" data-welcome-modal role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
             <section class="welcome-modal-card" style="--welcome-modal-background: url('<?= base_url('assets/images/welcome-corporate-wave.png') ?>?v=<?= esc($welcomeBackgroundVersion, 'attr') ?>');">
                 <img class="welcome-modal-logo" src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>?v=<?= esc($welcomeLogoVersion, 'attr') ?>" width="640" height="220" alt="JAKSA" decoding="async">

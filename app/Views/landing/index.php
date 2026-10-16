@@ -22,7 +22,7 @@ $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.mi
 $landingCssVersion = $assetVersion($landingCssAsset);
 $flowuiThemeVersion = $assetVersion('assets/flowui-theme.css');
 $landingSurabayaVersion = $assetVersion('assets/landing-surabaya.css');
-$landingBackgroundVersion = $assetVersion('assets/images/landing-jamkrindo-office.png');
+$landingBackgroundVersion = $assetVersion('assets/images/landing-jamkrindo-office.jpg');
 $landingLogoVersion = $assetVersion('assets/images/landing-jaksa-logo-photoroom.webp');
 $landingHeaderLogoVersion = $assetVersion('assets/images/jaksa-sidebar-logo-selected.png');
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
@@ -52,7 +52,7 @@ $openLoginModal = false;
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="preload" as="image" type="image/png" href="<?= base_url('assets/images/landing-jamkrindo-office.png') ?>?v=<?= esc($landingBackgroundVersion, 'attr') ?>" fetchpriority="high">
+    <link rel="preload" as="image" type="image/jpeg" href="<?= base_url('assets/images/landing-jamkrindo-office.jpg') ?>?v=<?= esc($landingBackgroundVersion, 'attr') ?>" fetchpriority="high">
     <link rel="preload" as="image" type="image/webp" href="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" fetchpriority="high">
     <link rel="preload" as="image" type="image/png" href="<?= base_url('assets/images/jaksa-sidebar-logo-selected.png') ?>?v=<?= esc($landingHeaderLogoVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url($landingCssAsset) ?>?v=<?= esc($landingCssVersion, 'attr') ?>">

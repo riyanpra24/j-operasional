@@ -10,7 +10,7 @@ body.landing-surabaya-page {
     margin: 0;
     overflow: hidden;
     color: #0b3971;
-    background: #061a35 url("images/landing-jamkrindo-office.png") center center / cover no-repeat;
+    background: #061a35 url("images/landing-jamkrindo-office.jpg") center center / cover no-repeat;
     font-family: var(--system-font);
 }
 body.landing-surabaya-page::before {
