@@ -68,7 +68,7 @@
             <td><?= esc($driverLabel ?: 'Belum dipilih') ?></td>
             <td><strong><?= number_format((int) $record['kilometer'], 0, ',', '.') ?> km</strong></td>
             <td><?php if ($isDeleted): ?><span class="vehicle-action dihapus">Dihapus</span><?php else: ?><span class="vehicle-status <?= esc(strtolower(str_replace(' ', '-', $record['status']))) ?>"><?= esc($statusLabel) ?></span><?php endif ?></td>
-            <td><div class="action-buttons"><button type="button" class="icon-btn" data-vehicle-detail='<?= esc(json_encode($viewData), 'attr') ?>' title="Lihat detail" aria-label="Lihat detail kendaraan">⌕</button><?php if (! $isDeleted): ?><button type="button" class="icon-btn" data-vehicle-crud-edit='<?= esc(json_encode($editData), 'attr') ?>' title="Edit">✎</button><?php endif ?></div></td>
+            <td><div class="action-buttons"><button type="button" class="icon-btn" data-vehicle-detail='<?= esc(json_encode($viewData), 'attr') ?>' title="Lihat detail" aria-label="Lihat detail kendaraan"><?= view('components/table_action_icon', ['icon' => 'view']) ?></button><?php if (! $isDeleted): ?><button type="button" class="icon-btn" data-vehicle-crud-edit='<?= esc(json_encode($editData), 'attr') ?>' title="Edit"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button><?php endif ?></div></td>
         </tr>
     <?php endforeach ?><?php endif ?>
     </tbody></table></div>

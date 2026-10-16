@@ -14,10 +14,14 @@
         <p class="eyebrow">PENGELOLAAN DOKUMEN</p>
         <h1>Distribusi Dokumen</h1>
     </div>
-    <?php if ($filters['tab'] === 'masuk'): ?><button type="button" class="btn btn-primary" data-open-input-modal>＋ Tambah Dokumen Masuk</button><?php endif ?>
+    <?= view('distribusi_dokumen/tabs', [
+        'activeTab' => $filters['tab'],
+        'counts' => [
+            'masuk' => $pager->getTotal('distribusi_dokumen'),
+            'keluar' => $pagerKeluar->getTotal('distribusi_keluar'),
+        ],
+    ]) ?>
 </section>
-
-<?= view('distribusi_dokumen/tabs', ['activeTab' => $filters['tab']]) ?>
 
 <section class="panel filter-panel security-filter-panel">
     <form method="get" action="<?= site_url('distribusi-dokumen') ?>" class="distribution-filter-form">
@@ -29,7 +33,25 @@
         <?= view('components/list_order_filter', ['id' => 'distribusi_urutan', 'value' => $filters['order']]) ?>
         <input type="hidden" name="tab" value="<?= esc($filters['tab']) ?>">
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
-        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('distribusi-dokumen?tab=' . $filters['tab']) ?>" class="btn btn-ghost">Reset</a></div>
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-secondary">Terapkan</button>
+            <a href="<?= site_url('distribusi-dokumen?tab=' . $filters['tab']) ?>" class="btn btn-ghost">Reset</a>
+            <?php if ($filters['tab'] === 'masuk'): ?>
+                <details class="lr-action-menu lr-filter-menu">
+                    <summary class="lr-filter-menu-trigger" aria-label="Menu tindakan Distribusi Dokumen" title="Menu tindakan">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                            <rect x="3" y="3" width="7" height="7" rx="1.4"></rect>
+                            <rect x="14" y="3" width="7" height="7" rx="1.4"></rect>
+                            <rect x="3" y="14" width="7" height="7" rx="1.4"></rect>
+                            <rect x="14" y="14" width="7" height="7" rx="1.4"></rect>
+                        </svg>
+                    </summary>
+                    <div class="lr-action-menu-popover" role="menu" aria-label="Menu Distribusi Dokumen">
+                        <button type="button" role="menuitem" class="lr-action-menu-item" data-open-input-modal aria-haspopup="dialog">Tambah Dokumen Masuk</button>
+                    </div>
+                </details>
+            <?php endif ?>
+        </div>
     </form>
 </section>
 
@@ -70,9 +92,9 @@
                                 <td><span class="security-expedition-chip"><?= esc($row['ekspedisi'] ?: '-') ?></span></td>
                                 <td>
                                     <div class="table-actions">
-                                        <button type="button" class="icon-btn" title="Detail" data-open-detail-modal data-detail-url="<?= site_url('distribusi-dokumen/dokumen-masuk/' . $row['id']) ?>">⌕</button>
-                                        <button type="button" class="icon-btn" title="Ubah" data-open-edit-modal data-detail-url="<?= site_url('distribusi-dokumen/dokumen-masuk/' . $row['id']) ?>">✎</button>
-                                        <button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-open-delete-modal data-delete-url="<?= site_url('distribusi-dokumen/dokumen-masuk/' . $row['id'] . '/hapus') ?>" data-delete-label="Dokumen dari <?= esc($row['pengirim'], 'attr') ?>" data-delete-locked="0">×</button>
+                                        <button type="button" class="icon-btn" title="Detail" data-open-detail-modal data-detail-url="<?= site_url('distribusi-dokumen/dokumen-masuk/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'view']) ?></button>
+                                        <button type="button" class="icon-btn" title="Ubah" data-open-edit-modal data-detail-url="<?= site_url('distribusi-dokumen/dokumen-masuk/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button>
+                                        <button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-open-delete-modal data-delete-url="<?= site_url('distribusi-dokumen/dokumen-masuk/' . $row['id'] . '/hapus') ?>" data-delete-label="Dokumen dari <?= esc($row['pengirim'], 'attr') ?>" data-delete-locked="0"><?= view('components/table_action_icon', ['icon' => 'delete']) ?></button>
                                         <button class="distribution-action-button" type="button" data-open-distribution-action data-action-url="<?= site_url('distribusi-dokumen/' . $row['id']) ?>">Proses</button>
                                     </div>
                                 </td>

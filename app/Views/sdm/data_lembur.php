@@ -10,6 +10,9 @@ $formatDuration = static function (int $minutes): string {
     return intdiv($minutes, 60) . 'j ' . ($minutes % 60) . 'm';
 };
 $dayNames = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+$rangeFilterLabel = ($rangeStart !== '' && $rangeEnd !== '')
+    ? date('d/m/Y', strtotime($rangeStart)) . ' – ' . date('d/m/Y', strtotime($rangeEnd))
+    : 'Pilih rentang tanggal';
 $selectedOfficialHoliday = null;
 if (! empty($showSelectedHolidayNote)) {
     foreach ($calendarDays as $calendarDay) {
@@ -25,28 +28,39 @@ if (! empty($showSelectedHolidayNote)) {
 ?>
 
 
-<section class="panel overtime-filter-panel">
+<section class="panel filter-panel overtime-filter-panel">
     <form method="get" action="<?= site_url('sdm/data-lembur') ?>" class="overtime-filter-form">
-        <div class="form-group overtime-date-filter">
-            <label for="overtime_from">Dari tanggal</label>
-            <input id="overtime_from" name="dari" type="date" value="<?= esc($rangeStart, 'attr') ?>" required>
+        <div class="form-group overtime-date-range-filter">
+            <label for="overtimeDateRangeToggle">Rentang tanggal</label>
+            <details class="overtime-date-range" data-overtime-date-range>
+                <summary id="overtimeDateRangeToggle" class="overtime-date-range-toggle" aria-haspopup="dialog">
+                    <span class="filter-date-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+                            <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+                            <path d="M8 3v4M16 3v4M4 10h16M8 14h2M14 14h2M8 17h2"></path>
+                        </svg></span>
+                    <strong data-overtime-range-label><?= esc($rangeFilterLabel) ?></strong>
+                    <svg class="overtime-date-range-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"></path></svg>
+                </summary>
+                <section class="overtime-date-range-popover" role="dialog" aria-label="Pilih rentang tanggal">
+                    <label for="overtime_from">Dari tanggal<input id="overtime_from" name="dari" type="date" value="<?= esc($rangeStart, 'attr') ?>" required></label>
+                    <label for="overtime_to">Sampai tanggal<input id="overtime_to" name="sampai" type="date" value="<?= esc($rangeEnd, 'attr') ?>" required></label>
+                </section>
+            </details>
         </div>
-        <div class="form-group overtime-date-filter">
-            <label for="overtime_to">Sampai tanggal</label>
-            <input id="overtime_to" name="sampai" type="date" value="<?= esc($rangeEnd, 'attr') ?>" required>
-        </div>
-        <button class="btn btn-primary" type="submit">Tampilkan</button>
         <div class="overtime-filter-copy"><strong><?= esc($monthLabel) ?></strong><span>Kalender dan data lembur mengikuti rentang tanggal yang dipilih.</span></div>
-        <a class="btn btn-ghost" href="<?= site_url('sdm/data-lembur') ?>">Reset</a>
-        <details class="overtime-action-menu">
-            <summary class="overtime-action-trigger" aria-label="Menu tindakan" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <div class="filter-actions">
+            <button class="btn btn-secondary" type="submit">Filter</button>
+            <a class="btn btn-ghost" href="<?= site_url('sdm/data-lembur') ?>">Reset</a>
+            <details class="lr-action-menu lr-filter-menu overtime-action-menu">
+            <summary class="lr-filter-menu-trigger" aria-label="Menu tindakan" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
                     <rect x="3" y="3" width="7" height="7" rx="1.4"></rect>
                     <rect x="14" y="3" width="7" height="7" rx="1.4"></rect>
                     <rect x="3" y="14" width="7" height="7" rx="1.4"></rect>
                     <rect x="14" y="14" width="7" height="7" rx="1.4"></rect>
                 </svg></summary>
-            <div class="overtime-action-popover"><button type="button" data-overtime-upload-open>Unggah Overtime Report ESS</button><span class="overtime-action-divider" aria-hidden="true"></span><button type="button" class="is-danger" data-overtime-delete-open <?= $overtimeImports === [] ? 'disabled' : '' ?>>Hapus Laporan Lembur</button></div>
-        </details>
+            <div class="lr-action-menu-popover"><button type="button" class="lr-action-menu-item" data-overtime-upload-open>Unggah Overtime Report ESS</button><span class="lr-action-menu-divider" aria-hidden="true"></span><button type="button" class="lr-action-menu-item is-danger" data-overtime-delete-open <?= $overtimeImports === [] ? 'disabled' : '' ?>>Hapus Laporan Lembur</button></div>
+            </details>
+        </div>
     </form>
 </section>
 
@@ -223,6 +237,31 @@ if (! empty($showSelectedHolidayNote)) {
         const deletion = setupModal('#overtimeDeleteModal', '[data-overtime-delete-open]', '[data-overtime-delete-close]');
         document.querySelectorAll('[data-overtime-upload-open]').forEach((button) => button.addEventListener('click', () => button.closest('details')?.removeAttribute('open')));
         document.querySelectorAll('[data-overtime-delete-open]').forEach((button) => button.addEventListener('click', () => button.closest('details')?.removeAttribute('open')));
+        const dateRange = document.querySelector('[data-overtime-date-range]');
+        const dateRangeLabel = document.querySelector('[data-overtime-range-label]');
+        const dateFrom = document.querySelector('#overtime_from');
+        const dateTo = document.querySelector('#overtime_to');
+        const formatDate = (value) => value ? value.split('-').reverse().join('/') : '…';
+        const updateDateRangeLabel = () => {
+            if (!dateRangeLabel) return;
+            dateRangeLabel.textContent = dateFrom?.value || dateTo?.value
+                ? `${formatDate(dateFrom?.value)} – ${formatDate(dateTo?.value)}`
+                : 'Pilih rentang tanggal';
+        };
+        dateFrom?.addEventListener('change', () => {
+            if (dateTo && dateTo.value && dateFrom.value > dateTo.value) dateTo.value = dateFrom.value;
+            if (dateTo) dateTo.min = dateFrom.value;
+            updateDateRangeLabel();
+        });
+        dateTo?.addEventListener('change', () => {
+            if (dateFrom && dateFrom.value && dateTo.value < dateFrom.value) dateFrom.value = dateTo.value;
+            if (dateTo) dateTo.min = dateFrom?.value || '';
+            updateDateRangeLabel();
+        });
+        if (dateTo) dateTo.min = dateFrom?.value || '';
+        document.addEventListener('click', (event) => {
+            if (dateRange && !dateRange.contains(event.target)) dateRange.removeAttribute('open');
+        });
         document.querySelectorAll('[data-overtime-calendar-open]').forEach((button) => button.addEventListener('click', () => {
             const day = document.querySelector('.overtime-calendar-day.is-selected');
             if (!day || !calendar.modal) return;

@@ -6,16 +6,13 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<section class="page-heading heading-actions distribution-heading">
+<section class="page-heading heading-actions distribution-heading security-page-heading">
     <div>
         <p class="eyebrow">AGENDARIS</p>
         <h1>Progres Dokumen</h1>
-        <p>Pantau proses dokumen masuk dan dokumen keluar dalam satu halaman terhubung.</p>
     </div>
-    <button type="button" class="btn btn-primary" data-progress-add>＋ Tambah Dokumen</button>
+    <?= view('agendaris/progres_tabs', ['activeTab' => 'keluar', 'counts' => $tabCounts]) ?>
 </section>
-
-<?= view('agendaris/progres_tabs', ['activeTab' => 'keluar']) ?>
 
 <section class="panel filter-panel security-filter-panel">
     <form method="get" action="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="agendaris-filter-form progress-outgoing-filter-form">
@@ -29,11 +26,11 @@
             </select></div>
         <?= view('components/list_order_filter', ['id' => 'progress_urutan', 'value' => $filters['order']]) ?>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
-        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="btn btn-ghost">Reset</a></div>
+        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen-keluar') ?>" class="btn btn-ghost">Reset</a><details class="lr-action-menu lr-filter-menu"><summary class="lr-filter-menu-trigger" aria-label="Menu tindakan Progres Dokumen Keluar" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><rect x="14" y="14" width="7" height="7" rx="1.4"></rect></svg></summary><div class="lr-action-menu-popover" role="menu" aria-label="Menu Progres Dokumen Keluar"><button type="button" role="menuitem" class="lr-action-menu-item" data-progress-add>Tambah Dokumen Keluar</button></div></details></div>
     </form>
 </section>
 
-<section class="panel register-panel progress-document-panel progress-outgoing-panel security-register-panel">
+<section class="panel register-panel agenda-document-table-card progress-document-panel progress-outgoing-panel security-register-panel">
     <div class="table-wrap">
         <table>
             <thead>
@@ -69,7 +66,7 @@
                         <td><?= esc($row['security'] ?: '-') ?></td>
                         <td><span class="pickup-status <?= $locked ? 'completed' : 'pending' ?>"><?= esc($row['progres'] ?: 'Menunggu Ekspedisi') ?></span></td>
                         <td>
-                            <div class="table-actions"><button type="button" class="icon-btn" title="Detail" data-progress-view data-progress-url="<?= site_url('agendaris/progres-dokumen-keluar/' . $row['id']) ?>">⌕</button><button type="button" class="icon-btn" title="Ubah" data-progress-edit data-progress-url="<?= site_url('agendaris/progres-dokumen-keluar/' . $row['id']) ?>">✎</button><?php if (! $locked || $adminCanDelete): ?><button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-progress-delete data-delete-url="<?= site_url('agendaris/progres-dokumen-keluar/' . $row['id'] . '/hapus') ?>" data-delete-label="<?= esc($row['nomor_surat'], 'attr') ?>">×</button><?php endif ?></div>
+                            <div class="table-actions"><button type="button" class="icon-btn" title="Detail" data-progress-view data-progress-url="<?= site_url('agendaris/progres-dokumen-keluar/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'view']) ?></button><button type="button" class="icon-btn" title="Ubah" data-progress-edit data-progress-url="<?= site_url('agendaris/progres-dokumen-keluar/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button><?php if (! $locked || $adminCanDelete): ?><button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-progress-delete data-delete-url="<?= site_url('agendaris/progres-dokumen-keluar/' . $row['id'] . '/hapus') ?>" data-delete-label="<?= esc($row['nomor_surat'], 'attr') ?>"><?= view('components/table_action_icon', ['icon' => 'delete']) ?></button><?php endif ?></div>
                         </td>
                     </tr><?php endforeach ?>
             <?php endif ?>

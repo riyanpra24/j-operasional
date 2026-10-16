@@ -133,7 +133,7 @@ $formatDate = static fn(?string $value): string => $value ? date('d-m-Y', strtot
                             <td><span class="magang-status <?= esc($record['status_class']) ?>"><?= esc($record['status']) ?></span></td>
                             <td class="magang-note-cell"><?= $record['keterangan'] ? esc($record['keterangan']) : '—' ?></td>
                             <td>
-                                <div class="table-actions"><button class="icon-btn" type="button" data-magang-view="<?= (int) $record['id'] ?>" title="Lihat detail peserta" aria-label="Lihat detail peserta">⌕</button><button class="icon-btn" type="button" data-magang-edit="<?= (int) $record['id'] ?>" title="Ubah data peserta">✎</button><button class="icon-btn icon-btn-delete" type="button" data-magang-delete="<?= (int) $record['id'] ?>" title="Hapus data peserta">×</button></div>
+                                <div class="table-actions"><button class="icon-btn" type="button" data-magang-view="<?= (int) $record['id'] ?>" title="Lihat detail peserta" aria-label="Lihat detail peserta"><?= view('components/table_action_icon', ['icon' => 'view']) ?></button><button class="icon-btn" type="button" data-magang-edit="<?= (int) $record['id'] ?>" title="Ubah data peserta"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button><button class="icon-btn icon-btn-delete" type="button" data-magang-delete="<?= (int) $record['id'] ?>" title="Hapus data peserta"><?= view('components/table_action_icon', ['icon' => 'delete']) ?></button></div>
                             </td>
                         </tr>
                 <?php endforeach;

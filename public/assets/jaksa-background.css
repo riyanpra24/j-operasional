@@ -5,13 +5,15 @@
     --amber: #f2b84b;
     --cloud: #f4f6f8;
     --white: #fff;
+    --system-canvas-gradient: radial-gradient(circle at 84% 67%, rgba(192,225,255,.74) 0%, rgba(220,240,255,.58) 34%, transparent 63%), linear-gradient(135deg, #fff 0%, #fff 38%, #edf8ff 72%, #dcefff 100%);
 }
 
-/* Main page background from the supplied JAKSA background stylesheet. */
+/* Latar sistem putih ke biru muda, mengikuti palet utama. */
 .jaksa-bg {
     position: relative;
     min-height: 100vh;
-    background: #f6f8fb;
+    background: var(--system-canvas-gradient);
+    background-attachment: fixed;
 }
 .jaksa-bg::before {
     display: none;
@@ -56,14 +58,12 @@
 /* Integration with the existing application shell. */
 /* Match the specificity of legacy page styles so every menu reveals this backdrop. */
 body.jaksa-bg:not(.landing-page):not(.login-page) .content-shell {
-    background:
-        linear-gradient(rgba(255, 255, 255, .50), rgba(255, 255, 255, .50)),
-        #f6f8fb url("images/operasional-content-background.png") center center / cover fixed no-repeat !important;
+    background: var(--system-canvas-gradient) !important;
+    background-attachment: fixed !important;
 }
 body.jaksa-bg:not(.landing-page):not(.login-page) .content-shell::before,
 body.jaksa-bg:not(.landing-page):not(.login-page) .content-shell::after { display: none !important; }
 body.jaksa-bg:not(.landing-page):not(.login-page) .main-content { background: transparent !important; }
-body.jaksa-bg .sidebar { background: linear-gradient(180deg, #143f71 0%, #155b87 48%, #0e7f99 100%) !important; }
 
 /* Compact sidebar matched to the Security distribution reference. */
 body.jaksa-bg {
@@ -73,13 +73,19 @@ body.jaksa-bg .sidebar {
     width: var(--sidebar) !important;
     padding: 12px 10px 14px !important;
     color: #f5fbff !important;
-    background:
-        linear-gradient(rgba(3, 39, 77, .35), rgba(4, 58, 91, .35)),
-        #063664 url("images/jaksa-sidebar-background.png") center center / cover no-repeat !important;
+    background: linear-gradient(rgba(6, 56, 120, .55), rgba(6, 56, 120, .55)), #063878 url("images/sidebar-blue-wave.png") center center / cover no-repeat !important;
     border: 0 !important;
     box-shadow: 6px 0 22px rgba(6,43,81,.20) !important;
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Garis header atas: biru elektrik, navy, lalu biru langit. */
+body.jaksa-bg .topbar::after {
+    display: block !important;
+    height: 2px !important;
+    background: linear-gradient(90deg, #0878c1 0%, #22396f 50%, #39c9f2 100%) !important;
+    opacity: 1 !important;
 }
 body.jaksa-bg .sidebar::-webkit-scrollbar { width: 0; height: 0; }
 body.jaksa-bg .brand.brand-jaksa {
@@ -150,7 +156,7 @@ body.jaksa-bg .nav-link {
 body.jaksa-bg .nav-link:hover {
     color: #fff !important;
     background: rgba(121,210,232,.13) !important;
-    box-shadow: inset 3px 0 0 #ffd35d !important;
+    box-shadow: inset 3px 0 0 #46c8c0 !important;
 }
 body.jaksa-bg .nav-icon,
 body.jaksa-bg .nav-link .nav-icon {
@@ -185,8 +191,8 @@ body.jaksa-bg .nav-link:hover .nav-icon {
 body.jaksa-bg .nav-link.active,
 body.jaksa-bg .nav-parent.active {
     color: #fff !important;
-    background: linear-gradient(100deg, #2a75c9 0%, #35b7ca 58%, #60cfb8 100%) !important;
-    box-shadow: inset 3px 0 0 #ffd35d, 0 6px 14px rgba(4,43,95,.23) !important;
+    background: linear-gradient(100deg, #0754d1 0%, #0a65d2 48%, #39c9f2 100%) !important;
+    box-shadow: 0 6px 14px rgba(4,43,95,.23) !important;
 }
 body.jaksa-bg .nav-link.active .nav-icon,
 body.jaksa-bg .nav-parent.active .nav-icon {
@@ -212,15 +218,15 @@ body.jaksa-bg .nav-sublink > span { color: #60d2dd !important; font-size: 5px !i
 body.jaksa-bg .nav-sublink:hover {
     color: #fff !important;
     background: rgba(121,210,232,.14) !important;
-    box-shadow: inset 3px 0 0 #ffd35d !important;
+    box-shadow: inset 3px 0 0 #46c8c0 !important;
 }
-body.jaksa-bg .nav-sublink:hover > span { color: #ffd35d !important; }
+body.jaksa-bg .nav-sublink:hover > span { color: #9ee9e2 !important; }
 body.jaksa-bg .nav-sublink.active {
-    color: #fff !important;
-    background: linear-gradient(100deg, #237aca 0%, #39accc 63%, #ffd35d 100%) !important;
+    color: #0b458f !important;
+    background: linear-gradient(100deg, #dff4ff 0%, #b9e3ff 55%, #65b9ec 100%) !important;
     box-shadow: 0 6px 13px rgba(4,36,75,.24) !important;
 }
-body.jaksa-bg .nav-sublink.active > span { color: #fff !important; }
+body.jaksa-bg .nav-sublink.active > span { color: #0750a8 !important; }
 body.jaksa-bg .nav-chevron { color: #e8f8ff !important; font-size: 13px !important; }
 /* Uniform right-facing submenu indicator, matching the supplied arrow reference. */
 body.jaksa-bg .nav-chevron {
@@ -286,15 +292,6 @@ body.jaksa-bg.progress-page .progress-document-panel th,
 body.jaksa-bg.progress-page .progress-document-panel td {
     padding-inline: 7px !important;
 }
-body.jaksa-bg.progress-page .progress-document-panel .table-actions { gap: 3px !important; }
-body.jaksa-bg.progress-page .progress-document-panel .table-actions .icon-btn {
-    width: 25px !important;
-    min-width: 25px !important;
-    height: 25px !important;
-    padding: 0 !important;
-    border-radius: 6px !important;
-    font-size: 10px !important;
-}
 /* Widths follow the visible columns after the row-number column was removed. */
 body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(1) { width: 8%; }
 body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(2) { width: 14%; }
@@ -302,8 +299,27 @@ body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-pane
 body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(4) { width: 17%; }
 body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(5) { width: 10%; }
 body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(6) { width: 14%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(7) { width: 10%; }
-body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) th:nth-child(8) { width: 12%; }
+/* Kolom Progres dan Aksi selalu menyediakan ruang untuk badge serta tiga ikon. */
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) :is(th, td):nth-child(7) {
+    width: max(17%, 160px) !important;
+    min-width: 160px !important;
+}
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) :is(th, td):nth-child(8) {
+    width: max(14%, 110px) !important;
+    min-width: 110px !important;
+}
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) td:nth-child(7) {
+    padding-right: clamp(16px, 2vw, 28px) !important;
+}
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) td:nth-child(8) {
+    padding-left: clamp(12px, 1.5vw, 22px) !important;
+}
+body.jaksa-bg.progress-page .progress-document-panel:not(.progress-outgoing-panel) .table-actions {
+    align-items: center !important;
+    gap: clamp(6px, .8vw, 10px) !important;
+    min-width: max-content !important;
+    white-space: nowrap !important;
+}
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(1) { width: 16%; }
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(2) { width: 9%; }
 body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel th:nth-child(3),
@@ -325,11 +341,13 @@ body.jaksa-bg.progress-page .progress-document-panel.progress-outgoing-panel td:
     line-height: 1.45 !important;
 }
 
-/* Neutral canvas while the replacement background template is being prepared. */
+/* Judul halaman menyatu langsung dengan latar sistem, tanpa card pembungkus. */
 body.jaksa-bg:not(.landing-page):not(.login-page) .page-heading:not(.security-page-heading):not(.distribution-heading),
 body.jaksa-bg:not(.landing-page):not(.login-page) .security-page-heading,
 body.jaksa-bg:not(.landing-page):not(.login-page) .distribution-heading {
-    background: #fff !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
 }
 body.jaksa-bg:not(.landing-page):not(.login-page) .page-heading::before,
 body.jaksa-bg:not(.landing-page):not(.login-page) .page-heading::after,
@@ -420,7 +438,7 @@ body.jaksa-bg .topbar-profile-chevron {
     height: 14px;
     margin-left: 2px;
     color: #39738e !important;
-    font-family: Arial, sans-serif;
+    font-family: inherit;
     font-size: 16px !important;
     font-weight: 800;
     line-height: 1;
@@ -509,8 +527,7 @@ body.jaksa-bg .lr-report-tab:hover {
     border-color: #a9d7ef !important;
     transform: none !important;
 }
-body.jaksa-bg .vehicle-module-tab.active,
-body.jaksa-bg .lr-report-tab.is-active {
+body.jaksa-bg .vehicle-module-tab.active {
     background: linear-gradient(110deg, #fff, #edf8ff 66%, #d9f2ff) !important;
     border: 2px solid #248df1 !important;
     box-shadow: 0 7px 17px rgba(21,121,225,.16) !important;
@@ -575,9 +592,9 @@ body.jaksa-bg.distribution-page .security-register-panel table {
 body.jaksa-bg.distribution-page .security-register-panel th,
 body.jaksa-bg.distribution-page .security-register-panel td {
     padding: 9px 8px !important;
-    font-size: 9px !important;
 }
-body.jaksa-bg.distribution-page .security-register-panel th { height: 42px !important; font-size: 8px !important; }
+body.jaksa-bg.distribution-page .security-register-panel td { font-size: 9px !important; }
+body.jaksa-bg.distribution-page .security-register-panel th { height: 42px !important; }
 /* Distribution tabs use the same visible-column order, without the former No. column. */
 body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(1) { width: 16%; }
 body.jaksa-bg.distribution-page .distribution-table-panel:not(.distribution-outgoing-panel) th:nth-child(2) { width: 16%; }
@@ -596,15 +613,6 @@ body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-
 body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(7) { width: 10%; }
 body.jaksa-bg.distribution-page .distribution-table-panel.distribution-outgoing-panel th:nth-child(8) { width: 9%; }
 body.jaksa-bg.distribution-page .distribution-table-panel td { overflow-wrap: anywhere !important; }
-body.jaksa-bg.distribution-page .security-register-panel .table-actions { gap: 3px !important; white-space: nowrap; }
-body.jaksa-bg.distribution-page .security-register-panel .icon-btn {
-    width: 27px !important;
-    min-width: 27px !important;
-    height: 27px !important;
-    padding: 0 !important;
-    border-radius: 7px !important;
-    font-size: 11px !important;
-}
 body.jaksa-bg.distribution-page .security-register-panel .distribution-action-button {
     min-width: 44px !important;
     min-height: 27px !important;
@@ -634,16 +642,6 @@ body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-pan
     min-height: 42px !important;
     padding: 8px 9px !important;
     font-size: 9px !important;
-}
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .table-actions {
-    gap: 4px !important;
-}
-body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) .table-actions .icon-btn {
-    width: 29px !important;
-    min-width: 29px !important;
-    height: 29px !important;
-    padding: 0 !important;
-    font-size: 11px !important;
 }
 body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-panel, .magang-register-panel, .simulation-history) :is(.security-type-chip, .security-expedition-chip, .agenda-source, .pickup-status, .vehicle-status, .vehicle-document-type, .vehicle-action, .vehicle-expiry, .magang-status, .simulation-stat) {
     padding: 4px 7px !important;
@@ -776,14 +774,12 @@ body.jaksa-bg .security-distribution-tabs .progress-document-tab small,
 body.jaksa-bg .vehicle-module-tab small,
 body.jaksa-bg .lr-report-tab small { font-size: 8px !important; }
 
-/* Match the soft lower-right half-circle across Distribution, Progress, and Laba/Rugi tabs. */
-body.jaksa-bg:is(.distribution-page, .progress-page) .security-distribution-tabs .progress-document-tab,
+/* Hiasan setengah lingkaran hanya dipertahankan pada tab laporan Laba/Rugi. */
 body.jaksa-bg.accounting-page .lr-report-tab {
     position: relative !important;
     isolation: isolate;
     overflow: hidden !important;
 }
-body.jaksa-bg:is(.distribution-page, .progress-page) .security-distribution-tabs .progress-document-tab::after,
 body.jaksa-bg.accounting-page .lr-report-tab::after {
     position: absolute;
     right: -68px;
@@ -796,11 +792,9 @@ body.jaksa-bg.accounting-page .lr-report-tab::after {
     content: "";
     pointer-events: none;
 }
-body.jaksa-bg:is(.distribution-page, .progress-page) .security-distribution-tabs .progress-document-tab:nth-child(2)::after,
 body.jaksa-bg.accounting-page .lr-report-tab:nth-child(2)::after {
     background: radial-gradient(ellipse, rgba(61, 198, 185, .16) 0 47%, transparent 48%);
 }
-body.jaksa-bg:is(.distribution-page, .progress-page) .security-distribution-tabs .progress-document-tab > *,
 body.jaksa-bg.accounting-page .lr-report-tab > * {
     position: relative;
     z-index: 1;
@@ -834,16 +828,6 @@ body.jaksa-bg.accounting-page .lr-report-tab small {
     font-size: 8px !important;
     line-height: 1.35 !important;
 }
-
-body.jaksa-bg .filter-panel { padding: 10px 14px !important; }
-body.jaksa-bg .filter-panel label { font-size: 8px !important; }
-body.jaksa-bg .filter-panel :is(input, select) { min-height: 38px !important; font-size: 9px !important; }
-body.jaksa-bg .filter-panel .filter-actions .btn { min-height: 38px !important; padding-inline: 14px !important; font-size: 9px !important; }
-body.jaksa-bg .filter-panel .list-order-menu > summary { width: 38px !important; height: 38px !important; }
-body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel { padding: 10px 14px !important; }
-body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel :is(input, select) { min-height: 38px !important; font-size: 9px !important; }
-body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel .filter-actions .btn { min-height: 38px !important; font-size: 9px !important; }
-body.jaksa-bg:is(.distribution-page, .progress-page) .security-filter-panel .list-order-menu > summary { width: 38px !important; height: 38px !important; }
 
 /* Keep both filter actions inside the Progres Dokumen panel instead of clipping Reset at the right edge. */
 body.jaksa-bg.progress-page .agendaris-filter-form:not(.progress-outgoing-filter-form) {
@@ -953,22 +937,6 @@ body.jaksa-bg :is(.register-panel, .agendaris-table-panel, .vehicle-register-pan
     body.jaksa-bg .footer { align-items: flex-start !important; flex-direction: column !important; gap: 3px !important; min-height: 0 !important; padding: 9px 14px !important; }
 }
 
-/* Continuous navy-to-yellow gradient for every data-list header. */
-body.jaksa-bg .table-wrap > table > thead,
-body.jaksa-bg .lr-audit-table-wrap > table > thead,
-body.jaksa-bg table.simulation-table > thead,
-body.jaksa-bg .lr-report-table > thead {
-    background: linear-gradient(90deg, #123f7e 0%, #1f6fa7 24%, #209cad 47%, #76af93 72%, #f4ca5b 100%) !important;
-}
-body.jaksa-bg .table-wrap > table > thead > tr > th,
-body.jaksa-bg .lr-audit-table-wrap > table > thead > tr > th,
-body.jaksa-bg table.simulation-table > thead > tr > th,
-body.jaksa-bg .lr-report-table > thead > tr > th {
-    color: #fff !important;
-    background: transparent !important;
-    border-color: rgba(255,255,255,.24) !important;
-}
-
 /* Shared popup system: always fit the viewport and use the application palette. */
 body.jaksa-bg .input-modal,
 body.jaksa-bg .edit-modal,
@@ -1064,9 +1032,9 @@ body.jaksa-bg .modal-header {
 }
 body.jaksa-bg .modal-title-icon {
     color: #fff !important;
-    background: linear-gradient(135deg, #123f7e 0%, #176b9c 55%, #32b7ae 100%) !important;
+    background: var(--system-electric-sky-gradient) !important;
     border-radius: 11px !important;
-    box-shadow: 0 7px 14px rgba(18,63,126,.24) !important;
+    box-shadow: 0 7px 14px rgba(10,101,210,.24) !important;
 }
 body.jaksa-bg .modal-title-group p { color: #6a83a2 !important; }
 body.jaksa-bg .modal-title-group h2 { color: #0b3369 !important; }
@@ -1100,24 +1068,67 @@ body.jaksa-bg .modal-body :is(input, select, textarea):focus {
     box-shadow: 0 0 0 3px rgba(41,146,211,.13) !important;
 }
 
-/* Navy-to-teal accent for modal progress and primary actions. */
+/* Aksen modal: biru elektrik menuju biru langit. */
 body.jaksa-bg .modal-footer .btn-primary,
 body.jaksa-bg .agendaris-form-modal .btn-primary,
 body.jaksa-bg .distribution-action-modal .btn-primary {
     color: #fff !important;
-    background: linear-gradient(135deg, #123f7e 0%, #176b9c 55%, #32b7ae 100%) !important;
-    box-shadow: 0 7px 16px rgba(18,63,126,.24) !important;
+    background: var(--system-electric-sky-gradient) !important;
+    box-shadow: 0 7px 16px rgba(10,101,210,.24) !important;
 }
 body.jaksa-bg .modal-footer .btn-primary:hover,
 body.jaksa-bg .agendaris-form-modal .btn-primary:hover,
 body.jaksa-bg .distribution-action-modal .btn-primary:hover {
-    background: linear-gradient(135deg, #0c3169 0%, #135b89 55%, #249a94 100%) !important;
+    background: linear-gradient(135deg, #0754b7 0%, #1bb8e7 100%) !important;
 }
 body.jaksa-bg .outgoing-distribution-steps span.active { color: #176b9c !important; }
 body.jaksa-bg .outgoing-distribution-steps span.active b {
     color: #fff !important;
-    background: linear-gradient(135deg, #123f7e 0%, #176b9c 55%, #32b7ae 100%) !important;
-    box-shadow: 0 5px 11px rgba(18,63,126,.18) !important;
+    background: var(--system-electric-sky-gradient) !important;
+    box-shadow: 0 5px 11px rgba(10,101,210,.18) !important;
+}
+
+/* Pembuat nomor Agendaris memakai aksen biru yang sama. */
+body.jaksa-bg .btn-agenda-generate {
+    color: #fff !important;
+    border-color: transparent !important;
+    background: var(--system-electric-sky-gradient) !important;
+    box-shadow: 0 7px 16px rgba(10,101,210,.24) !important;
+}
+body.jaksa-bg .btn-agenda-generate:hover {
+    background: linear-gradient(135deg, #0754b7 0%, #1bb8e7 100%) !important;
+}
+body.jaksa-bg .btn-agenda-generate[data-can-cancel="true"] {
+    color: #2162a4 !important;
+    border-color: #c8e4f4 !important;
+    background: #f5fbff !important;
+    box-shadow: none !important;
+}
+body.jaksa-bg .btn-agenda-generate[data-can-cancel="true"]:hover {
+    color: #fff !important;
+    border-color: #0a65d2 !important;
+    background: #0a65d2 !important;
+    box-shadow: 0 6px 14px rgba(10,101,210,.22) !important;
+}
+
+/* Aksi sekunder pada footer formulir mendapat penegasan biru elektrik saat disorot. */
+body.jaksa-bg .modal-footer :is(.btn-secondary, .btn-ghost):hover {
+    color: #fff !important;
+    border-color: #0a65d2 !important;
+    background: #0a65d2 !important;
+    box-shadow: 0 6px 14px rgba(10,101,210,.22) !important;
+}
+
+/* Tombol unduh lembar pengendalian tidak lagi memakai aksen kuning lama. */
+body.jaksa-bg .agenda-control-sheet-action .btn {
+    color: #0a65d2 !important;
+    border-color: #b8d9f5 !important;
+    background: #fff !important;
+}
+body.jaksa-bg .agenda-control-sheet-action .btn:hover {
+    color: #fff !important;
+    border-color: #0a65d2 !important;
+    background: #0a65d2 !important;
 }
 
 /* Account management matches the dedicated Add Account reference. */
@@ -1255,27 +1266,27 @@ body.jaksa-bg.account-management-page .account-role {
     body.jaksa-bg dialog { max-height: calc(100dvh - 16px) !important; border-radius: 14px !important; }
 }
 
-/* Sidebar: use a solid blue palette for icon tiles while keeping white icon lines. */
+/* Sidebar: tile ikon memakai biru transparan dan garis putih-kebiruan seperti referensi. */
 body.jaksa-bg .sidebar .nav-icon,
 body.jaksa-bg .sidebar .nav-link .nav-icon,
 body.jaksa-bg .sidebar .nav-icon.image-nav-icon,
 body.jaksa-bg .sidebar .nav-link .nav-icon.image-nav-icon {
-    color: #fff !important;
-    background: linear-gradient(145deg, #052f63 0%, #064986 58%, #0a5c9f 100%) !important;
-    border: 1px solid rgba(255,255,255,.60) !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.17), 0 4px 10px rgba(1,34,83,.28) !important;
+    color: #effaff !important;
+    background: linear-gradient(145deg, rgba(25,130,203,.48) 0%, rgba(7,72,151,.56) 100%) !important;
+    border: 1px solid rgba(166,218,255,.68) !important;
+    box-shadow: inset 0 1px 0 rgba(237,250,255,.16), 0 4px 10px rgba(1,34,83,.22) !important;
 }
 body.jaksa-bg .sidebar .nav-link:hover .nav-icon,
 body.jaksa-bg .sidebar .nav-parent:hover .nav-icon {
     color: #fff !important;
-    background: linear-gradient(145deg, #042750 0%, #053c72 55%, #07518c 100%) !important;
-    border-color: rgba(255,255,255,.82) !important;
+    background: linear-gradient(145deg, #1d8dd0 0%, #1164a8 100%) !important;
+    border-color: #c9edff !important;
 }
 body.jaksa-bg .sidebar .nav-link.active .nav-icon,
 body.jaksa-bg .sidebar .nav-parent.active .nav-icon {
     color: #fff !important;
-    background: linear-gradient(145deg, #032652 0%, #06457f 54%, #0a629f 100%) !important;
-    border-color: #fff !important;
+    background: linear-gradient(145deg, #1a87cd 0%, #0b579e 100%) !important;
+    border-color: #d8f3ff !important;
 }
 
 /* Flash upload notification is an overlay, not a page element. */
@@ -1326,4 +1337,231 @@ body.jaksa-bg.accounting-page .lr-rekap-table tbody td {
 body.jaksa-bg.accounting-page .lr-rekap-table tbody tr:nth-child(even) > th,
 body.jaksa-bg.accounting-page .lr-rekap-table tbody tr:nth-child(even) > td {
     background: #fbfdfe !important;
+}
+
+/* Pemilih dokumen pada Distribusi Security mengikuti bentuk pil dua bagian. */
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: min(400px, 100%) !important;
+    margin: 0 !important;
+    margin-left: auto !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 35px !important;
+    padding: 0 9px !important;
+    gap: 7px !important;
+    color: #304c78 !important;
+    background: #fff !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab::after {
+    display: none !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab:first-child {
+    z-index: 2 !important;
+    margin-right: -26px !important;
+    padding-right: 32px !important;
+    border-radius: 999px !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab:last-child {
+    z-index: 1 !important;
+    padding-left: 32px !important;
+    border-radius: 0 999px 999px 0 !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .security-distribution-tab-icon {
+    display: grid !important;
+    flex: 0 0 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    place-items: center !important;
+    color: #6685b4 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .security-distribution-tab-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab strong {
+    align-self: auto !important;
+    color: inherit !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab small {
+    display: grid !important;
+    align-self: center !important;
+    min-width: 24px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    padding: 0 5px !important;
+    place-items: center !important;
+    color: #265591 !important;
+    background: #edf4fd !important;
+    border-radius: 999px !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab.active {
+    color: #fff !important;
+    background: linear-gradient(100deg, #22396f 0%, #0a65d2 58%, #39c9f2 100%) !important;
+    box-shadow: 0 7px 15px rgba(12, 88, 187, .24) !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab:last-child.active {
+    background: linear-gradient(100deg, #39c9f2 0%, #0878c1 48%, #22396f 100%) !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab.active .security-distribution-tab-icon {
+    color: #fff !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab.active small {
+    color: #22538f !important;
+    background: rgba(255, 255, 255, .9) !important;
+}
+
+body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab:not(.active):hover {
+    color: #0a65d2 !important;
+    background: #f4f9ff !important;
+}
+
+/* Judul Progres Dokumen tidak memakai lapisan kartu terpisah. */
+body.jaksa-bg.progress-page:not(.landing-page):not(.login-page) .distribution-heading {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+@media (max-width: 620px) {
+    body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs { margin-left: auto !important; }
+
+    body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab {
+        min-height: 35px !important;
+        padding: 0 8px !important;
+        gap: 7px !important;
+    }
+
+    body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab strong { font-size: 9px !important; }
+    body.jaksa-bg:is(.distribution-page, .progress-page, .accounting-page) .security-distribution-tabs .progress-document-tab small { min-width: 22px !important; height: 20px !important; padding: 0 5px !important; }
+}
+
+/* Satu ukuran header tabel untuk seluruh halaman aplikasi. */
+body.jaksa-bg .content-shell .main-content table > thead > tr > th {
+    font-size: var(--system-table-header-font-size) !important;
+    font-weight: 800 !important;
+}
+
+/* Isi tabel Dokumen Masuk dan Keluar memakai abu-abu netral di semua role. */
+body.jaksa-bg :is(.security-register-panel, .document-register-table-card, .agenda-document-table-card) table > tbody > tr > td {
+    color: #667085 !important;
+}
+
+body.jaksa-bg :is(.security-register-panel, .document-register-table-card, .agenda-document-table-card) table > tbody > tr > td > strong {
+    color: #000 !important;
+}
+
+/* Tabel Dokumen Masuk Agendaris mengisi layar laptop tanpa memotong kolom terakhir. */
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) > .table-wrap {
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+}
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) > .table-wrap > table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+}
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) :is(th, td):nth-child(1) { width: 7% !important; }
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) :is(th, td):nth-child(2) { width: 11% !important; }
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) :is(th, td):nth-child(3) { width: 9% !important; }
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) :is(th, td):nth-child(4) { width: 16% !important; }
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) :is(th, td):nth-child(5) { width: 17% !important; }
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) :is(th, td):nth-child(6) { width: 10% !important; }
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) :is(th, td):nth-child(7) { width: 15% !important; }
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) :is(th, td):nth-child(8) { width: 9% !important; }
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) :is(th, td):nth-child(9) { width: 6% !important; }
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) > .table-wrap > table > tbody > tr > td {
+    overflow-wrap: anywhere !important;
+}
+body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) .table-actions {
+    align-items: center !important;
+    gap: clamp(6px, .7vw, 10px) !important;
+    min-width: max-content !important;
+    white-space: nowrap !important;
+}
+@media (max-width: 1140px) {
+    body.jaksa-bg .agendaris-table-panel.agenda-document-table-card:not(.progress-document-panel) > .table-wrap > table {
+        min-width: 980px !important;
+    }
+}
+
+/* Tabel Dokumen Keluar membagi setiap kolom secara tetap agar tidak bergeser atau terpotong. */
+body.jaksa-bg #agendarisOutgoingTableArea > .table-wrap {
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+}
+body.jaksa-bg #agendarisOutgoingTableArea > .table-wrap > table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+}
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(1) { width: 10% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(2) { width: 10% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(3) { width: 8% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(4) { width: 10% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(5) { width: 10% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(6) { width: 9% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(7) { width: 9% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(8) { width: 10% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(9) { width: 12% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea :is(th, td):nth-child(10) { width: 12% !important; }
+body.jaksa-bg #agendarisOutgoingTableArea > .table-wrap > table > tbody > tr > td {
+    overflow-wrap: anywhere !important;
+}
+body.jaksa-bg #agendarisOutgoingTableArea .table-actions {
+    align-items: center !important;
+    gap: clamp(6px, .7vw, 10px) !important;
+    min-width: max-content !important;
+    white-space: nowrap !important;
+}
+@media (max-width: 1180px) {
+    body.jaksa-bg #agendarisOutgoingTableArea > .table-wrap > table {
+        min-width: 1080px !important;
+    }
+}
+
+
+/* Sambutan login harus selalu berada di atas seluruh shell aplikasi. */
+body.jaksa-bg > .welcome-modal {
+    position: fixed !important;
+    z-index: 2147483647 !important;
+    inset: 0 !important;
 }

@@ -22,12 +22,16 @@ $urlMaskAsset = $resolveOptimizedAsset('assets/url-mask.js', 'assets/url-mask.mi
 $landingCssVersion = $assetVersion($landingCssAsset);
 $flowuiThemeVersion = $assetVersion('assets/flowui-theme.css');
 $landingSurabayaVersion = $assetVersion('assets/landing-surabaya.css');
-$landingBackgroundVersion = $assetVersion('assets/images/landing-surabaya-background-v2.webp');
+$landingBackgroundVersion = $assetVersion('assets/images/landing-jamkrindo-office.png');
 $landingLogoVersion = $assetVersion('assets/images/landing-jaksa-logo-photoroom.webp');
+$landingHeaderLogoVersion = $assetVersion('assets/images/jaksa-sidebar-logo-selected.png');
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
 $urlMaskVersion = $assetVersion($urlMaskAsset);
 $loginError        = session()->getFlashdata('login_error');
 $logoutSuccess     = session()->getFlashdata('logout_success');
+$sessionExpiryMessage = 'Sesi login telah berakhir setelah 2 jam. Silakan login kembali.';
+$sessionExpired = $loginError === $sessionExpiryMessage;
+$cardLoginError = $sessionExpired ? null : $loginError;
 $openAdminTakeover = (bool) session()->getFlashdata('open_admin_takeover_modal');
 $adminTakeoverError = session()->getFlashdata('admin_takeover_error');
 $adminTakeoverName = (string) session()->get('admin_takeover_display_name');
@@ -45,8 +49,12 @@ $openLoginModal = false;
     <meta name="description" content="Jamkrindo Kanwil Surabaya, sistem pengelolaan dokumen operasional.">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
     <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
-    <link rel="preload" as="image" type="image/webp" href="<?= base_url('assets/images/landing-surabaya-background-v2.webp') ?>?v=<?= esc($landingBackgroundVersion, 'attr') ?>" fetchpriority="high">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" type="image/png" href="<?= base_url('assets/images/landing-jamkrindo-office.png') ?>?v=<?= esc($landingBackgroundVersion, 'attr') ?>" fetchpriority="high">
     <link rel="preload" as="image" type="image/webp" href="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" fetchpriority="high">
+    <link rel="preload" as="image" type="image/png" href="<?= base_url('assets/images/jaksa-sidebar-logo-selected.png') ?>?v=<?= esc($landingHeaderLogoVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url($landingCssAsset) ?>?v=<?= esc($landingCssVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/flowui-theme.css') ?>?v=<?= esc($flowuiThemeVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/landing-surabaya.css') ?>?v=<?= esc($landingSurabayaVersion, 'attr') ?>">
@@ -57,25 +65,36 @@ $openLoginModal = false;
 <body class="landing-page landing-surabaya-page">
     <a class="landing-skip-link" href="#beranda">Lewati ke konten utama</a>
 
-    <header class="surabaya-landing-header">
-        <nav class="surabaya-landing-nav" aria-label="Navigasi utama">
-            <a class="surabaya-landing-brand" href="<?= site_url('/') ?>" aria-label="JAKSA">
-                <img src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" width="640" height="220" alt="JAKSA" decoding="async">
-                <span class="surabaya-landing-brand-title"><span>Jamkrindo Kanwil</span><span>Surabaya Operasional</span></span>
-            </a>
-            <div class="surabaya-landing-links">
-                <a class="active" href="#beranda">Beranda</a>
-                <a href="#tentang">Tentang</a>
-                <a href="#panduan">Dashboard</a>
-                <a href="#faq">SDM</a>
-                <a href="#kontak">Kontak</a>
-            </div>
+    <header class="surabaya-landing-brandbar">
+        <a class="surabaya-landing-brand" href="<?= site_url('/') ?>" aria-label="JAKSA">
+            <img src="<?= base_url('assets/images/jaksa-sidebar-logo-selected.png') ?>?v=<?= esc($landingHeaderLogoVersion, 'attr') ?>" width="2138" height="736" alt="JAKSA" decoding="async">
+            <span class="surabaya-landing-brand-title"><span>Jamkrindo Kanwil</span><span>Surabaya Operasional</span></span>
+        </a>
+        <nav class="surabaya-landing-links" aria-label="Navigasi utama">
+            <a class="active" href="#beranda">Beranda</a>
+            <a href="#tentang">Tentang</a>
+            <a href="#panduan">Dashboard</a>
+            <a href="#faq">SDM</a>
+            <a href="#kontak">Kontak</a>
         </nav>
     </header>
 
+    <?php if ($logoutSuccess || $sessionExpired): ?>
+        <div class="landing-session-modal<?= $logoutSuccess ? ' success' : '' ?>" data-session-notice role="dialog" aria-modal="true" aria-labelledby="sessionNoticeTitle">
+            <section class="landing-session-notice">
+                <span class="landing-session-notice-icon" aria-hidden="true"><?= $logoutSuccess ? '✓' : '!' ?></span>
+                <div>
+                    <strong id="sessionNoticeTitle"><?= $logoutSuccess ? 'Berhasil keluar' : 'Sesi telah berakhir' ?></strong>
+                    <p><?= esc($logoutSuccess ?: $sessionExpiryMessage) ?></p>
+                </div>
+                <button type="button" data-session-notice-close aria-label="Tutup notifikasi">×</button>
+            </section>
+        </div>
+    <?php endif ?>
+
     <main class="surabaya-landing-main" id="beranda">
         <section class="surabaya-landing-copy" aria-labelledby="landingTitle">
-            <h1 id="landingTitle"><span class="landing-title-primary">Satu Sistem,<br>Dukungan untuk</span><br><span class="landing-title-secondary">Kinerja Kanwil Surabaya.</span></h1>
+            <h1 id="landingTitle">Satu Sistem,<br>Dukungan untuk<br>Kinerja <span class="landing-title-secondary">Kanwil Surabaya.</span></h1>
             <p>Mendukung pengelolaan dokumen dan administrasi internal secara lebih terintegrasi, efektif, dan aman.</p>
         </section>
 
@@ -84,16 +103,15 @@ $openLoginModal = false;
             <p class="surabaya-login-title" aria-label="Jamkrindo Kanwil Surabaya Operasional"><span class="title-j">J</span><span class="title-a-orange">A</span>mkrindo <span class="title-k">K</span>anwil <span class="title-s">S</span>urabaya oper<span class="title-a-green">A</span>sional</p>
             <p class="surabaya-login-caption" id="surabayaLoginTitle">MASUK KE AKUN ANDA</p>
 
-            <?php if ($loginError): ?><div class="surabaya-login-alert" role="alert"><?= esc($loginError) ?></div><?php endif ?>
-            <?php if ($logoutSuccess): ?><div class="surabaya-login-alert success" role="status"><?= esc($logoutSuccess) ?></div><?php endif ?>
+            <?php if ($cardLoginError): ?><div class="surabaya-login-alert" role="alert"><?= esc($cardLoginError) ?></div><?php endif ?>
 
             <?php if ($isLoggedIn): ?>
                 <a class="surabaya-login-submit" href="<?= site_url('dashboard') ?>">Buka Dashboard <span aria-hidden="true">→</span></a>
             <?php else: ?>
                 <form action="<?= site_url('login') ?>" method="post" class="surabaya-login-form">
                     <?= csrf_field() ?>
-                    <label class="surabaya-field" for="surabayaUsername"><span aria-hidden="true">♙</span><input id="surabayaUsername" name="username" type="text" value="<?= esc(old('username')) ?>" placeholder="Username" autocomplete="username" required></label>
-                    <label class="surabaya-field password" for="surabayaPassword"><span aria-hidden="true">♧</span><input id="surabayaPassword" name="password" type="password" placeholder="Password" autocomplete="current-password" required><button type="button" data-surabaya-password-toggle aria-label="Tampilkan password">◉</button></label>
+                    <div class="surabaya-field"><span class="surabaya-field-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.3"/><path d="M5.5 19c.55-3.18 2.7-4.8 6.5-4.8s5.95 1.62 6.5 4.8"/></svg></span><input id="surabayaUsername" name="username" type="text" value="<?= esc(old('username')) ?>" placeholder="Username" aria-label="Username" autocomplete="username" required><span class="surabaya-field-required" aria-hidden="true">*</span></div>
+                    <div class="surabaya-field password"><span class="surabaya-field-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5.5" y="10" width="13" height="9.5" rx="1.8"/><path d="M8.5 10V7.8a3.5 3.5 0 0 1 7 0V10"/></svg></span><input id="surabayaPassword" name="password" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" required><button type="button" data-surabaya-password-toggle aria-label="Tampilkan password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2.8 12s3.25-5 9.2-5 9.2 5 9.2 5-3.25 5-9.2 5-9.2-5-9.2-5Z"/><circle cx="12" cy="12" r="2.1"/></svg></button><span class="surabaya-field-required" aria-hidden="true">*</span></div>
                     <p class="surabaya-login-hint">Masukan User dan Password yang Telah Diberikan</p>
                     <div class="surabaya-login-options">
                         <label><input type="checkbox" name="remember" value="1"> <span>Ingat saya</span></label>
@@ -210,13 +228,16 @@ $openLoginModal = false;
 
     <script>
         (() => {
+            const sessionNotice = document.querySelector('[data-session-notice]');
+            sessionNotice?.querySelector('[data-session-notice-close]')?.addEventListener('click', () => sessionNotice.remove());
+
             const surabayaPassword = document.getElementById('surabayaPassword');
             const surabayaPasswordToggle = document.querySelector('[data-surabaya-password-toggle]');
             surabayaPasswordToggle?.addEventListener('click', () => {
                 if (!surabayaPassword) return;
                 const visible = surabayaPassword.type === 'text';
                 surabayaPassword.type = visible ? 'password' : 'text';
-                surabayaPasswordToggle.textContent = visible ? '◉' : '⊘';
+                surabayaPasswordToggle.classList.toggle('is-visible', !visible);
                 surabayaPasswordToggle.setAttribute('aria-label', visible ? 'Tampilkan password' : 'Sembunyikan password');
             });
 

@@ -3,10 +3,10 @@
 
     const controlSelector = 'input:not([type="hidden"]), select, textarea';
 
-    const findExistingMarker = (label) => Array.from(label.querySelectorAll('span')).find((span) => (
-        span.classList.contains('required-marker')
-        || (span.classList.contains('required') && span.textContent.trim() === '*')
-        || span.textContent.trim() === '*'
+    const findExistingMarker = (label) => Array.from(label.querySelectorAll('span, b, em, strong')).find((element) => (
+        element.classList.contains('required-marker')
+        || (element.classList.contains('required') && element.textContent.trim() === '*')
+        || element.textContent.trim() === '*'
     ));
 
     const wrapTrailingMarker = (label) => {
@@ -42,6 +42,39 @@
         return group ? Array.from(group.querySelectorAll(controlSelector)) : [];
     };
 
+    const titleForLabel = (label, controls) => {
+        const controlBlock = Array.from(label.children).find((child) => (
+            child.matches(controlSelector) || child.querySelector(controlSelector)
+        ));
+
+        if (!controlBlock || controls.length === 0) {
+            return label;
+        }
+
+        const existingTitle = Array.from(label.children).find((child) => (
+            child !== controlBlock
+            && child.matches('span, strong, em, small')
+        ));
+        if (existingTitle) {
+            existingTitle.classList.add('required-label-title');
+            return existingTitle;
+        }
+
+        const nodesBeforeControl = [];
+        for (let node = label.firstChild; node && node !== controlBlock; node = node.nextSibling) {
+            nodesBeforeControl.push(node);
+        }
+        if (!nodesBeforeControl.some((node) => node.nodeType === Node.ELEMENT_NODE || node.textContent.trim() !== '')) {
+            return label;
+        }
+
+        const title = document.createElement('span');
+        title.className = 'required-label-title';
+        label.insertBefore(title, controlBlock);
+        nodesBeforeControl.forEach((node) => title.append(node));
+        return title;
+    };
+
     const synchronizeLabel = (label) => {
         if (!(label instanceof HTMLLabelElement)) {
             return;
@@ -58,10 +91,14 @@
         }
 
         const isRequired = controls.some((control) => control.required && !control.disabled);
+        const title = titleForLabel(label, controls);
+        if (marker && title !== label && !title.contains(marker)) {
+            title.append(' ', marker);
+        }
         if (isRequired && !marker) {
             marker = document.createElement('span');
             marker.textContent = '*';
-            label.append(' ', marker);
+            title.append(' ', marker);
         }
 
         if (marker) {

@@ -25,6 +25,11 @@
         <span><small>SIMULASI</small><strong>Simulasi Hitung</strong><p>Isi kertas kerja otomatis dari LR Oracle dan unduh hasilnya.</p></span>
         <b aria-hidden="true">→</b>
     </a>
+    <a class="panel accounting-menu-card is-report" href="<?= site_url('akutansi/bukti-bayar') ?>">
+        <span class="accounting-menu-icon" aria-hidden="true">✓</span>
+        <span><small>TRANSAKSI</small><strong>Bukti Bayar</strong><p>Kelola nomor memo, voucher, nominal, dan kategori pembayaran.</p></span>
+        <b aria-hidden="true">→</b>
+    </a>
 </section>
 
 <?= $this->endSection() ?>

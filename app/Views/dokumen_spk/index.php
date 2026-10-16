@@ -111,7 +111,7 @@ foreach ($records as $record) {
                             <td><?php if ($record['link_berkas']): ?><a class="btn btn-secondary btn-sm spk-file-button" href="<?= esc($record['link_berkas'], 'attr') ?>" target="_blank" rel="noopener noreferrer">↗ Buka Berkas</a><?php else: ?><span class="spk-missing-value">Belum ada link</span><?php endif ?></td>
                             <td><span class="spk-completeness <?= esc($record['kelengkapan_class']) ?>"><?= esc($record['kelengkapan_label']) ?></span></td>
                             <td>
-                                <div class="action-buttons"><button class="icon-btn" type="button" data-spk-view="<?= (int) $record['id'] ?>" title="Lihat detail">⌕</button><button class="icon-btn" type="button" data-spk-edit="<?= (int) $record['id'] ?>" title="Ubah dokumen">✎</button></div>
+                                <div class="action-buttons"><button class="icon-btn" type="button" data-spk-view="<?= (int) $record['id'] ?>" title="Lihat detail"><?= view('components/table_action_icon', ['icon' => 'view']) ?></button><button class="icon-btn" type="button" data-spk-edit="<?= (int) $record['id'] ?>" title="Ubah dokumen"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button></div>
                             </td>
                         </tr>
                     <?php endforeach ?>

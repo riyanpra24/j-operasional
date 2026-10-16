@@ -35,46 +35,55 @@ foreach (\App\Libraries\RkaCalculator::schema()['rows'] as $definition) {
 } ?>
 <?php $bopoPercent = static fn(?string $value): string => $value === null ? '—' : \App\Libraries\LrMoney::percentageDisplayFixed($value, 2);
 $bopoAchievement = static fn(?string $value): string => $value === null ? '—' : \App\Libraries\LrMoney::percentageDisplay($value); ?>
-
-
-
-<nav class="lr-report-tabs" aria-label="Jenis laporan laba rugi">
+<section class="page-heading lr-page-heading lr-report-page-heading">
+    <div>
+        <p class="eyebrow">AKUTANSI</p>
+        <h1>Laporan Laba / Rugi</h1>
+    </div>
+    <nav class="progress-document-tabs security-distribution-tabs lr-report-tabs" role="tablist" aria-label="Jenis laporan laba rugi">
     <?php foreach (\App\Libraries\LrRealizationService::BASES as $basis): ?>
         <?php $isActive = $basis === $selectedBasis; ?>
-        <a class="lr-report-tab <?= $isActive ? 'is-active' : '' ?>" href="<?= site_url('akutansi/laba-rugi?' . http_build_query(['jenis_laporan' => $basis, 'unit_kerja' => $selectedUnit, 'bulan' => $selectedMonth, 'tahun' => $selectedYear, 'lob' => $selectedLobs])) ?>" <?= $isActive ? 'aria-current="page"' : '' ?>>
-            <span class="lr-report-tab-badge"><?= $basis ?></span>
-            <span><strong>Laporan Laba / Rugi (<?= $basis ?>)</strong><small><?= $basis === 'YTD' ? 'Akumulasi dari awal tahun sampai periode terpilih' : 'Nilai khusus pada periode terpilih' ?></small></span>
+        <a class="progress-document-tab lr-report-tab <?= $isActive ? 'active is-active' : '' ?>" href="<?= site_url('akutansi/laba-rugi?' . http_build_query(['jenis_laporan' => $basis, 'unit_kerja' => $selectedUnit, 'bulan' => $selectedMonth, 'tahun' => $selectedYear, 'lob' => $selectedLobs])) ?>" role="tab" aria-selected="<?= $isActive ? 'true' : 'false' ?>" <?= $isActive ? 'aria-current="page"' : '' ?>>
+            <span class="security-distribution-tab-icon lr-report-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4.5" width="18" height="16.5" rx="3"></rect>
+                    <path d="M7.5 2.5v4M12 2.5v4M16.5 2.5v4M3 9h18"></path>
+                    <path d="M12 11.5a3.15 3.15 0 0 0-3.15 3.15c0 2.35 3.15 5.35 3.15 5.35s3.15-3 3.15-5.35A3.15 3.15 0 0 0 12 11.5Z"></path>
+                    <circle cx="12" cy="14.65" r=".85" fill="currentColor" stroke="none"></circle>
+                </svg></span>
+            <strong>Laporan Laba / Rugi</strong>
+            <small><?= esc($basis) ?></small>
         </a>
     <?php endforeach ?>
-</nav>
+    </nav>
+</section>
 
-<section class="panel lr-rka-filter-panel">
-    <form method="get" action="<?= site_url('akutansi/laba-rugi') ?>" class="lr-rka-filter">
+<section class="panel filter-panel lr-rka-filter-panel">
+    <form method="get" action="<?= site_url('akutansi/laba-rugi') ?>" class="lr-rka-filter lr-report-filter">
         <input type="hidden" name="jenis_laporan" value="<?= esc($selectedBasis, 'attr') ?>">
-        <div class="lr-filter-unit">
+        <div class="form-group lr-filter-unit">
             <label class="lr-upload-label" for="lrFilterUnit">Unit Kerja</label>
-            <select class="lr-upload-select" id="lrFilterUnit" name="unit_kerja">
+            <div class="lr-rka-filter-control"><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V6l8-3 8 3v14M8 9h.01M8 13h.01M8 17h.01M12 9h.01M12 13h.01M12 17h.01M16 9h.01M16 13h.01M16 17h.01"></path></svg></span><select class="lr-upload-select" id="lrFilterUnit" name="unit_kerja">
                 <?php foreach ($reportUnits as $unit): ?>
                     <option value="<?= esc($unit, 'attr') ?>" <?= $unit === $selectedUnit ? 'selected' : '' ?>><?= esc($unit) ?></option>
                 <?php endforeach ?>
-            </select>
+            </select></div>
         </div>
-        <div class="lr-filter-month">
+        <div class="form-group lr-filter-month">
             <label class="lr-upload-label" for="lrFilterMonth">Bulan</label>
-            <select class="lr-upload-select" id="lrFilterMonth" name="bulan" required>
+            <div class="lr-rka-filter-control"><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg></span><select class="lr-upload-select" id="lrFilterMonth" name="bulan" required>
                 <?php foreach ($lrMonths as $monthNumber => $monthName): ?>
                     <option value="<?= $monthNumber ?>" <?= $monthNumber === $selectedMonth ? 'selected' : '' ?>><?= $monthName ?></option>
                 <?php endforeach ?>
-            </select>
+            </select></div>
         </div>
-        <div class="lr-filter-year">
+        <div class="form-group lr-filter-year">
             <label class="lr-upload-label" for="lrFilterYear">Tahun</label>
-            <input class="lr-upload-select" id="lrFilterYear" type="number" name="tahun" min="2000" max="2100" step="1" value="<?= $selectedYear ?>" required>
+            <div class="lr-rka-filter-control"><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg></span><input class="lr-upload-select" id="lrFilterYear" type="number" name="tahun" min="2000" max="2100" step="1" value="<?= $selectedYear ?>" required></div>
         </div>
-        <div class="lr-filter-lob">
+        <div class="form-group lr-filter-lob">
             <label class="lr-upload-label">LOB</label>
             <details class="lr-lob-picker">
-                <summary><?= esc($lobSummary) ?></summary>
+                <summary><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Z"></path><path d="m4 12.5 8 4.5 8-4.5M4 17.5 12 22l8-4.5"></path></svg></span><span><?= esc($lobSummary) ?></span></summary>
                 <div class="lr-lob-options" role="group" aria-label="Pilih LOB yang ditampilkan">
                     <?php foreach ($allLobs as $lob): ?>
                         <label><input type="checkbox" name="lob[]" value="<?= esc($lob, 'attr') ?>" <?= in_array($lob, $selectedLobs, true) ? 'checked' : '' ?>><span><?= esc($lob) ?></span></label>
@@ -83,7 +92,8 @@ $bopoAchievement = static fn(?string $value): string => $value === null ? '—' 
                 </div>
             </details>
         </div>
-        <button type="submit" class="btn btn-secondary">Terapkan</button>
+        <div class="filter-actions lr-rka-filter-actions">
+        <button type="submit" class="btn btn-secondary">Filter</button>
         <a class="btn btn-ghost" href="<?= site_url('akutansi/laba-rugi') ?>">Reset</a>
         <details class="lr-action-menu lr-filter-menu">
             <summary class="lr-filter-menu-trigger" aria-label="Menu tindakan Laporan Laba Rugi" title="Menu tindakan">
@@ -103,6 +113,7 @@ $bopoAchievement = static fn(?string $value): string => $value === null ? '—' 
                 <button type="button" role="menuitem" class="lr-action-menu-item is-danger" data-lr-delete-open aria-haspopup="dialog" aria-controls="lrDeleteDialog">Hapus Laporan</button>
             </div>
         </details>
+        </div>
     </form>
 </section>
 

@@ -69,8 +69,6 @@ body:not(.landing-page) .content-shell { background: var(--flow-canvas) !importa
 
 input, select, textarea { background: #fff !important; border-color: #d5e6f3 !important; }
 input:focus, select:focus, textarea:focus { border-color: #2b8cea !important; box-shadow: 0 0 0 3px rgba(43,140,234,.13) !important; }
-thead, .table thead { background: linear-gradient(100deg, #e8f5ff, #f3fbff) !important; }
-thead th, .table thead th { color: #27628e !important; }
 th, td { border-color: #deebf5 !important; }
 tbody tr:hover, .table tbody tr:hover { background: #f1fbff !important; }
 .icon-btn, .menu-toggle, .topbar-icon, .date-pill { color: #1d62a5 !important; border-color: #d8e8f3 !important; }
@@ -304,29 +302,8 @@ tbody tr:hover, .table tbody tr:hover { background: #fff9e9 !important; }
 .security-distribution-tabs .progress-document-tab strong { color: var(--flow-ink) !important; font-size: 11px !important; }
 .security-distribution-tabs .progress-document-tab small { color: #6f8390 !important; font-size: 9px !important; }
 
-.security-filter-panel {
-    margin-top: 12px;
-    padding: 13px 15px !important;
-    background: #fff !important;
-    border-color: #e7edf0 !important;
-    border-radius: 12px !important;
-    box-shadow: 0 8px 22px rgba(29,82,106,.06) !important;
-}
-.security-filter-panel label { color: #3e5868 !important; font-weight: 800 !important; }
-.security-filter-panel :is(input, select) {
-    min-height: 40px;
-    background: #fff !important;
-    border-color: #dce6ec !important;
-    border-radius: 8px !important;
-}
-.security-filter-panel .input-with-icon span { color: var(--flow-sky) !important; }
-.security-filter-panel .filter-actions { gap: 10px; }
-.security-filter-panel .filter-actions .btn { min-height: 40px; padding-inline: 15px; }
-.security-filter-panel .filter-actions .btn-secondary { color: #fff !important; background: linear-gradient(135deg, #087b9b, #32b7d0) !important; border-color: transparent !important; box-shadow: 0 7px 14px rgba(16,128,158,.17) !important; }
-.security-filter-panel .filter-actions .btn-ghost { color: #117893 !important; background: #fff !important; border-color: #bfe5ee !important; }
-.security-filter-panel .filter-actions .btn::before { display: inline-block; margin-right: 3px; font-size: 15px; line-height: 1; }
-.security-filter-panel .filter-actions .btn-secondary::before { width: 14px; height: 14px; background: currentColor; clip-path: polygon(0 8%, 100% 8%, 64% 49%, 64% 100%, 38% 87%, 38% 49%); content: ""; }
-.security-filter-panel .filter-actions .btn-ghost::before { content: "↻"; font-size: 17px; }
+/* Tata letak Security dipertahankan; warna, ukuran, ikon, dan aksi mengikuti filter global. */
+.security-filter-panel { margin-top: 12px; }
 
 .security-register-panel {
     margin-top: 14px;
@@ -344,13 +321,8 @@ tbody tr:hover, .table tbody tr:hover { background: #fff9e9 !important; }
     border-radius: 9px;
 }
 .security-register-panel table { min-width: 920px; }
-.security-register-panel thead,
-.security-register-panel .table thead { background: linear-gradient(100deg, #eaf8fc, #f3fbfd) !important; }
 .security-register-panel th {
     height: 43px;
-    color: #16708e !important;
-    font-size: 9px !important;
-    font-weight: 850 !important;
     letter-spacing: .05px !important;
     text-transform: none !important;
 }
@@ -366,14 +338,6 @@ tbody tr:hover, .table tbody tr:hover { background: #fff9e9 !important; }
 .security-register-panel tbody tr:hover { background: #f3fbfd !important; }
 .security-register-panel .date-cell strong { color: var(--flow-ink) !important; }
 .security-register-panel .date-cell span { margin-top: 3px; color: #91a0aa !important; }
-.security-register-panel .table-actions { align-items: center; gap: 8px; }
-.security-register-panel .icon-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px !important;
-    font-size: 11px;
-}
-.security-register-panel .icon-btn-delete { color: var(--flow-coral) !important; background: #fff5f5 !important; border-color: #ffc9cc !important; }
 .security-register-panel .distribution-action-button {
     min-height: 39px;
     padding-inline: 16px;
@@ -385,12 +349,6 @@ tbody tr:hover, .table tbody tr:hover { background: #fff9e9 !important; }
     color: #72818c;
 }
 .security-register-panel .table-length-form select { min-height: 37px; background: #fff !important; }
-.security-filter-panel .list-order-filter { width: 40px !important; }
-.security-filter-panel .list-order-menu > summary { width: 40px !important; height: 40px !important; color: #167893 !important; border-color: #cbe6ee !important; border-radius: 8px !important; }
-.security-filter-panel .list-order-menu > summary:hover,
-.security-filter-panel .list-order-menu[open] > summary,
-.security-filter-panel .list-order-filter.is-active .list-order-menu > summary { color: #fff !important; background: linear-gradient(135deg, #087b9b, #32b7d0) !important; border-color: transparent !important; }
-
 .security-type-chip,
 .security-expedition-chip {
     display: inline-flex;
@@ -415,7 +373,6 @@ tbody tr:hover, .table tbody tr:hover { background: #fff9e9 !important; }
     .security-page-heading::after { top: -155px; right: -220px; left: auto; opacity: .42; }
     .security-distribution-tabs { gap: 9px !important; overflow-x: auto; }
     .security-distribution-tabs .progress-document-tab { flex: 0 0 220px; }
-    .security-filter-panel { padding: 12px !important; }
     .security-register-panel { padding: 7px !important; }
 }
 
@@ -493,77 +450,28 @@ tbody tr:hover, .table tbody tr:hover { background: #fff9e9 !important; }
 .distribution-page .distribution-heading::after { display: none !important; }
 .distribution-page .distribution-heading .eyebrow { color: #17668d !important; font-size: 9px !important; }
 .distribution-page .distribution-heading h1 { color: #092c60 !important; font-size: clamp(25px, 2.2vw, 34px) !important; letter-spacing: -.8px !important; }
-.distribution-page .distribution-heading .btn-primary {
-    min-height: 47px !important;
-    padding-inline: 22px !important;
-    background: linear-gradient(135deg, #ffbd45, #ffa828) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 8px 16px rgba(238,154,27,.27) !important;
-    font-size: 10px !important;
-}
-.distribution-page .distribution-heading .btn-primary:hover { background: linear-gradient(135deg, #ffc758, #f49c19) !important; }
-
-.distribution-page .security-distribution-tabs { gap: 12px !important; margin: 0 0 14px !important; }
-.distribution-page .security-distribution-tabs .progress-document-tab {
-    grid-template-columns: 58px minmax(0, 1fr) !important;
-    column-gap: 18px !important;
-    min-height: 91px !important;
-    padding: 15px 19px !important;
-    background: linear-gradient(105deg, #fff, #f3fbff) !important;
-    border-color: #d5e8f4 !important;
-    border-radius: 14px !important;
-    box-shadow: 0 6px 16px rgba(20,80,120,.08) !important;
-}
-.distribution-page .security-distribution-tabs .progress-document-tab.active {
-    background: linear-gradient(110deg, #fff, #edf8ff 66%, #d9f2ff) !important;
-    border: 2px solid #248df1 !important;
-    box-shadow: 0 7px 17px rgba(21,121,225,.16) !important;
-}
-.distribution-page .security-distribution-tabs .progress-document-tab > span {
-    flex: 0 0 58px !important;
-    width: 58px !important;
-    height: 58px !important;
-    color: #fff !important;
-    background: linear-gradient(135deg, #317fc8, #154b9a) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 7px 13px rgba(16,72,155,.22) !important;
-    font-size: 29px !important;
-}
-.distribution-page .security-distribution-tabs .progress-document-tab:nth-child(2) > span { background: linear-gradient(135deg, #65d4bf, #2aadaf) !important; }
-.distribution-page .security-distribution-tabs .progress-document-tab strong { color: #0d356a !important; font-size: 12px !important; }
-.distribution-page .security-distribution-tabs .progress-document-tab small { color: #5e7fa8 !important; font-size: 9.5px !important; }
-
-.distribution-page .security-filter-panel {
-    margin-top: 0 !important;
-    padding: 12px 20px !important;
-    border: 1px solid #dbe9f3 !important;
-    border-radius: 13px !important;
-    box-shadow: 0 6px 17px rgba(33,83,118,.08) !important;
-}
-.distribution-page .distribution-filter-form { grid-template-columns: minmax(240px,1.5fr) minmax(160px,.72fr) minmax(160px,.72fr) 44px auto !important; gap: 12px !important; }
-.distribution-page .security-filter-panel label { color: #173b6d !important; font-size: 8.5px !important; }
-.distribution-page .security-filter-panel :is(input, select) { min-height: 43px !important; color: #57739d !important; border-color: #dce8f3 !important; border-radius: 9px !important; box-shadow: 0 3px 8px rgba(19,66,108,.05) !important; }
-.distribution-page .security-filter-panel .filter-actions { gap: 9px !important; }
-.distribution-page .security-filter-panel .filter-actions .btn { min-height: 43px !important; padding-inline: 18px !important; font-size: 9.5px !important; }
-.distribution-page .security-filter-panel .filter-actions .btn-secondary { background: linear-gradient(135deg, #2479d3, #44c9b9) !important; box-shadow: 0 6px 13px rgba(31,119,203,.2) !important; }
-.distribution-page .security-filter-panel .filter-actions .btn-ghost { color: #3f6595 !important; border-color: transparent !important; }
-.distribution-page .security-filter-panel .list-order-filter { width: 43px !important; }
-.distribution-page .security-filter-panel .list-order-menu > summary { width: 43px !important; height: 43px !important; color: #163b70 !important; background: #e6f5ff !important; border: 0 !important; border-radius: 9px !important; }
+.distribution-page .security-filter-panel { margin-top: 0 !important; }
+.distribution-page .distribution-filter-form { grid-template-columns: minmax(240px,1.5fr) minmax(160px,.72fr) minmax(160px,.72fr) var(--system-filter-height) max-content !important; gap: 10px !important; }
+.distribution-page .security-filter-panel .filter-actions { gap: 6px !important; }
+.distribution-page .security-filter-panel .list-order-filter { width: var(--system-filter-height) !important; }
 
 .distribution-page .security-register-panel {
-    min-height: 306px;
+    min-height: 0 !important;
     margin-top: 15px !important;
-    padding: 0 !important;
-    overflow: hidden;
-    border: 0 !important;
+    padding: 10px !important;
+    overflow: hidden !important;
+    border: 1px solid #d6e4ee !important;
     border-radius: 15px !important;
-    box-shadow: 0 9px 21px rgba(20,70,109,.11) !important;
+    background: #fff !important;
+    box-shadow: 0 7px 20px rgba(21,78,133,.07) !important;
 }
-.distribution-page .security-register-panel .table-wrap { border: 0 !important; border-radius: 0 !important; }
+.distribution-page .security-register-panel .table-wrap {
+    overflow: auto !important;
+    border: 0 !important;
+    border-radius: 10px 10px 0 0 !important;
+}
 .distribution-page .security-register-panel table { min-width: 1040px; }
-.distribution-page .security-register-panel thead,
-.distribution-page .security-register-panel .table thead { background: linear-gradient(90deg, #133f83 0%, #1d9caf 52%, #ffd05d 100%) !important; }
-.distribution-page .security-register-panel th { height: 48px !important; color: #fff !important; font-size: 8.5px !important; font-weight: 850 !important; }
+.distribution-page .security-register-panel th { height: 48px !important; color: #fff !important; }
 .distribution-page .security-register-panel td { color: #55749b !important; }
 .distribution-page .security-register-panel tbody tr:hover { background: #f1fbff !important; }
 .distribution-page .security-register-panel .empty-state { min-height: 205px; padding: 48px 20px 24px !important; }
@@ -582,7 +490,6 @@ tbody tr:hover, .table tbody tr:hover { background: #fff9e9 !important; }
 @media (max-width: 700px) {
     .distribution-page .main-content { padding: 16px !important; }
     .distribution-page .distribution-heading { margin: -16px -16px 12px !important; padding: 18px 16px 12px !important; }
-    .distribution-page .distribution-heading .btn-primary { width: auto !important; }
     .distribution-page .security-distribution-tabs .progress-document-tab { flex-basis: 260px !important; }
 }
 
@@ -606,8 +513,6 @@ body:not(.landing-page) .content-shell { background: var(--flow-canvas) !importa
 .btn-danger, .btn-danger-outline, .btn-delete { color: #fff !important; background: linear-gradient(135deg, #ed6c7f, #df4561) !important; border-color: transparent !important; }
 input, select, textarea { color: #183d6d !important; background: #fff !important; border-color: #d5e6f3 !important; }
 input:focus, select:focus, textarea:focus { border-color: #2b8cea !important; box-shadow: 0 0 0 3px rgba(43,140,234,.13) !important; }
-thead, .table thead { background: linear-gradient(100deg, #e8f5ff, #f3fbff) !important; }
-thead th, .table thead th { color: #27628e !important; }
 th, td { border-color: #deebf5 !important; }
 tbody tr:hover, .table tbody tr:hover { background: #f1fbff !important; }
 .icon-btn, .menu-toggle, .topbar-icon, .date-pill { color: #1d62a5 !important; background: #fff !important; border-color: #d8e8f3 !important; }
@@ -691,41 +596,9 @@ body.distribution-page .main-content { background: transparent !important; }
     pointer-events: none;
 }
 .distribution-page .distribution-heading > * { position: relative; z-index: 1; }
-.distribution-page .security-distribution-tabs .progress-document-tab { position: relative; overflow: hidden; }
-.distribution-page .security-distribution-tabs .progress-document-tab::after {
-    position: absolute;
-    right: -94px;
-    bottom: -116px;
-    width: 280px;
-    height: 190px;
-    background: radial-gradient(ellipse, rgba(90,176,245,.15) 0 44%, transparent 45%);
-    border-radius: 50%;
-    content: "";
-    pointer-events: none;
-}
-.distribution-page .security-distribution-tabs .progress-document-tab:nth-child(2)::after { background: radial-gradient(ellipse, rgba(66,203,191,.16) 0 44%, transparent 45%); }
-.distribution-page .security-distribution-tabs .progress-document-tab > * { position: relative; z-index: 1; }
-.distribution-page .security-register-panel { position: relative; overflow: hidden !important; }
-.distribution-page .security-register-panel::after {
-    position: absolute;
-    right: -95px;
-    bottom: -130px;
-    width: 390px;
-    height: 300px;
-    background:
-        radial-gradient(ellipse, transparent 0 37%, rgba(74,200,195,.15) 37.5% 55%, transparent 55.5%),
-        radial-gradient(ellipse at 72% 62%, rgba(255,208,94,.20) 0 42%, transparent 42.5%);
-    border-radius: 50%;
-    content: "";
-    pointer-events: none;
-}
-.distribution-page .security-register-panel .table-wrap,
-.distribution-page .security-register-panel .table-list-footer { position: relative; z-index: 1; }
-
 @media (max-width: 700px) {
     .distribution-page .content-shell::before { right: -270px; opacity: .65; }
     .distribution-page .distribution-heading::before { right: -260px; opacity: .72; }
-    .distribution-page .security-register-panel::after { opacity: .55; }
 }
 
 /* Shared table and navigation treatment, matched to Distribusi Dokumen. */
@@ -746,10 +619,6 @@ body.distribution-page .main-content { background: transparent !important; }
 .nav-sublink:hover { color: #fff !important; background: rgba(126,216,229,.14) !important; }
 .nav-sublink.active { color: #fff !important; background: linear-gradient(100deg, #237aca, #3aadd0 64%, #ffd45d) !important; }
 
-thead,
-.table thead { background: linear-gradient(90deg, #133f83 0%, #1d9caf 52%, #ffd05d 100%) !important; }
-thead th,
-.table thead th { color: #fff !important; }
 .register-panel,
 .agendaris-table-panel,
 .progress-document-panel { border-color: #d8e7f2 !important; }
@@ -837,21 +706,6 @@ body:not(.landing-page):not(.login-page) .page-heading:not(.security-page-headin
 }
 body:not(.landing-page):not(.login-page) .page-heading:not(.security-page-heading):not(.distribution-heading) > * { position: relative; z-index: 1; }
 
-/* Table and filter colors use the exact same hierarchy as Distribusi Dokumen. */
-.register-panel thead,
-.register-panel .table thead,
-.security-register-panel thead,
-.security-register-panel .table thead,
-.agendaris-table-panel thead,
-.agendaris-table-panel .table thead,
-.progress-document-panel thead,
-.progress-document-panel .table thead {
-    background: linear-gradient(90deg, #133f83 0%, #1d9caf 52%, #ffd05d 100%) !important;
-}
-.register-panel th,
-.security-register-panel th,
-.agendaris-table-panel th,
-.progress-document-panel th { color: #fff !important; }
 .filter-actions .btn-secondary {
     color: #fff !important;
     background: linear-gradient(135deg, #237bd1, #45c5b8) !important;
@@ -902,16 +756,6 @@ body:not(.landing-page):not(.login-page) .dashboard-intro > *,
 body:not(.landing-page):not(.login-page) .account-heading > *,
 body:not(.landing-page):not(.login-page) .heading-actions:not(.page-heading):not(.distribution-heading) > * { position: relative; z-index: 1; }
 
-/* High-specificity rule intentionally covers legacy table modules as well. */
-body:not(.landing-page):not(.login-page) .table-wrap table thead {
-    background: linear-gradient(90deg, #133f83 0%, #1d9caf 52%, #ffd05d 100%) !important;
-}
-body:not(.landing-page):not(.login-page) .table-wrap table thead tr,
-body:not(.landing-page):not(.login-page) .table-wrap table thead th {
-    background: transparent !important;
-    color: #fff !important;
-}
-
 /* Rekap komposisi SDM Kanwil: pita warna khusus, bukan gradasi tabel global. */
 #sdmCompositionSummaryDialog .kanwil-sdm-summary-table thead {
     background: linear-gradient(90deg, #2a4f7f 0%, #294e7d 71%, #149da9 71%, #27b2b0 94%, #ffd365 94% 100%) !important;
@@ -956,11 +800,8 @@ body:not(.landing-page):not(.login-page) .table-wrap table thead th {
 .accounting-page .lr-report-year,
 .accounting-page .simulation-history-count { color: #187f7d !important; background: #e7faf5 !important; border-color: #bce8df !important; }
 .accounting-page .lr-report-table .lr-row-major > * { background: #eff8ff !important; }
-.accounting-page .lr-report-table thead { background: linear-gradient(90deg, #133f83 0%, #1d9caf 52%, #ffd05d 100%) !important; }
-.accounting-page .lr-report-table thead th,
-.accounting-page .lr-report-table thead th:first-child { color: #fff !important; background: transparent !important; border-color: rgba(255,255,255,.18) !important; }
-.accounting-page .lr-report-table .lr-row-subtotal > * { background: #e9faf7 !important; }
-.accounting-page .lr-report-table .lr-row-profit > * { border-top-color: #45c5b8 !important; background: #e2f8f3 !important; }
+.accounting-page .lr-report-table .lr-row-subtotal > * { background: #edf6ff !important; }
+.accounting-page .lr-report-table .lr-row-profit > * { border-top-color: #0a65d2 !important; background: #e7f2ff !important; }
 .accounting-page .lr-report-table .lr-row-detail-total > * { background: #e8f7ff !important; }
 .accounting-page .lr-group-chevron { color: #237bd1 !important; background: #e5f4ff !important; }
 .accounting-page .lr-percent-expand:hover,
@@ -1035,37 +876,10 @@ body:not(.landing-page):not(.login-page) .table-wrap table thead th {
     border-color: #cbe5f6 !important; border-radius: 12px !important; box-shadow: 0 5px 13px rgba(24,95,144,.08) !important;
 }
 
-.progress-page .security-distribution-tabs { gap: 12px !important; margin: 0 0 14px !important; padding: 0 !important; background: transparent !important; border: 0 !important; }
-.progress-page .security-distribution-tabs .progress-document-tab {
-    grid-template-columns: 58px minmax(0, 1fr) !important; column-gap: 18px !important; min-height: 91px !important; padding: 15px 19px !important;
-    background: linear-gradient(105deg, #fff, #f3fbff) !important; border-color: #d5e8f4 !important; border-radius: 14px !important;
-    box-shadow: 0 6px 16px rgba(20,80,120,.08) !important;
-}
-.progress-page .security-distribution-tabs .progress-document-tab.active {
-    background: linear-gradient(110deg, #fff, #edf8ff 66%, #d9f2ff) !important; border: 2px solid #248df1 !important;
-    box-shadow: 0 7px 17px rgba(21,121,225,.16) !important;
-}
-.progress-page .security-distribution-tabs .progress-document-tab > span {
-    width: 58px !important; height: 58px !important; color: #fff !important; background: linear-gradient(135deg, #317fc8, #154b9a) !important;
-    border-radius: 12px !important; box-shadow: 0 7px 13px rgba(16,72,155,.22) !important; font-size: 29px !important;
-}
-.progress-page .security-distribution-tabs .progress-document-tab:nth-child(2) > span { background: linear-gradient(135deg, #65d4bf, #2aadaf) !important; }
-.progress-page .security-distribution-tabs .progress-document-tab strong { color: #0d356a !important; font-size: 12px !important; }
-.progress-page .security-distribution-tabs .progress-document-tab small { color: #5e7fa8 !important; font-size: 9.5px !important; }
-
-.progress-page .security-filter-panel {
-    margin-top: 0 !important; padding: 12px 20px !important; border: 1px solid #dbe9f3 !important; border-radius: 13px !important;
-    background: rgba(255,255,255,.95) !important; box-shadow: 0 6px 17px rgba(33,83,118,.08) !important;
-}
-.progress-page .agendaris-filter-form { gap: 12px !important; }
-.progress-page .security-filter-panel label { color: #173b6d !important; font-size: 8.5px !important; }
-.progress-page .security-filter-panel :is(input, select) { min-height: 43px !important; color: #57739d !important; border-color: #dce8f3 !important; border-radius: 9px !important; box-shadow: 0 3px 8px rgba(19,66,108,.05) !important; }
-.progress-page .security-filter-panel .filter-actions { gap: 9px !important; }
-.progress-page .security-filter-panel .filter-actions .btn { min-height: 43px !important; padding-inline: 18px !important; font-size: 9.5px !important; }
-.progress-page .security-filter-panel .filter-actions .btn-secondary { color: #fff !important; background: linear-gradient(135deg, #2479d3, #44c9b9) !important; border-color: transparent !important; box-shadow: 0 6px 13px rgba(31,119,203,.2) !important; }
-.progress-page .security-filter-panel .filter-actions .btn-ghost { color: #3f6595 !important; background: transparent !important; border-color: transparent !important; }
-.progress-page .security-filter-panel .list-order-filter { width: 43px !important; }
-.progress-page .security-filter-panel .list-order-menu > summary { width: 43px !important; height: 43px !important; color: #163b70 !important; background: #e6f5ff !important; border: 0 !important; border-radius: 9px !important; }
+.progress-page .security-filter-panel { margin-top: 0 !important; }
+.progress-page .agendaris-filter-form { gap: 10px !important; }
+.progress-page .security-filter-panel .filter-actions { gap: 6px !important; }
+.progress-page .security-filter-panel .list-order-filter { width: var(--system-filter-height) !important; }
 
 .progress-page .security-register-panel {
     min-height: 306px; margin-top: 15px !important; padding: 0 !important; overflow: hidden !important; border: 0 !important; border-radius: 15px !important;
@@ -1073,17 +887,15 @@ body:not(.landing-page):not(.login-page) .table-wrap table thead th {
 }
 .progress-page .security-register-panel .table-wrap { border: 0 !important; border-radius: 0 !important; }
 .progress-page .security-register-panel table { min-width: 1040px; }
-.progress-page .security-register-panel thead,
-.progress-page .security-register-panel .table thead { background: linear-gradient(90deg, #133f83 0%, #1d9caf 52%, #ffd05d 100%) !important; }
-.progress-page .security-register-panel th { height: 48px !important; color: #fff !important; font-size: 8.5px !important; font-weight: 850 !important; }
+.progress-page .security-register-panel th { height: 48px !important; color: #fff !important; }
 .progress-page .security-register-panel td { color: #55749b !important; }
 .progress-page .security-register-panel tbody tr:hover { background: #f1fbff !important; }
 .progress-page .security-register-panel .table-list-footer { min-height: 57px; padding: 12px 20px !important; border-top: 1px solid #dfebf3; background: #fff !important; }
 .progress-page .security-register-panel .table-length-form { color: #315684 !important; font-size: 9px !important; }
 .progress-page .security-register-panel .table-length-form select { min-height: 32px !important; color: #0d3970 !important; border-color: #dce8f3 !important; border-radius: 8px !important; }
-.progress-page .security-register-panel .agenda-source.security { color: #117f92 !important; background: #e3f8f7 !important; border-color: #b7e6e2 !important; }
-.progress-page .security-register-panel .agenda-source.manual { color: #4165a8 !important; background: #eef3ff !important; border-color: #d2dfff !important; }
-.progress-page .security-register-panel .agenda-incomplete { color: #9a6915 !important; background: #fff4d9 !important; border-color: #f2d491 !important; }
+.progress-page .security-register-panel .agenda-source.security { color: #008d58 !important; background: #e4fbef !important; border-color: #a7edc8 !important; }
+.progress-page .security-register-panel .agenda-source.manual { color: #0878c1 !important; background: #e7f5ff !important; border-color: #b9e1f7 !important; }
+.progress-page .security-register-panel .agenda-incomplete { color: #a56d00 !important; background: #fff6c9 !important; border-color: #f5cf58 !important; }
 
 /* Isi tabel arsip Dokumen Masuk dan Dokumen Keluar dibuat lebih tegas. */
 .document-archive-table .table-wrap > table > tbody > tr > td,
@@ -1096,5 +908,4 @@ body:not(.landing-page):not(.login-page) .table-wrap table thead th {
 @media (max-width: 700px) {
     .progress-page .main-content { padding: 16px !important; }
     .progress-page .distribution-heading { margin: -16px -16px 12px !important; padding: 18px 16px 12px !important; }
-    .progress-page .security-distribution-tabs .progress-document-tab { flex-basis: 260px !important; }
 }

@@ -86,8 +86,8 @@ $summaryCards = [
                         <td><strong><?= $formatMoney($record['nilai_terakhir']) ?></strong></td>
                         <td><span class="pks-status <?= esc($record['status_class']) ?>"><?= esc($record['status_label']) ?></span></td>
                         <td><div class="action-buttons">
-                            <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']) ?>" data-pks-view data-pks-popup-url="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id'] . '?popup=1') ?>" title="Lihat detail" aria-label="Lihat detail">⌕</a>
-                            <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id'] . '/ubah') ?>" title="Edit dan kelola" aria-label="Edit dan kelola PKS">✎</a>
+                            <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']) ?>" data-pks-view data-pks-popup-url="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id'] . '?popup=1') ?>" title="Lihat detail" aria-label="Lihat detail"><?= view('components/table_action_icon', ['icon' => 'view']) ?></a>
+                            <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id'] . '/ubah') ?>" title="Edit dan kelola" aria-label="Edit dan kelola PKS"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></a>
                         </div></td>
                     </tr>
                 <?php endforeach ?>

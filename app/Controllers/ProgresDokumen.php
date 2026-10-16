@@ -99,6 +99,7 @@ class ProgresDokumen extends BaseController
             'pager'        => $this->agendarisModel->pager,
             'filters'      => compact('keyword', 'jenis', 'from', 'to', 'perPage', 'order'),
             'jenisOptions' => array_column($jenisOptions, 'jenis'),
+            'tabCounts'    => $this->progressTabCounts(),
         ]);
     }
 
@@ -181,7 +182,25 @@ class ProgresDokumen extends BaseController
             'pager'   => $this->model->pager,
             'filters' => compact('keyword', 'progres', 'perPage', 'order'),
             'workUnitOptions' => self::WORK_UNIT_OPTIONS,
+            'tabCounts' => $this->progressTabCounts(),
         ]);
+    }
+
+    /** @return array{masuk: int, keluar: int} */
+    private function progressTabCounts(): array
+    {
+        $db = db_connect();
+
+        return [
+            'masuk' => $db->table('agendaris')
+                ->where('deleted_at', null)
+                ->where('progres', 'Menunggu Penyelesaian')
+                ->countAllResults(),
+            'keluar' => $db->table('dokumen_keluar')
+                ->where('deleted_at', null)
+                ->where('status_agendaris !=', 'Selesai')
+                ->countAllResults(),
+        ];
     }
 
     public function store(): ResponseInterface

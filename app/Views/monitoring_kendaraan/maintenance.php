@@ -88,7 +88,7 @@
                         <td><strong>Rp <?= number_format((float)$record['biaya'], 0, ',', '.') ?></strong></td>
                         <td><strong><?= $record['servis_berikutnya_tanggal'] ? date('d-m-Y', strtotime($record['servis_berikutnya_tanggal'])) : '-' ?></strong></td>
                         <td>
-                            <div class="action-buttons"><button type="button" class="icon-btn" data-maintenance-detail='<?= esc(json_encode($viewData), 'attr') ?>' title="Lihat detail" aria-label="Lihat detail servis">⌕</button><?php if ($record['link_berkas']): ?><a class="icon-btn" href="<?= esc($record['link_berkas']) ?>" target="_blank" rel="noopener noreferrer" title="Buka berkas">↗</a><?php endif ?><?php if (! $isDeleted): ?><button type="button" class="icon-btn" data-vehicle-crud-edit='<?= esc(json_encode($editData), 'attr') ?>' title="Edit">✎</button><?php endif ?></div>
+                            <div class="action-buttons"><button type="button" class="icon-btn" data-maintenance-detail='<?= esc(json_encode($viewData), 'attr') ?>' title="Lihat detail" aria-label="Lihat detail servis"><?= view('components/table_action_icon', ['icon' => 'view']) ?></button><?php if ($record['link_berkas']): ?><a class="icon-btn" href="<?= esc($record['link_berkas']) ?>" target="_blank" rel="noopener noreferrer" title="Buka berkas"><?= view('components/table_action_icon', ['icon' => 'open']) ?></a><?php endif ?><?php if (! $isDeleted): ?><button type="button" class="icon-btn" data-vehicle-crud-edit='<?= esc(json_encode($editData), 'attr') ?>' title="Edit"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button><?php endif ?></div>
                         </td>
                     </tr>
                     <?php endforeach ?><?php endif ?>

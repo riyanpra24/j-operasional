@@ -1,4 +1,5 @@
 <?php
+
 /** @var list<array<string, mixed>> $agenda */
 /** @var array<string, mixed> $filters */
 /** @var list<string> $jenisOptions */
@@ -38,7 +39,7 @@ $detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
     </form>
 </section>
 
-<section class="panel register-panel agendaris-table-panel async-table-card" id="agendarisIncomingTableArea" aria-live="polite">
+<section class="panel register-panel agendaris-table-panel agenda-document-table-card async-table-card" id="agendarisIncomingTableArea" aria-live="polite">
     <div class="table-wrap">
         <table>
             <thead>
@@ -86,8 +87,8 @@ $detailUrlPrefix = $detailUrlPrefix ?? 'agendaris/surat-masuk';
                             <?php $dispositionLocked = (string) session()->get('auth_role') === 'agendaris' && ! empty($row['sdm_processed_at']); ?>
                             <td>
                                 <div class="table-actions">
-                                    <button type="button" class="icon-btn" title="Detail" data-agendaris-view data-agendaris-url="<?= site_url($detailUrlPrefix . '/' . $row['id']) ?>">⌕</button>
-                                    <?php if (! $archiveView): ?><button type="button" class="icon-btn <?= $dispositionLocked ? 'is-locked' : '' ?>" title="<?= $dispositionLocked ? 'Disposisi telah diproses oleh SDM & Teller' : 'Edit dan kembalikan ke progres' ?>" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-masuk/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'] ?: 'Belum diisi', 'attr') ?>" <?= $dispositionLocked ? ' data-reopen-locked-message="Disposisi telah diproses oleh SDM &amp; Teller. Hubungi Administrator untuk tindakan selanjutnya."' : '' ?>><?= $dispositionLocked ? '🔒' : '✎' ?></button><?php endif ?>
+                                    <button type="button" class="icon-btn" title="Detail" data-agendaris-view data-agendaris-url="<?= site_url($detailUrlPrefix . '/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'view']) ?></button>
+                                    <?php if (! $archiveView): ?><button type="button" class="icon-btn <?= $dispositionLocked ? 'is-locked' : '' ?>" title="<?= $dispositionLocked ? 'Disposisi telah diproses oleh SDM & Teller' : 'Edit dan kembalikan ke progres' ?>" data-reopen-progress data-reopen-url="<?= site_url('agendaris/surat-masuk/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen nomor <?= esc($row['nomor_surat'] ?: 'Belum diisi', 'attr') ?>" <?= $dispositionLocked ? ' data-reopen-locked-message="Disposisi telah diproses oleh SDM &amp; Teller. Hubungi Administrator untuk tindakan selanjutnya."' : '' ?>><?= view('components/table_action_icon', ['icon' => $dispositionLocked ? 'lock' : 'edit']) ?></button><?php endif ?>
                                 </div>
                             </td>
                         </tr><?php endforeach ?>

@@ -46,7 +46,7 @@
     </form>
 </section>
 
-<section class="panel register-panel agendaris-table-panel">
+<section class="panel register-panel agendaris-table-panel document-register-table-card">
     <div class="table-wrap">
         <table>
             <thead><tr><th>Sumber</th><th>Nomor Agendaris</th><th>Tanggal Surat</th><th>Nomor Surat</th><th>Perihal Surat</th><th>Pengirim</th><th>Tracking Disposisi</th><th>Tanggal Diterima</th><th>Aksi</th></tr></thead>
@@ -102,7 +102,7 @@
                     $documentModalJson = esc(json_encode($documentModalData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'attr');
                     ?>
                     <tr>
-                        <td><strong><?= $document['dokumen_masuk_id'] !== null ? 'Security' : 'Input Manual' ?></strong></td>
+                        <td><span class="agenda-source <?= $document['dokumen_masuk_id'] !== null ? 'security' : 'manual' ?>"><?= $document['dokumen_masuk_id'] !== null ? 'Security' : 'Input Manual' ?></span></td>
                         <td><strong><?= $document['nomor_agendaris'] ? esc($document['nomor_agendaris']) : '<span class="agenda-incomplete">Belum dibuat</span>' ?></strong></td>
                         <td><?= $document['tanggal_surat'] ? date('d-m-Y', strtotime($document['tanggal_surat'])) : '<span class="agenda-incomplete">Belum diisi</span>' ?></td>
                         <td><strong><?= $document['nomor_surat'] ? esc($document['nomor_surat']) : '<span class="agenda-incomplete">Belum diisi</span>' ?></strong></td>
@@ -110,7 +110,7 @@
                         <td><?= esc($document['pengirim']) ?></td>
                         <td><div class="disposition-table-tracking"><strong><?= esc($document['disposisi_terakhir']) ?></strong><span><?= $document['waktu_disposisi_terakhir'] ? date('d-m-Y H:i', strtotime($document['waktu_disposisi_terakhir'])) . ' WIB' : 'Waktu belum dicatat' ?></span><em class="disposition-status-badge <?= $statusClass ?>"><?= esc($document['status_disposisi_terakhir']) ?></em></div></td>
                         <td><?= $document['tanggal_diterima'] ? date('d-m-Y', strtotime($document['tanggal_diterima'])) : '-' ?></td>
-                        <td><div class="table-actions"><button type="button" class="icon-btn" title="Lihat dokumen dan riwayat disposisi" data-sdm-document-view='<?= $documentModalJson ?>'>⌕</button><?php if ($canEditDisposition): ?><button type="button" class="icon-btn" title="Edit disposisi" data-sdm-document-edit='<?= $documentModalJson ?>'>✎</button><?php else: ?><span class="disposition-history-only">Riwayat</span><?php endif ?></div></td>
+                        <td><div class="table-actions"><button type="button" class="icon-btn" title="Lihat dokumen dan riwayat disposisi" data-sdm-document-view='<?= $documentModalJson ?>'><?= view('components/table_action_icon', ['icon' => 'view']) ?></button><?php if ($canEditDisposition): ?><button type="button" class="icon-btn" title="Edit disposisi" data-sdm-document-edit='<?= $documentModalJson ?>'><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button><?php else: ?><span class="disposition-history-only">Riwayat</span><?php endif ?></div></td>
                     </tr>
                 <?php endforeach ?>
             <?php endif ?>

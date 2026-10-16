@@ -31,7 +31,7 @@
     </form>
 </section>
 
-<section class="panel register-panel security-register-panel document-archive-table async-table-card" id="securityIncomingTableArea" aria-live="polite">
+<section class="panel register-panel document-register-table-card security-register-panel document-archive-table async-table-card" id="securityIncomingTableArea" aria-live="polite">
     <div class="table-wrap">
         <table>
             <thead>
@@ -59,9 +59,9 @@
                         <td><?= esc($row['penerima'] ?: '-') ?></td>
                         <td><?= esc($row['hari']) ?></td>
                         <td><?= date('d-m-Y', strtotime($row['tanggal'])) ?></td>
-                        <td><span class="pickup-status completed" title="<?= esc($row['pengambilan'], 'attr') ?>"><?= esc($row['pengambilan']) ?></span></td>
+                        <td><span class="pickup-status completed handover-name-chip" title="<?= esc($row['pengambilan'], 'attr') ?>"><?= esc($row['pengambilan']) ?></span></td>
                         <td>
-                            <div class="table-actions"><a class="icon-btn" href="<?= site_url('dokumen-masuk/' . $row['id']) ?>" title="Detail" data-open-detail-modal data-detail-url="<?= site_url('dokumen-masuk/' . $row['id']) ?>">⌕</a><button type="button" class="icon-btn" title="Edit dan kembalikan ke distribusi" data-reopen-progress data-reopen-url="<?= site_url('dokumen-masuk/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen dari <?= esc($row['pengirim'], 'attr') ?>">✎</button></div>
+                            <div class="table-actions"><a class="icon-btn" href="<?= site_url('dokumen-masuk/' . $row['id']) ?>" title="Detail" data-open-detail-modal data-detail-url="<?= site_url('dokumen-masuk/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'view']) ?></a><button type="button" class="icon-btn" title="Edit dan kembalikan ke distribusi" data-reopen-progress data-reopen-url="<?= site_url('dokumen-masuk/' . $row['id'] . '/kembalikan') ?>" data-reopen-label="Dokumen dari <?= esc($row['pengirim'], 'attr') ?>"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button></div>
                         </td>
                     </tr><?php endforeach ?><?php endif ?>
             </tbody>

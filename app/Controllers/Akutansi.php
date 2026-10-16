@@ -151,13 +151,9 @@ class Akutansi extends BaseController
             if ($indicator['label'] === 'IJP CASH BASIS' && isset($manualValues['rka']) && is_string($manualValues['rka'])) {
                 $indicator['rka'] = $manualValues['rka'];
             }
-            $hasCalculation = $indicator['realisasi'] !== null || $indicator['prognosa'] !== null;
-            $indicator['prognosa_ytd'] = $hasCalculation
-                ? LrMoney::add((string) ($indicator['realisasi'] ?? '0.00'), (string) ($indicator['prognosa'] ?? '0.00'))
-                : null;
-            $indicator['persentase_rka'] = $indicator['prognosa_ytd'] !== null && is_string($indicator['rka']) && ! LrMoney::isZero($indicator['rka'])
-                ? LrMoney::divide($indicator['prognosa_ytd'], $indicator['rka'], 18)
-                : null;
+            // Prognosa kumulatif dan persentase menunggu rumus bisnis yang ditetapkan.
+            $indicator['prognosa_ytd'] = null;
+            $indicator['persentase_rka'] = null;
         }
         unset($indicator);
 
@@ -242,9 +238,10 @@ class Akutansi extends BaseController
             ['label' => 'BEBAN KLAIM', 'rka_cell' => 'H17', 'lr_label' => 'JUMLAH BEBAN KLAIM'],
             ['label' => 'CADANGAN KLAIM', 'rka_cell' => 'H18', 'lr_label' => 'Kenaikan (Penurunan) Cadangan Klaim'],
             ['label' => 'SUBROGASI', 'rka_cell' => 'H19', 'lr_label' => 'Pendapatan Subrogasi'],
-            ['label' => 'PENJAMINAN BERSIH', 'rka_cell' => 'H23', 'lr_label' => 'PENJAMINAN BERSIH'],
+            // Realisasi dan PTD untuk dua indikator ini ditetapkan secara manual.
+            ['label' => 'PENJAMINAN BERSIH', 'rka_cell' => 'H23', 'lr_label' => null],
             ['label' => 'BEBAN USAHA', 'rka_cell' => 'H162', 'lr_label' => 'TOTAL BEBAN USAHA'],
-            ['label' => 'EBT', 'rka_cell' => 'H166', 'lr_label' => 'LABA SEBELUM PAJAK'],
+            ['label' => 'EBT', 'rka_cell' => 'H166', 'lr_label' => null],
         ];
     }
 

@@ -3,7 +3,6 @@
 
 $uri = service('uri');
 $segment = $uri->getSegment(1);
-$isWelcomePage = $segment === 'welcome';
 $securityActive = in_array($segment, ['dokumen-masuk', 'dokumen-keluar', 'distribusi-dokumen'], true);
 $agendarisActive = $segment === 'agendaris';
 $accountManagementActive = in_array($segment, ['kelola-akun', 'data-terhapus'], true);
@@ -23,7 +22,6 @@ $akutansiActive = $segment === 'akutansi';
 $akutansiPage = $akutansiActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : '';
 $agendarisPage = $agendarisActive && $uri->getTotalSegments() >= 2 ? $uri->getSegment(2) : 'surat-masuk';
 $pageClasses = [];
-$pageClasses[] = $isWelcomePage ? 'welcome-page' : '';
 if ($segment === 'distribusi-dokumen') {
     $pageClasses[] = 'distribution-page';
 }
@@ -54,6 +52,7 @@ $success = session()->getFlashdata('success');
 $syncSuccess = session()->getFlashdata('sync_success');
 $successToast = $syncSuccess ?: $success;
 $successToastTitle = $syncSuccess ? 'Sinkronisasi berhasil' : 'Berhasil';
+$welcomeModal = (bool) session()->getFlashdata('welcome_modal');
 $error   = session()->getFlashdata('error');
 $errors  = session()->getFlashdata('errors') ?? [];
 $resolveOptimizedAsset = static function (string $source, string $optimized): string {
@@ -77,8 +76,8 @@ $appCssVersion = $assetVersion($appCssAsset);
 $flowuiThemeVersion = $assetVersion('assets/flowui-theme.css');
 $jaksaBackgroundVersion = $assetVersion('assets/jaksa-background.css');
 $sidebarLogoVersion = $assetVersion('assets/images/jaksa-sidebar-logo-selected.png');
-$welcomeMotionVersion = $assetVersion('assets/welcome-motion.css');
-$welcomeFluidVersion = $assetVersion('assets/welcome-fluid-simulation.js');
+$welcomeLogoVersion = $assetVersion('assets/images/landing-jaksa-logo-photoroom.webp');
+$welcomeBackgroundVersion = $assetVersion('assets/images/welcome-corporate-wave.png');
 $appJsVersion = $assetVersion($appJsAsset);
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
 $urlMaskVersion = $assetVersion($urlMaskAsset);
@@ -125,23 +124,18 @@ if ($currentRole === 'security') {
     <meta name="description" content="Sistem register dokumen masuk operasional">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
     <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= base_url($appCssAsset) ?>?v=<?= esc($appCssVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/flowui-theme.css') ?>?v=<?= esc($flowuiThemeVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/jaksa-background.css') ?>?v=<?= esc($jaksaBackgroundVersion, 'attr') ?>">
-    <?php if ($segment === 'welcome'): ?>
-        <link rel="stylesheet" href="<?= base_url('assets/welcome-motion.css') ?>?v=<?= esc($welcomeMotionVersion, 'attr') ?>">
-    <?php endif; ?>
     <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>
     <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
     <script>
         try {
-            const isWelcomePage = <?= $segment === 'welcome' ? 'true' : 'false' ?>;
-            if (window.innerWidth > 900) {
-                if (isWelcomePage) {
-                    localStorage.setItem('j-operasional-sidebar', 'expanded');
-                } else if (localStorage.getItem('j-operasional-sidebar') === 'collapsed') {
-                    document.documentElement.classList.add('sidebar-collapsed');
-                }
+            if (window.innerWidth > 900 && localStorage.getItem('j-operasional-sidebar') === 'collapsed') {
+                document.documentElement.classList.add('sidebar-collapsed');
             }
         } catch (error) {}
     </script>
@@ -161,9 +155,20 @@ if ($currentRole === 'security') {
             <button type="button" data-success-toast-close aria-label="Tutup notifikasi">×</button>
         </div>
     <?php endif ?>
+    <?php if ($welcomeModal): ?>
+        <div class="welcome-modal" data-welcome-modal role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
+            <section class="welcome-modal-card" style="--welcome-modal-background: url('<?= base_url('assets/images/welcome-corporate-wave.png') ?>?v=<?= esc($welcomeBackgroundVersion, 'attr') ?>');">
+                <img class="welcome-modal-logo" src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>?v=<?= esc($welcomeLogoVersion, 'attr') ?>" width="640" height="220" alt="JAKSA" decoding="async">
+                <p class="welcome-modal-kicker">JAKSA OPERASIONAL</p>
+                <h2 id="welcomeModalTitle">Selamat Datang,<br><strong><?= esc($displayName !== '' ? $displayName : 'Pengguna') ?></strong></h2>
+                <p class="welcome-modal-message">Sistem siap membantu aktivitas operasional Anda hari ini.</p>
+                <div class="welcome-modal-role"><span aria-hidden="true">●</span><div><small>AKSES ANDA</small><strong><?= esc($roleLabel) ?></strong></div></div>
+                <button type="button" class="welcome-modal-start" data-welcome-modal-close>Mulai <span aria-hidden="true">→</span></button>
+            </section>
+        </div>
+    <?php endif ?>
     <div class="jaksa-bg-ornaments" aria-hidden="true"><span class="arc-left-bottom"></span><span class="arc-right-mid"></span></div>
     <div class="app-shell">
-        <?php if (! $isWelcomePage): ?>
         <aside class="sidebar" id="sidebar">
             <a href="<?= site_url(\Config\UserRoles::defaultRoute($currentRole)) ?>" class="brand brand-jaksa" aria-label="Halaman awal JAKSA — Jamkrindo Kanwil Surabaya Operasional">
                 <img class="brand-jaksa-wordmark" src="<?= base_url('assets/images/jaksa-sidebar-logo-selected.png') ?>?v=<?= esc($sidebarLogoVersion, 'attr') ?>" width="2138" height="736" alt="JAKSA" decoding="async">
@@ -174,7 +179,7 @@ if ($currentRole === 'security') {
                 <p class="nav-label">MENU UTAMA</p>
                 <?php if ($showDashboardMenu): ?>
                 <a href="<?= site_url('dashboard') ?>" class="nav-link <?= $segment === 'dashboard' ? 'active' : '' ?>" title="Dashboard">
-                    <span class="nav-icon icon-dashboard" aria-hidden="true"><i>◆</i></span>
+                    <span class="nav-icon icon-dashboard" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /></svg></span>
                     <span class="nav-link-text">Dashboard</span>
                 </a>
                 <?php endif ?>
@@ -341,6 +346,10 @@ if ($currentRole === 'security') {
                             <span aria-hidden="true">●</span>
                             Simulasi Hitung
                         </a>
+                        <a href="<?= site_url('akutansi/bukti-bayar') ?>" class="nav-sublink <?= $akutansiPage === 'bukti-bayar' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Bukti Bayar
+                        </a>
                         <a href="<?= site_url('akutansi/laba-rugi') ?>" class="nav-sublink <?= in_array($akutansiPage, ['laba-rugi', 'bopo-ytd', 'bopo-ptd'], true) ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Laporan Laba / Rugi
@@ -387,10 +396,8 @@ if ($currentRole === 'security') {
         </aside>
 
         <button class="sidebar-backdrop" type="button" data-sidebar-close aria-label="Tutup menu"></button>
-        <?php endif; ?>
 
         <div class="content-shell">
-            <?php if (! $isWelcomePage): ?>
             <header class="topbar">
                 <button class="menu-toggle" type="button" data-sidebar-toggle aria-label="Tutup menu" aria-controls="sidebar" aria-expanded="true"><span aria-hidden="true">☰</span></button>
                 <div class="topbar-title">
@@ -484,7 +491,6 @@ if ($currentRole === 'security') {
                     </div>
                 </div>
             </header>
-            <?php endif; ?>
 
             <main class="main-content">
                 <?php if ($error): ?>
@@ -509,12 +515,10 @@ if ($currentRole === 'security') {
                 <?= $this->renderSection('content') ?>
             </main>
 
-            <?php if (! $isWelcomePage): ?>
             <footer class="footer">
                 <span>Register Operasional · <?= date('Y') ?></span>
                 <span>Waktu sistem: Asia/Jakarta</span>
             </footer>
-            <?php endif; ?>
         </div>
     </div>
     <?php if ($canAccessSecurity && $incomingWorkspace): ?>
@@ -576,10 +580,17 @@ if ($currentRole === 'security') {
                 }
             }, true);
         })();
+
+        (() => {
+            const welcomeModal = document.querySelector('[data-welcome-modal]');
+            if (!welcomeModal) return;
+
+            welcomeModal.querySelectorAll('[data-welcome-modal-close]').forEach((button) => {
+                button.addEventListener('click', () => welcomeModal.remove());
+            });
+        })();
+
     </script>
     <script src="<?= base_url($appJsAsset) ?>?v=<?= esc($appJsVersion, 'attr') ?>"></script>
-    <?php if ($segment === 'welcome'): ?>
-        <script src="<?= base_url('assets/welcome-fluid-simulation.js') ?>?v=<?= esc($welcomeFluidVersion, 'attr') ?>"></script>
-    <?php endif; ?>
 </body>
 </html>

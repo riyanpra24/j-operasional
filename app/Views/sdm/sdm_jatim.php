@@ -97,11 +97,11 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
                 <input id="attendance_to" type="date" name="sampai" value="<?= esc($attendanceFilters['to'] ?? '', 'attr') ?>" min="<?= esc($report['period_start'] ?? '', 'attr') ?>" max="<?= esc($report['period_end'] ?? '', 'attr') ?>">
             </div>
             <input type="hidden" name="per_page" value="<?= (int) $attendancePagination['per_page'] ?>">
-            <div class="sdm-daily-filter-actions">
+            <div class="filter-actions">
                 <button type="submit" class="btn btn-primary">Tampilkan</button>
                 <a href="<?= site_url('sdm/data-kehadiran' . ($selectedImportId !== null ? '?import_id=' . (int) $selectedImportId : '')) ?>" class="btn btn-ghost">Reset</a>
-                <details class="sdm-daily-menu">
-                    <summary class="sdm-daily-menu-trigger" aria-label="Menu tindakan" title="Menu tindakan">
+                <details class="lr-action-menu lr-filter-menu">
+                    <summary class="lr-filter-menu-trigger" aria-label="Menu tindakan" title="Menu tindakan">
                         <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
                             <rect x="3" y="3" width="7" height="7" rx="1.4"></rect>
                             <rect x="14" y="3" width="7" height="7" rx="1.4"></rect>
@@ -109,10 +109,10 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
                             <rect x="14" y="14" width="7" height="7" rx="1.4"></rect>
                         </svg>
                     </summary>
-                    <div class="sdm-daily-menu-list">
+                    <div class="lr-action-menu-popover">
                         <button type="button" data-open-attendance-upload>Unggah Laporan Kehadiran</button>
                         <?php if ($attendanceImports !== []): ?><button type="button" data-open-attendance-export>Ekspor Rekap Kehadiran</button><?php endif ?>
-                        <span class="sdm-daily-menu-divider" aria-hidden="true"></span>
+                        <span class="lr-action-menu-divider" aria-hidden="true"></span>
                         <button type="button" class="is-danger" data-open-attendance-delete>Hapus Laporan Kehadiran</button>
                     </div>
                 </details>

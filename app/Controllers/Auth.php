@@ -19,7 +19,7 @@ class Auth extends BaseController
             $expiresAt = (int) session()->get('auth_expires_at');
 
             if ($expiresAt > time()) {
-                return redirect()->to(site_url('welcome'));
+                return redirect()->to(site_url(UserRoles::defaultRoute((string) session()->get('auth_role'))));
             }
 
             $this->clearAuthentication();
@@ -106,7 +106,8 @@ class Auth extends BaseController
 
         $this->establishAuthentication($user, $role, $expiresAt, $sessionLock['token']);
 
-        return redirect()->to(site_url('welcome'))->with('success', 'Selamat datang, ' . $user['display_name'] . '.');
+        return redirect()->to(site_url(UserRoles::defaultRoute($role)))
+            ->with('welcome_modal', true);
     }
 
     public function takeoverAdminSession(): RedirectResponse
@@ -188,8 +189,8 @@ class Auth extends BaseController
             'userId' => $userId,
         ]);
 
-        return redirect()->to(site_url('welcome'))
-            ->with('success', 'Perangkat lain berhasil dikeluarkan. Anda sekarang login sebagai ' . $user['display_name'] . '.');
+        return redirect()->to(site_url(UserRoles::defaultRoute('admin')))
+            ->with('welcome_modal', true);
     }
 
     public function logout(): RedirectResponse

@@ -7,22 +7,17 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<section class="page-heading heading-actions distribution-heading">
+<section class="page-heading heading-actions distribution-heading security-page-heading">
     <div>
         <p class="eyebrow">AGENDARIS</p>
         <h1>Progres Dokumen</h1>
-        <p>Kelola Dokumen Masuk dan tandai sebagai Selesai untuk memindahkannya ke arsip Dokumen Masuk.</p>
     </div>
-    <div class="heading-button-group agendaris-heading-actions">
-        <form method="post" action="<?= site_url('agendaris/progres-dokumen-masuk/sinkronkan') ?>">
-            <?= csrf_field() ?>
-            <button type="submit" class="btn btn-secondary btn-agendaris-sync" title="Buat ulang Dokumen Masuk yang hilang dari data Security">↻ Sinkronkan</button>
-        </form>
-        <button type="button" class="btn btn-primary" data-agendaris-add>＋ Tambah Dokumen Masuk</button>
-    </div>
+    <?= view('agendaris/progres_tabs', ['activeTab' => 'masuk', 'counts' => $tabCounts]) ?>
 </section>
 
-<?= view('agendaris/progres_tabs', ['activeTab' => 'masuk']) ?>
+<form id="incomingProgressSyncForm" method="post" action="<?= site_url('agendaris/progres-dokumen-masuk/sinkronkan') ?>" hidden>
+    <?= csrf_field() ?>
+</form>
 
 <section class="panel filter-panel security-filter-panel">
     <form method="get" action="<?= site_url('agendaris/progres-dokumen') ?>" class="agendaris-filter-form">
@@ -36,11 +31,11 @@
         <div class="form-group"><label for="incoming_progress_sampai">Sampai tanggal diterima</label><input id="incoming_progress_sampai" type="date" name="sampai" value="<?= esc($filters['to']) ?>"></div>
         <?= view('components/list_order_filter', ['id' => 'incoming_progress_urutan', 'value' => $filters['order']]) ?>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
-        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen') ?>" class="btn btn-ghost">Reset</a></div>
+        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen') ?>" class="btn btn-ghost">Reset</a><details class="lr-action-menu lr-filter-menu"><summary class="lr-filter-menu-trigger" aria-label="Menu tindakan Progres Dokumen Masuk" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><rect x="14" y="14" width="7" height="7" rx="1.4"></rect></svg></summary><div class="lr-action-menu-popover" role="menu" aria-label="Menu Progres Dokumen Masuk"><button type="button" role="menuitem" class="lr-action-menu-item" data-agendaris-add>Tambah Dokumen Masuk</button><span class="lr-action-menu-divider" aria-hidden="true"></span><button type="submit" form="incomingProgressSyncForm" role="menuitem" class="lr-action-menu-item">Sinkronkan Dokumen</button></div></details></div>
     </form>
 </section>
 
-<section class="panel register-panel agendaris-table-panel progress-document-panel security-register-panel">
+<section class="panel register-panel agendaris-table-panel agenda-document-table-card progress-document-panel security-register-panel">
     <div class="table-wrap">
         <table>
             <thead>
@@ -86,9 +81,9 @@
                             <td><span class="pickup-status <?= $completed ? 'completed' : 'pending' ?>"><?= esc($row['progres'] ?? 'Menunggu Penyelesaian') ?></span></td>
                             <td>
                                 <div class="table-actions">
-                                    <button type="button" class="icon-btn" title="Detail" data-agendaris-view data-agendaris-url="<?= site_url('agendaris/progres-dokumen-masuk/' . $row['id']) ?>">⌕</button>
-                                    <button type="button" class="icon-btn" title="Ubah" data-agendaris-edit data-agendaris-url="<?= site_url('agendaris/progres-dokumen-masuk/' . $row['id']) ?>">✎</button>
-                                    <button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-agendaris-delete data-delete-url="<?= site_url('agendaris/progres-dokumen-masuk/' . $row['id'] . '/hapus') ?>" data-delete-label="<?= esc($row['nomor_surat'] ?: 'Belum diisi', 'attr') ?>">×</button>
+                                    <button type="button" class="icon-btn" title="Detail" data-agendaris-view data-agendaris-url="<?= site_url('agendaris/progres-dokumen-masuk/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'view']) ?></button>
+                                    <button type="button" class="icon-btn" title="Ubah" data-agendaris-edit data-agendaris-url="<?= site_url('agendaris/progres-dokumen-masuk/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button>
+                                    <button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-agendaris-delete data-delete-url="<?= site_url('agendaris/progres-dokumen-masuk/' . $row['id'] . '/hapus') ?>" data-delete-label="<?= esc($row['nomor_surat'] ?: 'Belum diisi', 'attr') ?>"><?= view('components/table_action_icon', ['icon' => 'delete']) ?></button>
                                 </div>
                             </td>
                         </tr><?php endforeach ?>

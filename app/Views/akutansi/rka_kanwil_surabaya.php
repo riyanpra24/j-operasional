@@ -1,22 +1,10 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 <?php
-$rkaLobs = $rkaLobs ?? array_values(array_filter($schema['columns'], static fn (string $label): bool => $label !== 'TOTAL'));
+$rkaLobs = $rkaLobs ?? array_values(array_filter($schema['columns'], static fn(string $label): bool => $label !== 'TOTAL'));
 $selectedLobs = $selectedLobs ?? $rkaLobs;
 ?>
 
-<section class="page-heading lr-page-heading lr-rka-heading">
-    <div>
-        <p class="eyebrow">AKUTANSI</p>
-        <h1>RKA Kanwil Surabaya</h1>
-        <p>Rencana Kerja dan Anggaran per unit kerja dan tahun, sesuai Template RKA.</p>
-    </div>
-    <div class="lr-rka-heading-actions">
-        <button type="button" class="btn btn-primary" data-rka-settings-open aria-haspopup="dialog" aria-controls="rkaSettingsDialog">
-            <span aria-hidden="true">⚙</span> Seting RKA Kanwil Surabaya
-        </button>
-    </div>
-</section>
 
 <?= view('akutansi/partials/rka_filter', compact('rkaUnits', 'selectedUnit', 'selectedYear', 'record', 'revision', 'rkaLobs', 'selectedLobs') + ['filterAction' => site_url('akutansi/rka-kanwil-surabaya')]) ?>
 <?= view('akutansi/partials/rka_table', compact('schema', 'selectedUnit', 'selectedYear', 'inputs', 'calculated', 'selectedLobs') + ['editable' => false, 'idPrefix' => 'lr']) ?>

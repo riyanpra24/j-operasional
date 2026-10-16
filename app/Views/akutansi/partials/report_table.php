@@ -63,7 +63,6 @@ unset($row);
 <section class="panel lr-report-panel lr-profitloss-report-panel table-title-flat" aria-labelledby="lr-report-title">
     <header class="lr-report-header table-title-flat__header">
         <div>
-            <p class="lr-report-kicker">REKAP LABA / RUGI</p>
             <h2 id="lr-report-title"><?= esc($selectedUnit ?? 'Korporat Kanwil') ?> · <?= esc($reportPeriod) ?></h2>
         </div>
         <span class="lr-report-status <?= $hasRka ? 'is-available' : 'is-unavailable' ?>"><?= $hasRka ? 'RKA tersedia' : 'RKA belum tersedia' ?></span>

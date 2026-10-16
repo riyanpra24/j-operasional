@@ -1270,12 +1270,8 @@
     // Security lainnya tetap dikunci.
     const agendaSourceFieldNames = ['tanggal_diterima', 'penerima', 'pengambilan', 'jenis'];
     const agendaDispositionStages = agendaFormModal?.querySelectorAll('[data-disposition-form-stage]') || [];
-    const agendaEditHistoryButton = agendaFormModal?.querySelector('[data-agendaris-edit-history-open]');
-    const agendaEditHistoryModal = document.querySelector('#agendarisDispositionHistoryModal');
-    const agendaEditHistory = agendaEditHistoryModal?.querySelector('[data-agendaris-edit-history]');
     const agendaLastStep = agendaStepPanels.length || 1;
     let agendaCurrentStep = 1;
-    let agendaEditHistoryReturnFocus = null;
 
     const currentDateLocal = () => {
         const now = new Date();
@@ -1318,46 +1314,6 @@
             field.add(legacyOption);
         }
         field.value = recipient;
-    };
-
-    const renderAgendaEditHistory = (timeline = []) => {
-        if (!agendaEditHistory || !agendaEditHistoryButton) return;
-        const filled = timeline.filter((item) => item.terisi);
-        agendaEditHistoryButton.hidden = filled.length === 0;
-        agendaEditHistoryButton.setAttribute('aria-expanded', 'false');
-        agendaEditHistory.innerHTML = filled.map((item) => {
-            const status = item.status || 'Menunggu';
-            const statusClass = ({ Menunggu:'pending', Diterima:'received', Diproses:'active', Diteruskan:'forwarded', Selesai:'completed' }[status] || 'empty');
-            return `<article class="disposition-detail-item filled">
-                <span class="disposition-detail-dot">${String(item.urutan).padStart(2, '0')}</span>
-                <div class="disposition-detail-card">
-                    <header><div><h3>${escapeHtml(item.penerima)}</h3><time>${escapeHtml(item.waktu)}</time></div><span class="disposition-status-badge ${statusClass}">${escapeHtml(status)}</span></header>
-                    <p>${escapeHtml(item.catatan)}</p>
-                </div>
-            </article>`;
-        }).join('');
-    };
-
-    const closeAgendaEditHistory = () => {
-        if (!agendaEditHistoryModal || agendaEditHistoryModal.hidden) return;
-        agendaEditHistoryModal.classList.remove('open');
-        agendaEditHistoryModal.setAttribute('aria-hidden', 'true');
-        agendaEditHistoryButton?.setAttribute('aria-expanded', 'false');
-        window.setTimeout(() => {
-            agendaEditHistoryModal.hidden = true;
-            agendaEditHistoryReturnFocus?.focus();
-            agendaEditHistoryReturnFocus = null;
-        }, 180);
-    };
-
-    const openAgendaEditHistory = () => {
-        if (!agendaEditHistoryModal || !agendaEditHistoryButton || agendaEditHistoryButton.hidden) return;
-        agendaEditHistoryReturnFocus = document.activeElement;
-        agendaEditHistoryModal.hidden = false;
-        agendaEditHistoryModal.setAttribute('aria-hidden', 'false');
-        agendaEditHistoryButton.setAttribute('aria-expanded', 'true');
-        requestAnimationFrame(() => agendaEditHistoryModal.classList.add('open'));
-        window.setTimeout(() => agendaEditHistoryModal.querySelector('.modal-close')?.focus(), 120);
     };
 
     agendaDispositionStages.forEach((stage) => {
@@ -1422,7 +1378,6 @@
 
     const closeAgendaForm = () => {
         if (!agendaFormModal) return;
-        closeAgendaEditHistory();
         agendaFormModal.classList.remove('open');
         agendaFormModal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
@@ -1457,7 +1412,6 @@
         setAgendaSourceLock(false);
         setAgendaLink(true);
         setAgendaNumberState(false);
-        renderAgendaEditHistory([]);
         refreshDispositionForm();
         agendaErrors.hidden = true;
         agendaStatus.textContent = '';
@@ -1486,7 +1440,6 @@
         agendaFormTitle.textContent = 'Edit Surat Masuk';
         agendaSubmit.textContent = 'Simpan perubahan';
         agendaStatus.textContent = 'Memuat data...';
-        renderAgendaEditHistory([]);
         showAgendaForm();
 
         try {
@@ -1509,7 +1462,6 @@
                 agendaForm.elements[`disposisi_${step}_catatan`].value = data[`disposisi_${step}_catatan_value`] || '';
             }
             agendaForm.elements.progres.value = data.progres || 'Menunggu Penyelesaian';
-            renderAgendaEditHistory(data.disposisi_timeline || []);
             setAgendaSourceLock(Boolean(data.source_locked));
             setAgendaLink(true, data.berkas_link || '');
             setAgendaNumberState(Boolean(data.nomor_agendaris_value));
@@ -1524,14 +1476,6 @@
     document.querySelector('[data-agendaris-add]')?.addEventListener('click', openAgendaCreate);
     document.querySelectorAll('[data-agendaris-edit]').forEach((button) => button.addEventListener('click', () => openAgendaEdit(button.dataset.agendarisUrl)));
     agendaFormModal?.querySelectorAll('[data-agendaris-form-close]').forEach((button) => button.addEventListener('click', closeAgendaForm));
-    agendaEditHistoryButton?.addEventListener('click', openAgendaEditHistory);
-    agendaEditHistoryModal?.querySelectorAll('[data-agendaris-edit-history-close]').forEach((button) => button.addEventListener('click', closeAgendaEditHistory));
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && agendaEditHistoryModal?.classList.contains('open')) {
-            event.stopImmediatePropagation();
-            closeAgendaEditHistory();
-        }
-    });
     agendaStepNext?.addEventListener('click', () => {
         agendaErrors.hidden = true;
         if (!validateAgendaStep(agendaCurrentStep)) return;
@@ -2342,6 +2286,17 @@
     });
 })();
 
+// Standar aksi filter: Filter, Reset, dan menu kotak untuk aksi tambahan.
+(() => {
+    document.querySelectorAll('.filter-panel form .filter-actions').forEach((actions) => {
+        if (actions.querySelector('.lr-filter-menu')) return;
+        const menu = document.createElement('details');
+        menu.className = 'lr-action-menu lr-filter-menu';
+        menu.innerHTML = '<summary class="lr-filter-menu-trigger" aria-label="Menu tindakan filter" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><rect x="14" y="14" width="7" height="7" rx="1.4"></rect></svg></summary><div class="lr-action-menu-popover" role="menu" aria-label="Menu filter"><span class="lr-filter-menu-empty">Tidak ada aksi tambahan.</span></div>';
+        actions.append(menu);
+    });
+})();
+
 // Rekap Laba/Rugi: edit nilai dalam tabel pop-up, lalu hitung ulang kolom formula secara langsung.
 (() => {
     const dialog = document.querySelector('#lrRecapEditDialog');
@@ -2416,312 +2371,6 @@
 })();
 
 (() => {
-    const scene = document.querySelector('[data-welcome-scene]');
-    if (!scene) return;
-
-    const card = scene.querySelector('[data-welcome-card]');
-    const particleLayer = scene.querySelector('[data-welcome-particles]');
-    const liquidCanvas = scene.querySelector('[data-welcome-liquid]');
-    const emblem = scene.querySelector('[data-welcome-emblem]');
-    const status = scene.querySelector('[data-welcome-status]');
-    const depthElements = scene.querySelectorAll('[data-welcome-depth]');
-    const dragTargets = scene.querySelectorAll('[data-welcome-drag]');
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let activeDrag = null;
-    let draggedUntil = 0;
-    let ripplePointerId = null;
-    let lastRippleAt = 0;
-    let lastRipplePoint = null;
-    const returnTimers = new WeakMap();
-    const liquidContext = liquidCanvas?.getContext('2d');
-    const liquidRipples = [];
-    let liquidFrame = 0;
-
-    const resizeLiquidCanvas = () => {
-        if (!liquidCanvas || !liquidContext) return;
-        const bounds = scene.getBoundingClientRect();
-        const ratio = Math.min(window.devicePixelRatio || 1, 2);
-        liquidCanvas.width = Math.max(1, Math.round(bounds.width * ratio));
-        liquidCanvas.height = Math.max(1, Math.round(bounds.height * ratio));
-        liquidContext.setTransform(ratio, 0, 0, ratio, 0, 0);
-    };
-
-    const drawLiquid = (now) => {
-        if (!liquidCanvas || !liquidContext) return;
-        const bounds = scene.getBoundingClientRect();
-        liquidContext.clearRect(0, 0, bounds.width, bounds.height);
-
-        for (let index = liquidRipples.length - 1; index >= 0; index -= 1) {
-            const ripple = liquidRipples[index];
-            const age = (now - ripple.startedAt) / 1450;
-            if (age >= 1) {
-                liquidRipples.splice(index, 1);
-                continue;
-            }
-
-            const fade = Math.pow(1 - age, 1.65);
-            const radius = 10 + age * (142 + ripple.energy * 38);
-            const isWake = ripple.isDrag;
-            const glow = liquidContext.createRadialGradient(ripple.x, ripple.y, 0, ripple.x, ripple.y, 36 + age * 42);
-            glow.addColorStop(0, `rgba(235, 252, 255, ${.11 * fade})`);
-            glow.addColorStop(.45, `rgba(151, 222, 242, ${.045 * fade})`);
-            glow.addColorStop(1, 'rgba(151, 222, 242, 0)');
-            liquidContext.fillStyle = glow;
-            liquidContext.beginPath();
-            liquidContext.ellipse(ripple.x, ripple.y, radius * .58, radius * .22, 0, 0, Math.PI * 2);
-            liquidContext.fill();
-
-            for (let ring = 0; ring < 3; ring += 1) {
-                const ringAge = age - ring * .11;
-                if (ringAge <= 0) continue;
-                const ringRadius = 8 + ringAge * (136 + ripple.energy * 34);
-                const ringFade = Math.pow(Math.max(0, 1 - ringAge), 1.6) * (.78 - ring * .14);
-                const xRadius = isWake ? ringRadius * .44 : ringRadius;
-                const yRadius = isWake ? ringRadius * .76 : Math.max(4, ringRadius * .29);
-                liquidContext.beginPath();
-                liquidContext.ellipse(ripple.x, ripple.y, xRadius, yRadius, isWake ? ripple.angle : 0, 0, Math.PI * 2);
-                liquidContext.strokeStyle = `rgba(224, 252, 255, ${ringFade})`;
-                liquidContext.lineWidth = Math.max(.75, 1.7 - ring * .25);
-                liquidContext.shadowColor = `rgba(30, 167, 208, ${ringFade * .62})`;
-                liquidContext.shadowBlur = 8;
-                liquidContext.stroke();
-            }
-            liquidContext.shadowBlur = 0;
-        }
-
-        liquidFrame = liquidRipples.length ? window.requestAnimationFrame(drawLiquid) : 0;
-    };
-
-    const createLiquidRipple = (event, isDrag = false) => {
-        if (!liquidContext || reduceMotion) return;
-        const bounds = scene.getBoundingClientRect();
-        const x = event.clientX - bounds.left;
-        const y = event.clientY - bounds.top;
-        const previous = lastRipplePoint;
-        const angle = previous ? Math.atan2(y - previous.y, x - previous.x) + Math.PI / 2 : 0;
-        const distance = previous ? Math.hypot(x - previous.x, y - previous.y) : 0;
-        liquidRipples.push({
-            x,
-            y,
-            angle,
-            isDrag,
-            energy: isDrag ? Math.min(1.05, .4 + distance / 38) : 1,
-            startedAt: performance.now(),
-        });
-        if (!liquidFrame) liquidFrame = window.requestAnimationFrame(drawLiquid);
-        lastRippleAt = performance.now();
-        lastRipplePoint = { x, y };
-    };
-
-    if (liquidContext && !reduceMotion) {
-        resizeLiquidCanvas();
-        new ResizeObserver(resizeLiquidCanvas).observe(scene);
-        scene.addEventListener('pointerdown', (event) => {
-            if (event.button > 0 || event.target.closest('[data-welcome-drag], .welcome-start, .welcome-balloon')) return;
-            ripplePointerId = event.pointerId;
-            scene.setPointerCapture?.(event.pointerId);
-            createLiquidRipple(event);
-        });
-
-        scene.addEventListener('pointermove', (event) => {
-            if (ripplePointerId !== event.pointerId) return;
-            const bounds = scene.getBoundingClientRect();
-            const x = event.clientX - bounds.left;
-            const y = event.clientY - bounds.top;
-            const distance = lastRipplePoint ? Math.hypot(x - lastRipplePoint.x, y - lastRipplePoint.y) : Infinity;
-            if (performance.now() - lastRippleAt > 52 && distance > 12) createLiquidRipple(event, true);
-        });
-
-        const stopRipples = (event) => {
-            if (ripplePointerId !== event.pointerId) return;
-            scene.releasePointerCapture?.(event.pointerId);
-            ripplePointerId = null;
-            lastRipplePoint = null;
-        };
-        scene.addEventListener('pointerup', stopRipples);
-        scene.addEventListener('pointercancel', stopRipples);
-    }
-
-    if (particleLayer) {
-        const sparkColors = ['#dff7ff', '#55c9ff', '#6ee3bc', '#ffe58b'];
-        const placeBalloon = (balloon, index, generation) => {
-            balloon.style.setProperty('--x', `${5 + ((index * 37 + generation * 23) % 89)}%`);
-            balloon.style.setProperty('--y', `${7 + ((index * 53 + generation * 31) % 80)}%`);
-            balloon.style.setProperty('--size', `${15 + ((index * 7 + generation * 3) % 18)}px`);
-            balloon.style.setProperty('--delay', `${(index % 8) * -0.65}s`);
-            balloon.style.setProperty('--duration', `${7.6 + ((index * 11) % 34) / 10}s`);
-        };
-
-        const createPopEffect = (balloon) => {
-            const layerBounds = particleLayer.getBoundingClientRect();
-            const balloonBounds = balloon.getBoundingClientRect();
-            const x = balloonBounds.left - layerBounds.left + (balloonBounds.width / 2);
-            const y = balloonBounds.top - layerBounds.top + (balloonBounds.height / 2);
-            const ring = document.createElement('i');
-            ring.className = 'welcome-balloon-pop-ring';
-            ring.style.setProperty('--x', `${x}px`);
-            ring.style.setProperty('--y', `${y}px`);
-            particleLayer.appendChild(ring);
-
-            Array.from({ length: 10 }).forEach((_, index) => {
-                const angle = (Math.PI * 2 * index / 10) + (Math.random() * .35);
-                const distance = 30 + Math.random() * 46;
-                const spark = document.createElement('i');
-                spark.className = 'welcome-balloon-spark';
-                spark.style.setProperty('--x', `${x}px`);
-                spark.style.setProperty('--y', `${y}px`);
-                spark.style.setProperty('--burst-x', `${Math.cos(angle) * distance}px`);
-                spark.style.setProperty('--burst-y', `${Math.sin(angle) * distance}px`);
-                spark.style.setProperty('--color', sparkColors[index % sparkColors.length]);
-                particleLayer.appendChild(spark);
-                window.setTimeout(() => spark.remove(), 720);
-            });
-            window.setTimeout(() => ring.remove(), 640);
-        };
-
-        const createBalloon = (index, generation = 0) => {
-            const balloon = document.createElement('button');
-            balloon.type = 'button';
-            balloon.className = 'welcome-balloon';
-            balloon.setAttribute('aria-label', 'Pecahkan balon');
-            balloon.dataset.balloonTone = ['gold', 'blue', 'mint'][index % 3];
-            balloon.dataset.balloonMotion = ['one', 'two', 'three', 'four'][index % 4];
-            placeBalloon(balloon, index, generation);
-            if (generation > 0 && !reduceMotion) {
-                balloon.classList.add('is-entering');
-                window.setTimeout(() => balloon.classList.remove('is-entering'), 800);
-            }
-
-            balloon.addEventListener('pointerdown', (event) => event.stopPropagation());
-            balloon.addEventListener('click', (event) => {
-                event.stopPropagation();
-                if (balloon.classList.contains('is-popped')) return;
-
-                balloon.classList.add('is-popped');
-                if (!reduceMotion) createPopEffect(balloon);
-
-                window.setTimeout(() => {
-                    balloon.remove();
-                    if (particleLayer.isConnected) particleLayer.appendChild(createBalloon(index, generation + 1));
-                }, reduceMotion ? 80 : 560);
-            });
-            return balloon;
-        };
-
-        Array.from({ length: 16 }).forEach((_, index) => {
-            particleLayer.appendChild(createBalloon(index));
-        });
-    }
-
-    if (card && !reduceMotion && window.matchMedia('(pointer: fine)').matches) {
-        scene.addEventListener('pointermove', (event) => {
-            const bounds = scene.getBoundingClientRect();
-            const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - 0.5) * 2));
-            const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - 0.5) * 2));
-            card.style.transform = `perspective(1200px) translate3d(${x * 5}px, ${y * 4}px, 0) rotateX(${y * -2.2}deg) rotateY(${x * 2.8}deg)`;
-            particleLayer?.style.setProperty('--welcome-bubble-shift-x', `${x * 11}px`);
-            particleLayer?.style.setProperty('--welcome-bubble-shift-y', `${y * 8}px`);
-            depthElements.forEach((element) => {
-                const depth = Number(element.dataset.welcomeDepth || 1);
-                element.style.setProperty('--welcome-parallax-x', `${x * depth * 8}px`);
-                element.style.setProperty('--welcome-parallax-y', `${y * depth * 6}px`);
-            });
-        });
-        scene.addEventListener('pointerleave', () => {
-            card.style.transform = '';
-            particleLayer?.style.setProperty('--welcome-bubble-shift-x', '0px');
-            particleLayer?.style.setProperty('--welcome-bubble-shift-y', '0px');
-            depthElements.forEach((element) => {
-                element.style.setProperty('--welcome-parallax-x', '0px');
-                element.style.setProperty('--welcome-parallax-y', '0px');
-            });
-        });
-    }
-
-    dragTargets.forEach((target) => {
-        const releaseDrag = () => {
-            target.classList.remove('is-dragging');
-        };
-
-        target.addEventListener('dragstart', (event) => event.preventDefault());
-
-        target.addEventListener('pointerdown', (event) => {
-            if (reduceMotion || event.button > 0) return;
-            event.preventDefault();
-            window.clearTimeout(returnTimers.get(target));
-            target.classList.remove('is-returning');
-            activeDrag = {
-                target,
-                startX: event.clientX,
-                startY: event.clientY,
-                baseX: Number(target.dataset.welcomeDragX || 0),
-                baseY: Number(target.dataset.welcomeDragY || 0),
-                moved: false,
-            };
-            target.setPointerCapture?.(event.pointerId);
-            target.classList.add('is-dragging');
-        });
-
-        target.addEventListener('pointermove', (event) => {
-            if (!activeDrag || activeDrag.target !== target) return;
-            event.preventDefault();
-            const x = activeDrag.baseX + event.clientX - activeDrag.startX;
-            const y = activeDrag.baseY + event.clientY - activeDrag.startY;
-            activeDrag.moved ||= Math.abs(x - activeDrag.baseX) > 5 || Math.abs(y - activeDrag.baseY) > 5;
-            target.dataset.welcomeDragX = String(x);
-            target.dataset.welcomeDragY = String(y);
-            target.style.setProperty('--welcome-drag-x', `${x}px`);
-            target.style.setProperty('--welcome-drag-y', `${y}px`);
-        });
-
-        const finishDrag = () => {
-            if (!activeDrag || activeDrag.target !== target) return;
-            if (activeDrag.moved) draggedUntil = Date.now() + 180;
-            releaseDrag();
-            if (activeDrag.moved && target.hasAttribute('data-welcome-return')) {
-                returnTimers.set(target, window.setTimeout(() => {
-                    target.classList.add('is-returning');
-                    target.dataset.welcomeDragX = '0';
-                    target.dataset.welcomeDragY = '0';
-                    target.style.setProperty('--welcome-drag-x', '0px');
-                    target.style.setProperty('--welcome-drag-y', '0px');
-                }, 280));
-            }
-            activeDrag = null;
-        };
-        target.addEventListener('pointerup', finishDrag);
-        target.addEventListener('pointercancel', finishDrag);
-    });
-
-    const messages = ['Menyiapkan ruang kerja Anda', 'Menyelaraskan menu sesuai akses Anda', 'Semua siap untuk hari ini'];
-    let messageIndex = 0;
-    const setStatus = (message) => {
-        if (!status) return;
-        status.classList.remove('is-changing');
-        void status.offsetWidth;
-        status.textContent = message;
-        status.classList.add('is-changing');
-    };
-
-    if (status && !reduceMotion) {
-        window.setInterval(() => {
-            messageIndex = (messageIndex + 1) % messages.length;
-            setStatus(messages[messageIndex]);
-        }, 3600);
-    }
-
-    emblem?.addEventListener('click', () => {
-        if (Date.now() < draggedUntil) return;
-        if (!reduceMotion) {
-            emblem.classList.remove('is-celebrating');
-            void emblem.offsetWidth;
-            emblem.classList.add('is-celebrating');
-        }
-        setStatus('Sistem siap digunakan');
-    });
-})();
-
-(() => {
     const dialog = document.querySelector('#lrMappingDetailDialog');
     if (dialog instanceof HTMLDialogElement) {
         document.querySelectorAll('[data-lr-mapping-detail-open]').forEach((button) => button.addEventListener('click', () => {
@@ -2767,6 +2416,15 @@
 
 // Laba & Rugi: buka dan tutup rincian kelompok tanpa memuat ulang halaman.
 (() => {
+    const synchronizeProfitLossScroll = (table) => {
+        if (!table.classList.contains('lr-profitloss-table')) return;
+        const panel = table.closest('.lr-profitloss-report-panel');
+        if (!panel) return;
+        const hasExpandedDetail = Array.from(table.querySelectorAll('[data-lr-toggle]'))
+            .some((toggle) => toggle.getAttribute('aria-expanded') === 'true');
+        panel.classList.toggle('lr-details-expanded', hasExpandedDetail);
+    };
+
     document.querySelectorAll('.lr-report-table [data-lr-expandable]').forEach((row) => {
         const toggle = row.querySelector('[data-lr-toggle]');
         if (!toggle) return;
@@ -2793,8 +2451,10 @@
                     percentageToggle?.setAttribute('aria-expanded', 'false');
                 }
             });
+            synchronizeProfitLossScroll(row.closest('table'));
         });
     });
+    document.querySelectorAll('.lr-profitloss-table').forEach(synchronizeProfitLossScroll);
 })();
 
 // Laba & Rugi: tampilkan rincian % Pencapaian per LOB untuk Korporat Kanwil.
@@ -3749,13 +3409,13 @@
 
     // Menu tindakan tidak dibiarkan terbuka ketika pengguna melanjutkan ke area lain.
     document.addEventListener('click', (event) => {
-        document.querySelectorAll('details.sdm-daily-menu[open]').forEach((menu) => {
+        document.querySelectorAll('details.lr-filter-menu[open]').forEach((menu) => {
             if (!menu.contains(event.target)) menu.removeAttribute('open');
         });
     });
 
     document.addEventListener('submit', () => {
-        document.querySelectorAll('details.sdm-daily-menu[open]').forEach((menu) => menu.removeAttribute('open'));
+        document.querySelectorAll('details.lr-filter-menu[open]').forEach((menu) => menu.removeAttribute('open'));
     });
 
     document.addEventListener('keydown', (event) => {
@@ -3904,4 +3564,21 @@
         if (event.key === 'Escape') closeModal();
     });
     if (modal.dataset.calendarAutoOpen === 'true') openModal();
+})();
+
+/* Satu istilah untuk seluruh aksi pencarian pada panel filter. */
+(() => {
+    const applyGlobalFilterLabel = () => {
+        document.querySelectorAll('.content-shell .main-content .filter-panel form button[type="submit"]').forEach((button) => {
+            if (!['Terapkan', 'Tampilkan'].includes(button.textContent.trim())) return;
+            button.textContent = 'Filter';
+            button.setAttribute('aria-label', 'Filter');
+        });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyGlobalFilterLabel, { once: true });
+    } else {
+        applyGlobalFilterLabel();
+    }
 })();
