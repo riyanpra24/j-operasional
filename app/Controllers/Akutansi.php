@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Libraries\RkaBudgetService;
 use App\Libraries\RkaCalculator;
 use App\Libraries\MonitoringAnggaran;
+use App\Libraries\MonitoringAnggaranExport;
 use App\Libraries\RkaWorkbookParser;
 use App\Libraries\OracleLrSalaryParser;
 use App\Libraries\OracleLrImportService;
@@ -41,6 +42,10 @@ class Akutansi extends BaseController
         // Konsolidasi follows the same corporate view used by the Laba/Rugi page.
         $report = (new LrRealizationService())->view($unit === 'Konsolidasi' ? 'Korporat Kanwil' : $unit, $year, 'YTD', $month);
         $realizationValues = $report['values'];
+        $notes = [];
+        $storedNotes = db_connect()->table('accounting_monitoring_notes')->select('row_key, explanation')
+            ->where('unit_name', $unit)->where('report_year', $year)->where('report_month', $month)->get()->getResultArray();
+        foreach ($storedNotes as $note) $notes[$note['row_key']] = $note['explanation'];
 
         return view('akutansi/monitoring_anggaran', [
             'title' => 'Monitoring Anggaran',
@@ -50,9 +55,106 @@ class Akutansi extends BaseController
             'selectedMonth' => $month,
             'search' => $search,
             'monitoringRows' => (new MonitoringAnggaran())->rows($values, $search, $realizationValues),
+            'monitoringNotes' => $notes,
+            'monitoringEditOpen' => $this->request->getGet('edit') === '1',
             'hasRka' => $record !== null,
             'hasRealization' => $realizationValues !== [],
         ]);
+    }
+
+    public function exportMonitoringAnggaran(): ResponseInterface|RedirectResponse
+    {
+        $unit = $this->request->getGet('unit');
+        $year = $this->request->getGet('tahun');
+        $month = $this->request->getGet('bulan');
+        $search = $this->request->getGet('uraian');
+        if (!is_string($unit) || !in_array($unit, ['Konsolidasi', ...RkaCalculator::SOURCE_UNITS], true)
+            || !is_string($year) || !preg_match('/^\d{4}$/D', $year) || (int)$year < 2000 || (int)$year > 2100
+            || !is_string($month) || !preg_match('/^(?:[1-9]|1[0-2])$/D', $month)
+            || !is_string($search) || mb_strlen($search) > 150) {
+            return redirect()->to(site_url('akutansi/monitoring-anggaran'))->with('error', 'Unit dan periode monitoring tidak valid.');
+        }
+        $url = site_url('akutansi/monitoring-anggaran') . '?' . http_build_query(['unit'=>$unit, 'tahun'=>$year, 'bulan'=>$month, 'uraian'=>$search]);
+        $path = null;
+        try {
+            $budgetService = new RkaBudgetService();
+            $report = (new LrRealizationService())->view('Korporat Kanwil', (int)$year, 'YTD', (int)$month);
+            $notes = [];
+            $storedNotes = db_connect()->table('accounting_monitoring_notes')->select('row_key, explanation')
+                ->select('unit_name')->whereIn('unit_name', ['Konsolidasi', ...RkaCalculator::SOURCE_UNITS])
+                ->where('report_year', (int)$year)->where('report_month', (int)$month)->get()->getResultArray();
+            foreach ($storedNotes as $note) $notes[$note['unit_name']][$note['row_key']] = $note['explanation'];
+            $sheets = [];
+            foreach (['Konsolidasi', ...RkaCalculator::SOURCE_UNITS] as $sheetUnit) {
+                $sourceUnit = $sheetUnit === 'Konsolidasi' ? 'Korporat Kanwil' : $sheetUnit;
+                $record = $budgetService->find($sourceUnit, (int)$year);
+                $values = $record === null ? null : json_decode((string)$record['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
+                $sheets[$sheetUnit] = ['rows' => (new MonitoringAnggaran())->rows($values, '', $report['values_by_unit'][$sourceUnit] ?? []), 'notes' => $notes[$sheetUnit] ?? []];
+            }
+            $export = (new MonitoringAnggaranExport())->create($sheets, $unit, (int)$year, (int)$month);
+            $path = $export['path']; $contents = file_get_contents($path);
+            if ($contents === false) throw new RuntimeException('File hasil ekspor belum dapat dibaca.');
+            return $this->response->setHeader('Cache-Control', 'private, no-store, max-age=0')
+                ->setHeader('X-Content-Type-Options', 'nosniff')
+                ->setHeader('Content-Disposition', 'attachment; filename="' . $export['filename'] . '"')
+                ->setContentType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')->setBody($contents);
+        } catch (Throwable $exception) {
+            log_message('warning', 'Ekspor Monitoring Anggaran gagal: {message}', ['message'=>$exception->getMessage()]);
+            return redirect()->to($url)->with('error', 'Monitoring Anggaran belum dapat diekspor.');
+        } finally {
+            if ($path !== null && is_file($path)) unlink($path);
+        }
+    }
+
+    /** Only explanations are persisted; financial values always come from their source reports. */
+    public function saveMonitoringExplanations(): RedirectResponse
+    {
+        $unit = $this->request->getPost('unit');
+        $year = $this->request->getPost('tahun');
+        $month = $this->request->getPost('bulan');
+        $search = $this->request->getPost('uraian');
+        $valid = is_string($unit) && in_array($unit, ['Konsolidasi', ...RkaCalculator::SOURCE_UNITS], true)
+            && is_string($year) && preg_match('/^\d{4}$/D', $year) && (int) $year >= 2000 && (int) $year <= 2100
+            && is_string($month) && preg_match('/^(?:[1-9]|1[0-2])$/D', $month)
+            && is_string($search) && mb_strlen($search) <= 150;
+        if (! $valid) return redirect()->to(site_url('akutansi/monitoring-anggaran'))->with('error', 'Unit dan periode monitoring tidak valid.');
+
+        $url = site_url('akutansi/monitoring-anggaran') . '?' . http_build_query(['unit' => $unit, 'tahun' => $year, 'bulan' => $month, 'uraian' => $search]);
+        $db = db_connect();
+        try {
+            $notes = $this->request->getPost('notes');
+            $original = $this->request->getPost('original');
+            if (! is_array($notes) || ! is_array($original)) throw new RuntimeException('Tabel penjelasan tidak valid.');
+            $allowed = array_column((new MonitoringAnggaran())->rows(null, $search), 'key');
+            $changes = [];
+            foreach ($notes as $key => $note) {
+                if (! is_string($key) || ! in_array($key, $allowed, true) || ! is_string($note)
+                    || ! isset($original[$key]) || ! is_string($original[$key]) || mb_strlen($note) > 2000) {
+                    throw new RuntimeException('Penjelasan tidak valid atau melebihi 2.000 karakter.');
+                }
+                $note = str_replace(["\r\n", "\r"], "\n", $note);
+                $previous = str_replace(["\r\n", "\r"], "\n", $original[$key]);
+                if ($note !== $previous) $changes[$key] = ['note' => $note, 'original' => $previous];
+            }
+            ksort($changes);
+            $db->transBegin();
+            foreach ($changes as $key => $change) {
+                $existing = $db->query('SELECT id, explanation FROM accounting_monitoring_notes WHERE unit_name = ? AND report_year = ? AND report_month = ? AND row_key = ? FOR UPDATE', [$unit, (int) $year, (int) $month, $key])->getRowArray();
+                if (($existing['explanation'] ?? '') !== $change['original']) throw new RuntimeException('Penjelasan telah diubah pengguna lain. Muat ulang halaman sebelum menyimpan.');
+                $data = ['explanation' => $change['note'], 'updated_by_name' => (string) session()->get('auth_display_name'), 'updated_at' => date('Y-m-d H:i:s')];
+                $builder = $db->table('accounting_monitoring_notes');
+                $ok = $existing === null
+                    ? $builder->insert($data + ['unit_name' => $unit, 'report_year' => (int) $year, 'report_month' => (int) $month, 'row_key' => $key])
+                    : $builder->where('id', $existing['id'])->update($data);
+                if (! $ok) throw new RuntimeException('Penjelasan belum berhasil disimpan.');
+            }
+            if (! $db->transStatus() || ! $db->transCommit()) throw new RuntimeException('Penjelasan belum berhasil disimpan.');
+            return redirect()->to($url)->with('success', 'Penjelasan Monitoring Anggaran berhasil disimpan.');
+        } catch (Throwable $exception) {
+            $db->transRollback();
+            log_message('warning', 'Simpan penjelasan monitoring gagal: {message}', ['message' => $exception->getMessage()]);
+            return redirect()->to($url . '&edit=1')->withInput()->with('error', $exception instanceof RuntimeException ? $exception->getMessage() : 'Penjelasan belum dapat disimpan.');
+        }
     }
 
     public function labaRugi(): string

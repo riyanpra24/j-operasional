@@ -60,6 +60,8 @@ $routes->post('sdm/dokumen-masuk/(:num)', 'Sdm::updateIncomingDocument/$1', ['as
 $routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);
 $routes->get('akutansi/dashboard', 'Akutansi::dashboard', ['as' => 'akutansi.dashboard']);
 $routes->get('akutansi/monitoring-anggaran', 'Akutansi::monitoringAnggaran', ['as' => 'akutansi.monitoring_anggaran']);
+$routes->get('akutansi/monitoring-anggaran/export', 'Akutansi::exportMonitoringAnggaran', ['as' => 'akutansi.monitoring_anggaran.export']);
+$routes->post('akutansi/monitoring-anggaran/penjelasan', 'Akutansi::saveMonitoringExplanations', ['as' => 'akutansi.monitoring_anggaran.penjelasan']);
 $routes->get('akutansi/bukti-bayar', 'BuktiBayar::index', ['as' => 'akutansi.bukti_bayar']);
 $routes->post('akutansi/bukti-bayar', 'BuktiBayar::store', ['as' => 'akutansi.bukti_bayar.store']);
 $routes->get('akutansi/bukti-bayar/(:num)', 'BuktiBayar::show/$1', ['as' => 'akutansi.bukti_bayar.show']);

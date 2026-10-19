@@ -77,14 +77,9 @@ $openLoginModal = false;
             <a href="#tentang">Tentang</a>
             <a href="#panduan">Dashboard</a>
             <a href="#faq">SDM</a>
-            <a href="#kontak">Kontak</a>
+            <button type="button" class="surabaya-nav-login" data-login-card-toggle data-open-on-load="<?= $openLoginCard ? 'true' : 'false' ?>" aria-controls="surabayaLoginCard" aria-expanded="<?= $openLoginCard ? 'true' : 'false' ?>" aria-label="<?= $openLoginCard ? 'Tutup form login' : 'Buka form login' ?>">Masuk</button>
         </nav>
     </header>
-
-    <button type="button" class="surabaya-login-bookmark" data-login-card-toggle data-open-on-load="<?= $openLoginCard ? 'true' : 'false' ?>" aria-controls="surabayaLoginCard" aria-expanded="<?= $openLoginCard ? 'true' : 'false' ?>" aria-label="<?= $openLoginCard ? 'Tutup form login' : 'Buka form login' ?>">
-        <span class="surabaya-login-bookmark-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c.5-3.2 2.7-4.8 6.5-4.8s6 1.6 6.5 4.8"/></svg></span>
-        <span class="surabaya-login-bookmark-label">Masuk</span>
-    </button>
 
     <div class="surabaya-login-processing" data-login-processing hidden>
         <div class="surabaya-login-processing-panel" role="status" aria-live="polite">
@@ -152,7 +147,7 @@ $openLoginModal = false;
                     <p class="surabaya-login-hint">Masukan User dan Password yang Telah Diberikan</p>
                     <div class="surabaya-login-options">
                         <label><input type="checkbox" name="remember" value="1"> <span>Ingat saya</span></label>
-                        <a href="#kontak">Lupa password?</a>
+                        <span class="surabaya-password-help">Lupa password? Hubungi admin.</span>
                     </div>
                     <button type="submit" class="surabaya-login-submit">Masuk <span aria-hidden="true">→</span></button>
                 </form>
@@ -299,6 +294,8 @@ $openLoginModal = false;
             });
             let loginCardCloseTimer;
             if (loginCard && loginCardToggle) {
+                const navigationLinks = Array.from(document.querySelectorAll('.surabaya-landing-links a'));
+                let activeNavigationLink = navigationLinks.find((link) => link.classList.contains('active')) || navigationLinks[0];
                 const setLoginCardOpen = (open, focusInput = false) => {
                     window.clearTimeout(loginCardCloseTimer);
                     if (landingFlow) {
@@ -315,6 +312,8 @@ $openLoginModal = false;
                     }
                     loginCardToggle.setAttribute('aria-expanded', String(open));
                     loginCardToggle.setAttribute('aria-label', open ? 'Tutup form login' : 'Buka form login');
+                    navigationLinks.forEach((link) => link.classList.toggle('active', !open && link === activeNavigationLink));
+                    loginCardToggle.classList.toggle('active', open);
                     loginCard.setAttribute('aria-hidden', String(!open));
                     loginCard.inert = !open;
                     if (open) {
@@ -338,6 +337,10 @@ $openLoginModal = false;
                 if (!initiallyOpen) loginCard.hidden = true;
                 setLoginCardOpen(initiallyOpen);
                 loginCardToggle.addEventListener('click', () => setLoginCardOpen(loginCardToggle.getAttribute('aria-expanded') !== 'true', true));
+                navigationLinks.forEach((link) => link.addEventListener('click', () => {
+                    activeNavigationLink = link;
+                    setLoginCardOpen(false);
+                }));
                 document.addEventListener('keydown', (event) => {
                     if (event.key === 'Escape' && loginCardToggle.getAttribute('aria-expanded') === 'true' && !document.querySelector('.landing-login-modal.open')) {
                         setLoginCardOpen(false);

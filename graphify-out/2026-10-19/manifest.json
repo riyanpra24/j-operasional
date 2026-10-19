@@ -228,9 +228,9 @@
     "semantic_hash": "e176a1960ff2eeb4400478e402e6cc7e"
   },
   "app/Config/Routes.php": {
-    "mtime": 1792375422.9399662,
-    "seen": 1792375666.3234766,
-    "ast_hash": "edcfff00a0886b89ccab7e1cc206190d",
+    "mtime": 1792393034.7064364,
+    "seen": 1792393174.307922,
+    "ast_hash": "43a2e51b2756fdaa0aaa956e47c4e66c",
     "semantic_hash": ""
   },
   "app/Config/Routing.php": {
@@ -306,9 +306,9 @@
     "semantic_hash": "0ac77bd3df537db3a8712f8384f9a3ab"
   },
   "app/Controllers/Akutansi.php": {
-    "mtime": 1792379116.0280564,
-    "seen": 1792379291.6716566,
-    "ast_hash": "424339393ddcb267ecc9e6e6f25244fb",
+    "mtime": 1792393034.924556,
+    "seen": 1792393174.3102686,
+    "ast_hash": "1658eb496b20471b909b6459ba90ec2e",
     "semantic_hash": ""
   },
   "app/Controllers/Auth.php": {
@@ -1662,9 +1662,9 @@
     "semantic_hash": ""
   },
   "app/Views/landing/index.php": {
-    "mtime": 1792227922.7778268,
-    "seen": 1792245645.560323,
-    "ast_hash": "ee326a6ad6f60eb8bccca763f9adc051",
+    "mtime": 1792391577.7505887,
+    "seen": 1792391707.1513274,
+    "ast_hash": "b3a08aa7d4e62fbeb95b24bcc407ad4b",
     "semantic_hash": ""
   },
   "app/Views/layouts/main.php": {
@@ -6600,9 +6600,9 @@
     "semantic_hash": ""
   },
   "app/Libraries/MonitoringAnggaran.php": {
-    "mtime": 1792379941.2084818,
-    "seen": 1792380013.250813,
-    "ast_hash": "0b1f2d3b3610d5a2a2689df5be86b441",
+    "mtime": 1792391251.7816124,
+    "seen": 1792391497.2555816,
+    "ast_hash": "8777fb609e4e385e6d90a40ab22f68ca",
     "semantic_hash": ""
   },
   "app/Models/BuktiBayarModel.php": {
@@ -6618,9 +6618,9 @@
     "semantic_hash": ""
   },
   "app/Views/akutansi/monitoring_anggaran.php": {
-    "mtime": 1792380544.2776148,
-    "seen": 1792380596.3593192,
-    "ast_hash": "76703d68200f259d18091942d6ddfb0a",
+    "mtime": 1792393411.8956387,
+    "seen": 1792393464.6363382,
+    "ast_hash": "bf100463444386f4522b2c390e661347",
     "semantic_hash": ""
   },
   "app/Views/components/chartjs_asset.php": {
@@ -6636,21 +6636,21 @@
     "semantic_hash": ""
   },
   "tests/rka/monitoring_anggaran.php": {
-    "mtime": 1792379941.6054513,
-    "seen": 1792380013.3909814,
-    "ast_hash": "7721972ce60d3163aa27d1862d41469e",
+    "mtime": 1792390510.9689314,
+    "seen": 1792390609.5942438,
+    "ast_hash": "e042c4bb8e82677fe562c8347d947294",
     "semantic_hash": ""
   },
   "tests/rka/monitoring_expand.js": {
-    "mtime": 1792244700.4006412,
-    "seen": 1792245645.8321724,
-    "ast_hash": "0ea64c6797bdf8f425843c790f390fa6",
+    "mtime": 1792391832.3442614,
+    "seen": 1792391882.1727881,
+    "ast_hash": "382d8fbfee05095475389b0256b11ce5",
     "semantic_hash": ""
   },
   "tests/rka/monitoring_expand.php": {
-    "mtime": 1792380544.4860268,
-    "seen": 1792380596.5035977,
-    "ast_hash": "b703792af1c165a3ddb2e1dfed92379e",
+    "mtime": 1792393418.3971872,
+    "seen": 1792393464.7777019,
+    "ast_hash": "5e4a13256e848cfd2bc2f341056761d5",
     "semantic_hash": ""
   },
   "public/assets/images/dashboard-nav-icon.png": {
@@ -6822,9 +6822,51 @@
     "semantic_hash": ""
   },
   "tests/rka/monitoring_period.php": {
-    "mtime": 1792379138.2302866,
-    "seen": 1792379292.0610757,
-    "ast_hash": "4b71746325132bf6e61fb56b7315a3e0",
+    "mtime": 1792391371.2433336,
+    "seen": 1792391497.6369646,
+    "ast_hash": "b39f1c80a8ae1771e66735316f3f9007",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-19-120000_CreateMonitoringAnggaranNotes.php": {
+    "mtime": 1792391252.3376684,
+    "seen": 1792391497.2366915,
+    "ast_hash": "21feb939e55bb4c1c77c8e349c0cae45",
+    "semantic_hash": ""
+  },
+  "tests/rka/migrate_monitoring_notes.php": {
+    "mtime": 1792391353.2901883,
+    "seen": 1792391497.6364653,
+    "ast_hash": "e1ed7efc8bb2687ab3cee103b84a3519",
+    "semantic_hash": ""
+  },
+  "tests/rka/monitoring_notes_save.php": {
+    "mtime": 1792391393.1474385,
+    "seen": 1792391497.6369584,
+    "ast_hash": "685805f38f681e892858af355d034d0c",
+    "semantic_hash": ""
+  },
+  "tests/landing_navigation.js": {
+    "mtime": 1792391593.3551672,
+    "seen": 1792391707.4567099,
+    "ast_hash": "6e580c5d0a31241a8c2a58af58dc0bf2",
+    "semantic_hash": ""
+  },
+  "app/Libraries/MonitoringAnggaranExport.php": {
+    "mtime": 1792393089.4296117,
+    "seen": 1792393174.3480504,
+    "ast_hash": "cfbf7df304b5a72775c0ed6028fdda51",
+    "semantic_hash": ""
+  },
+  "scripts/prepare_monitoring_template.php": {
+    "mtime": 1792392997.0744514,
+    "seen": 1792393174.377194,
+    "ast_hash": "cf9ee0fac9d1dbd4959c713fbb51fb6a",
+    "semantic_hash": ""
+  },
+  "tests/rka/monitoring_export.php": {
+    "mtime": 1792393063.5055137,
+    "seen": 1792393174.4964154,
+    "ast_hash": "ef12ee851c6b120e88919dbbd253b310",
     "semantic_hash": ""
   }
 }

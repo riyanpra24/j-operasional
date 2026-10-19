@@ -42,11 +42,11 @@ final class MonitoringAnggaran
                     if ($total !== null) $total = bcadd($total, $amount, 2);
                 }
                 if ($search === '' || $matchesGroup || mb_stripos($label, $search) !== false) {
-                    $details[] = ['label' => $label, 'amount' => $amount, 'realization' => $realization, 'realization_ratio' => $this->realizationRatio($amount, $realization), 'group' => false];
+                    $details[] = ['key' => 'row_' . $sourceRow, 'label' => $label, 'amount' => $amount, 'realization' => $realization, 'realization_ratio' => $this->realizationRatio($amount, $realization), 'remaining_budget' => $this->remainingBudget($amount, $realization), 'group' => false];
                 }
             }
             if ($details !== []) {
-                $result[] = ['label' => $heading, 'amount' => $total, 'realization' => $realizationTotal, 'realization_ratio' => $this->realizationRatio($total, $realizationTotal), 'group' => true];
+                $result[] = ['key' => 'group_' . $sourceRows[0], 'label' => $heading, 'amount' => $total, 'realization' => $realizationTotal, 'realization_ratio' => $this->realizationRatio($total, $realizationTotal), 'remaining_budget' => $this->remainingBudget($total, $realizationTotal), 'group' => true];
                 array_push($result, ...$details);
             }
         }
@@ -58,6 +58,12 @@ final class MonitoringAnggaran
     {
         if ($budget === null || $realization === null) return null;
         return LrMoney::divide($realization, $budget) ?? '0.00';
+    }
+
+    private function remainingBudget(?string $budget, ?string $realization): ?string
+    {
+        if ($budget === null || $realization === null) return null;
+        return LrMoney::subtract($budget, $realization);
     }
 
     /** Deviation is the unrounded elapsed-year proportion minus the realization ratio. */

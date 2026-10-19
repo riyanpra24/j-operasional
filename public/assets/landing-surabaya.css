@@ -24,7 +24,7 @@ body.landing-surabaya-page::before {
 .surabaya-landing-main { position: relative; z-index: 1; }
 .surabaya-landing-brandbar {
     position: absolute;
-    z-index: 1;
+    z-index: 3;
     top: clamp(22px,3.8vh,36px);
     left: clamp(24px,4.2vw,72px);
     right: clamp(24px,4.2vw,72px);
@@ -78,22 +78,33 @@ body.landing-surabaya-page::before {
     align-items: center;
     gap: clamp(18px,2.8vw,36px);
 }
-.surabaya-landing-links a {
+.surabaya-landing-links a,
+.surabaya-landing-links .surabaya-nav-login {
     padding: 8px 16px;
     color: rgba(255,255,255,.94);
+    background: transparent;
+    border: 0;
     border-radius: 999px;
     font-size: 15px;
     font-weight: 750;
+    font-family: inherit;
     text-decoration: none;
     text-shadow: 0 1px 9px rgba(0,21,54,.48);
-    transition: color .18s ease, background-color .18s ease;
+    cursor: pointer;
+    transition: color .22s ease, background-color .22s ease, box-shadow .22s ease, transform .18s ease;
 }
 .surabaya-landing-links a:hover,
-.surabaya-landing-links a.active {
+.surabaya-landing-links a.active,
+.surabaya-landing-links .surabaya-nav-login:hover,
+.surabaya-landing-links .surabaya-nav-login.active {
     color: #fff;
     background: rgba(255,255,255,.20);
     box-shadow: inset 0 1px 1px rgba(255,255,255,.38);
 }
+.surabaya-landing-links .surabaya-nav-login { display: none; }
+.js-login-drawer .surabaya-landing-links .surabaya-nav-login { display: inline-flex; align-items: center; justify-content: center; }
+.surabaya-landing-links a:focus-visible, .surabaya-nav-login:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.surabaya-landing-links .surabaya-nav-login:active { transform: scale(.96); }
 .landing-session-modal {
     position: fixed;
     z-index: 20;
@@ -273,58 +284,6 @@ body.landing-surabaya-page::before {
     font-size: clamp(14px, 1.18vw, 18px);
     line-height: 1.48;
 }
-.surabaya-login-bookmark { display: none; }
-.js-login-drawer .surabaya-login-bookmark {
-    position: fixed;
-    z-index: 10;
-    top: clamp(150px, 27vh, 270px);
-    right: 0;
-    display: flex;
-    width: 52px;
-    height: auto;
-    padding: 14px 6px;
-    align-items: center;
-    flex-direction: column;
-    gap: 8px;
-    color: #fff;
-    background: radial-gradient(ellipse at 110% 110%, #16c9ff 0%, #087cf1 27%, transparent 52%), linear-gradient(160deg, #052963 0%, #05255f 38%, #0753df 76%, #20c8f2 100%);
-    border: 2px solid #258cff;
-    border-right: 0;
-    border-radius: 24px 0 0 24px;
-    box-shadow: -5px 0 16px rgba(14, 123, 255, .45), -8px 12px 25px rgba(0, 25, 70, .35), inset 3px 0 7px rgba(109, 224, 255, .35);
-    cursor: pointer;
-    transition: filter .2s ease, box-shadow .2s ease;
-}
-.surabaya-login-bookmark:hover { filter: brightness(1.12); }
-.surabaya-login-bookmark:focus-visible { outline: 3px solid #fff; outline-offset: -4px; }
-.surabaya-login-bookmark-icon {
-    display: grid;
-    width: 33px;
-    height: 33px;
-    flex: 0 0 33px;
-    place-items: center;
-    border: 1px solid rgba(103, 169, 255, .6);
-    border-radius: 50%;
-    background: rgba(45, 104, 213, .25);
-    box-shadow: inset 0 0 8px rgba(95, 166, 255, .25);
-}
-.surabaya-login-bookmark-icon svg { width: 21px; height: 21px; }
-.surabaya-login-bookmark-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: .01em;
-    writing-mode: vertical-rl;
-}
-.surabaya-login-bookmark-label::before {
-    width: 21px;
-    height: 2px;
-    background: rgba(112, 164, 255, .55);
-    border-radius: 2px;
-    content: "";
-}
 .surabaya-login-card {
     position: relative;
     width: min(100%, 360px);
@@ -434,7 +393,7 @@ body.landing-surabaya-page::before {
 .surabaya-login-options { display: flex; justify-content: space-between; align-items: center; padding-top: 2px; color: #183d74; font-size: 13px; }
 .surabaya-login-options label { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
 .surabaya-login-options input { width: 15px; height: 15px; margin: 0; accent-color: #0878d1; }
-.surabaya-login-options a { color: #076ca9; font-weight: 700; text-decoration: underline; }
+.surabaya-password-help { color: #315e85; font-size: 11px; text-align: right; }
 .surabaya-login-hint {
     margin: 1px 0 0;
     color: #6a79a9;
@@ -483,6 +442,10 @@ body.landing-surabaya-page::before {
 .surabaya-login-alert + .surabaya-login-form { margin-top: 2px; }
 
 
+@media (max-width: 1100px) {
+    .surabaya-landing-links { gap: 2px; }
+    .surabaya-landing-links a, .surabaya-landing-links .surabaya-nav-login { padding: 8px 7px; font-size: 13px; }
+}
 @media (max-width: 980px) {
     .surabaya-landing-main { grid-template-columns: minmax(0,1fr) minmax(310px,350px); gap: 42px; width: min(100% - 56px, 1100px); }
 }
@@ -492,7 +455,10 @@ body.landing-surabaya-page::before {
     .surabaya-landing-brand { gap: 5px; height: 40px; }
     .surabaya-landing-brand img { width: 118px; height: 44px; }
     .surabaya-landing-brand-title { padding-left: 8px; font-size: 11px; }
-    .surabaya-landing-links { display: none; }
+    .surabaya-landing-brandbar { right: 16px; }
+    .surabaya-landing-links { display: flex; gap: 0; }
+    .surabaya-landing-links a { display: none; }
+    .surabaya-landing-links .surabaya-nav-login { padding: 8px 12px; font-size: 14px; }
     .landing-session-modal { padding: 16px; place-items: start center; }
     .surabaya-landing-main { grid-template-columns: 1fr; gap: 30px; width: min(100% - 32px, 540px); height: auto; min-height: auto; padding: 118px 0 68px; }
     .surabaya-landing-copy { text-align: center; transform: none; }
@@ -504,17 +470,17 @@ body.landing-surabaya-page::before {
     .surabaya-landing-copy > p:last-child { margin-top: 19px; font-size: 14px; }
     .surabaya-login-card { width: min(100%, 360px); min-height: 440px; margin-inline: auto; padding: 32px 28px 33px; transform: none; }
     .surabaya-login-logo { width: 166px; height: 58px; }
-    .js-login-drawer .surabaya-login-bookmark { top: 115px; width: 42px; height: auto; padding: 11px 4px; gap: 7px; border-radius: 19px 0 0 19px; }
-    .surabaya-login-bookmark-icon { width: 28px; height: 28px; flex-basis: 28px; }
-    .surabaya-login-bookmark-icon svg { width: 18px; height: 18px; }
-    .surabaya-login-bookmark-label { font-size: 13px; gap: 7px; }
-    .surabaya-login-bookmark-label::before { width: 16px; }
     .js-login-drawer .surabaya-login-card { transform: translateY(24px) scale(.97); }
     .js-login-drawer .surabaya-login-card.is-open { transform: translateY(0) scale(1); }
 }
+@media (max-width: 380px) {
+    .surabaya-landing-brand img { width: 98px; }
+    .surabaya-landing-brand-title { font-size: 9px; }
+    .surabaya-landing-links .surabaya-nav-login { padding: 7px 9px; }
+}
 @media (prefers-reduced-motion: reduce) {
     .surabaya-login-processing-spinner { animation: none; }
-    .js-login-drawer .surabaya-login-card, .surabaya-login-bookmark { transition: none; }
+    .js-login-drawer .surabaya-login-card, .surabaya-nav-login, .surabaya-landing-links a { transition: none; }
     .surabaya-landing-flow { transition: none; }
     .surabaya-landing-flow.is-active .surabaya-landing-flow-circle { animation: none; opacity: .7; }
 }

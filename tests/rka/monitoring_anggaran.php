@@ -55,14 +55,18 @@ if ($missingActual[0]['realization'] !== null || $missingActual[1]['realization'
 $fullRka = $calculator->calculate($inputs);
 $realizations['beban gaji karyawan']['TOTAL'] = '103.23';
 $ratios = $monitoring->rows($fullRka, '', $realizations);
+if ($ratios[1]['remaining_budget'] !== '7.77' || $ratios[0]['remaining_budget'] !== '-2.240') throw new RuntimeException('Remaining budget must subtract the full-precision YTD realization from RKA.');
+if ($monitoring->rows($fullRka, 'gaji', $realizations)[0]['remaining_budget'] !== $ratios[0]['remaining_budget']) throw new RuntimeException('Search must not change group remaining budget.');
 if (App\Libraries\LrMoney::percentageDisplay($ratios[1]['realization_ratio']) !== '93%') throw new RuntimeException('Realization ratio must divide YTD by annual RKA.');
 if (App\Libraries\LrMoney::percentageDisplay($ratios[0]['realization_ratio']) !== '102%') throw new RuntimeException('Group percentage must use group totals.');
 $realizations['beban gaji karyawan']['TOTAL'] = '-103.23';
 if (App\Libraries\LrMoney::percentageDisplay($monitoring->rows($fullRka, '', $realizations)[1]['realization_ratio']) !== '*93%') throw new RuntimeException('Negative percentages must retain the report marker.');
 if ($monitoring->rows($fullRka, '', $realizations)[2]['realization_ratio'] !== '0.00') throw new RuntimeException('Excel IFERROR behavior for zero RKA is required.');
 if ($monitoring->rows(null, '', $realizations)[1]['realization_ratio'] !== null) throw new RuntimeException('Missing RKA must not be treated as zero.');
+if ($monitoring->rows(null, '', $realizations)[1]['remaining_budget'] !== null) throw new RuntimeException('Remaining budget must be unavailable when RKA is missing.');
 unset($realizations['beban gaji karyawan']);
 if ($monitoring->rows($fullRka, '', $realizations)[1]['realization_ratio'] !== null || $monitoring->rows($fullRka, '', $realizations)[0]['realization_ratio'] !== null) throw new RuntimeException('Missing realization must not be treated as zero.');
+if ($monitoring->rows($fullRka, '', $realizations)[1]['remaining_budget'] !== null || $monitoring->rows($fullRka, '', $realizations)[0]['remaining_budget'] !== null) throw new RuntimeException('Missing realization must not produce a partial remaining budget.');
 foreach ([[9, '0.93', '*18%'], [9, '0.65', '10%'], [9, '0.75', '0%'], [8, '0.662', '0%'], [12, '0.00', '100%']] as [$month, $ratio, $expected]) {
     $deviation = App\Libraries\MonitoringAnggaran::deviation($ratio, $month);
     if (App\Libraries\LrMoney::percentageDisplay($deviation) !== $expected) throw new RuntimeException("Incorrect deviation for month $month and realization $ratio.");
