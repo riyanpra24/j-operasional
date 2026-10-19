@@ -38,6 +38,7 @@ $adminTakeoverName = (string) session()->get('admin_takeover_display_name');
 $adminTakeoverDevice = (string) session()->get('admin_takeover_device');
 $adminTakeoverIp = (string) session()->get('admin_takeover_ip');
 $adminTakeoverLastSeen = (string) session()->get('admin_takeover_last_seen_at');
+$openLoginCard = (bool) session()->getFlashdata('open_login_modal') || (bool) $loginError || $openAdminTakeover || service('request')->getGet('login') === '1';
 $openLoginModal = false;
 ?>
 <!DOCTYPE html>
@@ -48,6 +49,7 @@ $openLoginModal = false;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Jamkrindo Kanwil Surabaya, sistem pengelolaan dokumen operasional.">
     <title>JAKSA | Jamkrindo Kanwil Surabaya Operasional</title>
+    <script>document.documentElement.classList.add('js-login-drawer');</script>
     <link rel="icon" type="image/png" href="<?= base_url('assets/images/jaksa-favicon.png?v=1') ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,6 +81,19 @@ $openLoginModal = false;
         </nav>
     </header>
 
+    <button type="button" class="surabaya-login-bookmark" data-login-card-toggle data-open-on-load="<?= $openLoginCard ? 'true' : 'false' ?>" aria-controls="surabayaLoginCard" aria-expanded="<?= $openLoginCard ? 'true' : 'false' ?>" aria-label="<?= $openLoginCard ? 'Tutup form login' : 'Buka form login' ?>">
+        <span class="surabaya-login-bookmark-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c.5-3.2 2.7-4.8 6.5-4.8s6 1.6 6.5 4.8"/></svg></span>
+        <span class="surabaya-login-bookmark-label">Masuk</span>
+    </button>
+
+    <div class="surabaya-login-processing" data-login-processing hidden>
+        <div class="surabaya-login-processing-panel" role="status" aria-live="polite">
+            <span class="surabaya-login-processing-spinner" aria-hidden="true"></span>
+            <strong>Memproses login</strong>
+            <span>Mohon tunggu sebentar.</span>
+        </div>
+    </div>
+
     <?php if ($logoutSuccess || $sessionExpired): ?>
         <div class="landing-session-modal<?= $logoutSuccess ? ' success' : '' ?>" data-session-notice role="dialog" aria-modal="true" aria-labelledby="sessionNoticeTitle">
             <section class="landing-session-notice">
@@ -94,11 +109,33 @@ $openLoginModal = false;
 
     <main class="surabaya-landing-main" id="beranda">
         <section class="surabaya-landing-copy" aria-labelledby="landingTitle">
+            <div class="surabaya-landing-flow" data-landing-flow aria-hidden="true">
+            <svg class="surabaya-landing-flow-art" viewBox="0 0 720 440" preserveAspectRatio="none" focusable="false">
+                <defs>
+                    <linearGradient id="landingFlowGradient" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#075be3" stop-opacity="0" />
+                        <stop offset="35%" stop-color="#167cf2" stop-opacity="0.7" />
+                        <stop offset="75%" stop-color="#48c9ff" stop-opacity="0.8" />
+                        <stop offset="100%" stop-color="#a1e4ff" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+                <path class="surabaya-landing-flow-line" pathLength="1" d="M-35 132 C70 44 190 22 330 34 S586 0 756 -18 S1200 -5 1600 -18 S2900 -18 3600 -18" />
+                <path class="surabaya-landing-flow-line" pathLength="1" d="M-45 150 C90 64 198 48 342 61 S607 26 755 7 S1200 20 1600 7 S2900 7 3600 7" />
+                <path class="surabaya-landing-flow-line" pathLength="1" d="M-35 351 C100 399 195 379 323 389 S598 422 754 360 S1200 375 1600 360 S2900 360 3600 360" />
+                <path class="surabaya-landing-flow-line" pathLength="1" d="M-48 116 C78 14 198 3 335 14 S594 -20 760 -42 S1200 -30 1600 -42 S2900 -42 3600 -42" />
+                <path class="surabaya-landing-flow-line" pathLength="1" d="M-38 370 C85 422 204 404 326 410 S590 443 758 380 S1200 395 1600 380 S2900 380 3600 380" />
+                <path class="surabaya-landing-flow-line" pathLength="1" d="M-25 393 C107 442 214 425 343 429 S602 460 755 400 S1200 415 1600 400 S2900 400 3600 400" />
+                <circle class="surabaya-landing-flow-circle" cx="68" cy="74" r="8" />
+                <circle class="surabaya-landing-flow-circle" cx="565" cy="28" r="5" />
+                <circle class="surabaya-landing-flow-circle" cx="666" cy="392" r="9" />
+                <circle class="surabaya-landing-flow-circle" cx="132" cy="400" r="5" />
+            </svg>
+            </div>
             <h1 id="landingTitle">Satu Sistem,<br>Dukungan untuk<br>Kinerja <span class="landing-title-secondary">Kanwil Surabaya.</span></h1>
             <p>Mendukung pengelolaan dokumen dan administrasi internal secara lebih terintegrasi, efektif, dan aman.</p>
         </section>
 
-        <section class="surabaya-login-card" aria-labelledby="surabayaLoginTitle">
+        <section class="surabaya-login-card<?= $openLoginCard ? ' is-open' : '' ?>" id="surabayaLoginCard" data-login-card aria-labelledby="surabayaLoginTitle">
             <img class="surabaya-login-logo" src="<?= base_url('assets/images/landing-jaksa-logo-photoroom.webp') ?>?v=<?= esc($landingLogoVersion, 'attr') ?>" width="640" height="220" alt="JAKSA" decoding="async">
             <p class="surabaya-login-title" aria-label="Jamkrindo Kanwil Surabaya Operasional"><span class="title-j">J</span><span class="title-a-orange">A</span>mkrindo <span class="title-k">K</span>anwil <span class="title-s">S</span>urabaya oper<span class="title-a-green">A</span>sional</p>
             <p class="surabaya-login-caption" id="surabayaLoginTitle">MASUK KE AKUN ANDA</p>
@@ -230,6 +267,84 @@ $openLoginModal = false;
         (() => {
             const sessionNotice = document.querySelector('[data-session-notice]');
             sessionNotice?.querySelector('[data-session-notice-close]')?.addEventListener('click', () => sessionNotice.remove());
+
+            const loginCard = document.querySelector('[data-login-card]');
+            const landingFlow = document.querySelector('[data-landing-flow]');
+            const loginCardToggle = document.querySelector('[data-login-card-toggle]');
+            const surabayaLoginForm = document.querySelector('.surabaya-login-form');
+            const loginProcessing = document.querySelector('[data-login-processing]');
+            window.addEventListener('pageshow', (event) => {
+                if (!event.persisted || !surabayaLoginForm) return;
+                surabayaLoginForm.dataset.submitting = 'false';
+                surabayaLoginForm.removeAttribute('aria-busy');
+                const submitButton = surabayaLoginForm.querySelector('button[type="submit"]');
+                if (submitButton) submitButton.disabled = false;
+                if (loginProcessing) loginProcessing.hidden = true;
+            });
+            surabayaLoginForm?.addEventListener('submit', (event) => {
+                if (surabayaLoginForm.dataset.submitting === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+                surabayaLoginForm.dataset.submitting = 'true';
+                surabayaLoginForm.setAttribute('aria-busy', 'true');
+                const submitButton = surabayaLoginForm.querySelector('button[type="submit"]');
+                if (submitButton) submitButton.disabled = true;
+                if (loginProcessing) loginProcessing.hidden = false;
+                if (!landingFlow?.classList.contains('is-active') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                event.preventDefault();
+                landingFlow.classList.add('is-closing');
+                landingFlow.classList.remove('is-active');
+                window.setTimeout(() => HTMLFormElement.prototype.submit.call(surabayaLoginForm), 1000);
+            });
+            let loginCardCloseTimer;
+            if (loginCard && loginCardToggle) {
+                const setLoginCardOpen = (open, focusInput = false) => {
+                    window.clearTimeout(loginCardCloseTimer);
+                    if (landingFlow) {
+                        if (open) {
+                            landingFlow.classList.add('is-resetting');
+                            landingFlow.classList.remove('is-active', 'is-closing');
+                            void landingFlow.offsetWidth;
+                            landingFlow.classList.remove('is-resetting');
+                            landingFlow.classList.add('is-active');
+                        } else if (landingFlow.classList.contains('is-active')) {
+                            landingFlow.classList.add('is-closing');
+                            landingFlow.classList.remove('is-active');
+                        }
+                    }
+                    loginCardToggle.setAttribute('aria-expanded', String(open));
+                    loginCardToggle.setAttribute('aria-label', open ? 'Tutup form login' : 'Buka form login');
+                    loginCard.setAttribute('aria-hidden', String(!open));
+                    loginCard.inert = !open;
+                    if (open) {
+                        loginCard.hidden = false;
+                        requestAnimationFrame(() => {
+                            if (loginCardToggle.getAttribute('aria-expanded') !== 'true') return;
+                            loginCard.classList.add('is-open');
+                            if (focusInput) {
+                                if (window.matchMedia('(max-width: 760px)').matches) {
+                                    loginCard.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+                                }
+                                document.getElementById('surabayaUsername')?.focus({ preventScroll: true });
+                            }
+                        });
+                    } else {
+                        loginCard.classList.remove('is-open');
+                        loginCardCloseTimer = window.setTimeout(() => { loginCard.hidden = true; }, 380);
+                    }
+                };
+                const initiallyOpen = loginCardToggle.dataset.openOnLoad === 'true';
+                if (!initiallyOpen) loginCard.hidden = true;
+                setLoginCardOpen(initiallyOpen);
+                loginCardToggle.addEventListener('click', () => setLoginCardOpen(loginCardToggle.getAttribute('aria-expanded') !== 'true', true));
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape' && loginCardToggle.getAttribute('aria-expanded') === 'true' && !document.querySelector('.landing-login-modal.open')) {
+                        setLoginCardOpen(false);
+                        loginCardToggle.focus();
+                    }
+                });
+            }
 
             const surabayaPassword = document.getElementById('surabayaPassword');
             const surabayaPasswordToggle = document.querySelector('[data-surabaya-password-toggle]');

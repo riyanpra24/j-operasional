@@ -1,0 +1,15 @@
+const fs = require('fs');
+const vm = require('vm');
+const path = require('path');
+const template = fs.readFileSync(path.join(__dirname, '../../app/Views/akutansi/monitoring_anggaran.php'), 'utf8');
+const script = template.match(/<script>\s*([\s\S]*?)\s*<\/script>/)[1];
+const details = { one: { hidden: true }, two: { hidden: true } };
+const attributes = { 'aria-expanded': 'false', 'aria-controls': 'one two' };
+const button = { getAttribute: (key) => attributes[key], setAttribute: (key, value) => { attributes[key] = value; } };
+const row = { querySelector: () => button, addEventListener: (_, handler) => { row.click = handler; } };
+vm.runInNewContext(script, { document: { querySelectorAll: () => [row], getElementById: (id) => details[id] } });
+row.click();
+if (attributes['aria-expanded'] !== 'true' || details.one.hidden || details.two.hidden) throw new Error('Failed to expand.');
+row.click();
+if (attributes['aria-expanded'] !== 'false' || !details.one.hidden || !details.two.hidden) throw new Error('Failed to collapse.');
+console.log('Monitoring expand interaction: passed');

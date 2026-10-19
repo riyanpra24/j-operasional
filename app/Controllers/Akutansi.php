@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Libraries\RkaBudgetService;
 use App\Libraries\RkaCalculator;
+use App\Libraries\MonitoringAnggaran;
 use App\Libraries\RkaWorkbookParser;
 use App\Libraries\OracleLrSalaryParser;
 use App\Libraries\OracleLrImportService;
@@ -22,6 +23,38 @@ use Throwable;
 
 class Akutansi extends BaseController
 {
+    public function monitoringAnggaran(): string
+    {
+        $units = ['Konsolidasi', ...RkaCalculator::SOURCE_UNITS];
+        $unit = $this->request->getGet('unit');
+        $unit = is_string($unit) && in_array($unit, $units, true) ? $unit : 'Konsolidasi';
+        $year = $this->request->getGet('tahun');
+        $year = is_string($year) && preg_match('/^\d{4}$/D', $year) && (int) $year >= 2000 && (int) $year <= 2100
+            ? (int) $year : (int) date('Y');
+        $month = $this->request->getGet('bulan');
+        $month = is_string($month) && preg_match('/^(?:[1-9]|1[0-2])$/D', $month)
+            ? (int) $month : (int) date('n');
+        $search = $this->request->getGet('uraian');
+        $search = is_string($search) ? mb_substr(trim($search), 0, 150) : '';
+        $record = (new RkaBudgetService())->find($unit === 'Konsolidasi' ? 'Korporat Kanwil' : $unit, $year);
+        $values = $record === null ? null : json_decode((string) $record['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
+        // Konsolidasi follows the same corporate view used by the Laba/Rugi page.
+        $report = (new LrRealizationService())->view($unit === 'Konsolidasi' ? 'Korporat Kanwil' : $unit, $year, 'YTD', $month);
+        $realizationValues = $report['values'];
+
+        return view('akutansi/monitoring_anggaran', [
+            'title' => 'Monitoring Anggaran',
+            'units' => $units,
+            'selectedUnit' => $unit,
+            'selectedYear' => $year,
+            'selectedMonth' => $month,
+            'search' => $search,
+            'monitoringRows' => (new MonitoringAnggaran())->rows($values, $search, $realizationValues),
+            'hasRka' => $record !== null,
+            'hasRealization' => $realizationValues !== [],
+        ]);
+    }
+
     public function labaRugi(): string
     {
         $unit = $this->request->getGet('unit_kerja');

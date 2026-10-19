@@ -9,6 +9,7 @@ use App\Libraries\LrWorkpaperImportParser;
 use App\Models\DokumenKeluarModel;
 use App\Models\DokumenMasukModel;
 use App\Models\DokumenSpkModel;
+use App\Models\DataAsetModel;
 use App\Models\MagangModel;
 use App\Models\PksDokumenModel;
 use App\Models\PksItemModel;
@@ -32,6 +33,7 @@ class DeletedData extends BaseController
         'agendaris' => ['label' => 'Agendaris', 'table' => 'agendaris', 'model' => AgendarisModel::class, 'fields' => ['nomor_surat', 'pengirim', 'perihal_surat']],
         'dokumen-keluar' => ['label' => 'Dokumen Keluar', 'table' => 'dokumen_keluar', 'model' => DokumenKeluarModel::class, 'fields' => ['nomor_surat', 'jenis_surat', 'penerima']],
         'dokumen-spk' => ['label' => 'Dokumen SPK', 'table' => 'dokumen_spk', 'model' => DokumenSpkModel::class, 'fields' => ['nomor_dokumen', 'perihal']],
+        'data-aset' => ['label' => 'Data Aset', 'table' => 'data_aset', 'model' => DataAsetModel::class, 'fields' => ['nomor_aset', 'kelompok_aset']],
         'data-magang' => ['label' => 'Data Magang', 'table' => 'sdm_magang', 'model' => MagangModel::class, 'fields' => ['nama_magang', 'nomor_kontrak_kerja', 'unit_kerja']],
         'pks' => ['label' => 'PKS Barang dan Jasa', 'table' => 'pks_kerjasama', 'model' => PksKerjasamaModel::class, 'fields' => ['kode_internal', 'nama_kerjasama']],
         'dokumen-pks' => ['label' => 'Riwayat Dokumen PKS', 'table' => 'pks_dokumen_kerjasama', 'model' => PksDokumenModel::class, 'fields' => ['jenis_dokumen', 'nomor_dokumen']],

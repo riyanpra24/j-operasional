@@ -21,18 +21,6 @@ body.landing-surabaya-page::before {
     content: "";
     pointer-events: none;
 }
-body.landing-surabaya-page::after {
-    position: fixed;
-    z-index: 0;
-    inset: -18%;
-    background:
-        radial-gradient(ellipse at 83% 16%, transparent 0 18%, rgba(255,255,255,.20) 18.15% 18.45%, transparent 18.6% 25%, rgba(57,201,242,.32) 25.15% 25.5%, transparent 25.65%),
-        radial-gradient(ellipse at 14% 88%, transparent 0 13%, rgba(255,255,255,.13) 13.15% 13.4%, transparent 13.55% 19%, rgba(57,201,242,.22) 19.15% 19.45%, transparent 19.6%);
-    content: "";
-    opacity: .9;
-    pointer-events: none;
-    transform: rotate(-7deg);
-}
 .surabaya-landing-main { position: relative; z-index: 1; }
 .surabaya-landing-brandbar {
     position: absolute;
@@ -117,6 +105,42 @@ body.landing-surabaya-page::after {
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
+.surabaya-login-processing[hidden] { display: none; }
+.surabaya-login-processing {
+    position: fixed;
+    z-index: 30;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(2, 21, 53, .28);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+.surabaya-login-processing-panel {
+    display: grid;
+    justify-items: center;
+    gap: 9px;
+    min-width: 215px;
+    padding: 24px 30px;
+    color: #103e78;
+    background: rgba(235, 247, 255, .96);
+    border: 1px solid rgba(190, 226, 255, .9);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(0, 24, 65, .25);
+}
+.surabaya-login-processing-panel strong { font-size: 16px; }
+.surabaya-login-processing-panel > span:last-child { color: #54779d; font-size: 13px; }
+.surabaya-login-processing-spinner {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 3px;
+    border: 4px solid #c5e5fc;
+    border-top-color: #0967d6;
+    border-radius: 50%;
+    animation: surabaya-login-processing-spin .9s linear infinite;
+}
+@keyframes surabaya-login-processing-spin { to { transform: rotate(360deg); } }
 .landing-session-notice {
     position: relative;
     display: flex;
@@ -150,8 +174,51 @@ body.landing-surabaya-page::after {
     padding: clamp(125px,17vh,160px) 0 18px;
 }
 .surabaya-landing-copy {
+    position: relative;
+    isolation: isolate;
     max-width: 655px;
     transform: translateY(calc(clamp(62px, 8.5vh, 94px) + 2px));
+}
+.surabaya-landing-flow {
+    position: absolute;
+    z-index: -1;
+    top: -28%;
+    left: -10%;
+    width: calc(100vw + 10%);
+    height: 156%;
+    overflow: visible;
+    clip-path: inset(-100px 100% -100px 0);
+    pointer-events: none;
+    transition: clip-path 3s cubic-bezier(.37, 0, .22, 1);
+}
+.surabaya-landing-flow.is-active { clip-path: inset(-100px 0 -100px 0); }
+.surabaya-landing-flow.is-closing { clip-path: inset(-100px 0 -100px 100%); transition-duration: 1s; }
+.surabaya-landing-flow.is-resetting { transition: none; }
+.surabaya-landing-flow-art { display: block; width: min(786px, 75vw); height: 100%; overflow: visible; }
+.surabaya-landing-flow-line {
+    fill: none;
+    stroke: url(#landingFlowGradient);
+    stroke-width: 2;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 5px rgba(36, 174, 255, .45));
+}
+.surabaya-landing-flow-circle {
+    fill: rgba(55, 195, 255, .12);
+    stroke: rgba(111, 215, 255, .8);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+}
+.surabaya-landing-flow.is-active .surabaya-landing-flow-circle { animation: landing-flow-circle 2.8s ease-in-out infinite; }
+.surabaya-landing-flow.is-active .surabaya-landing-flow-circle:nth-of-type(2) { animation-delay: .35s; }
+.surabaya-landing-flow.is-active .surabaya-landing-flow-circle:nth-of-type(3) { animation-delay: .7s; }
+.surabaya-landing-flow.is-active .surabaya-landing-flow-circle:nth-of-type(4) { animation-delay: 1.05s; }
+@keyframes landing-flow-circle {
+    0%, 100% { opacity: .35; transform: scale(.8); }
+    50% { opacity: .9; transform: scale(1.15); }
 }
 .surabaya-landing-kicker {
     margin: 0 0 20px;
@@ -206,6 +273,58 @@ body.landing-surabaya-page::after {
     font-size: clamp(14px, 1.18vw, 18px);
     line-height: 1.48;
 }
+.surabaya-login-bookmark { display: none; }
+.js-login-drawer .surabaya-login-bookmark {
+    position: fixed;
+    z-index: 10;
+    top: clamp(150px, 27vh, 270px);
+    right: 0;
+    display: flex;
+    width: 52px;
+    height: auto;
+    padding: 14px 6px;
+    align-items: center;
+    flex-direction: column;
+    gap: 8px;
+    color: #fff;
+    background: radial-gradient(ellipse at 110% 110%, #16c9ff 0%, #087cf1 27%, transparent 52%), linear-gradient(160deg, #052963 0%, #05255f 38%, #0753df 76%, #20c8f2 100%);
+    border: 2px solid #258cff;
+    border-right: 0;
+    border-radius: 24px 0 0 24px;
+    box-shadow: -5px 0 16px rgba(14, 123, 255, .45), -8px 12px 25px rgba(0, 25, 70, .35), inset 3px 0 7px rgba(109, 224, 255, .35);
+    cursor: pointer;
+    transition: filter .2s ease, box-shadow .2s ease;
+}
+.surabaya-login-bookmark:hover { filter: brightness(1.12); }
+.surabaya-login-bookmark:focus-visible { outline: 3px solid #fff; outline-offset: -4px; }
+.surabaya-login-bookmark-icon {
+    display: grid;
+    width: 33px;
+    height: 33px;
+    flex: 0 0 33px;
+    place-items: center;
+    border: 1px solid rgba(103, 169, 255, .6);
+    border-radius: 50%;
+    background: rgba(45, 104, 213, .25);
+    box-shadow: inset 0 0 8px rgba(95, 166, 255, .25);
+}
+.surabaya-login-bookmark-icon svg { width: 21px; height: 21px; }
+.surabaya-login-bookmark-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: .01em;
+    writing-mode: vertical-rl;
+}
+.surabaya-login-bookmark-label::before {
+    width: 21px;
+    height: 2px;
+    background: rgba(112, 164, 255, .55);
+    border-radius: 2px;
+    content: "";
+}
 .surabaya-login-card {
     position: relative;
     width: min(100%, 360px);
@@ -215,12 +334,27 @@ body.landing-surabaya-page::after {
     padding: 34px 32px 35px;
     transform: translate(-78px, 24px);
     overflow: hidden;
-    background: linear-gradient(140deg, rgba(255,255,255,.74), rgba(231,243,255,.56));
-    border: 1px solid rgba(255,255,255,.68);
+    background: radial-gradient(circle at 100% 0%, rgba(130, 192, 255, .45), transparent 48%), linear-gradient(140deg, rgba(229, 242, 255, .96), rgba(190, 222, 255, .94) 65%, rgba(177, 217, 252, .94));
+    border: 1px solid rgba(235, 248, 255, .9);
     border-radius: 22px;
-    box-shadow: 0 22px 48px rgba(0,18,53,.31), inset 0 1px 1px rgba(255,255,255,.46);
+    box-shadow: 0 22px 48px rgba(0,18,53,.31), inset 0 1px 3px rgba(255,255,255,.7), 0 0 12px rgba(119,190,255,.25);
     backdrop-filter: blur(22px) saturate(145%);
     -webkit-backdrop-filter: blur(22px) saturate(145%);
+}
+.surabaya-login-card[hidden] { display: none !important; }
+.js-login-drawer .surabaya-login-card {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate(-38px, 24px) scale(.97);
+    transition: opacity .35s ease, transform .38s cubic-bezier(.2,.8,.2,1), visibility 0s linear .38s;
+}
+.js-login-drawer .surabaya-login-card.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-78px, 24px) scale(1);
+    transition-delay: 0s;
 }
 .surabaya-login-card::before,
 .surabaya-login-card::after {
@@ -321,16 +455,16 @@ body.landing-surabaya-page::after {
     margin-inline: auto;
     margin-top: 0;
     color: #fff;
-    background: linear-gradient(105deg, #0754d1 0%, #0989e4 52%, #36c8f3 100%);
-    border: 0;
+    background: linear-gradient(105deg, #1041aa 0%, #216bd4 48%, #8bd4ff 100%);
+    border: 1px solid rgba(167, 225, 255, .9);
     border-radius: 999px;
-    box-shadow: 0 10px 21px rgba(6,87,128,.20);
+    box-shadow: 0 8px 20px rgba(19, 101, 210, .32), inset 0 1px 2px rgba(255, 255, 255, .3);
     font-size: 17px;
     font-weight: 700;
     text-decoration: none;
     cursor: pointer;
 }
-.surabaya-login-submit:hover { background: linear-gradient(105deg, #043fa9 0%, #076fca 52%, #1ba9d9 100%); }
+.surabaya-login-submit:hover { background: linear-gradient(105deg, #0b3693 0%, #1b5fbd 48%, #6ec4f6 100%); }
 .surabaya-login-submit span { font-size: 25px; line-height: 1; }
 .surabaya-login-secure {
     display: flex;
@@ -362,10 +496,25 @@ body.landing-surabaya-page::after {
     .landing-session-modal { padding: 16px; place-items: start center; }
     .surabaya-landing-main { grid-template-columns: 1fr; gap: 30px; width: min(100% - 32px, 540px); height: auto; min-height: auto; padding: 118px 0 68px; }
     .surabaya-landing-copy { text-align: center; transform: none; }
+    .surabaya-landing-flow { top: -15%; left: -2%; width: 104vw; height: 130%; }
+    .surabaya-landing-flow-art { width: min(104vw, 562px); }
     .surabaya-landing-kicker { margin-bottom: 16px; font-size: 15px; letter-spacing: -.02em; }
     .surabaya-landing-kicker::after { width: 72px; height: 3px; margin-top: 12px; }
     .surabaya-landing-copy h1 { font-size: clamp(34px, 9.5vw, 48px); }
     .surabaya-landing-copy > p:last-child { margin-top: 19px; font-size: 14px; }
     .surabaya-login-card { width: min(100%, 360px); min-height: 440px; margin-inline: auto; padding: 32px 28px 33px; transform: none; }
     .surabaya-login-logo { width: 166px; height: 58px; }
+    .js-login-drawer .surabaya-login-bookmark { top: 115px; width: 42px; height: auto; padding: 11px 4px; gap: 7px; border-radius: 19px 0 0 19px; }
+    .surabaya-login-bookmark-icon { width: 28px; height: 28px; flex-basis: 28px; }
+    .surabaya-login-bookmark-icon svg { width: 18px; height: 18px; }
+    .surabaya-login-bookmark-label { font-size: 13px; gap: 7px; }
+    .surabaya-login-bookmark-label::before { width: 16px; }
+    .js-login-drawer .surabaya-login-card { transform: translateY(24px) scale(.97); }
+    .js-login-drawer .surabaya-login-card.is-open { transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .surabaya-login-processing-spinner { animation: none; }
+    .js-login-drawer .surabaya-login-card, .surabaya-login-bookmark { transition: none; }
+    .surabaya-landing-flow { transition: none; }
+    .surabaya-landing-flow.is-active .surabaya-landing-flow-circle { animation: none; opacity: .7; }
 }

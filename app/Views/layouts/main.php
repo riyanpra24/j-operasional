@@ -238,6 +238,10 @@ if ($currentRole === 'security') {
                         <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="generalSectionSubmenu" data-nav-submenu <?= $generalSectionActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('bagian-umum-1/data-aset') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'data-aset' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Data Aset
+                        </a>
                         <a href="<?= site_url('bagian-umum-1/dokumen-masuk') ?>" class="nav-sublink <?= $generalSectionActive && $generalSectionPage === 'dokumen-masuk' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Dokumen Masuk
@@ -342,6 +346,10 @@ if ($currentRole === 'security') {
                         <a href="<?= site_url('akutansi/rka-kanwil-surabaya') ?>" class="nav-sublink <?= $akutansiPage === 'rka-kanwil-surabaya' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             RKA Kanwil
+                        </a>
+                        <a href="<?= site_url('akutansi/monitoring-anggaran') ?>" class="nav-sublink <?= $akutansiPage === 'monitoring-anggaran' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Monitoring Anggaran
                         </a>
                         <a href="<?= site_url('akutansi/simulasi-hitung') ?>" class="nav-sublink <?= $akutansiPage === 'simulasi-hitung' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>

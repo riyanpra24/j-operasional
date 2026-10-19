@@ -59,6 +59,7 @@ $routes->post('sdm/sdm-jatim/(:num)/hapus', 'Sdm::deleteSdmJatim/$1', ['as' => '
 $routes->post('sdm/dokumen-masuk/(:num)', 'Sdm::updateIncomingDocument/$1', ['as' => 'sdm.dokumen_masuk.update']);
 $routes->get('akutansi', 'Akutansi::index', ['as' => 'akutansi.index']);
 $routes->get('akutansi/dashboard', 'Akutansi::dashboard', ['as' => 'akutansi.dashboard']);
+$routes->get('akutansi/monitoring-anggaran', 'Akutansi::monitoringAnggaran', ['as' => 'akutansi.monitoring_anggaran']);
 $routes->get('akutansi/bukti-bayar', 'BuktiBayar::index', ['as' => 'akutansi.bukti_bayar']);
 $routes->post('akutansi/bukti-bayar', 'BuktiBayar::store', ['as' => 'akutansi.bukti_bayar.store']);
 $routes->get('akutansi/bukti-bayar/(:num)', 'BuktiBayar::show/$1', ['as' => 'akutansi.bukti_bayar.show']);
@@ -90,6 +91,15 @@ $routes->post('akutansi/rka-kanwil-surabaya/seting-manual', 'Akutansi::saveRkaMa
 $routes->post('akutansi/rka-kanwil-surabaya/hapus', 'Akutansi::deleteRka', ['as' => 'akutansi.rka_delete']);
 
 // Bagian Umum 1
+$routes->get('bagian-umum-1/data-aset', 'DataAset::index', ['as' => 'bagian_umum_1.data_aset']);
+$routes->get('bagian-umum-1/data-aset/tambah', 'DataAset::create');
+$routes->post('bagian-umum-1/data-aset', 'DataAset::store');
+$routes->post('bagian-umum-1/data-aset/impor', 'DataAset::import');
+$routes->get('bagian-umum-1/data-aset/(:num)', 'DataAset::show/$1');
+$routes->get('bagian-umum-1/data-aset/(:num)/ubah', 'DataAset::edit/$1');
+$routes->post('bagian-umum-1/data-aset/(:num)', 'DataAset::update/$1');
+$routes->post('bagian-umum-1/data-aset/(:num)/hapus', 'DataAset::destroy/$1');
+
 $routes->group('bagian-umum-1/dokumen-masuk', static function (RouteCollection $routes): void {
     $routes->get('/', 'Agendaris::suratMasuk', ['as' => 'bagian_umum_1.dokumen_masuk']);
     $routes->get('(:num)', 'Agendaris::show/$1', ['as' => 'bagian_umum_1.dokumen_masuk.show']);
