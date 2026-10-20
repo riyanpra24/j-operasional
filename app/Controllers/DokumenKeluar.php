@@ -68,13 +68,18 @@ class DokumenKeluar extends BaseController
             $this->model->where('tanggal_pengiriman <=', $to);
         }
 
-        $jenisBuilder = db_connect()->table('dokumen_keluar')->select('jenis_surat')->where('deleted_at', null);
-        if ($securityView) {
-            $jenisBuilder->where('progres', 'Diambil Ekspedisi');
-        } else {
-            $jenisBuilder->where('status_agendaris', 'Selesai');
-        }
-        $jenisOptions = $jenisBuilder->groupBy('jenis_surat')->orderBy('jenis_surat', 'ASC')->get()->getResultArray();
+        // Gunakan daftar jenis yang sama dengan arsip Surat Masuk agar filter antar-register konsisten.
+        // Nilai filter tetap diterapkan ke kolom jenis_surat milik Dokumen Keluar.
+        $jenisOptions = db_connect()->table('agendaris')
+            ->select('jenis')
+            ->where('deleted_at', null)
+            ->where('progres', 'Selesai')
+            ->where('jenis IS NOT NULL', null, false)
+            ->where('jenis !=', '')
+            ->groupBy('jenis')
+            ->orderBy('jenis', 'ASC')
+            ->get()
+            ->getResultArray();
 
         if ($order !== '') {
             $direction = $order === 'terbaru' ? 'DESC' : 'ASC';
@@ -98,7 +103,7 @@ class DokumenKeluar extends BaseController
             'dokumen'      => $this->model->paginate($perPage, 'dokumen_keluar'),
             'pager'        => $this->model->pager,
             'filters'      => compact('keyword', 'jenis', 'from', 'to', 'perPage', 'order'),
-            'jenisOptions' => array_column($jenisOptions, 'jenis_surat'),
+            'jenisOptions' => array_column($jenisOptions, 'jenis'),
         ]);
     }
 

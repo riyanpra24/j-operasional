@@ -37,6 +37,9 @@ class Akutansi extends BaseController
             ? (int) $month : (int) date('n');
         $search = $this->request->getGet('uraian');
         $search = is_string($search) ? mb_substr(trim($search), 0, 150) : '';
+        $deviationFilter = $this->request->getGet('deviasi');
+        $deviationFilter = is_string($deviationFilter) && in_array($deviationFilter, ['all', 'normal', 'negative'], true)
+            ? $deviationFilter : 'all';
         $record = (new RkaBudgetService())->find($unit === 'Konsolidasi' ? 'Korporat Kanwil' : $unit, $year);
         $values = $record === null ? null : json_decode((string) $record['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
         // Konsolidasi follows the same corporate view used by the Laba/Rugi page.
@@ -46,6 +49,8 @@ class Akutansi extends BaseController
         $storedNotes = db_connect()->table('accounting_monitoring_notes')->select('row_key, explanation')
             ->where('unit_name', $unit)->where('report_year', $year)->where('report_month', $month)->get()->getResultArray();
         foreach ($storedNotes as $note) $notes[$note['row_key']] = $note['explanation'];
+        $monitoringRows = (new MonitoringAnggaran())->rows($values, $search, $realizationValues);
+        if ($deviationFilter !== 'all') $monitoringRows = MonitoringAnggaran::filterDeviationRows($monitoringRows, $month, $deviationFilter);
 
         return view('akutansi/monitoring_anggaran', [
             'title' => 'Monitoring Anggaran',
@@ -54,7 +59,8 @@ class Akutansi extends BaseController
             'selectedYear' => $year,
             'selectedMonth' => $month,
             'search' => $search,
-            'monitoringRows' => (new MonitoringAnggaran())->rows($values, $search, $realizationValues),
+            'selectedDeviationFilter' => $deviationFilter,
+            'monitoringRows' => $monitoringRows,
             'monitoringNotes' => $notes,
             'monitoringEditOpen' => $this->request->getGet('edit') === '1',
             'hasRka' => $record !== null,
@@ -68,10 +74,12 @@ class Akutansi extends BaseController
         $year = $this->request->getGet('tahun');
         $month = $this->request->getGet('bulan');
         $search = $this->request->getGet('uraian');
+        $document = $this->request->getGet('dokumen_export');
         if (!is_string($unit) || !in_array($unit, ['Konsolidasi', ...RkaCalculator::SOURCE_UNITS], true)
             || !is_string($year) || !preg_match('/^\d{4}$/D', $year) || (int)$year < 2000 || (int)$year > 2100
             || !is_string($month) || !preg_match('/^(?:[1-9]|1[0-2])$/D', $month)
-            || !is_string($search) || mb_strlen($search) > 150) {
+            || !is_string($search) || mb_strlen($search) > 150
+            || !is_string($document) || !in_array($document, ['all', 'negative_deviation'], true)) {
             return redirect()->to(site_url('akutansi/monitoring-anggaran'))->with('error', 'Unit dan periode monitoring tidak valid.');
         }
         $url = site_url('akutansi/monitoring-anggaran') . '?' . http_build_query(['unit'=>$unit, 'tahun'=>$year, 'bulan'=>$month, 'uraian'=>$search]);
@@ -89,9 +97,11 @@ class Akutansi extends BaseController
                 $sourceUnit = $sheetUnit === 'Konsolidasi' ? 'Korporat Kanwil' : $sheetUnit;
                 $record = $budgetService->find($sourceUnit, (int)$year);
                 $values = $record === null ? null : json_decode((string)$record['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
-                $sheets[$sheetUnit] = ['rows' => (new MonitoringAnggaran())->rows($values, '', $report['values_by_unit'][$sourceUnit] ?? []), 'notes' => $notes[$sheetUnit] ?? []];
+                $rows = (new MonitoringAnggaran())->rows($values, '', $report['values_by_unit'][$sourceUnit] ?? []);
+                if ($document === 'negative_deviation') $rows = MonitoringAnggaran::negativeDeviationRows($rows, (int) $month);
+                $sheets[$sheetUnit] = ['rows' => $rows, 'notes' => $notes[$sheetUnit] ?? []];
             }
-            $export = (new MonitoringAnggaranExport())->create($sheets, $unit, (int)$year, (int)$month);
+            $export = (new MonitoringAnggaranExport())->create($sheets, $unit, (int)$year, (int)$month, $document);
             $path = $export['path']; $contents = file_get_contents($path);
             if ($contents === false) throw new RuntimeException('File hasil ekspor belum dapat dibaca.');
             return $this->response->setHeader('Cache-Control', 'private, no-store, max-age=0')
@@ -113,13 +123,15 @@ class Akutansi extends BaseController
         $year = $this->request->getPost('tahun');
         $month = $this->request->getPost('bulan');
         $search = $this->request->getPost('uraian');
+        $deviationFilter = $this->request->getPost('deviasi');
         $valid = is_string($unit) && in_array($unit, ['Konsolidasi', ...RkaCalculator::SOURCE_UNITS], true)
             && is_string($year) && preg_match('/^\d{4}$/D', $year) && (int) $year >= 2000 && (int) $year <= 2100
             && is_string($month) && preg_match('/^(?:[1-9]|1[0-2])$/D', $month)
-            && is_string($search) && mb_strlen($search) <= 150;
+            && is_string($search) && mb_strlen($search) <= 150
+            && is_string($deviationFilter) && in_array($deviationFilter, ['all', 'normal', 'negative'], true);
         if (! $valid) return redirect()->to(site_url('akutansi/monitoring-anggaran'))->with('error', 'Unit dan periode monitoring tidak valid.');
 
-        $url = site_url('akutansi/monitoring-anggaran') . '?' . http_build_query(['unit' => $unit, 'tahun' => $year, 'bulan' => $month, 'uraian' => $search]);
+        $url = site_url('akutansi/monitoring-anggaran') . '?' . http_build_query(['unit' => $unit, 'tahun' => $year, 'bulan' => $month, 'uraian' => $search, 'deviasi' => $deviationFilter]);
         $db = db_connect();
         try {
             $notes = $this->request->getPost('notes');

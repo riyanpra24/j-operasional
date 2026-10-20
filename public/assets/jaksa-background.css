@@ -1068,55 +1068,11 @@ body.jaksa-bg .modal-body :is(input, select, textarea):focus {
     box-shadow: 0 0 0 3px rgba(41,146,211,.13) !important;
 }
 
-/* Aksen modal: biru elektrik menuju biru langit. */
-body.jaksa-bg .modal-footer .btn-primary,
-body.jaksa-bg .agendaris-form-modal .btn-primary,
-body.jaksa-bg .distribution-action-modal .btn-primary {
-    color: #fff !important;
-    background: var(--system-electric-sky-gradient) !important;
-    box-shadow: 0 7px 16px rgba(10,101,210,.24) !important;
-}
-body.jaksa-bg .modal-footer .btn-primary:hover,
-body.jaksa-bg .agendaris-form-modal .btn-primary:hover,
-body.jaksa-bg .distribution-action-modal .btn-primary:hover {
-    background: linear-gradient(135deg, #0754b7 0%, #1bb8e7 100%) !important;
-}
 body.jaksa-bg .outgoing-distribution-steps span.active { color: #176b9c !important; }
 body.jaksa-bg .outgoing-distribution-steps span.active b {
     color: #fff !important;
     background: var(--system-electric-sky-gradient) !important;
     box-shadow: 0 5px 11px rgba(10,101,210,.18) !important;
-}
-
-/* Pembuat nomor Agendaris memakai aksen biru yang sama. */
-body.jaksa-bg .btn-agenda-generate {
-    color: #fff !important;
-    border-color: transparent !important;
-    background: var(--system-electric-sky-gradient) !important;
-    box-shadow: 0 7px 16px rgba(10,101,210,.24) !important;
-}
-body.jaksa-bg .btn-agenda-generate:hover {
-    background: linear-gradient(135deg, #0754b7 0%, #1bb8e7 100%) !important;
-}
-body.jaksa-bg .btn-agenda-generate[data-can-cancel="true"] {
-    color: #2162a4 !important;
-    border-color: #c8e4f4 !important;
-    background: #f5fbff !important;
-    box-shadow: none !important;
-}
-body.jaksa-bg .btn-agenda-generate[data-can-cancel="true"]:hover {
-    color: #fff !important;
-    border-color: #0a65d2 !important;
-    background: #0a65d2 !important;
-    box-shadow: 0 6px 14px rgba(10,101,210,.22) !important;
-}
-
-/* Aksi sekunder pada footer formulir mendapat penegasan biru elektrik saat disorot. */
-body.jaksa-bg .modal-footer :is(.btn-secondary, .btn-ghost):hover {
-    color: #fff !important;
-    border-color: #0a65d2 !important;
-    background: #0a65d2 !important;
-    box-shadow: 0 6px 14px rgba(10,101,210,.22) !important;
 }
 
 /* Tombol unduh lembar pengendalian tidak lagi memakai aksen kuning lama. */
@@ -1170,11 +1126,7 @@ body.jaksa-bg.account-management-page .account-heading p { margin-top: 7px !impo
 body.jaksa-bg.account-management-page .account-heading .btn-primary {
     min-height: 45px !important;
     padding: 0 20px !important;
-    color: #fff !important;
-    background: linear-gradient(135deg, #ffbd45, #ffa828) !important;
-    border: 0 !important;
     border-radius: 10px !important;
-    box-shadow: 0 9px 19px rgba(238,154,27,.25) !important;
     font-size: 11px !important;
 }
 body.jaksa-bg.account-management-page .account-stat-grid {

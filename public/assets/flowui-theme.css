@@ -27,7 +27,10 @@
     --brand-indigo: var(--flow-navy);
     --brand-blue: var(--flow-navy);
     --brand-teal: var(--flow-sky);
-    --brand-gradient: linear-gradient(135deg, #123f7e, #2787d7 56%, #45c5b8);
+    --system-electric-blue: #147cff;
+    --system-electric-blue-dark: #0759ca;
+    --system-electric-blue-shadow: rgba(20, 124, 255, .26);
+    --brand-gradient: linear-gradient(135deg, #2693ff 0%, #147cff 54%, #0759ca 100%);
     --sidebar: 228px;
 }
 
@@ -58,13 +61,6 @@ body:not(.landing-page) .content-shell { background: var(--flow-canvas) !importa
 .panel, .reference-panel, .profile-summary-card, .company-summary-card, .reference-data-section,
 .ring-stat-card, .mini-analytics-card, .filter-panel, .register-panel, .form-section, .single-detail,
 .accounting-dashboard-card, .simulation-history-card { box-shadow: 0 7px 20px rgba(21,78,133,.07) !important; }
-.btn-primary, .company-summary-card header button, .main-graph-card header a, .reference-section-header > a,
-.distribution-action-button, .btn-agenda-generate { background: linear-gradient(135deg, #237bd1, #45c5b8) !important; box-shadow: 0 7px 16px rgba(29,113,192,.20) !important; }
-.btn-primary:hover, .company-summary-card header button:hover, .main-graph-card header a:hover,
-.reference-section-header > a:hover, .distribution-action-button:hover, .btn-agenda-generate:hover { background: linear-gradient(135deg, #155eae, #31a99f) !important; }
-.btn-secondary, .btn-ghost, .btn-agendaris-sync, .btn-shift-handover, .btn-agenda-generate[data-can-cancel="true"] { color: #2162a4 !important; background: #f5fbff !important; border-color: #c8e4f4 !important; }
-.btn-secondary:hover, .btn-ghost:hover, .btn-agendaris-sync:hover, .btn-shift-handover:hover,
-.btn-agenda-generate[data-can-cancel="true"]:hover { color: #0d417f !important; background: #e5f5ff !important; border-color: #9ad6ee !important; }
 .btn-danger, .btn-danger-outline, .btn-delete { background: linear-gradient(135deg, #ed6c7f, #df4561) !important; border-color: transparent !important; }
 
 input, select, textarea { background: #fff !important; border-color: #d5e6f3 !important; }
@@ -72,16 +68,13 @@ input:focus, select:focus, textarea:focus { border-color: #2b8cea !important; bo
 th, td { border-color: #deebf5 !important; }
 tbody tr:hover, .table tbody tr:hover { background: #f1fbff !important; }
 .icon-btn, .menu-toggle, .topbar-icon, .date-pill { color: #1d62a5 !important; border-color: #d8e8f3 !important; }
-.icon-btn:hover, .menu-toggle:hover, .topbar-icon:hover { background: linear-gradient(135deg, #237bd1, #45c5b8) !important; border-color: transparent !important; }
 .date-pill-time, .record-link, .text-link, .back-link, .agenda-file-link, .accounting-dashboard-link { color: #2586d8 !important; }
-.pagination li.active a { color: #fff !important; background: linear-gradient(135deg, #237bd1, #45c5b8) !important; border-color: transparent !important; }
 
 .pill, .badge, .tag, .status-chip, .account-role { color: #176cae !important; background: #e8f6ff !important; border-color: #c6e6f7 !important; }
 .status-success, .badge-success, .is-success, .is-profit { color: #177f79 !important; background: #e6faf5 !important; border-color: #bdeae0 !important; }
 .status-danger, .badge-danger, .is-loss { color: #b44257 !important; background: #fff0f3 !important; border-color: #f4c9d1 !important; }
 .section-number, .modal-section-heading > span, .distribution-section-title > div > span,
 .account-name-cell > span, .vehicle-form-stepper li.complete > span, .progress-document-tab.complete > span { color: #1765ad !important; background: #e4f4ff !important; border-color: #bfdef3 !important; }
-.vehicle-module-tab.active > span, .vehicle-form-stepper li.active > span, .progress-document-tab.active > span { background: linear-gradient(135deg, #237bd1, #45c5b8) !important; }
 
 /* Dark navigation rail */
 .sidebar { color: #d9e8ec !important; background: linear-gradient(180deg, #0d3b50, #092f41) !important; border: 0 !important; box-shadow: 8px 0 28px rgba(5,34,48,.19) !important; }
@@ -153,26 +146,6 @@ tbody tr:hover, .table tbody tr:hover { background: #f1fbff !important; }
     background: var(--brand-gradient) !important;
 }
 
-/* Action system */
-.btn-primary, .company-summary-card header button, .main-graph-card header a, .reference-section-header > a,
-.distribution-action-button, .btn-agenda-generate {
-    color: #fff !important;
-    background: var(--brand-gradient) !important;
-    border-color: transparent !important;
-    box-shadow: 0 8px 18px rgba(12,52,70,.20) !important;
-}
-.btn-primary:hover, .company-summary-card header button:hover, .main-graph-card header a:hover,
-.reference-section-header > a:hover, .distribution-action-button:hover, .btn-agenda-generate:hover {
-    background: linear-gradient(135deg, #082a3a, #10455e 63%, #36a9c6) !important;
-}
-.btn-secondary, .btn-ghost, .btn-agendaris-sync, .btn-shift-handover, .btn-agenda-generate[data-can-cancel="true"] {
-    color: var(--flow-navy) !important;
-    background: #fff6d9 !important;
-    border-color: #f0d98e !important;
-    box-shadow: none !important;
-}
-.btn-secondary:hover, .btn-ghost:hover, .btn-agendaris-sync:hover, .btn-shift-handover:hover,
-.btn-agenda-generate[data-can-cancel="true"]:hover { color: var(--flow-navy) !important; background: var(--flow-yellow) !important; border-color: #eabf48 !important; }
 .btn-danger, .btn-danger-outline, .btn-delete { color: #fff !important; background: var(--flow-coral) !important; border-color: var(--flow-coral) !important; }
 .btn-danger:hover, .btn-danger-outline:hover, .btn-delete:hover { background: #d94b59 !important; border-color: #d94b59 !important; }
 
@@ -195,9 +168,7 @@ thead th, .table thead th { color: #667781 !important; }
 th, td { border-color: #f0e8da !important; }
 tbody tr:hover, .table tbody tr:hover { background: #fff9e9 !important; }
 .icon-btn, .menu-toggle, .topbar-icon, .date-pill { color: var(--flow-navy) !important; background: #fff !important; border-color: #e9e2d6 !important; }
-.icon-btn:hover, .menu-toggle:hover, .topbar-icon:hover { color: #fff !important; background: var(--flow-navy) !important; border-color: var(--flow-navy) !important; }
 .date-pill-time, .record-link, .text-link, .back-link, .agenda-file-link, .accounting-dashboard-link { color: var(--flow-sky) !important; }
-.pagination li.active a { color: var(--flow-navy) !important; background: var(--flow-yellow) !important; border-color: var(--flow-yellow) !important; }
 
 /* Statuses, icons, and dashboard data colors */
 .section-number, .modal-section-heading > span, .distribution-section-title > div > span,
@@ -205,11 +176,6 @@ tbody tr:hover, .table tbody tr:hover { background: #fff9e9 !important; }
     color: var(--flow-navy) !important;
     background: #fff0bf !important;
     border-color: #eed07a !important;
-}
-.vehicle-module-tab.active > span, .vehicle-form-stepper li.active > span, .progress-document-tab.active > span {
-    color: #fff !important;
-    background: var(--brand-gradient) !important;
-    border-color: transparent !important;
 }
 .pill, .badge, .tag, .status-chip, .account-role { color: var(--flow-navy) !important; background: #fff2c7 !important; border-color: #f0d581 !important; }
 .status-success, .badge-success, .is-success, .is-profit { color: var(--flow-navy) !important; background: #fff0b5 !important; border-color: #edcf72 !important; }
@@ -507,24 +473,18 @@ body:not(.landing-page) .content-shell { background: var(--flow-canvas) !importa
 .panel, .reference-panel, .profile-summary-card, .company-summary-card, .reference-data-section,
 .ring-stat-card, .mini-analytics-card, .filter-panel, .register-panel, .form-section, .single-detail,
 .accounting-dashboard-card, .simulation-history-card { border-color: #dce9f4 !important; box-shadow: 0 7px 20px rgba(21,78,133,.07) !important; }
-.btn-primary, .company-summary-card header button, .main-graph-card header a, .reference-section-header > a,
-.distribution-action-button, .btn-agenda-generate { color: #fff !important; background: linear-gradient(135deg, #237bd1, #45c5b8) !important; border-color: transparent !important; box-shadow: 0 7px 16px rgba(29,113,192,.20) !important; }
-.btn-secondary, .btn-ghost, .btn-agendaris-sync, .btn-shift-handover, .btn-agenda-generate[data-can-cancel="true"] { color: #2162a4 !important; background: #f5fbff !important; border-color: #c8e4f4 !important; }
 .btn-danger, .btn-danger-outline, .btn-delete { color: #fff !important; background: linear-gradient(135deg, #ed6c7f, #df4561) !important; border-color: transparent !important; }
 input, select, textarea { color: #183d6d !important; background: #fff !important; border-color: #d5e6f3 !important; }
 input:focus, select:focus, textarea:focus { border-color: #2b8cea !important; box-shadow: 0 0 0 3px rgba(43,140,234,.13) !important; }
 th, td { border-color: #deebf5 !important; }
 tbody tr:hover, .table tbody tr:hover { background: #f1fbff !important; }
 .icon-btn, .menu-toggle, .topbar-icon, .date-pill { color: #1d62a5 !important; background: #fff !important; border-color: #d8e8f3 !important; }
-.icon-btn:hover, .menu-toggle:hover, .topbar-icon:hover { color: #fff !important; background: linear-gradient(135deg, #237bd1, #45c5b8) !important; border-color: transparent !important; }
 .date-pill-time, .record-link, .text-link, .back-link, .agenda-file-link, .accounting-dashboard-link { color: #2586d8 !important; }
-.pagination li.active a { color: #fff !important; background: linear-gradient(135deg, #237bd1, #45c5b8) !important; border-color: transparent !important; }
 .pill, .badge, .tag, .status-chip, .account-role { color: #176cae !important; background: #e8f6ff !important; border-color: #c6e6f7 !important; }
 .status-success, .badge-success, .is-success, .is-profit { color: #177f79 !important; background: #e6faf5 !important; border-color: #bdeae0 !important; }
 .status-danger, .badge-danger, .is-loss { color: #b44257 !important; background: #fff0f3 !important; border-color: #f4c9d1 !important; }
 .section-number, .modal-section-heading > span, .distribution-section-title > div > span,
 .account-name-cell > span, .vehicle-form-stepper li.complete > span, .progress-document-tab.complete > span { color: #1765ad !important; background: #e4f4ff !important; border-color: #bfdef3 !important; }
-.vehicle-module-tab.active > span, .vehicle-form-stepper li.active > span, .progress-document-tab.active > span { color: #fff !important; background: linear-gradient(135deg, #237bd1, #45c5b8) !important; }
 
 /* Decorative backdrop for Distribusi Dokumen.  It is purely visual and sits behind every control. */
 .distribution-page { overflow-x: hidden; }
@@ -706,21 +666,6 @@ body:not(.landing-page):not(.login-page) .page-heading:not(.security-page-headin
 }
 body:not(.landing-page):not(.login-page) .page-heading:not(.security-page-heading):not(.distribution-heading) > * { position: relative; z-index: 1; }
 
-.filter-actions .btn-secondary {
-    color: #fff !important;
-    background: linear-gradient(135deg, #237bd1, #45c5b8) !important;
-    border-color: transparent !important;
-    box-shadow: 0 7px 16px rgba(29,113,192,.20) !important;
-}
-.filter-actions .btn-ghost { color: #2162a4 !important; background: #f5fbff !important; border-color: #c8e4f4 !important; }
-.heading-actions > .btn-primary,
-.heading-button-group .btn-primary {
-    color: #fff !important;
-    background: linear-gradient(135deg, #ffbd45, #ffa828) !important;
-    border-color: transparent !important;
-    box-shadow: 0 8px 16px rgba(238,154,27,.27) !important;
-}
-
 /* Headings that do not use page-heading (dashboard and account modules) receive the same backdrop. */
 body:not(.landing-page):not(.login-page) .dashboard-intro,
 body:not(.landing-page):not(.login-page) .account-heading,
@@ -868,12 +813,12 @@ body:not(.landing-page):not(.login-page) .heading-actions:not(.page-heading):not
 .progress-page .distribution-heading p:not(.eyebrow) { color: #6280aa !important; }
 .progress-page .distribution-heading .heading-button-group { gap: 10px !important; }
 .progress-page .distribution-heading .btn-primary {
-    min-height: 47px !important; padding-inline: 22px !important; background: linear-gradient(135deg, #ffbd45, #ffa828) !important;
-    border-color: transparent !important; border-radius: 12px !important; box-shadow: 0 8px 16px rgba(238,154,27,.27) !important; font-size: 10px !important;
+    min-height: 47px !important; padding-inline: 22px !important;
+    border-radius: 12px !important; font-size: 10px !important;
 }
 .progress-page .distribution-heading .btn-secondary {
-    min-height: 47px !important; color: #276397 !important; background: rgba(255,255,255,.86) !important;
-    border-color: #cbe5f6 !important; border-radius: 12px !important; box-shadow: 0 5px 13px rgba(24,95,144,.08) !important;
+    min-height: 47px !important; border-radius: 12px !important;
+    box-shadow: 0 5px 13px rgba(24,95,144,.08) !important;
 }
 
 .progress-page .security-filter-panel { margin-top: 0 !important; }
@@ -908,4 +853,97 @@ body:not(.landing-page):not(.login-page) .heading-actions:not(.page-heading):not
 @media (max-width: 700px) {
     .progress-page .main-content { padding: 16px !important; }
     .progress-page .distribution-heading { margin: -16px -16px 12px !important; padding: 18px 16px 12px !important; }
+}
+
+/* Aksi utama global menggunakan biru elektrik. Warna status tetap terpisah. */
+.btn-primary,
+.company-summary-card header button,
+.main-graph-card header a,
+.reference-section-header > a,
+.distribution-action-button,
+.btn-agenda-generate:not([data-can-cancel="true"]),
+.login-submit,
+.landing-login-submit,
+.geo-primary-action,
+.filter-actions .btn-secondary,
+.heading-actions > .btn-primary,
+.heading-button-group .btn-primary,
+.progress-page .distribution-heading .btn-primary {
+    color: #fff !important;
+    background: var(--brand-gradient) !important;
+    border-color: transparent !important;
+    box-shadow: 0 7px 16px var(--system-electric-blue-shadow) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible,
+.company-summary-card header button:hover,
+.company-summary-card header button:focus-visible,
+.main-graph-card header a:hover,
+.main-graph-card header a:focus-visible,
+.reference-section-header > a:hover,
+.reference-section-header > a:focus-visible,
+.distribution-action-button:hover,
+.distribution-action-button:focus-visible,
+.btn-agenda-generate:not([data-can-cancel="true"]):hover,
+.btn-agenda-generate:not([data-can-cancel="true"]):focus-visible,
+.login-submit:hover,
+.landing-login-submit:hover,
+.geo-primary-action:hover,
+.filter-actions .btn-secondary:hover,
+.filter-actions .btn-secondary:focus-visible,
+.heading-actions > .btn-primary:hover,
+.heading-actions > .btn-primary:focus-visible,
+.heading-button-group .btn-primary:hover,
+.heading-button-group .btn-primary:focus-visible,
+.progress-page .distribution-heading .btn-primary:hover,
+.progress-page .distribution-heading .btn-primary:focus-visible {
+    color: #fff !important;
+    background: linear-gradient(135deg, #0d72e4 0%, #0759ca 58%, #03459f 100%) !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 18px rgba(5, 89, 202, .30) !important;
+}
+
+/* Tombol pendamping tidak lagi memakai kuning, tetapi tetap lebih ringan dari aksi utama. */
+.btn-secondary,
+.btn-ghost,
+.btn-agendaris-sync,
+.btn-shift-handover,
+.btn-agenda-generate[data-can-cancel="true"],
+.progress-page .distribution-heading .btn-secondary,
+.filter-actions .btn-ghost {
+    color: #075fc9 !important;
+    background: #f1f7ff !important;
+    border-color: #b9d9ff !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus-visible,
+.btn-ghost:hover,
+.btn-ghost:focus-visible,
+.btn-agendaris-sync:hover,
+.btn-agendaris-sync:focus-visible,
+.btn-shift-handover:hover,
+.btn-shift-handover:focus-visible,
+.btn-agenda-generate[data-can-cancel="true"]:hover,
+.btn-agenda-generate[data-can-cancel="true"]:focus-visible,
+.progress-page .distribution-heading .btn-secondary:hover,
+.progress-page .distribution-heading .btn-secondary:focus-visible,
+.filter-actions .btn-ghost:hover,
+.filter-actions .btn-ghost:focus-visible {
+    color: #064ca8 !important;
+    background: #e3f0ff !important;
+    border-color: #75b1ff !important;
+}
+
+.icon-btn:hover,
+.menu-toggle:hover,
+.topbar-icon:hover,
+.pagination li.active a,
+.vehicle-module-tab.active > span,
+.vehicle-form-stepper li.active > span,
+.progress-document-tab.active > span {
+    color: #fff !important;
+    background: var(--brand-gradient) !important;
+    border-color: transparent !important;
 }

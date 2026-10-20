@@ -109,11 +109,11 @@ $exportDefaultYear = (int) ($exportDefaultPeriod?->format('Y') ?? $uploadYear);
                             <rect x="14" y="14" width="7" height="7" rx="1.4"></rect>
                         </svg>
                     </summary>
-                    <div class="lr-action-menu-popover">
-                        <button type="button" data-open-attendance-upload>Unggah Laporan Kehadiran</button>
-                        <?php if ($attendanceImports !== []): ?><button type="button" data-open-attendance-export>Ekspor Rekap Kehadiran</button><?php endif ?>
+                    <div class="lr-action-menu-popover" role="menu" aria-label="Menu Data Kehadiran">
+                        <button type="button" role="menuitem" class="lr-action-menu-item" data-open-attendance-upload>Unggah Laporan Kehadiran</button>
+                        <?php if ($attendanceImports !== []): ?><button type="button" role="menuitem" class="lr-action-menu-item" data-open-attendance-export>Ekspor Rekap Kehadiran</button><?php endif ?>
                         <span class="lr-action-menu-divider" aria-hidden="true"></span>
-                        <button type="button" class="is-danger" data-open-attendance-delete>Hapus Laporan Kehadiran</button>
+                        <button type="button" role="menuitem" class="lr-action-menu-item is-danger" data-open-attendance-delete>Hapus Laporan Kehadiran</button>
                     </div>
                 </details>
             </div>

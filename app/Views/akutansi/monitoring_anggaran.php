@@ -6,13 +6,14 @@ $months = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Me
 $period = $months[$selectedMonth] . ' ' . $selectedYear;
 // Excel displays the elapsed-month fraction as a whole percentage.
 $proportionalPercent = intdiv($selectedMonth * 100 + 6, 12) . '%';
-$displayMarkedValue = static function (string $value): string {
+$displayMarkedValue = static function (string $value, string $negativeMarker = '*'): string {
+    if (str_starts_with($value, '*')) $value = $negativeMarker . substr($value, 1);
     $escaped = esc($value);
-    return str_starts_with($value, '*') ? '<span class="monitoring-negative-value">' . $escaped . '</span>' : $escaped;
+    return str_starts_with($value, $negativeMarker) ? '<span class="monitoring-negative-value">' . $escaped . '</span>' : $escaped;
 };
 $displayDeviation = static function (?string $realizationRatio) use ($selectedMonth, $displayMarkedValue): string {
     $deviation = \App\Libraries\MonitoringAnggaran::deviation($realizationRatio, $selectedMonth);
-    return $deviation === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::percentageDisplay($deviation));
+    return $deviation === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::percentageDisplay($deviation), '-');
 };
 $groups = [];
 foreach ($monitoringRows as $row) {
@@ -22,7 +23,13 @@ foreach ($monitoringRows as $row) {
         $groups[count($groups) - 1]['details'][] = $row;
     }
 }
-$showSearchResults = $search !== '';
+$selectedDeviationFilter = $selectedDeviationFilter ?? 'all';
+$showFilteredRows = $search !== '' || $selectedDeviationFilter !== 'all';
+$emptyResultMessage = match ($selectedDeviationFilter) {
+    'normal' => 'Tidak ada uraian dengan deviasi normal pada periode ini.',
+    'negative' => 'Tidak ada uraian dengan deviasi minus pada periode ini.',
+    default => 'Coba kata pencarian lain.',
+};
 $monitoringNotes = $monitoringNotes ?? [];
 $editNotes = function_exists('old') ? old('notes') : null;
 $editNotes = is_array($editNotes) ? $editNotes : [];
@@ -38,7 +45,9 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
     .monitoring-budget-table .monitoring-budget-group { cursor: pointer; }
     .monitoring-budget-table tbody td:last-child { color: #000; font-weight: 600; }
     .monitoring-budget-table tbody td:nth-child(2) { color: var(--navy); font-weight: 800; }
-    .monitoring-budget-table .monitoring-negative-value { color: #c62828; }
+    .monitoring-budget-table .monitoring-negative-value { color: #991b1b; }
+    .monitoring-budget-table tbody td:has(> .monitoring-negative-value),
+    .monitoring-budget-table .monitoring-budget-group:hover > td:has(> .monitoring-negative-value) { background-color: #fee8e8; }
     .monitoring-budget-table td:last-child { white-space: pre-wrap; overflow-wrap: anywhere; }
     .monitoring-budget-table:not(.monitoring-edit-table) tbody td:last-child { text-align: left; }
     .monitoring-edit-dialog { width: min(1500px, calc(100% - 28px)); }
@@ -91,6 +100,16 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
                 <input class="lr-upload-select" id="budgetYear" type="number" name="tahun" min="2000" max="2100" value="<?= $selectedYear ?>" required>
             </div>
         </div>
+        <div class="form-group lr-filter-deviation">
+            <label class="lr-upload-label" for="budgetDeviation">Filter Deviasi</label>
+            <div class="lr-rka-filter-control"><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4h10M7 20h10M9 4 15 20M15 4 9 20"></path></svg></span>
+                <select class="lr-upload-select" id="budgetDeviation" name="deviasi">
+                    <option value="all" <?= $selectedDeviationFilter === 'all' ? 'selected' : '' ?>>Semua Deviasi</option>
+                    <option value="normal" <?= $selectedDeviationFilter === 'normal' ? 'selected' : '' ?>>Deviasi Normal</option>
+                    <option value="negative" <?= $selectedDeviationFilter === 'negative' ? 'selected' : '' ?>>Deviasi Mines</option>
+                </select>
+            </div>
+        </div>
         <div class="form-group lr-filter-lob">
             <label class="lr-upload-label" for="budgetSearch">Cari Uraian</label>
             <div class="lr-rka-filter-control"><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 5 5"></path></svg></span>
@@ -102,7 +121,7 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
             <a class="btn btn-ghost" href="<?= site_url('akutansi/monitoring-anggaran') ?>">Reset</a>
             <details class="lr-action-menu lr-filter-menu">
                 <summary class="lr-filter-menu-trigger" aria-label="Menu tindakan Monitoring Anggaran" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><rect x="14" y="14" width="7" height="7" rx="1.4"></rect></svg></summary>
-                <div class="lr-action-menu-popover" role="menu" aria-label="Menu Monitoring Anggaran"><button type="button" role="menuitem" class="lr-action-menu-item" data-monitoring-edit-open aria-haspopup="dialog" aria-controls="monitoringEditDialog">Edit Anggaran</button><a role="menuitem" class="lr-action-menu-item" href="<?= esc(site_url('akutansi/monitoring-anggaran/export') . '?' . http_build_query(['unit' => $selectedUnit, 'tahun' => $selectedYear, 'bulan' => $selectedMonth, 'uraian' => $search]), 'attr') ?>">Export Excel</a></div>
+                <div class="lr-action-menu-popover" role="menu" aria-label="Menu Monitoring Anggaran"><button type="button" role="menuitem" class="lr-action-menu-item" data-monitoring-edit-open aria-haspopup="dialog" aria-controls="monitoringEditDialog">Edit Anggaran</button><button type="button" role="menuitem" class="lr-action-menu-item" data-monitoring-export-open aria-haspopup="dialog" aria-controls="monitoringExportDialog">Export Excel</button></div>
             </details>
         </div>
     </form>
@@ -128,7 +147,7 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
             </tr></thead>
             <tbody>
                 <?php if ($monitoringRows === []): ?>
-                    <tr><td class="bukti-bayar-empty" colspan="8"><strong>Uraian tidak ditemukan</strong><span>Coba kata pencarian lain.</span></td></tr>
+                    <tr><td class="bukti-bayar-empty" colspan="8"><strong>Uraian tidak ditemukan</strong><span><?= esc($emptyResultMessage) ?></span></td></tr>
                 <?php else: ?>
                     <?php foreach ($groups as $groupIndex => $group): ?>
                         <?php
@@ -137,15 +156,15 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
                         $heading = $group['heading'];
                         ?>
                         <tr class="lr-row-subgroup monitoring-budget-group" data-monitoring-group>
-                            <th scope="row"><button type="button" class="lr-group-toggle" data-monitoring-toggle aria-expanded="<?= $showSearchResults ? 'true' : 'false' ?>" aria-controls="<?= esc(implode(' ', $detailIds), 'attr') ?>"><span class="lr-group-chevron" aria-hidden="true">›</span><span><?= esc($heading['label']) ?></span></button></th>
+                            <th scope="row"><button type="button" class="lr-group-toggle" data-monitoring-toggle aria-expanded="<?= $showFilteredRows ? 'true' : 'false' ?>" aria-controls="<?= esc(implode(' ', $detailIds), 'attr') ?>"><span class="lr-group-chevron" aria-hidden="true">›</span><span><?= esc($heading['label']) ?></span></button></th>
                             <td><?= $heading['amount'] === null ? '—' : esc(\App\Libraries\RkaMoney::display($heading['amount'])) ?></td>
-                            <td><?= ($heading['realization'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($heading['realization'])) ?></td><td><?= ($heading['realization_ratio'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::percentageDisplay($heading['realization_ratio'])) ?></td><td><?= esc($proportionalPercent) ?></td><td><?= $displayDeviation($heading['realization_ratio'] ?? null) ?></td><td><?= ($heading['remaining_budget'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($heading['remaining_budget'])) ?></td><td><?= ($monitoringNotes[$heading['key']] ?? '') === '' ? '—' : esc($monitoringNotes[$heading['key']]) ?></td>
+                            <td><?= ($heading['realization'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($heading['realization'])) ?></td><td><?= ($heading['realization_ratio'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::percentageDisplay($heading['realization_ratio'])) ?></td><td><?= esc($proportionalPercent) ?></td><td><?= $displayDeviation($heading['realization_ratio'] ?? null) ?></td><td><?= ($heading['remaining_budget'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($heading['remaining_budget']), '-') ?></td><td><?= ($monitoringNotes[$heading['key']] ?? '') === '' ? '—' : esc($monitoringNotes[$heading['key']]) ?></td>
                         </tr>
                         <?php foreach ($group['details'] as $detailIndex => $row): ?>
-                            <tr id="<?= esc($detailIds[$detailIndex], 'attr') ?>" class="lr-row-detail monitoring-budget-detail" <?= $showSearchResults ? '' : 'hidden' ?>>
+                            <tr id="<?= esc($detailIds[$detailIndex], 'attr') ?>" class="lr-row-detail monitoring-budget-detail" <?= $showFilteredRows ? '' : 'hidden' ?>>
                                 <th scope="row"><?= esc($row['label']) ?></th>
                                 <td><?= $row['amount'] === null ? '—' : esc(\App\Libraries\RkaMoney::display($row['amount'])) ?></td>
-                                <td><?= ($row['realization'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($row['realization'])) ?></td><td><?= ($row['realization_ratio'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::percentageDisplay($row['realization_ratio'])) ?></td><td><?= esc($proportionalPercent) ?></td><td><?= $displayDeviation($row['realization_ratio'] ?? null) ?></td><td><?= ($row['remaining_budget'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($row['remaining_budget'])) ?></td><td><?= ($monitoringNotes[$row['key']] ?? '') === '' ? '—' : esc($monitoringNotes[$row['key']]) ?></td>
+                                <td><?= ($row['realization'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($row['realization'])) ?></td><td><?= ($row['realization_ratio'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::percentageDisplay($row['realization_ratio'])) ?></td><td><?= esc($proportionalPercent) ?></td><td><?= $displayDeviation($row['realization_ratio'] ?? null) ?></td><td><?= ($row['remaining_budget'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($row['remaining_budget']), '-') ?></td><td><?= ($monitoringNotes[$row['key']] ?? '') === '' ? '—' : esc($monitoringNotes[$row['key']]) ?></td>
                             </tr>
                         <?php endforeach ?>
                     <?php endforeach ?>
@@ -158,11 +177,36 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
     <?php if ($hasRealization ?? false): ?><p>Tanda — berarti realisasi uraian belum tersedia. Total kelompok hanya ditampilkan jika seluruh rinciannya tersedia.</p><?php endif ?>
 </section>
 
+<dialog id="monitoringExportDialog" class="lr-settings-dialog lr-export-dialog" aria-labelledby="monitoringExportTitle">
+    <header class="lr-settings-header">
+        <div><p class="eyebrow">AKUNTANSI / MONITORING ANGGARAN</p><h2 id="monitoringExportTitle">Export Excel</h2></div>
+        <button type="button" class="icon-btn" data-monitoring-export-close aria-label="Tutup popup export">×</button>
+    </header>
+    <form method="get" action="<?= site_url('akutansi/monitoring-anggaran/export') ?>" data-monitoring-export-form>
+        <input type="hidden" name="unit" value="<?= esc($selectedUnit, 'attr') ?>">
+        <input type="hidden" name="uraian" value="<?= esc($search, 'attr') ?>">
+        <div class="lr-settings-body">
+            <p>Pilih periode untuk mengunduh Monitoring Anggaran.</p>
+            <label class="lr-upload-label" for="monitoringExportDocument">Dokumen export</label>
+            <select id="monitoringExportDocument" class="lr-upload-select" name="dokumen_export" required>
+                <option value="all">All Monitoring</option>
+                <option value="negative_deviation">Deviasi Minus</option>
+            </select>
+            <label class="lr-upload-label" for="monitoringExportMonth">Bulan</label>
+            <select id="monitoringExportMonth" class="lr-upload-select" name="bulan" required><?php foreach ($months as $number => $month): ?><option value="<?= $number ?>" <?= $number === $selectedMonth ? 'selected' : '' ?>><?= esc($month) ?></option><?php endforeach ?></select>
+            <label class="lr-upload-label" for="monitoringExportYear">Tahun</label>
+            <input id="monitoringExportYear" class="lr-upload-select" type="number" name="tahun" min="2000" max="2100" step="1" value="<?= $selectedYear ?>" required>
+            <p class="lr-upload-note">All Monitoring memuat seluruh data. Deviasi Minus hanya memuat uraian dengan deviasi bertanda merah, beserta kelompoknya.</p>
+        </div>
+        <footer class="lr-settings-footer lr-upload-footer"><button type="button" class="btn btn-secondary" data-monitoring-export-close>Batal</button><button type="submit" class="btn btn-primary">Export Excel</button></footer>
+    </form>
+</dialog>
+
 <dialog id="monitoringEditDialog" class="lr-settings-dialog monitoring-edit-dialog" aria-labelledby="monitoringEditTitle" data-auto-open="<?= $monitoringEditOpen ? 'true' : 'false' ?>">
     <header class="lr-settings-header"><div><p class="eyebrow">AKUNTANSI / MONITORING ANGGARAN</p><h2 id="monitoringEditTitle">Edit Anggaran</h2><p class="monitoring-edit-context">Unit kerja: <?= esc($selectedUnit) ?> · Periode: <?= esc($period) ?></p></div><button type="button" class="icon-btn" data-monitoring-edit-close aria-label="Tutup popup edit">×</button></header>
     <form method="post" action="<?= site_url('akutansi/monitoring-anggaran/penjelasan') ?>">
         <?= csrf_field() ?>
-        <input type="hidden" name="unit" value="<?= esc($selectedUnit, 'attr') ?>"><input type="hidden" name="tahun" value="<?= $selectedYear ?>"><input type="hidden" name="bulan" value="<?= $selectedMonth ?>"><input type="hidden" name="uraian" value="<?= esc($search, 'attr') ?>">
+        <input type="hidden" name="unit" value="<?= esc($selectedUnit, 'attr') ?>"><input type="hidden" name="tahun" value="<?= $selectedYear ?>"><input type="hidden" name="bulan" value="<?= $selectedMonth ?>"><input type="hidden" name="uraian" value="<?= esc($search, 'attr') ?>"><input type="hidden" name="deviasi" value="<?= esc($selectedDeviationFilter, 'attr') ?>">
         <div class="monitoring-edit-scroll" role="region" aria-label="Tabel edit monitoring anggaran" tabindex="0">
             <table class="lr-report-table lr-rka-table monitoring-budget-table monitoring-edit-table">
                 <colgroup><col style="width:23%"><col style="width:10%"><col style="width:12%"><col style="width:8%"><col style="width:12%"><col style="width:8%"><col style="width:10%"><col style="width:17%"></colgroup>
@@ -176,13 +220,13 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
                     ?>
                     <?php foreach ($editRows as $editIndex => $editRow): ?>
                         <?php $key = $editRow['key']; $note = $monitoringNotes[$key] ?? ''; ?>
-                        <tr class="<?= $editRow['group'] ? 'lr-row-subgroup monitoring-budget-group' : 'lr-row-detail monitoring-edit-detail' ?>" <?php if ($editRow['group']): ?>data-monitoring-group<?php else: ?>id="<?= esc($editDetailIds[$editIndex - 1], 'attr') ?>" <?= $showSearchResults ? '' : 'hidden' ?><?php endif ?>>
-                            <th scope="row"><?php if ($editRow['group']): ?><button type="button" class="lr-group-toggle" data-monitoring-toggle aria-expanded="<?= $showSearchResults ? 'true' : 'false' ?>" aria-controls="<?= esc(implode(' ', $editDetailIds), 'attr') ?>"><span class="lr-group-chevron" aria-hidden="true">›</span><span><?= esc($editRow['label']) ?></span></button><?php else: ?><?= esc($editRow['label']) ?><?php endif ?></th>
+                        <tr class="<?= $editRow['group'] ? 'lr-row-subgroup monitoring-budget-group' : 'lr-row-detail monitoring-edit-detail' ?>" <?php if ($editRow['group']): ?>data-monitoring-group<?php else: ?>id="<?= esc($editDetailIds[$editIndex - 1], 'attr') ?>" <?= $showFilteredRows ? '' : 'hidden' ?><?php endif ?>>
+                            <th scope="row"><?php if ($editRow['group']): ?><button type="button" class="lr-group-toggle" data-monitoring-toggle aria-expanded="<?= $showFilteredRows ? 'true' : 'false' ?>" aria-controls="<?= esc(implode(' ', $editDetailIds), 'attr') ?>"><span class="lr-group-chevron" aria-hidden="true">›</span><span><?= esc($editRow['label']) ?></span></button><?php else: ?><?= esc($editRow['label']) ?><?php endif ?></th>
                             <td><?= $editRow['amount'] === null ? '—' : esc(\App\Libraries\RkaMoney::display($editRow['amount'])) ?></td>
                             <td><?= ($editRow['realization'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($editRow['realization'])) ?></td>
                             <td><?= ($editRow['realization_ratio'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::percentageDisplay($editRow['realization_ratio'])) ?></td>
                             <td><?= esc($proportionalPercent) ?></td><td><?= $displayDeviation($editRow['realization_ratio'] ?? null) ?></td>
-                            <td><?= ($editRow['remaining_budget'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($editRow['remaining_budget'])) ?></td>
+                            <td><?= ($editRow['remaining_budget'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($editRow['remaining_budget']), '-') ?></td>
                             <td><textarea name="notes[<?= esc($key, 'attr') ?>]" rows="1" maxlength="2000" aria-label="Penjelasan <?= esc($editRow['label'], 'attr') ?>"><?= esc($editNotes[$key] ?? $note) ?></textarea><textarea name="original[<?= esc($key, 'attr') ?>]" hidden><?= esc($note) ?></textarea></td>
                         </tr>
                     <?php endforeach ?>
@@ -215,6 +259,13 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
     });
     monitoringDialog?.querySelectorAll('[data-monitoring-edit-close]').forEach((button) => button.addEventListener('click', () => monitoringDialog.close()));
     if (monitoringDialog?.dataset.autoOpen === 'true') monitoringDialog.showModal();
+    const monitoringExportDialog = document.getElementById('monitoringExportDialog');
+    document.querySelector('[data-monitoring-export-open]')?.addEventListener('click', (event) => {
+        event.currentTarget.closest('details')?.removeAttribute('open');
+        monitoringExportDialog?.showModal();
+    });
+    monitoringExportDialog?.querySelectorAll('[data-monitoring-export-close]').forEach((button) => button.addEventListener('click', () => monitoringExportDialog.close()));
+    monitoringExportDialog?.querySelector('[data-monitoring-export-form]')?.addEventListener('submit', () => monitoringExportDialog.close());
 </script>
 
 <?= $this->endSection() ?>

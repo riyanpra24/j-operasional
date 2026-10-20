@@ -499,6 +499,7 @@ $rangeLabel = $filters['tanggal_dari'] !== '' || $filters['tanggal_sampai'] !== 
 
         const closeCategoryOptions = () => {
             if (!categoryOptions || !categoryTrigger) return;
+            window.hideJaksaSelectOverlay?.(categoryOptions);
             categoryOptions.hidden = true;
             categoryTrigger.setAttribute('aria-expanded', 'false');
             categoryWidget?.classList.remove('is-open');
@@ -509,9 +510,15 @@ $rangeLabel = $filters['tanggal_dari'] !== '' || $filters['tanggal_sampai'] !== 
             categoryOptions.style.removeProperty('right');
             categoryOptions.style.removeProperty('width');
             categoryOptions.style.removeProperty('z-index');
+            categoryOptions.style.removeProperty('max-height');
+            categoryOptions.style.removeProperty('overflow-y');
         };
-        const positionCategoryOptions = () => {
+        const positionCategoryOptions = (ensureSpace = false) => {
             if (!categoryOptions || !categoryTrigger || categoryOptions.hidden) return;
+            if (window.positionJaksaSelectMenu) {
+                window.positionJaksaSelectMenu(categoryTrigger, categoryOptions, categoryTrigger.closest('[role="dialog"][aria-modal="true"]'), ensureSpace === true);
+                return;
+            }
             const triggerBounds = categoryTrigger.getBoundingClientRect();
             categoryOptions.style.top = `${Math.round(triggerBounds.bottom + 5)}px`;
             categoryOptions.style.left = `${Math.round(triggerBounds.left)}px`;
@@ -536,7 +543,8 @@ $rangeLabel = $filters['tanggal_dari'] !== '' || $filters['tanggal_sampai'] !== 
                     categoryOptions.style.position = 'fixed';
                     categoryOptions.style.zIndex = '150';
                     categoryOptions.style.right = 'auto';
-                    positionCategoryOptions();
+                    window.showJaksaSelectOverlay?.(categoryOptions);
+                    positionCategoryOptions(true);
                 } else {
                     closeCategoryOptions();
                 }

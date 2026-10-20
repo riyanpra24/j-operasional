@@ -82,6 +82,8 @@ $welcomeBackgroundVersion = $assetVersion('assets/images/welcome-corporate-wave.
 $appJsVersion = $assetVersion($appJsAsset);
 $requiredMarkersVersion = $assetVersion($requiredMarkersAsset);
 $urlMaskVersion = $assetVersion($urlMaskAsset);
+$globalSelectCssVersion = $assetVersion('assets/global-select.css');
+$globalSelectJsVersion = $assetVersion('assets/global-select.js');
 $authExpiresAt = (int) session()->get('auth_expires_at');
 $roleNotifications = [
     'total' => 0,
@@ -131,6 +133,7 @@ if ($currentRole === 'security') {
     <link rel="stylesheet" href="<?= base_url($appCssAsset) ?>?v=<?= esc($appCssVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/flowui-theme.css') ?>?v=<?= esc($flowuiThemeVersion, 'attr') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/jaksa-background.css') ?>?v=<?= esc($jaksaBackgroundVersion, 'attr') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/global-select.css') ?>?v=<?= esc($globalSelectCssVersion, 'attr') ?>">
     <script src="<?= base_url($urlMaskAsset) ?>?v=<?= esc($urlMaskVersion, 'attr') ?>"></script>
     <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
     <script>
@@ -584,6 +587,7 @@ if ($currentRole === 'security') {
 
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape' && popupIsVisible()) {
+                    if (event.target instanceof Element && (event.target.closest('.global-select-menu') || event.target.closest('.global-select-trigger[aria-expanded="true"]'))) return;
                     event.preventDefault();
                     event.stopImmediatePropagation();
                 }
@@ -601,5 +605,6 @@ if ($currentRole === 'security') {
 
     </script>
     <script src="<?= base_url($appJsAsset) ?>?v=<?= esc($appJsVersion, 'attr') ?>"></script>
+    <script src="<?= base_url('assets/global-select.js') ?>?v=<?= esc($globalSelectJsVersion, 'attr') ?>"></script>
 </body>
 </html>

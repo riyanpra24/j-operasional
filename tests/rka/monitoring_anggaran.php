@@ -10,17 +10,25 @@ $calculator = new App\Libraries\RkaCalculator();
 $inputs = $calculator->zeros();
 $inputs['C29'] = '100.25';
 $inputs['D29'] = '10.75';
-$inputs['C32'] = '999.00'; // Outside the monitoring worksheet's SDM detail.
+$inputs['C32'] = '999.00'; // Previously missing from monitoring.
 $inputs['C59'] = '25.00';
 $values = $calculator->calculate($inputs);
 $monitoring = new App\Libraries\MonitoringAnggaran();
 $rows = $monitoring->rows($values);
-if (count($rows) !== 61 || $rows[0]['amount'] !== '111.00' || $rows[1]['amount'] !== '111.00'
-    || $rows[12]['amount'] !== '25.00' || $rows[13]['label'] !== 'Imbal jasa profesional - lainnya') {
+$expectedGroups = ['beban-karyawan'=>'group_29', 'beban-administrasi-umum'=>'group_59', 'beban-penyusutan-amortisasi'=>'group_145'];
+foreach (App\Libraries\RkaCalculator::schema()['groups'] as $group) {
+    if (!isset($expectedGroups[$group['key'] ?? ''])) continue;
+    $expected = array_map(static fn ($row) => 'row_'.$row, array_values(array_filter($group['details'], static fn ($row) => App\Libraries\RkaCalculator::schema()['rows'][$row]['terms'] === null)));
+    $start = array_search($expectedGroups[$group['key']], array_column($rows, 'key'), true);
+    if ($start === false || array_column(array_slice($rows, $start + 1, count($expected)), 'key') !== $expected) throw new RuntimeException('Monitoring must contain all and only the RKA group details, in order.');
+    if ($rows[$start]['amount'] !== $values['H'.$group['value_row']]) throw new RuntimeException('Monitoring group must match the RKA subtotal.');
+}
+if (count($rows) !== 128 || $rows[0]['amount'] !== '1110.00' || $rows[1]['amount'] !== '111.00'
+    || $rows[24]['amount'] !== '25.00' || $rows[25]['label'] !== 'Imbal jasa profesional - akuntan publik') {
     throw new RuntimeException('RKA detail or worksheet subtotal mapping is incorrect.');
 }
 $filtered = $monitoring->rows($values, 'gaji');
-if (count($filtered) !== 2 || $filtered[0]['amount'] !== '111.00' || $filtered[1]['label'] !== 'Beban gaji karyawan') {
+if (count($filtered) !== 2 || $filtered[0]['amount'] !== '1110.00' || $filtered[1]['label'] !== 'Beban gaji karyawan') {
     throw new RuntimeException('Search changed the group total or returned the wrong detail.');
 }
 $missing = $monitoring->rows(null);
@@ -34,19 +42,22 @@ if ($monitoring->rows($values)[0]['amount'] !== null) {
 $realizations = [];
 foreach ($rows as $row) {
     if ($row['group']) continue;
-    $label = $row['label'] === 'Tranportasi dinas dalam negeri' ? 'Transportasi dinas dalam negeri' : $row['label'];
+    $label = match ($row['key']) { 'row_57'=>'Imbal jasa profesional - konsultan manajemen', 'row_71'=>'Transportasi dinas dalam negeri', 'row_74'=>'Transportasi dinas luar negeri', default=>$row['label'] };
     $realizations[App\Libraries\OracleLrSalaryParser::normalizeLabel($label)] = ['TOTAL' => '1.001'];
 }
 $realizations['beban gaji karyawan']['TOTAL'] = '2.005';
 $realizations['transportasi dinas dalam negeri']['TOTAL'] = '-7.75';
+$realizations['transportasi dinas luar negeri']['TOTAL'] = '4.50';
+$realizations['imbal jasa profesional - konsultan manajemen']['TOTAL'] = '9.25';
 $actualRows = $monitoring->rows(null, '', $realizations);
-if ($actualRows[0]['realization'] !== '12.015' || $actualRows[1]['realization'] !== '2.005' || $actualRows[1]['amount'] !== null) {
+if ($actualRows[0]['realization'] !== '24.027' || $actualRows[1]['realization'] !== '2.005' || $actualRows[1]['amount'] !== null) {
     throw new RuntimeException('YTD values or full-precision group total not mapped independently of RKA.');
 }
 $transport = $monitoring->rows(null, 'Tranportasi', $realizations);
-if (count($transport) !== 2 || $transport[1]['realization'] !== '-7.75' || $transport[0]['realization'] !== $actualRows[12]['realization']) {
+if (count($transport) !== 3 || $transport[1]['realization'] !== '-7.75' || $transport[0]['realization'] !== $actualRows[24]['realization']) {
     throw new RuntimeException('Spelling alias or filtered group subtotal incorrect.');
 }
+if ($transport[2]['realization'] !== '4.50' || $monitoring->rows(null, 'konsultan manajemen', $realizations)[1]['realization'] !== '9.25') throw new RuntimeException('Realization label aliases must follow Laba Rugi.');
 $realizations['beban gaji karyawan']['TOTAL'] = '0.00';
 if ($monitoring->rows(null, '', $realizations)[1]['realization'] !== '0.00') throw new RuntimeException('Real zero was treated as missing.');
 unset($realizations['beban gaji karyawan']);
@@ -55,10 +66,10 @@ if ($missingActual[0]['realization'] !== null || $missingActual[1]['realization'
 $fullRka = $calculator->calculate($inputs);
 $realizations['beban gaji karyawan']['TOTAL'] = '103.23';
 $ratios = $monitoring->rows($fullRka, '', $realizations);
-if ($ratios[1]['remaining_budget'] !== '7.77' || $ratios[0]['remaining_budget'] !== '-2.240') throw new RuntimeException('Remaining budget must subtract the full-precision YTD realization from RKA.');
+if ($ratios[1]['remaining_budget'] !== '7.77' || $ratios[0]['remaining_budget'] !== '984.748') throw new RuntimeException('Remaining budget must subtract the full-precision YTD realization from RKA.');
 if ($monitoring->rows($fullRka, 'gaji', $realizations)[0]['remaining_budget'] !== $ratios[0]['remaining_budget']) throw new RuntimeException('Search must not change group remaining budget.');
 if (App\Libraries\LrMoney::percentageDisplay($ratios[1]['realization_ratio']) !== '93%') throw new RuntimeException('Realization ratio must divide YTD by annual RKA.');
-if (App\Libraries\LrMoney::percentageDisplay($ratios[0]['realization_ratio']) !== '102%') throw new RuntimeException('Group percentage must use group totals.');
+if (App\Libraries\LrMoney::percentageDisplay($ratios[0]['realization_ratio']) !== '11%') throw new RuntimeException('Group percentage must use group totals.');
 $realizations['beban gaji karyawan']['TOTAL'] = '-103.23';
 if (App\Libraries\LrMoney::percentageDisplay($monitoring->rows($fullRka, '', $realizations)[1]['realization_ratio']) !== '*93%') throw new RuntimeException('Negative percentages must retain the report marker.');
 if ($monitoring->rows($fullRka, '', $realizations)[2]['realization_ratio'] !== '0.00') throw new RuntimeException('Excel IFERROR behavior for zero RKA is required.');

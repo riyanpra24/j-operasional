@@ -1,0 +1,39 @@
+/* Dropdown bersama. Select asli tetap digunakan untuk pengiriman dan validasi form. */
+.global-select { position: relative; display: inline-block; width: 100%; min-width: 0; vertical-align: middle; }
+.global-select > select.global-select-native {
+    position: absolute !important; width: 1px !important; height: 1px !important;
+    min-width: 0 !important; min-height: 0 !important; padding: 0 !important;
+    margin: 0 !important; opacity: 0 !important; border: 0 !important; pointer-events: none !important;
+}
+.global-select-trigger {
+    box-sizing: border-box; display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; width: 100%; min-height: 38px; padding: 8px 12px;
+    color: #4d6680; border: 1px solid #d9e5ed; border-radius: 9px;
+    background: #fff; font-family: var(--system-font, "Manrope", "Segoe UI", Arial, sans-serif);
+    font-size: var(--system-select-font-size, 10px); font-weight: 500; line-height: 1.4; text-align: left; cursor: pointer;
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+.global-select-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.global-select-trigger svg { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .16s ease; }
+.global-select-trigger[aria-expanded="true"], .global-select-trigger:focus-visible { outline: none; border-color: #9cc6df; box-shadow: 0 0 0 3px rgba(112,169,205,.15); }
+.global-select-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+.global-select-trigger:disabled { opacity: .6; cursor: not-allowed; background: #f1f4f7; }
+.global-select-menu {
+    position: fixed; z-index: 2147483000; box-sizing: border-box; display: grid; gap: 2px;
+    max-height: min(260px, 45vh); overflow: auto; padding: 5px; border: 1px solid #d9e7ef;
+    border-radius: 10px; background: #fff; box-shadow: 0 10px 22px rgba(43,82,111,.13);
+    font-family: var(--system-font, "Manrope", "Segoe UI", Arial, sans-serif);
+    font-size: var(--system-select-font-size, 10px); font-weight: 500; line-height: 1.4;
+}
+.global-select-menu[hidden] { display: none; }
+.global-select-menu[popover], .bukti-category-options[popover] { inset: auto; margin: 0; }
+.bukti-category-options[popover] { animation: none; }
+.global-select-option { box-sizing: border-box; width: 100%; min-width: 0; min-height: 32px; padding: 7px 9px; color: #4d6680; border: 0; border-radius: 6px; background: transparent; font: inherit; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
+.global-select-option:hover, .global-select-option:focus-visible, .global-select-option[aria-selected="true"] { outline: 0; color: #176aa7; background: #edf7fc; }
+.global-select-option[aria-selected="true"] { font-weight: 700; }
+.global-select-option:disabled { opacity: .5; cursor: not-allowed; }
+.global-select-group { padding: 6px 9px 2px; color: #758ba0; font-size: .85em; font-weight: 700; }
+.table-length-form .global-select { width: auto; min-width: 58px; }
+.table-length-form .global-select-trigger { min-height: 32px; padding: 5px 8px; }
+.lr-rka-filter-control .global-select { flex: 1 1 auto; }
+.lr-rka-filter-control .global-select-trigger { min-height: 0; height: calc(var(--system-filter-height, 38px) - 2px); padding: 0 8px 0 4px; border: 0; box-shadow: none; }
