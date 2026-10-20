@@ -24,6 +24,7 @@ foreach ($monitoringRows as $row) {
     }
 }
 $selectedDeviationFilter = $selectedDeviationFilter ?? 'all';
+$showGroupTotals = $selectedUnit === 'Konsolidasi';
 $showFilteredRows = $search !== '' || $selectedDeviationFilter !== 'all';
 $emptyResultMessage = match ($selectedDeviationFilter) {
     'normal' => 'Tidak ada uraian dengan deviasi normal pada periode ini.',
@@ -157,8 +158,12 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
                         ?>
                         <tr class="lr-row-subgroup monitoring-budget-group" data-monitoring-group>
                             <th scope="row"><button type="button" class="lr-group-toggle" data-monitoring-toggle aria-expanded="<?= $showFilteredRows ? 'true' : 'false' ?>" aria-controls="<?= esc(implode(' ', $detailIds), 'attr') ?>"><span class="lr-group-chevron" aria-hidden="true">›</span><span><?= esc($heading['label']) ?></span></button></th>
+                            <?php if ($showGroupTotals): ?>
                             <td><?= $heading['amount'] === null ? '—' : esc(\App\Libraries\RkaMoney::display($heading['amount'])) ?></td>
                             <td><?= ($heading['realization'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($heading['realization'])) ?></td><td><?= ($heading['realization_ratio'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::percentageDisplay($heading['realization_ratio'])) ?></td><td><?= esc($proportionalPercent) ?></td><td><?= $displayDeviation($heading['realization_ratio'] ?? null) ?></td><td><?= ($heading['remaining_budget'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($heading['remaining_budget']), '-') ?></td><td><?= ($monitoringNotes[$heading['key']] ?? '') === '' ? '—' : esc($monitoringNotes[$heading['key']]) ?></td>
+                            <?php else: ?>
+                            <td colspan="6" aria-label="Nilai kelompok tersedia pada Konsolidasi saja"></td><td><?= ($monitoringNotes[$heading['key']] ?? '') === '' ? '—' : esc($monitoringNotes[$heading['key']]) ?></td>
+                            <?php endif ?>
                         </tr>
                         <?php foreach ($group['details'] as $detailIndex => $row): ?>
                             <tr id="<?= esc($detailIds[$detailIndex], 'attr') ?>" class="lr-row-detail monitoring-budget-detail" <?= $showFilteredRows ? '' : 'hidden' ?>>
@@ -222,11 +227,15 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
                         <?php $key = $editRow['key']; $note = $monitoringNotes[$key] ?? ''; ?>
                         <tr class="<?= $editRow['group'] ? 'lr-row-subgroup monitoring-budget-group' : 'lr-row-detail monitoring-edit-detail' ?>" <?php if ($editRow['group']): ?>data-monitoring-group<?php else: ?>id="<?= esc($editDetailIds[$editIndex - 1], 'attr') ?>" <?= $showFilteredRows ? '' : 'hidden' ?><?php endif ?>>
                             <th scope="row"><?php if ($editRow['group']): ?><button type="button" class="lr-group-toggle" data-monitoring-toggle aria-expanded="<?= $showFilteredRows ? 'true' : 'false' ?>" aria-controls="<?= esc(implode(' ', $editDetailIds), 'attr') ?>"><span class="lr-group-chevron" aria-hidden="true">›</span><span><?= esc($editRow['label']) ?></span></button><?php else: ?><?= esc($editRow['label']) ?><?php endif ?></th>
+                            <?php if (! $editRow['group'] || $showGroupTotals): ?>
                             <td><?= $editRow['amount'] === null ? '—' : esc(\App\Libraries\RkaMoney::display($editRow['amount'])) ?></td>
                             <td><?= ($editRow['realization'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($editRow['realization'])) ?></td>
                             <td><?= ($editRow['realization_ratio'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::percentageDisplay($editRow['realization_ratio'])) ?></td>
                             <td><?= esc($proportionalPercent) ?></td><td><?= $displayDeviation($editRow['realization_ratio'] ?? null) ?></td>
                             <td><?= ($editRow['remaining_budget'] ?? null) === null ? '—' : $displayMarkedValue(\App\Libraries\LrMoney::reportDisplay($editRow['remaining_budget']), '-') ?></td>
+                            <?php else: ?>
+                            <td colspan="6" aria-label="Nilai kelompok tersedia pada Konsolidasi saja"></td>
+                            <?php endif ?>
                             <td><textarea name="notes[<?= esc($key, 'attr') ?>]" rows="1" maxlength="2000" aria-label="Penjelasan <?= esc($editRow['label'], 'attr') ?>"><?= esc($editNotes[$key] ?? $note) ?></textarea><textarea name="original[<?= esc($key, 'attr') ?>]" hidden><?= esc($note) ?></textarea></td>
                         </tr>
                     <?php endforeach ?>

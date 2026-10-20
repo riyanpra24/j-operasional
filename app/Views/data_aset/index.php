@@ -27,39 +27,35 @@
         box-sizing: border-box;
         padding: 9px 8px;
         white-space: normal;
-        text-align: center;
+        text-align: left;
     }
 
     .asset-table thead th:nth-child(1) {
-        width: 20%;
+        width: 22%;
     }
 
     .asset-table thead th:nth-child(2) {
-        width: 17%;
+        width: 18%;
     }
 
     .asset-table thead th:nth-child(3) {
-        width: 7%;
+        width: 9%;
     }
 
     .asset-table thead th:nth-child(4) {
-        width: 9%;
+        width: 13%;
     }
 
     .asset-table thead th:nth-child(5) {
-        width: 12%;
+        width: 18%;
     }
 
     .asset-table thead th:nth-child(6) {
-        width: 13%;
+        width: 12%;
     }
 
     .asset-table thead th:nth-child(7) {
-        width: 9%;
-    }
-
-    .asset-table thead th:nth-child(8) {
-        width: 13%;
+        width: 8%;
     }
 
     .asset-table td {
@@ -87,8 +83,7 @@
     }
 
     .asset-table .asset-detail>td:nth-child(1),
-    .asset-table .asset-detail>td:nth-child(2),
-    .asset-table .asset-detail>td:nth-child(4) {
+    .asset-table .asset-detail>td:nth-child(2) {
         color: #000;
         font-weight: 700;
     }
@@ -173,7 +168,6 @@
                     <th scope="col">Kelompok aset</th>
                     <th scope="col">Kodefikasi aset</th>
                     <th scope="col">Nomor aset</th>
-                    <th scope="col">Nama aset</th>
                     <th scope="col">Status aset</th>
                     <th scope="col">Periode Manfaat</th>
                     <th scope="col">Lokasi</th>
@@ -183,7 +177,7 @@
             <tbody>
                 <?php if ($groups === []): ?>
                     <tr>
-                        <td colspan="8">
+                        <td colspan="7">
                             <div class="empty-state asset-empty"><span aria-hidden="true">▤</span><strong>Data aset tidak ditemukan</strong>
                                 <p>Ubah filter atau tambahkan data aset.</p>
                             </div>
@@ -191,14 +185,13 @@
                     </tr>
                     <?php else: foreach ($groups as $groupName => $records): ?>
                         <tr class="asset-group">
-                            <th scope="row" colspan="8"><?= esc($groupName) ?></th>
+                            <th scope="row" colspan="7"><?= esc($groupName) ?></th>
                         </tr>
                         <?php foreach ($records as $record): ?>
                             <tr class="asset-detail">
                                 <td><span class="asset-group-name"><?= esc($record['kelompok_aset']) ?></span></td>
                                 <td><?= esc($record['kodefikasi_aset']) ?></td>
                                 <td><?= esc($record['nomor_aset']) ?></td>
-                                <td><?= esc($record['nama_aset']) ?></td>
                                 <td><?= esc($record['status_aset']) ?></td>
                                 <td>
                                     <div class="date-cell asset-period">

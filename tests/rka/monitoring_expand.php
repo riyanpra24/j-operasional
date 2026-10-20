@@ -14,11 +14,11 @@ $renderer = new class {
     public function extend($layout): string { return ''; }
     public function section($name): string { return ''; }
     public function endSection(): string { return ''; }
-    public function render(string $search, ?array $rka = null, array $realizations = [], int $selectedMonth = 1, array $monitoringNotes = [], string $deviationFilter = 'all'): string
+    public function render(string $search, ?array $rka = null, array $realizations = [], int $selectedMonth = 1, array $monitoringNotes = [], string $deviationFilter = 'all', string $unit = 'Konsolidasi'): string
     {
         $monitoringRows = (new App\Libraries\MonitoringAnggaran())->rows($rka, $search, $realizations);
         if ($deviationFilter !== 'all') $monitoringRows = App\Libraries\MonitoringAnggaran::filterDeviationRows($monitoringRows, $selectedMonth, $deviationFilter);
-        $months = []; $units = ['Konsolidasi']; $selectedUnit = 'Konsolidasi';
+        $months = []; $units = [$unit]; $selectedUnit = $unit;
         $selectedYear = 2026; $hasRka = false;
         $selectedDeviationFilter = $deviationFilter;
         ob_start();
@@ -56,6 +56,13 @@ foreach (['' => [3, 125], 'gaji' => [1, 1], 'tidak ada uraian ini' => [0, 0]] as
         }
     }
     if ($xpath->query('//dialog//textarea[starts-with(@name,"notes[")]')->length !== $groupCount + $detailCount || $xpath->query('//dialog//textarea[starts-with(@name,"original[")]')->length !== $groupCount + $detailCount) throw new RuntimeException('Collapsed rows must retain their editable and original notes.');
+}
+$document = new DOMDocument();
+@$document->loadHTML('<?xml encoding="UTF-8">' . $renderer->render('', null, [], 9, [], 'all', 'Kanwil Surabaya'));
+$xpath = new DOMXPath($document);
+if ($xpath->query('//tr[@data-monitoring-group and not(ancestor::dialog)]/td[@colspan="6"]')->length !== 3
+    || $xpath->query('//dialog//tr[@data-monitoring-group]/td[@colspan="6"]')->length !== 3) {
+    throw new RuntimeException('Non-consolidated units must hide values in group headings.');
 }
 $document = new DOMDocument();
 @$document->loadHTML('<?xml encoding="UTF-8">' . $renderer->render('', null, [], 9, [], 'negative'));
