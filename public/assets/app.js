@@ -296,7 +296,7 @@
     };
 
     if (desktopMedia.matches) {
-        setDesktopSidebar(storedSidebarState() === 'collapsed', false);
+        setDesktopSidebar(storedSidebarState() !== 'expanded', false);
     } else {
         document.documentElement.classList.remove('sidebar-collapsed');
         updateToggleAccessibility(false);
@@ -313,7 +313,7 @@
     document.querySelector('[data-sidebar-close]')?.addEventListener('click', () => setMobileSidebar(false));
     window.addEventListener('resize', () => {
         if (desktopMedia.matches) {
-            setDesktopSidebar(storedSidebarState() === 'collapsed', false);
+            setDesktopSidebar(storedSidebarState() !== 'expanded', false);
             return;
         }
 
@@ -322,6 +322,8 @@
     });
 
     const navigationGroups = Array.from(document.querySelectorAll('[data-nav-group]'));
+    const isDesktopSidebarCollapsed = () => desktopMedia.matches
+        && document.documentElement.classList.contains('sidebar-collapsed');
     const setNavigationGroupOpen = (group, open) => {
         const groupToggle = group?.querySelector('[data-nav-toggle]');
         const groupSubmenu = group?.querySelector('[data-nav-submenu]');
@@ -332,11 +334,69 @@
         groupSubmenu.hidden = !open;
     };
 
+    const closeCollapsedSidebarPopup = (group) => {
+        const groupToggle = group?.querySelector('[data-nav-toggle]');
+        const groupSubmenu = group?.querySelector('[data-nav-submenu]');
+        if (!group || !groupToggle || !groupSubmenu) return;
+
+        group.classList.remove('sidebar-hover-open');
+        groupSubmenu.hidden = !group.classList.contains('open');
+        groupToggle.setAttribute('aria-expanded', String(group.classList.contains('open')));
+    };
+    const closeCollapsedSidebarPopups = (exceptGroup = null) => {
+        navigationGroups.forEach((group) => {
+            if (group !== exceptGroup) closeCollapsedSidebarPopup(group);
+        });
+    };
+    const openCollapsedSidebarPopup = (group) => {
+        if (!isDesktopSidebarCollapsed()) return;
+
+        const groupToggle = group?.querySelector('[data-nav-toggle]');
+        const groupSubmenu = group?.querySelector('[data-nav-submenu]');
+        if (!group || !groupToggle || !groupSubmenu) return;
+
+        closeCollapsedSidebarPopups(group);
+        const label = groupToggle.querySelector('.nav-link-text')?.textContent?.trim() || 'Menu';
+        groupSubmenu.dataset.sidebarPopupTitle = label;
+        group.classList.add('sidebar-hover-open');
+        groupSubmenu.hidden = false;
+        groupToggle.setAttribute('aria-expanded', 'true');
+    };
+
+    navigationGroups.forEach((group) => {
+        let closeTimer;
+        const openPopup = () => {
+            window.clearTimeout(closeTimer);
+            openCollapsedSidebarPopup(group);
+        };
+        const closePopup = () => {
+            window.clearTimeout(closeTimer);
+            closeTimer = window.setTimeout(() => {
+                if (!isDesktopSidebarCollapsed() || group.matches(':hover') || group.contains(document.activeElement)) return;
+                closeCollapsedSidebarPopup(group);
+            }, 120);
+        };
+
+        group.addEventListener('mouseenter', openPopup);
+        group.addEventListener('mouseleave', closePopup);
+        group.addEventListener('focusin', openPopup);
+        group.addEventListener('focusout', closePopup);
+    });
+
     document.querySelectorAll('[data-nav-toggle]').forEach((toggle) => {
         toggle.addEventListener('click', () => {
             const group = toggle.closest('[data-nav-group]');
             const submenu = group?.querySelector('[data-nav-submenu]');
             if (!group || !submenu) return;
+
+            if (isDesktopSidebarCollapsed()) {
+                document.querySelectorAll('.main-nav > .nav-link.active, [data-nav-toggle].active')
+                    .forEach((activeLink) => activeLink.classList.remove('active'));
+                toggle.classList.add('active');
+                openCollapsedSidebarPopup(group);
+                return;
+            }
+
             const open = !group.classList.contains('open');
 
             // Pindahkan sorotan menu saat induk dipilih tanpa mengganti halaman.
@@ -352,6 +412,16 @@
 
             setNavigationGroupOpen(group, open);
         });
+    });
+
+    sidebarToggle?.addEventListener('click', () => closeCollapsedSidebarPopups());
+    window.addEventListener('resize', () => closeCollapsedSidebarPopups());
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || !isDesktopSidebarCollapsed()) return;
+        const openGroup = navigationGroups.find((group) => group.classList.contains('sidebar-hover-open'));
+        if (!openGroup) return;
+        closeCollapsedSidebarPopup(openGroup);
+        openGroup.querySelector('[data-nav-toggle]')?.focus();
     });
 
     const profileMenu = document.querySelector('[data-profile-menu]');

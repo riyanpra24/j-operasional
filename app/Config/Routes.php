@@ -269,4 +269,40 @@ $routes->group('agendaris', static function (RouteCollection $routes): void {
         $routes->post('(:num)', 'ProgresDokumen::update/$1', ['as' => 'progres_dokumen_keluar.update']);
         $routes->post('(:num)/hapus', 'ProgresDokumen::destroy/$1', ['as' => 'progres_dokumen_keluar.destroy']);
     });
+
+    $routes->group('souvenir-inventaris', static function (RouteCollection $routes): void {
+        $routes->get('/', 'SouvenirInventaris::index', ['as' => 'agendaris.souvenir_inventaris']);
+        $routes->get('tambah', 'SouvenirInventaris::create', ['as' => 'agendaris.souvenir_inventaris.create']);
+        $routes->post('/', 'SouvenirInventaris::store', ['as' => 'agendaris.souvenir_inventaris.store']);
+        $routes->post('pengambilan', 'SouvenirInventaris::storePickup', ['as' => 'agendaris.souvenir_inventaris.pickup.store']);
+        $routes->post('pengambilan/(:num)', 'SouvenirInventaris::updatePickup/$1', ['as' => 'agendaris.souvenir_inventaris.pickup.update']);
+        $routes->post('pengambilan/(:num)/hapus', 'SouvenirInventaris::destroyPickup/$1', ['as' => 'agendaris.souvenir_inventaris.pickup.destroy']);
+        $routes->get('pengambilan/(:num)/bukti', 'SouvenirInventaris::downloadPickupProof/$1', ['as' => 'agendaris.souvenir_inventaris.pickup.proof']);
+        $routes->post('pengembalian', 'SouvenirInventaris::storeReturn', ['as' => 'agendaris.souvenir_inventaris.return.store']);
+        $routes->post('pengembalian/(:num)', 'SouvenirInventaris::updateReturn/$1', ['as' => 'agendaris.souvenir_inventaris.return.update']);
+        $routes->post('pengembalian/(:num)/hapus', 'SouvenirInventaris::destroyReturn/$1', ['as' => 'agendaris.souvenir_inventaris.return.destroy']);
+        $routes->get('pengembalian/(:num)/bukti', 'SouvenirInventaris::downloadReturnProof/$1', ['as' => 'agendaris.souvenir_inventaris.return.proof']);
+        $routes->post('peminjaman-inventaris', 'SouvenirInventaris::storeInventoryLoan', ['as' => 'agendaris.souvenir_inventaris.loan.store']);
+        $routes->post('peminjaman-inventaris/(:num)', 'SouvenirInventaris::updateInventoryLoan/$1', ['as' => 'agendaris.souvenir_inventaris.loan.update']);
+        $routes->post('peminjaman-inventaris/(:num)/hapus', 'SouvenirInventaris::destroyInventoryLoan/$1', ['as' => 'agendaris.souvenir_inventaris.loan.destroy']);
+        $routes->get('peminjaman-inventaris/(:num)/bukti', 'SouvenirInventaris::downloadInventoryLoanProof/$1', ['as' => 'agendaris.souvenir_inventaris.loan.proof']);
+        $routes->post('pengembalian-inventaris', 'SouvenirInventaris::storeInventoryReturn', ['as' => 'agendaris.souvenir_inventaris.inventory_return.store']);
+        $routes->post('pengembalian-inventaris/(:num)', 'SouvenirInventaris::updateInventoryReturn/$1', ['as' => 'agendaris.souvenir_inventaris.inventory_return.update']);
+        $routes->post('pengembalian-inventaris/(:num)/hapus', 'SouvenirInventaris::destroyInventoryReturn/$1', ['as' => 'agendaris.souvenir_inventaris.inventory_return.destroy']);
+        $routes->get('pengembalian-inventaris/(:num)/bukti', 'SouvenirInventaris::downloadInventoryReturnProof/$1', ['as' => 'agendaris.souvenir_inventaris.inventory_return.proof']);
+        $routes->get('(:num)', 'SouvenirInventaris::show/$1', ['as' => 'agendaris.souvenir_inventaris.show']);
+        $routes->get('(:num)/ubah', 'SouvenirInventaris::edit/$1', ['as' => 'agendaris.souvenir_inventaris.edit']);
+        $routes->post('(:num)', 'SouvenirInventaris::update/$1', ['as' => 'agendaris.souvenir_inventaris.update']);
+        $routes->post('(:num)/hapus', 'SouvenirInventaris::destroy/$1', ['as' => 'agendaris.souvenir_inventaris.destroy']);
+    });
+
+    $routes->group('atk-kantor', static function (RouteCollection $routes): void {
+        $routes->get('/', 'AtkKantor::index', ['as' => 'agendaris.atk_kantor']);
+        $routes->post('/', 'AtkKantor::store', ['as' => 'agendaris.atk_kantor.store']);
+        $routes->post('(:num)', 'AtkKantor::update/$1', ['as' => 'agendaris.atk_kantor.update']);
+        $routes->post('(:num)/hapus', 'AtkKantor::destroy/$1', ['as' => 'agendaris.atk_kantor.destroy']);
+        $routes->post('pengambilan', 'AtkKantor::storePickup', ['as' => 'agendaris.atk_kantor.pickup.store']);
+        $routes->get('pengambilan/bukti', 'AtkKantor::downloadPickupProof', ['as' => 'agendaris.atk_kantor.pickup.proof']);
+        $routes->post('pengambilan/(:num)/hapus', 'AtkKantor::destroyPickup/$1', ['as' => 'agendaris.atk_kantor.pickup.destroy']);
+    });
 });

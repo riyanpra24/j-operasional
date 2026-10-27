@@ -2,7 +2,7 @@
 /** @var string $icon */
 $icon = $icon ?? 'view';
 ?>
-<svg class="table-action-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+<svg class="table-action-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9">
     <?php if ($icon === 'edit'): ?>
         <path d="m4 16.8-.7 3.9 3.9-.7L18.4 8.8l-3.2-3.2L4 16.8Z" />
         <path d="m13.8 7 3.2 3.2" />
@@ -17,6 +17,10 @@ $icon = $icon ?? 'view';
         <path d="M14 4h6v6" />
         <path d="m20 4-9 9" />
         <path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5" />
+    <?php elseif ($icon === 'download'): ?>
+        <path d="M12 3v12" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 20h14" />
     <?php else: ?>
         <path d="M2.5 12s3.4-5.8 9.5-5.8S21.5 12 21.5 12 18.1 17.8 12 17.8 2.5 12 2.5 12Z" />
         <circle cx="12" cy="12" r="2.7" />

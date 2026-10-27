@@ -228,9 +228,9 @@
     "semantic_hash": "e176a1960ff2eeb4400478e402e6cc7e"
   },
   "app/Config/Routes.php": {
-    "mtime": 1792393034.7064364,
-    "seen": 1792393174.307922,
-    "ast_hash": "43a2e51b2756fdaa0aaa956e47c4e66c",
+    "mtime": 1793072454.9999037,
+    "seen": 1793072744.4853487,
+    "ast_hash": "3fd867374ed3174c0743364312461fba",
     "semantic_hash": ""
   },
   "app/Config/Routing.php": {
@@ -1668,9 +1668,9 @@
     "semantic_hash": ""
   },
   "app/Views/layouts/main.php": {
-    "mtime": 1792424745.2120204,
-    "seen": 1792424859.1289837,
-    "ast_hash": "ab3ba98fb47e2ef509ecd90775ba0ce4",
+    "mtime": 1793007478.2754169,
+    "seen": 1793007636.0770314,
+    "ast_hash": "42558b40a30e440b8b4c153256833961",
     "semantic_hash": ""
   },
   "app/Views/monitoring_kendaraan/_crud_script.php": {
@@ -1824,9 +1824,9 @@
     "semantic_hash": "78e2a3cada5052f148c4865bac51d6ea"
   },
   "public/assets/app.js": {
-    "mtime": 1792141184.0484414,
-    "seen": 1792245645.5654967,
-    "ast_hash": "6c485a848ce6d31bad44901b0f1c207c",
+    "mtime": 1792744147.7621737,
+    "seen": 1792744235.2107508,
+    "ast_hash": "5d1d6792558aff402a935062cdd3c88a",
     "semantic_hash": ""
   },
   "public/assets/lr-volume-editor-popup.js": {
@@ -2472,10 +2472,10 @@
     "semantic_hash": "7e5f112e15df18739e86154da9699c09"
   },
   "system/Config/DotEnv.php": {
-    "mtime": 1783416215.0,
-    "seen": 1791336831.475056,
-    "ast_hash": "4b0aadf5db611476160f586746c7ef53",
-    "semantic_hash": "4b0aadf5db611476160f586746c7ef53"
+    "mtime": 1792470488.230806,
+    "seen": 1792470714.3153417,
+    "ast_hash": "3f2bb5fe892228f281df4a1358d31723",
+    "semantic_hash": ""
   },
   "system/Config/Factories.php": {
     "mtime": 1783416215.0,
@@ -6588,15 +6588,15 @@
     "semantic_hash": ""
   },
   "app/Database/Migrations/2026-10-15-103000_AddBerkasToAccountingBuktiBayar.php": {
-    "mtime": 1792036368.9714682,
-    "seen": 1792245645.5170596,
-    "ast_hash": "f347ac1efd9e2b9d240cd107217910a5",
+    "mtime": 1792471018.2274263,
+    "seen": 1792471087.2741272,
+    "ast_hash": "7842d71cf88613eaa3df9e25c2a46e54",
     "semantic_hash": ""
   },
   "app/Database/Migrations/2026-10-15-104000_AddBerkasUrlToAccountingBuktiBayar.php": {
-    "mtime": 1792036607.8028908,
-    "seen": 1792245645.517066,
-    "ast_hash": "ba92b4680759d77abd63e4f0a9ee1a5d",
+    "mtime": 1792471018.470921,
+    "seen": 1792471087.274131,
+    "ast_hash": "a36051c36e0cfa9ff7e36328c0f70ff2",
     "semantic_hash": ""
   },
   "app/Libraries/MonitoringAnggaran.php": {
@@ -6630,9 +6630,9 @@
     "semantic_hash": ""
   },
   "app/Views/components/table_action_icon.php": {
-    "mtime": 1792083571.3939664,
-    "seen": 1792245645.5532043,
-    "ast_hash": "23a84c9fb4ed05198b9767de6c4f6f45",
+    "mtime": 1793067880.6266897,
+    "seen": 1793067986.9252365,
+    "ast_hash": "9fcf825fe13a34bad6540da5e5c70577",
     "semantic_hash": ""
   },
   "tests/rka/monitoring_anggaran.php": {
@@ -6891,6 +6891,498 @@
     "mtime": 1792426382.225567,
     "seen": 1792426383.5677016,
     "ast_hash": "d1a3346d30209f75840ad61cd511d04e",
+    "semantic_hash": ""
+  },
+  "app/Controllers/SouvenirInventaris.php": {
+    "mtime": 1793005374.9287026,
+    "seen": 1793005619.574845,
+    "ast_hash": "9b92321692ece9979850d0f0b7e2b56a",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-20-090000_CreateAgendarisSouvenirInventaris.php": {
+    "mtime": 1792556539.4911044,
+    "seen": 1792556780.2331963,
+    "ast_hash": "7fd0afdb9f50ff291052d1c5bdf49b13",
+    "semantic_hash": ""
+  },
+  "app/Models/AgendarisSouvenirInventarisModel.php": {
+    "mtime": 1792558000.0833285,
+    "seen": 1792558217.6210847,
+    "ast_hash": "97e374d2560ae74c9720ecbd96b728a2",
+    "semantic_hash": ""
+  },
+  "app/Views/agendaris/souvenir_inventaris/form.php": {
+    "mtime": 1792558518.651709,
+    "seen": 1792558614.0263383,
+    "ast_hash": "a1c417e4643fb38348a8d3a460d6779d",
+    "semantic_hash": ""
+  },
+  "app/Views/agendaris/souvenir_inventaris/index.php": {
+    "mtime": 1793006704.8212357,
+    "seen": 1793006765.0220249,
+    "ast_hash": "bd2ca146d5a5a618f40c231d1145a443",
+    "semantic_hash": ""
+  },
+  "app/Views/agendaris/souvenir_inventaris/show.php": {
+    "mtime": 1792558519.1637938,
+    "seen": 1792558614.0263472,
+    "ast_hash": "ca1fe7498b25ed98f15de80dd2a17238",
+    "semantic_hash": ""
+  },
+  "tests/agendaris/souvenir_inventaris.php": {
+    "mtime": 1793005515.6426919,
+    "seen": 1793005619.7958808,
+    "ast_hash": "e27b8e7cf3ffe5f0bfbd8dad14fabbe7",
+    "semantic_hash": ""
+  },
+  "app/Database/Seeds/AgendarisSouvenirInventarisDummyData.php": {
+    "mtime": 1792558066.881504,
+    "seen": 1792558217.6038423,
+    "ast_hash": "b5ccc950ede3e7215766192cbf276d9c",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-20-140000_AddJenisToAgendarisSouvenirInventaris.php": {
+    "mtime": 1792485752.1599402,
+    "seen": 1792486062.796956,
+    "ast_hash": "4dc1d31b629c3a66c2052946cbe027cd",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-21-090000_RenameAgendarisSouvenirNamaToNamaItem.php": {
+    "mtime": 1792556540.0794716,
+    "seen": 1792556780.233542,
+    "ast_hash": "e23aa152ae2b6006fa99bd00e47be6f0",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-21-100000_AddSatuanToAgendarisSouvenirInventaris.php": {
+    "mtime": 1792558001.2084236,
+    "seen": 1792558217.603836,
+    "ast_hash": "94c7219966df1fa065c31bc31eabee79",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-21-110000_CreateAgendarisSouvenirPengambilan.php": {
+    "mtime": 1792566515.513505,
+    "seen": 1792566873.3478484,
+    "ast_hash": "a9594634cfce3cd7db85bd4da0cca523",
+    "semantic_hash": ""
+  },
+  "app/Models/AgendarisSouvenirPengambilanModel.php": {
+    "mtime": 1792729654.6645644,
+    "seen": 1792729791.285709,
+    "ast_hash": "75955df261b01725d9329509c8693a30",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-21-120000_CreateAgendarisSouvenirPengambilanItems.php": {
+    "mtime": 1792567382.9908514,
+    "seen": 1792567562.946626,
+    "ast_hash": "e2893eebd5fcbe63158b7f6f4822f8bd",
+    "semantic_hash": ""
+  },
+  "app/Models/AgendarisSouvenirPengambilanItemModel.php": {
+    "mtime": 1792567875.6456156,
+    "seen": 1792568022.5138097,
+    "ast_hash": "08c86449d8f7517bd20076ca123e83b9",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-21-130000_AddJumlahToAgendarisSouvenirPengambilanItems.php": {
+    "mtime": 1792567875.8586688,
+    "seen": 1792568022.5054836,
+    "ast_hash": "a2006ddfef346f9b45ed5a8e155a160f",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-21-140000_AddKeteranganToAgendarisSouvenirPengambilan.php": {
+    "mtime": 1792578351.386367,
+    "seen": 1792578449.514234,
+    "ast_hash": "a9e04e2fb1d9324e0dbe4c68be9de468",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-23-090000_AddKeperluanKegiatanToAgendarisSouvenirPengambilan.php": {
+    "mtime": 1792729655.7082424,
+    "seen": 1792729791.2268958,
+    "ast_hash": "543d7379cb39f1a223aa0b07ab67647c",
+    "semantic_hash": ""
+  },
+  "app/Libraries/SouvenirPickupProofPdf.php": {
+    "mtime": 1793005310.3093772,
+    "seen": 1793005619.6183512,
+    "ast_hash": "b4b14c384327587cebcd897a223f4e99",
+    "semantic_hash": ""
+  },
+  "tests/agendaris/souvenir_pickup_proof_pdf.php": {
+    "mtime": 1793003847.6889195,
+    "seen": 1793004013.5653605,
+    "ast_hash": "8b492d03e9b2e7af07ecdc6f56cd15af",
+    "semantic_hash": ""
+  },
+  "output/pdf/bukti-pengambilan-souvenir-contoh.pdf": {
+    "mtime": 1793003864.416916,
+    "seen": 1793004013.6192253,
+    "ast_hash": "160995743f65580f5d590decb3e6a32d",
+    "semantic_hash": ""
+  },
+  "app/Resources/pdf/bukti_pengambilan_souvenir.jpg": {
+    "mtime": 1792773316.350902,
+    "seen": 1792773464.8944438,
+    "ast_hash": "bece5766648df82be3b43da8daf0a996",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-1.png": {
+    "mtime": 1792746580.663036,
+    "seen": 1792746795.9185164,
+    "ast_hash": "3556c031e39330ce150a9089aa19106d",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bottom.png": {
+    "mtime": 1792746494.4645128,
+    "seen": 1792746795.918511,
+    "ast_hash": "1ad220f5ad1d01f21351c172030b0b48",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-final-1.png": {
+    "mtime": 1792746596.8605256,
+    "seen": 1792746795.9185197,
+    "ast_hash": "3556c031e39330ce150a9089aa19106d",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-polished-1.png": {
+    "mtime": 1792746665.792886,
+    "seen": 1792746795.9185228,
+    "ast_hash": "06e611397e3a587e977787af9bca8b23",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-adjusted-1.png": {
+    "mtime": 1792746970.5572982,
+    "seen": 1792747059.920709,
+    "ast_hash": "46b108af41d48fe341926a985bd6e795",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-aligned-1.png": {
+    "mtime": 1792747141.6523256,
+    "seen": 1792747218.993511,
+    "ast_hash": "1d4bee2029f2e69df500ba2993cf95dc",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-city-1.png": {
+    "mtime": 1792747291.346695,
+    "seen": 1792747469.1009855,
+    "ast_hash": "5db757cea77a632090ea5d35c5e417c2",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-surabaya-1.png": {
+    "mtime": 1792747252.7370021,
+    "seen": 1792747469.1016846,
+    "ast_hash": "0ea9454673230bebc7414f4bab422e90",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-surabaya-final-1.png": {
+    "mtime": 1792747370.8438008,
+    "seen": 1792747469.101688,
+    "ast_hash": "b283d1096765f6967d38e82e211c738e",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/template-date.png": {
+    "mtime": 1792747334.618887,
+    "seen": 1792747469.101692,
+    "ast_hash": "ad95df7af3761518d788dfe32e62caa9",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-baseline-1.png": {
+    "mtime": 1792747642.1778371,
+    "seen": 1792747780.7289891,
+    "ast_hash": "0319bc21d0072c920cd78aa908b65717",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-signature-1.png": {
+    "mtime": 1792772335.6336312,
+    "seen": 1792772507.6366143,
+    "ast_hash": "d589af50b0be61507d8ceadb80e4b077",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-signature-box-1.png": {
+    "mtime": 1792772665.6871197,
+    "seen": 1792772787.378749,
+    "ast_hash": "f384ef9d518f010b0cb36cfa84595d68",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-template-baru-1.png": {
+    "mtime": 1792773355.9825716,
+    "seen": 1792773464.9222138,
+    "ast_hash": "af70b64f63a1e3842897ea3a2c6ed558",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-signature-font15-1.png": {
+    "mtime": 1792834869.5056982,
+    "seen": 1792834927.5613966,
+    "ast_hash": "f7fc5031d8afd7be7c15e618ee290403",
+    "semantic_hash": ""
+  },
+  "tmp/pdf-preview/bukti-signature-font12-1.png": {
+    "mtime": 1792834957.0355377,
+    "seen": 1792835023.64861,
+    "ast_hash": "8d07106fadc2aa4825cad83a4df76e67",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-26-090000_CreateAgendarisSouvenirPengembalian.php": {
+    "mtime": 1792995982.0708447,
+    "seen": 1792996267.3646665,
+    "ast_hash": "2b1d1d71eaa5c2fc773a769a65ed6d21",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-26-091000_CreateAgendarisSouvenirPengembalianItems.php": {
+    "mtime": 1792995982.332193,
+    "seen": 1792996267.3646708,
+    "ast_hash": "2d424bcca13829b26a30e85ad8a5ba2e",
+    "semantic_hash": ""
+  },
+  "app/Models/AgendarisSouvenirPengembalianItemModel.php": {
+    "mtime": 1792995981.8212447,
+    "seen": 1792996267.378073,
+    "ast_hash": "627a61ca7a9f7dae36d336122d33310f",
+    "semantic_hash": ""
+  },
+  "app/Models/AgendarisSouvenirPengembalianModel.php": {
+    "mtime": 1793000129.3042216,
+    "seen": 1793000323.2629924,
+    "ast_hash": "be97a203f0c0183f440a89f60c2aa34d",
+    "semantic_hash": ""
+  },
+  "app/Resources/pdf/bukti_pengambilan_souvenir_hijau.jpg": {
+    "mtime": 1792999738.6719892,
+    "seen": 1792999938.6069775,
+    "ast_hash": "22569134430bed82a1300f93d890b5bf",
+    "semantic_hash": ""
+  },
+  "tmp/pdfs/bukti-pengambilan-hijau-1.png": {
+    "mtime": 1792999813.867808,
+    "seen": 1792999938.6418886,
+    "ast_hash": "8af7cb19d4d8e0024639a3d3d00eada2",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-26-100000_AddKeperluanKegiatanToAgendarisSouvenirPengembalian.php": {
+    "mtime": 1793000129.888337,
+    "seen": 1793000323.240447,
+    "ast_hash": "1d74b7889797634ec5785839fc783456",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-26-110000_CreateAgendarisInventarisPeminjaman.php": {
+    "mtime": 1793000658.5791764,
+    "seen": 1793001239.8267741,
+    "ast_hash": "8986ede47ad2063719f2c7952e86880f",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-26-111000_CreateAgendarisInventarisPeminjamanItems.php": {
+    "mtime": 1793000659.0841641,
+    "seen": 1793001239.8267782,
+    "ast_hash": "caeda7ff6464d3dacedf0f36d91528ba",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-26-112000_CreateAgendarisInventarisPengembalian.php": {
+    "mtime": 1793000659.5879488,
+    "seen": 1793001239.826782,
+    "ast_hash": "ce7462467dfd292ff44a61bc56380940",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-26-113000_CreateAgendarisInventarisPengembalianItems.php": {
+    "mtime": 1793000660.098178,
+    "seen": 1793001239.8267858,
+    "ast_hash": "01ebcf4b6bda673750d98a192a0b632f",
+    "semantic_hash": ""
+  },
+  "app/Models/AgendarisInventarisPeminjamanItemModel.php": {
+    "mtime": 1793000613.0891416,
+    "seen": 1793001239.8484933,
+    "ast_hash": "14de441755f3bf12dab8c40d2c7a540c",
+    "semantic_hash": ""
+  },
+  "app/Models/AgendarisInventarisPeminjamanModel.php": {
+    "mtime": 1793000612.5841267,
+    "seen": 1793001239.8485003,
+    "ast_hash": "5a247e44c35e7b06c9f9b4cb51a265ae",
+    "semantic_hash": ""
+  },
+  "app/Models/AgendarisInventarisPengembalianItemModel.php": {
+    "mtime": 1793000614.1283782,
+    "seen": 1793001239.8485043,
+    "ast_hash": "504d35450135eea3c5c832ced50d6387",
+    "semantic_hash": ""
+  },
+  "app/Models/AgendarisInventarisPengembalianModel.php": {
+    "mtime": 1793000613.5985315,
+    "seen": 1793001239.8485084,
+    "ast_hash": "581395bd512e2f087c597bc9358c7785",
+    "semantic_hash": ""
+  },
+  "app/Libraries/SouvenirReturnProofPdf.php": {
+    "mtime": 1793003714.174461,
+    "seen": 1793004013.2013524,
+    "ast_hash": "00e2a584019ecb97208e7ee70f1ad77c",
+    "semantic_hash": ""
+  },
+  "tests/agendaris/souvenir_return_proof_pdf.php": {
+    "mtime": 1793003848.1921422,
+    "seen": 1793004013.5653667,
+    "ast_hash": "e098c6738262b5a86c1253a1ca2c11d0",
+    "semantic_hash": ""
+  },
+  "output/pdf/bukti-pengembalian-souvenir-contoh.pdf": {
+    "mtime": 1793003864.631669,
+    "seen": 1793004013.6192317,
+    "ast_hash": "6e35391290fdcd7a5a37931288a7662d",
+    "semantic_hash": ""
+  },
+  "app/Resources/pdf/bukti_pengambilan_souvenir_baru.jpg": {
+    "mtime": 1793003664.452833,
+    "seen": 1793004013.620049,
+    "ast_hash": "66eb3a8e92b5cae5f75df6c10aa8724b",
+    "semantic_hash": ""
+  },
+  "app/Resources/pdf/bukti_pengembalian_sisa_souvenir.jpg": {
+    "mtime": 1793003664.5224504,
+    "seen": 1793004013.620451,
+    "ast_hash": "ca13ad9abec0ed641f39dda4874e22c0",
+    "semantic_hash": ""
+  },
+  "tmp/pdfs/bukti-pengambilan-template-baru-1.png": {
+    "mtime": 1793003872.616089,
+    "seen": 1793004013.6516364,
+    "ast_hash": "c395cb34f8dcc73774d6b8da6886c654",
+    "semantic_hash": ""
+  },
+  "tmp/pdfs/bukti-pengembalian-template-baru-1.png": {
+    "mtime": 1793003880.0038526,
+    "seen": 1793004013.651642,
+    "ast_hash": "cc8745749a4eca25f82e026c848e8801",
+    "semantic_hash": ""
+  },
+  "app/Libraries/InventoryLoanProofPdf.php": {
+    "mtime": 1793005310.549606,
+    "seen": 1793005619.6124642,
+    "ast_hash": "81ba519c75c8150bb0581465e31d595c",
+    "semantic_hash": ""
+  },
+  "app/Libraries/InventoryReturnProofPdf.php": {
+    "mtime": 1793005310.7871566,
+    "seen": 1793005619.6124673,
+    "ast_hash": "b4bfd49de1c2ceefe91da9365c87663f",
+    "semantic_hash": ""
+  },
+  "tests/agendaris/inventory_loan_proof_pdf.php": {
+    "mtime": 1793005515.177676,
+    "seen": 1793005619.795875,
+    "ast_hash": "c75582df476708b220d42ecee8e424da",
+    "semantic_hash": ""
+  },
+  "tests/agendaris/inventory_return_proof_pdf.php": {
+    "mtime": 1793005515.4138494,
+    "seen": 1793005619.7958777,
+    "ast_hash": "a2c816c0c3cf6006411a5377c97f725e",
+    "semantic_hash": ""
+  },
+  "output/pdf/bukti-peminjaman-inventaris-contoh.pdf": {
+    "mtime": 1793005533.3930469,
+    "seen": 1793005619.8230007,
+    "ast_hash": "e10e8b7f48c2213ebb1fc3e60e659935",
+    "semantic_hash": ""
+  },
+  "output/pdf/bukti-pengembalian-inventaris-contoh.pdf": {
+    "mtime": 1793005533.4943693,
+    "seen": 1793005619.823215,
+    "ast_hash": "3aed87821b135284b9e11e1d0215a6fa",
+    "semantic_hash": ""
+  },
+  "app/Resources/pdf/bukti-peminjaman-inventaris.jpg": {
+    "mtime": 1793005278.7796762,
+    "seen": 1793005619.823643,
+    "ast_hash": "de9af99667933f8a4ae28d82ddc238c8",
+    "semantic_hash": ""
+  },
+  "app/Resources/pdf/bukti-pengembalian-inventaris.jpg": {
+    "mtime": 1793005278.8116882,
+    "seen": 1793005619.8236468,
+    "ast_hash": "ac642c98eb337cf6413f270bf37e18c4",
+    "semantic_hash": ""
+  },
+  "tmp/pdfs/bukti-peminjaman-inventaris-1.png": {
+    "mtime": 1793005537.1258037,
+    "seen": 1793005619.8423867,
+    "ast_hash": "106d281729b7e62b9739e9966fd8e709",
+    "semantic_hash": ""
+  },
+  "tmp/pdfs/bukti-pengembalian-inventaris-1.png": {
+    "mtime": 1793005540.475465,
+    "seen": 1793005619.8429658,
+    "ast_hash": "b5454c1b1eaf7c5b468a4c3872b84474",
+    "semantic_hash": ""
+  },
+  "app/Controllers/AtkKantor.php": {
+    "mtime": 1793072448.0641806,
+    "seen": 1793072744.4913337,
+    "ast_hash": "a7916dcb683c56b344139bb925681638",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-26-120000_CreateAgendarisAtkKantor.php": {
+    "mtime": 1793007385.3503842,
+    "seen": 1793007636.038537,
+    "ast_hash": "351447fcb80f6ab7f4b33424d33b2077",
+    "semantic_hash": ""
+  },
+  "app/Models/AtkKantorModel.php": {
+    "mtime": 1793065100.634926,
+    "seen": 1793065284.183411,
+    "ast_hash": "885305b0b0dddccacb37844258bd2d2b",
+    "semantic_hash": ""
+  },
+  "app/Views/agendaris/atk_kantor/index.php": {
+    "mtime": 1793072516.148448,
+    "seen": 1793072744.5853357,
+    "ast_hash": "2d3b1c7dc45fd70356c08845ae680423",
+    "semantic_hash": ""
+  },
+  "tests/agendaris/atk_kantor.php": {
+    "mtime": 1793072535.4563024,
+    "seen": 1793072744.9512973,
+    "ast_hash": "26958849c9ee70cca899b7375c7d7c89",
+    "semantic_hash": ""
+  },
+  "app/Database/Seeds/AtkKantorDummyData.php": {
+    "mtime": 1793022666.149987,
+    "seen": 1793022984.7182267,
+    "ast_hash": "d37e410e009e14c899fa460fc4f1395a",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-26-130000_CreateAgendarisAtkPengambilan.php": {
+    "mtime": 1793027359.1868064,
+    "seen": 1793027655.7710063,
+    "ast_hash": "c8328c505f6620c7c384e5d983e8c654",
+    "semantic_hash": ""
+  },
+  "app/Models/AtkPengambilanItemModel.php": {
+    "mtime": 1793027359.68117,
+    "seen": 1793027655.7833345,
+    "ast_hash": "057d879da385467a128df8d6c13f6501",
+    "semantic_hash": ""
+  },
+  "app/Models/AtkPengambilanModel.php": {
+    "mtime": 1793027359.432355,
+    "seen": 1793027655.7833369,
+    "ast_hash": "55de05e8d05571edb5eef09fb6dc884f",
+    "semantic_hash": ""
+  },
+  "app/Database/Migrations/2026-10-27-080000_AddSatuanToAgendarisAtkKantor.php": {
+    "mtime": 1793065100.1466756,
+    "seen": 1793065284.1569586,
+    "ast_hash": "370fcc05c7f6f550296802fca7a80512",
+    "semantic_hash": ""
+  },
+  "app/Libraries/AtkPickupProofPdf.php": {
+    "mtime": 1793072423.2035124,
+    "seen": 1793072744.5583448,
+    "ast_hash": "904bf57cf02e8c0589ef644b3334ad70",
+    "semantic_hash": ""
+  },
+  "app/Resources/pdf/bukti_pengambilan_atk.jpg": {
+    "mtime": 1793072355.2404976,
+    "seen": 1793072745.0058665,
+    "ast_hash": "e7541dfcffd92ff1fadbc1b83958376e",
     "semantic_hash": ""
   }
 }

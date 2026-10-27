@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace CodeIgniter\Config;
 
-use CodeIgniter\Exceptions\InvalidArgumentException;
-
 /**
  * Environment-specific configuration
  *
@@ -59,14 +57,16 @@ class DotEnv
             return null;
         }
 
-        // Ensure the file is readable
-        if (! is_readable($this->path)) {
-            throw new InvalidArgumentException("The .env file is not readable: {$this->path}");
-        }
-
         $vars = [];
 
-        $lines = file($this->path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        // `is_readable()` may return false for valid files on Windows CLI even
+        // though PHP can read them. Read the file directly so the CLI bootstrap
+        // and web bootstrap follow the same behaviour.
+        $lines = @file($this->path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        if ($lines === false) {
+            throw new \RuntimeException("The .env file is not readable: {$this->path}");
+        }
 
         foreach ($lines as $line) {
             // Is it a comment?
@@ -176,7 +176,7 @@ class DotEnv
 
             // Unquoted values cannot contain whitespace
             if (preg_match('/\s+/', $value) > 0) {
-                throw new InvalidArgumentException('.env values containing spaces must be surrounded by quotes.');
+                throw new \InvalidArgumentException('.env values containing spaces must be surrounded by quotes.');
             }
         }
 

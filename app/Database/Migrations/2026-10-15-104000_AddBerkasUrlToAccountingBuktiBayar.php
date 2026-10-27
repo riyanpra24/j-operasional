@@ -8,9 +8,11 @@ final class AddBerkasUrlToAccountingBuktiBayar extends Migration
 {
     public function up(): void
     {
-        $this->forge->addColumn('accounting_bukti_bayar', [
-            'berkas_url' => ['type' => 'VARCHAR', 'constraint' => 2048, 'null' => true, 'after' => 'berkas_mime'],
-        ]);
+        if (! $this->db->fieldExists('berkas_url', 'accounting_bukti_bayar')) {
+            $this->forge->addColumn('accounting_bukti_bayar', [
+                'berkas_url' => ['type' => 'VARCHAR', 'constraint' => 2048, 'null' => true, 'after' => 'berkas_mime'],
+            ]);
+        }
     }
 
     public function down(): void

@@ -138,7 +138,7 @@ if ($currentRole === 'security') {
     <script src="<?= base_url($requiredMarkersAsset) ?>?v=<?= esc($requiredMarkersVersion, 'attr') ?>" defer></script>
     <script>
         try {
-            if (window.innerWidth > 900 && localStorage.getItem('j-operasional-sidebar') === 'collapsed') {
+            if (window.innerWidth > 900 && localStorage.getItem('j-operasional-sidebar') !== 'expanded') {
                 document.documentElement.classList.add('sidebar-collapsed');
             }
         } catch (error) {}
@@ -229,6 +229,14 @@ if ($currentRole === 'security') {
                         <a href="<?= site_url('agendaris/progres-dokumen') ?>" class="nav-sublink <?= $agendarisActive && in_array($agendarisPage, ['progres-dokumen', 'progres-dokumen-masuk', 'progres-dokumen-keluar'], true) ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Progres Dokumen
+                        </a>
+                        <a href="<?= site_url('agendaris/souvenir-inventaris') ?>" class="nav-sublink <?= $agendarisActive && $agendarisPage === 'souvenir-inventaris' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Souvenir dan Inventaris
+                        </a>
+                        <a href="<?= site_url('agendaris/atk-kantor') ?>" class="nav-sublink <?= $agendarisActive && $agendarisPage === 'atk-kantor' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            ATK Kantor
                         </a>
                     </div>
                 </div>
