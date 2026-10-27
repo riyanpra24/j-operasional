@@ -77760,7 +77760,7 @@
       "file_type": "code",
       "norm_label": ".down()",
       "source_file": "app/Database/Migrations/2026-10-20-140000_AddJenisToAgendarisSouvenirInventaris.php",
-      "source_location": "L18"
+      "source_location": "L24"
     },
     {
       "id": "app_database_migrations_2026_10_20_140000_addjenistoagendarissouvenirinventaris_addjenistoagendarissouvenirinventaris_up",
@@ -269735,7 +269735,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Database/Migrations/2026-10-20-140000_AddJenisToAgendarisSouvenirInventaris.php",
-      "source_location": "L18",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -343412,5 +343412,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "eb743d3ea8068b81b9f0a589d368fc58ff9ffc47"
+  "built_at_commit": "80ae1da3b7c60aea88fd300e6229f69b3c543632"
 }
