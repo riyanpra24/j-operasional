@@ -17,6 +17,7 @@ $canReviewSdm = in_array($sdmRole, ['admin', 'sdm'], true);
 $canDeleteAllSdm = $sdmRole === 'admin';
 $canImportSdm = $sdmRole === 'admin';
 $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
+$openValidationDialog = (bool) ($openValidationDialog ?? false);
 ?>
 
 <?= $this->extend('layouts/main') ?>
@@ -519,7 +520,7 @@ $canExportSdm = in_array($sdmRole, ['admin', 'sdm'], true);
         };
         const syncPageScroll = () => document.body.classList.toggle('sdm-profile-modal-open', [formDialog, viewDialog, deleteDialog, deleteAllDialog, importDialog, validationDialog, compositionSummaryDialog, jatimCompositionSummaryDialog].some(dialog => dialog?.open));
         const genderLabel = value => value === 'L' ? 'Laki-laki' : (value === 'P' ? 'Perempuan' : value);
-        const validationRequested = new URLSearchParams(window.location.search).get('review_data') === '1';
+        const validationRequested = <?= $openValidationDialog ? 'true' : 'false' ?>;
         const open = dialog => {
             if (dialog && !dialog.open) dialog.showModal();
             syncPageScroll();

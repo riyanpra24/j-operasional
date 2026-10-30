@@ -232,6 +232,11 @@ input, select { height: 37px; padding: 8px 10px; }
 textarea { min-height: 80px; padding: 9px 10px; resize: vertical; }
 input:focus, select:focus, textarea:focus { border-color: #8296ef; box-shadow: 0 0 0 3px rgba(89,116,236,.1); }
 input[readonly] { color: #788598; background: #f7f8fa; }
+
+/* Compact controls used inside dashboard cards. Kept separate from the global form controls. */
+.card-filter { display: grid; align-items: center; }
+.card-filter-select { all: revert; box-sizing: border-box; display: block; width: 100%; height: 20px; min-height: 20px; padding: 0 20px 0 7px; color: #16477e; border: 1px solid #cfe0ef; border-radius: 5px; background-color: #fff; font: 700 8px/18px var(--system-font); outline: 0; cursor: pointer; }
+.card-filter-select:focus { border-color: #1f06ac; box-shadow: 0 0 0 2px rgba(31,6,172,.12); }
 .input-with-icon { position: relative; }
 .input-with-icon span { position: absolute; top: 50%; left: 10px; color: #9ca7b6; transform: translateY(-50%); font-size: 15px; }
 .input-with-icon input { padding-left: 32px; }
@@ -4694,6 +4699,9 @@ body .content-shell .main-content .filter-panel input[type=date]::-webkit-calend
 .bukti-filter-input .bukti-filter-field-icon,.bukti-date-range-toggle .bukti-filter-field-icon,.filter-date-icon,.accounting-page .lr-rka-filter-control .lr-rka-filter-icon,.accounting-page .lr-rka-filter .lr-lob-picker .lr-rka-filter-icon{color:var(--system-field-icon)!important}
 body .content-shell .main-content .filter-panel form .input-with-icon>span{color:var(--system-field-icon)!important}
 body .content-shell .main-content .filter-panel input[type=date]::-webkit-calendar-picker-indicator{filter:invert(17%) sepia(34%) saturate(1763%) hue-rotate(176deg) brightness(86%) contrast(96%)}
+
+/* SPPD */
+.sppd-filter-form{display:grid;grid-template-columns:minmax(240px,1.55fr) minmax(145px,.7fr) minmax(155px,.8fr) auto;gap:10px;align-items:end}.sppd-register-panel.table-title-flat{--table-title-flat-table-head-height:34px}.sppd-register-panel.table-title-flat>.table-title-flat__header{min-height:96px!important}.sppd-table{min-width:1250px;table-layout:fixed}.sppd-table th,.sppd-table td{padding:9px 10px;text-align:center}.sppd-table th{white-space:nowrap}.sppd-table th:nth-child(1),.sppd-table td:nth-child(1){width:145px;text-align:left}.sppd-table th:nth-child(2),.sppd-table td:nth-child(2),.sppd-table th:nth-child(7),.sppd-table td:nth-child(7),.sppd-table th:nth-child(8),.sppd-table td:nth-child(8){width:100px}.sppd-table th:nth-child(3),.sppd-table td:nth-child(3),.sppd-table th:nth-child(4),.sppd-table td:nth-child(4),.sppd-table th:nth-child(5),.sppd-table td:nth-child(5){width:145px;text-align:left}.sppd-table th:nth-child(6),.sppd-table td:nth-child(6){width:185px}.sppd-table th:nth-child(9),.sppd-table td:nth-child(9){width:80px}.sppd-table th:nth-child(10),.sppd-table td:nth-child(10){width:110px}.sppd-purpose-cell{color:#667a90;line-height:1.45;overflow-wrap:anywhere}.sppd-form-dialog,.sppd-view-dialog{width:min(720px,calc(100% - 32px))}.sppd-total-preview{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;align-items:baseline;padding:11px 13px;border:1px solid #dbe9ef;border-radius:9px;background:#f8fcfd}.sppd-total-preview span{color:#718398;font-size:9px;font-weight:800}.sppd-total-preview strong{color:#087d74;font-size:15px}.sppd-total-preview small{grid-column:1/-1;color:#8a9aac;font-size:8px}.sppd-detail-list>div{min-height:60px}.sppd-detail-list dd{overflow-wrap:anywhere}@media(max-width:900px){.sppd-filter-form{grid-template-columns:repeat(2,minmax(0,1fr))}.sppd-filter-form>.search-group,.sppd-filter-form>.filter-actions{grid-column:1/-1}}@media(max-width:560px){.sppd-filter-form{grid-template-columns:1fr}.sppd-filter-form>.search-group,.sppd-filter-form>.filter-actions{grid-column:auto}.sppd-form-dialog,.sppd-view-dialog{width:100%}}
 
 /* Kontrak global ikon field: gunakan variabel navy ini pada komponen baru. */
 body .content-shell .main-content .input-with-icon>span,.filter-date-icon,.bukti-filter-field-icon,.lr-rka-filter-icon{color:var(--system-field-icon)!important}

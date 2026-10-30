@@ -350,7 +350,7 @@ $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_
         });
         return totals;
     };
-    const returnQuantityErrors = ({ itemList, itemSelector, quantitySelector, takenRecords, takenItemKey, takenQuantityKey, returnedRecords, returnedItemKey, returnedQuantityKey, itemIdKey, editingId = null }) => {
+    const inventoryReturnQuantityErrors = ({ itemList, itemSelector, quantitySelector, takenRecords, takenItemKey, takenQuantityKey, returnedRecords, returnedItemKey, returnedQuantityKey, itemIdKey, editingId = null }) => {
         const taken = itemQuantityTotals(takenRecords, takenItemKey, itemIdKey, takenQuantityKey);
         const returned = itemQuantityTotals(returnedRecords, returnedItemKey, itemIdKey, returnedQuantityKey, editingId);
         const submitted = {};
@@ -365,7 +365,7 @@ $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_
         });
         return Object.entries(submitted).flatMap(([id, quantity]) => {
             const available = Math.max(0, (taken[id] || 0) - (returned[id] || 0));
-            return quantity > available ? [`Jumlah pengembalian ${labels[id]} melebihi jumlah yang pernah diambil. Maksimal yang dapat dikembalikan: ${number.format(available)}.`] : [];
+            return quantity > available ? [`Jumlah pengembalian ${labels[id]} melebihi jumlah yang pernah dipinjam. Maksimal yang dapat dikembalikan: ${number.format(available)}.`] : [];
         });
     };
     let lastTrigger = null;
@@ -503,7 +503,7 @@ $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_
         };
         form?.addEventListener('submit', (event) => {
             if (!config.takenRecords) return;
-            const errors = returnQuantityErrors({
+            const errors = inventoryReturnQuantityErrors({
                 itemList,
                 itemSelector: select('item'),
                 quantitySelector: select('quantity'),
@@ -577,22 +577,6 @@ $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_
         returnForm.dataset.editingId = id === null ? '' : String(id);
         showReturnErrors(errors); open(returnFormModal);
     };
-    returnForm?.addEventListener('submit', (event) => {
-        const errors = returnQuantityErrors({
-            itemList: returnItemList,
-            itemSelector: '[data-souvenir-return-item]',
-            quantitySelector: '[data-souvenir-return-quantity]',
-            takenRecords: pickupRecords,
-            takenItemKey: 'pickup_items',
-            takenQuantityKey: 'jumlah_diambil',
-            returnedRecords: returnRecords,
-            returnedItemKey: 'return_items',
-            returnedQuantityKey: 'jumlah_dikembalikan',
-            itemIdKey: 'souvenir_id',
-            editingId: returnForm.dataset.editingId || null,
-        });
-        if (errors.length) { event.preventDefault(); showReturnErrors(errors); }
-    });
     document.querySelector('[data-souvenir-create]')?.addEventListener('click', (event) => {
         const menu = event.currentTarget.closest('details'); lastTrigger = menu?.querySelector('summary') || event.currentTarget; menu?.removeAttribute('open'); openForm();
     });

@@ -339,6 +339,10 @@ if ($currentRole === 'security') {
                             <span aria-hidden="true">●</span>
                             Data Magang
                         </a>
+                        <a href="<?= site_url('sdm/sppd') ?>" class="nav-sublink <?= $sdmActive && $sdmPage === 'sppd' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            SPPD
+                        </a>
                     </div>
                 </div>
                 <?php endif ?>

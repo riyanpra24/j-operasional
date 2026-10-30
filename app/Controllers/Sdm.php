@@ -645,6 +645,8 @@ class Sdm extends BaseController
             'compositionStatusCounts' => $compositionStatusCounts,
             'jatimCompositionUnits' => $workUnitOptions,
             'employeesNeedingReview' => $employeesNeedingReview,
+            'openValidationDialog' => (string) $this->request->getGet('review_data') === '1'
+                || (string) session()->getFlashdata('open_sdm_validation_dialog') === '1',
         ]);
     }
 
@@ -831,7 +833,10 @@ class Sdm extends BaseController
 
     private function saveSdmJatim(?int $id = null): RedirectResponse
     {
-        $returnUrl = $this->sdmJatimReturnUrl();
+        // Penyuntingan yang dibuka dari popup validasi harus kembali ke popup
+        // tersebut setelah halaman dimuat ulang, termasuk saat validasi gagal.
+        $returnToValidation = (string) $this->request->getPost('return_to_validation') === '1';
+        $returnUrl = $this->sdmJatimReturnUrl($returnToValidation);
         $workUnit = $this->systemSdmWorkUnit((string) $this->request->getPost('work_unit'));
         $status = $this->systemSdmEmploymentStatus((string) $this->request->getPost('employment_status'));
         $gender = $this->systemSdmGender((string) $this->request->getPost('gender'));
@@ -877,11 +882,29 @@ class Sdm extends BaseController
         $model = new SdmEmployeeProfileModel();
         $duplicate = $model->where('employee_no', $data['employee_no'])->first();
         if (is_array($duplicate) && (int) $duplicate['id'] !== $id) $errors[] = 'NPP sudah digunakan oleh data SDM lain.';
-        if ($errors !== []) return redirect()->to($returnUrl)->with('error', implode(' ', $errors));
+        if ($errors !== []) {
+            $response = redirect()->to($returnUrl)->with('error', implode(' ', $errors));
+
+            return $returnToValidation
+                ? $response->with('open_sdm_validation_dialog', '1')
+                : $response;
+        }
 
         $success = $id === null ? $model->insert($data) !== false : $model->update($id, $data);
-        if (! $success) return redirect()->to($returnUrl)->with('error', 'Data SDM belum dapat disimpan.');
-        return redirect()->to($returnUrl)->with('success', 'Data SDM berhasil ' . ($id === null ? 'ditambahkan.' : 'diperbarui.'));
+        if (! $success) {
+            $response = redirect()->to($returnUrl)->with('error', 'Data SDM belum dapat disimpan.');
+
+            return $returnToValidation
+                ? $response->with('open_sdm_validation_dialog', '1')
+                : $response;
+        }
+
+        $response = redirect()->to($returnUrl)
+            ->with('success', 'Data SDM berhasil ' . ($id === null ? 'ditambahkan.' : 'diperbarui.'));
+
+        return $returnToValidation
+            ? $response->with('open_sdm_validation_dialog', '1')
+            : $response;
     }
 
     /**
@@ -1117,7 +1140,7 @@ class Sdm extends BaseController
     /**
      * Restores the active list filters after a profile is saved.
      */
-    private function sdmJatimReturnUrl(): string
+    private function sdmJatimReturnUrl(bool $returnToValidation = false): string
     {
         $query = (string) $this->request->getPost('return_query');
         parse_str(ltrim($query, '?'), $parameters);
@@ -1128,7 +1151,7 @@ class Sdm extends BaseController
                 $allowed[$key] = (string) $parameters[$key];
             }
         }
-        if ((string) $this->request->getPost('return_to_validation') === '1') {
+        if ($returnToValidation || (string) $this->request->getPost('return_to_validation') === '1') {
             $allowed['review_data'] = '1';
         }
 

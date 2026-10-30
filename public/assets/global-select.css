@@ -35,5 +35,8 @@
 .global-select-group { padding: 6px 9px 2px; color: #758ba0; font-size: .85em; font-weight: 700; }
 .table-length-form .global-select { width: auto; min-width: 58px; }
 .table-length-form .global-select-trigger { min-height: 32px; padding: 5px 8px; }
+.card-filter .global-select { display: block; width: 100%; }
+.card-filter .global-select-trigger { min-height: 20px; height: 20px; padding: 0 7px; border-radius: 5px; color: #16477e; border-color: #cfe0ef; font-size: 8px; font-weight: 700; line-height: 18px; }
+.card-filter .global-select-trigger svg { width: 10px; height: 10px; }
 .lr-rka-filter-control .global-select { flex: 1 1 auto; }
 .lr-rka-filter-control .global-select-trigger { min-height: 0; height: calc(var(--system-filter-height, 38px) - 2px); padding: 0 8px 0 4px; border: 0; box-shadow: none; }

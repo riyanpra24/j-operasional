@@ -24,6 +24,10 @@ $routes->get('dashboard', 'Dashboard::index', ['as' => 'dashboard']);
 
 // Halaman awal modul SDM & Teller dan Akutansi
 $routes->get('sdm', 'Sdm::index', ['as' => 'sdm.index']);
+$routes->get('sdm/sppd', 'Sppd::index', ['as' => 'sdm.sppd']);
+$routes->post('sdm/sppd', 'Sppd::store', ['as' => 'sdm.sppd.store']);
+$routes->post('sdm/sppd/(:num)', 'Sppd::update/$1', ['as' => 'sdm.sppd.update']);
+$routes->post('sdm/sppd/(:num)/hapus', 'Sppd::destroy/$1', ['as' => 'sdm.sppd.delete']);
 $routes->get('sdm/data-magang', 'Magang::index', ['as' => 'sdm.data_magang']);
 $routes->post('sdm/data-magang', 'Magang::store', ['as' => 'sdm.data_magang.store']);
 $routes->post('sdm/data-magang/import', 'Magang::import', ['as' => 'sdm.data_magang.import']);

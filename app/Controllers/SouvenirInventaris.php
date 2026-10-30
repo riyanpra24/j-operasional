@@ -913,14 +913,13 @@ class SouvenirInventaris extends BaseController
             if ($used > $stockItem['persediaan_awal']) {
                 throw new \RuntimeException('Jumlah pengambilan ' . $stockItem['nama_item'] . ' melebihi stok yang tersedia.');
             }
-            if ($used < 0) throw new \RuntimeException('Jumlah pengembalian ' . $stockItem['nama_item'] . ' melebihi jumlah yang pernah diambil.');
         }
 
         foreach ($stockItems as $stockItem) {
             $used = ($usedBySouvenir[$stockItem['id']] ?? 0) - ($returnedBySouvenir[$stockItem['id']] ?? 0);
             if (! $db->table('agendaris_souvenir_inventaris')->where('id', $stockItem['id'])->update([
                 'persediaan_akhir' => $stockItem['persediaan_awal'] - $used,
-                'terpakai' => $used,
+                'terpakai' => max(0, $used),
             ])) {
                 throw new \RuntimeException('Stok souvenir belum dapat diperbarui.');
             }

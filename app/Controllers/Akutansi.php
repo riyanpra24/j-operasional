@@ -818,7 +818,7 @@ class Akutansi extends BaseController
         ]);
     }
 
-    public function dashboard(): string
+    public function dashboard(): string|ResponseInterface
     {
         $rkaRecords = (new AccountingRkaBudgetModel())
             ->orderBy('budget_year', 'DESC')
@@ -882,10 +882,68 @@ class Akutansi extends BaseController
         $dashboardBasis = 'YTD';
         $dashboardYear = (int) ($lrPeriods['YTD']['year'] ?? $rkaSummary['year'] ?? 2026);
         $dashboardMonth = null;
+        $expenseTrendUnits = ['Konsolidasi', ...RkaCalculator::SOURCE_UNITS];
+        $requestedExpenseTrendUnit = $this->request->getGet('trend_unit');
+        $expenseTrendUnit = is_string($requestedExpenseTrendUnit) && in_array($requestedExpenseTrendUnit, $expenseTrendUnits, true)
+            ? $requestedExpenseTrendUnit : 'Konsolidasi';
+        $expenseTrendSourceUnit = $expenseTrendUnit === 'Konsolidasi' ? 'Korporat Kanwil' : $expenseTrendUnit;
+
         $realizationService = new LrRealizationService();
         $selectedReport = $realizationService->view($dashboardUnit, $dashboardYear, $dashboardBasis, $dashboardMonth);
         $selectedMonth = (int) $selectedReport['month'];
         $selectedValues = $selectedReport['values'];
+
+        // Kartu donut mengikuti periode yang dipilih pada Monitoring Anggaran.
+        $monitoringYears = [];
+        foreach (array_merge($rkaRecords, $importRows) as $record) {
+            $year = (int) ($record['budget_year'] ?? $record['report_year'] ?? 0);
+            if ($year >= 2000 && $year <= 2100) $monitoringYears[$year] = $year;
+        }
+        if ($monitoringYears === []) $monitoringYears[$dashboardYear] = $dashboardYear;
+        krsort($monitoringYears);
+        $requestedMonitoringYear = $this->request->getGet('monitoring_tahun');
+        $requestedMonitoringYear = is_string($requestedMonitoringYear) && ctype_digit($requestedMonitoringYear)
+            ? (int) $requestedMonitoringYear : $dashboardYear;
+        $monitoringYear = isset($monitoringYears[$requestedMonitoringYear]) ? $requestedMonitoringYear : $dashboardYear;
+        $requestedMonitoringMonth = $this->request->getGet('monitoring_bulan');
+        $requestedMonitoringMonth = is_string($requestedMonitoringMonth) && ctype_digit($requestedMonitoringMonth)
+            ? (int) $requestedMonitoringMonth : $selectedMonth;
+        $monitoringMonth = $requestedMonitoringMonth >= 1 && $requestedMonitoringMonth <= 12
+            ? $requestedMonitoringMonth : $selectedMonth;
+
+        $monitoringUnits = ['Konsolidasi', ...RkaCalculator::SOURCE_UNITS];
+        $requestedMonitoringUnit = $this->request->getGet('monitoring_unit');
+        $monitoringUnit = is_string($requestedMonitoringUnit) && in_array($requestedMonitoringUnit, $monitoringUnits, true)
+            ? $requestedMonitoringUnit : 'Konsolidasi';
+        $monitoringSourceUnit = $monitoringUnit === 'Konsolidasi' ? 'Korporat Kanwil' : $monitoringUnit;
+
+        $monitoringBudgetValues = null;
+        try {
+            $monitoringBudgetRecord = (new RkaBudgetService())->find($monitoringSourceUnit, $monitoringYear);
+            if ($monitoringBudgetRecord !== null) {
+                $decodedBudget = json_decode((string) $monitoringBudgetRecord['calculated_json'], true, 512, JSON_THROW_ON_ERROR);
+                $monitoringBudgetValues = is_array($decodedBudget) ? $decodedBudget : null;
+            }
+        } catch (\JsonException) {
+            $monitoringBudgetValues = null;
+        }
+        $monitoringReport = $realizationService->view($monitoringSourceUnit, $monitoringYear, 'YTD', $monitoringMonth);
+        $monitoringExpenseGroups = array_values(array_filter(
+            (new MonitoringAnggaran())->rows($monitoringBudgetValues, '', (array) ($monitoringReport['values'] ?? [])),
+            static fn (array $row): bool => ($row['group'] ?? false) === true,
+        ));
+        $monitoringExpenseDonut = array_map(static fn (array $row): array => [
+            'label' => (string) ($row['label'] ?? '-'),
+            'value' => is_numeric($row['realization'] ?? null) ? (float) $row['realization'] : 0.0,
+        ], $monitoringExpenseGroups);
+        $monitoringExpenseTotal = array_sum(array_column($monitoringExpenseDonut, 'value'));
+        if ($this->request->getGet('monitoring_fragment') === '1') {
+            return $this->response->setJSON([
+                'has_data' => $monitoringExpenseTotal > 0,
+                'total' => $monitoringExpenseTotal,
+                'items' => $monitoringExpenseDonut,
+            ]);
+        }
         $valueFor = static function (string $label) use ($selectedValues): array {
             $key = OracleLrSalaryParser::normalizeLabel($label);
             return [
@@ -965,7 +1023,7 @@ class Akutansi extends BaseController
         $coverageYear = (int) ($lrPeriods['YTD']['year'] ?? $lrPeriods['PTD']['year'] ?? $rkaSummary['year'] ?? date('Y'));
         $monthlyCoverageUnits = array_fill(1, 12, []);
         foreach ($importRows as $row) {
-            if (strtoupper((string) ($row['report_basis'] ?? '')) !== 'YTD'
+            if (strtoupper((string) ($row['report_basis'] ?? '')) !== 'PTD'
                 || (int) ($row['report_year'] ?? 0) !== $coverageYear) continue;
             $month = (int) ($row['report_month'] ?? 0);
             $unit = (string) ($row['unit_name'] ?? '');
@@ -980,13 +1038,13 @@ class Akutansi extends BaseController
             'ptd' => (int) ($lrPeriods['PTD']['unit_count'] ?? 0),
         ];
 
-        // Ambil tren dari hasil kertas kerja Korporat Kanwil yang sudah tersimpan.
+        // Ambil tren dari hasil kertas kerja unit yang dipilih dan sudah tersimpan.
         // Tidak dibuatkan angka pengganti ketika suatu bulan belum diunggah.
         $monthlyTrend = [];
         foreach ($importRows as $row) {
-            if (strtoupper((string) ($row['report_basis'] ?? '')) !== 'YTD'
+            if (strtoupper((string) ($row['report_basis'] ?? '')) !== 'PTD'
                 || (int) ($row['report_year'] ?? 0) !== $dashboardYear
-                || (string) ($row['unit_name'] ?? '') !== $dashboardUnit) {
+                || (string) ($row['unit_name'] ?? '') !== $expenseTrendSourceUnit) {
                 continue;
             }
             $month = (int) ($row['report_month'] ?? 0);
@@ -1005,8 +1063,23 @@ class Akutansi extends BaseController
                 'volume' => $trendValue('VOLUME'),
                 'pendapatan' => $trendValue('Imbal Jasa Penjaminan Bruto'),
                 'klaim' => $trendValue('JUMLAH BEBAN KLAIM'),
+                'beban_karyawan' => $trendValue('Total Beban Karyawan'),
+                'beban_administrasi' => $trendValue('Total Beban Administrasi & Umum'),
+                'beban_penyusutan' => $trendValue('Total Beban Penyusutan & Amortisasi'),
                 'laba' => $trendValue('LABA SEBELUM PAJAK'),
             ];
+        }
+
+        if ($this->request->getGet('trend_fragment') === '1') {
+            $shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            $trendData = ['labels' => $shortMonths, 'employee' => [], 'administration' => [], 'depreciation' => []];
+            foreach (range(1, 12) as $month) {
+                foreach (['employee' => 'beban_karyawan', 'administration' => 'beban_administrasi', 'depreciation' => 'beban_penyusutan'] as $target => $source) {
+                    $value = $monthlyTrend[$month][$source] ?? null;
+                    $trendData[$target][] = is_numeric($value) ? (float) $value : null;
+                }
+            }
+            return $this->response->setJSON($trendData);
         }
 
         $simulations = (new LrWorkpaperSimulationService())->history(
@@ -1027,6 +1100,13 @@ class Akutansi extends BaseController
             'dashboardBasis' => $dashboardBasis,
             'dashboardMonth' => $selectedMonth,
             'dashboardReportAvailable' => $selectedReport['import'] !== null,
+            'monitoringExpenseDonut' => $monitoringExpenseDonut,
+            'monitoringExpenseTotal' => $monitoringExpenseTotal,
+            'monitoringYear' => $monitoringYear,
+            'monitoringMonth' => $monitoringMonth,
+            'monitoringYears' => array_values($monitoringYears),
+            'monitoringUnit' => $monitoringUnit,
+            'monitoringUnits' => $monitoringUnits,
             'dashboardMetrics' => $dashboardMetrics,
             'insuranceRevenueBreakdown' => $insuranceRevenueBreakdown,
             'expenseComposition' => $expenseComposition,
@@ -1038,6 +1118,8 @@ class Akutansi extends BaseController
             'coverageCounts' => $coverageCounts,
             'coverageYear' => $coverageYear,
             'monthlyTrend' => $monthlyTrend,
+            'expenseTrendUnit' => $expenseTrendUnit,
+            'expenseTrendUnits' => $expenseTrendUnits,
         ]);
     }
 
