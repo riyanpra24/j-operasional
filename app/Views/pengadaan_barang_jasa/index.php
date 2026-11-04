@@ -1,17 +1,11 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<section class="page-heading">
-    <div>
-        <p class="eyebrow">BAGIAN UMUM 1</p>
-        <h1>Pengadaan Barang Jasa</h1>
-        <p>Kelola proses dan dokumen pengadaan barang maupun jasa dalam satu tempat.</p>
-    </div>
-</section>
-
-<?= view('components/under_construction', [
-    'module' => 'Pengadaan Barang Jasa',
-    'message' => 'Pengelolaan proses dan dokumen pengadaan sedang disiapkan pada halaman ini.',
+<?= view('components/coming_soon', [
+    'eyebrow' => 'BAGIAN UMUM 1',
+    'heading' => 'Pengadaan Barang dan Jasa',
+    'description' => 'Pengelolaan proses dan dokumen pengadaan sedang kami siapkan. Halaman ini akan segera tersedia untuk digunakan.',
+    'status' => 'Dalam pengembangan',
 ]) ?>
 
 <?= $this->endSection() ?>

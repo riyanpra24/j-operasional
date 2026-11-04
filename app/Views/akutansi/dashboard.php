@@ -1,5 +1,13 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
+<?php if ($showComingSoon ?? false): ?>
+<?= view('components/coming_soon', [
+    'eyebrow' => 'AKUTANSI',
+    'heading' => 'Dashboard Akuntansi',
+    'description' => 'Halaman ini akan segera tersedia untuk digunakan.',
+    'status' => 'Dalam pengembangan',
+]) ?>
+<?php else: ?>
 <?php
 $monthNames = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'];
 $periodMonth = (int) ($dashboardMonth ?? 1); $periodYear = (int) ($dashboardYear ?? date('Y'));
@@ -113,6 +121,9 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
 .accounting-dashboard-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:auto;gap:12px}.dashboard-expense-summary{display:grid;grid-template-columns:30px minmax(0,1fr);gap:9px;align-items:center;min-width:0;height:88px;padding:12px 13px;border:1px solid #dceaf6;border-left:3px solid var(--summary-tone);border-radius:8px;background:linear-gradient(135deg,#fff,#f8fcff);box-shadow:0 2px 8px rgba(19,75,128,.08)}.dashboard-expense-summary-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--summary-tone) 11%,#fff);color:var(--summary-tone);font-size:15px;font-weight:800}.dashboard-expense-summary small,.dashboard-expense-summary strong,.dashboard-expense-summary span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dashboard-expense-summary small{color:#375a83;font-size:8px;font-weight:800}.dashboard-expense-summary strong{margin-top:3px;color:#071d61;font-size:17px;letter-spacing:-.4px}.dashboard-expense-summary span{margin-top:3px;color:#738eaa;font-size:7px;font-weight:700}.dashboard-expense-summary.total{--summary-tone:#1F06AC}.dashboard-expense-summary.employee{--summary-tone:#1F06AC}.dashboard-expense-summary.administration{--summary-tone:#08CB00}.dashboard-expense-summary.depreciation{--summary-tone:#06B6D4}.monitoring-donut-card{grid-column:span 1;height:286px}.expense-trend-card{grid-column:span 3;height:286px}.monitoring-donut-card-head,.expense-trend-card-head{height:42px;padding:9px 12px}.monitoring-donut-card-head h2,.expense-trend-card-head h2{font-size:13px}.monitoring-donut-card-head h2 span{font-size:11px}.expense-trend-card-head h2 span{font-size:9px}.monitoring-donut-live,.expense-trend-source{font-size:8px;padding:4px 6px}.monitoring-donut-content{height:244px;grid-template-columns:140px minmax(0,1fr);grid-template-rows:180px minmax(24px,1fr);gap:3px 8px;padding:7px 10px}.monitoring-donut-visual{transform:none;align-self:center}.monitoring-donut-chart{width:136px;height:136px}.monitoring-donut-total strong{max-width:82px;font-size:10px}.monitoring-donut-total span{font-size:7px}.monitoring-donut-item{grid-template-columns:7px minmax(0,1fr) 66px;min-height:0;padding:6px 0}.monitoring-donut-name{font-size:8px}.monitoring-donut-meta,.monitoring-donut-value{font-size:7px}.monitoring-donut-period{align-self:end;width:100%;grid-template-columns:minmax(0,1fr) 64px}.expense-trend-chart-wrap{height:244px;padding:11px 16px 10px}.expense-trend-filter{width:118px}.expense-trend-card .global-select-trigger{min-height:24px}.expense-trend-card .global-select-value{font-size:9px}@media(max-width:1040px){.accounting-dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.expense-trend-card{grid-column:span 1}.dashboard-expense-summary{height:82px}.monitoring-donut-card,.expense-trend-card{height:278px}}@media(max-width:650px){.accounting-dashboard-grid{grid-template-columns:1fr}.dashboard-expense-summary{height:76px}.monitoring-donut-card,.expense-trend-card{grid-column:span 1;height:270px}.monitoring-donut-content{height:228px}.expense-trend-chart-wrap{height:228px}.expense-trend-source{display:inline-flex}}
 .accounting-dashboard-grid{grid-template-columns:repeat(12,minmax(0,1fr))}.dashboard-expense-summary{grid-column:span 3}.monitoring-donut-card{grid-column:span 5}.expense-trend-card{grid-column:span 7}.dashboard-placeholder-card{grid-column:span 4;height:220px}.dashboard-title-info{display:inline-grid;place-items:center;width:13px;height:13px;margin-left:5px;border:1px solid #8da3c2;border-radius:50%;color:#6680a1;font-size:8px;font-weight:800;line-height:1;vertical-align:1px}.monitoring-donut-card-head h2,.expense-trend-card-head h2{color:#1F06AC}.monitoring-donut-content{grid-template-columns:174px minmax(0,1fr)}.monitoring-donut-chart{width:170px;height:170px}@media(max-width:1040px){.accounting-dashboard-grid{grid-template-columns:repeat(12,minmax(0,1fr))}.dashboard-expense-summary{grid-column:span 6}.monitoring-donut-card,.expense-trend-card{grid-column:span 6}.dashboard-placeholder-card{grid-column:span 6}}@media(max-width:650px){.accounting-dashboard-grid{grid-template-columns:1fr}.dashboard-expense-summary,.monitoring-donut-card,.expense-trend-card,.dashboard-placeholder-card{grid-column:span 1}}
 .monitoring-donut-card-head h2,.expense-trend-card-head h2,.dashboard-expense-summary small{color:#0000D3!important}.dashboard-title-unit{font:inherit;font-style:normal;color:inherit}
+.monitoring-donut-visual{transform:translateY(16px)}.monitoring-donut-legend{align-self:center;transform:translateY(16px)}.monitoring-donut-unit{padding-top:0;padding-bottom:1px}@media(max-width:650px){.monitoring-donut-visual{transform:translateY(8px)}.monitoring-donut-legend{transform:translateY(8px)}}
+.monitoring-donut-item{grid-template-rows:auto auto}.monitoring-donut-item>div{display:contents}.monitoring-donut-dot{grid-row:1 / span 2;align-self:center}.monitoring-donut-name{grid-column:2;grid-row:1}.monitoring-donut-item .monitoring-donut-meta{grid-column:3;grid-row:1;margin:0;font-weight:800;text-align:right;align-self:center}.monitoring-donut-item .monitoring-donut-value{grid-column:2;grid-row:2;margin-top:2px;text-align:left}
+.monitoring-donut-item{grid-template-columns:9px minmax(0,1fr) auto;column-gap:6px;padding:5px 0}.monitoring-donut-dot{width:9px;height:9px}.monitoring-donut-name{color:#1c2f88;font-size:8px;font-weight:800;line-height:1.2}.monitoring-donut-item .monitoring-donut-value{margin-top:2px;color:#162a76;font-size:9px;font-weight:800;line-height:1.2}.monitoring-donut-item .monitoring-donut-meta{color:#1c2f88;font-size:9px;font-weight:800;line-height:1.2}
 </style>
 <main class="accounting-dashboard-stage-one" aria-label="Dashboard Akuntansi">
 <section class="accounting-dashboard-grid" aria-label="Kartu ringkasan Dashboard Akuntansi">
@@ -146,6 +157,28 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
   const canvas = document.getElementById('monitoringExpenseDonut');
   if (!canvas || !Array.isArray(donut.labels) || !Array.isArray(donut.values)) return;
   const money = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(value || 0));
+  const doughnutPercentages = {
+    id: 'doughnutPercentages',
+    afterDatasetDraw: (chart, args, options) => {
+      if (!options?.display || args.index !== 0) return;
+      const values = chart.data.datasets[0]?.data || [];
+      const total = values.reduce((sum, value) => sum + Math.max(0, Number(value) || 0), 0);
+      if (total <= 0) return;
+      const { ctx } = chart;
+      ctx.save();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 8px Manrope, Segoe UI, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      chart.getDatasetMeta(0).data.forEach((arc, index) => {
+        const percentage = (Math.max(0, Number(values[index]) || 0) / total) * 100;
+        if (percentage < 4) return;
+        const point = arc.getCenterPoint();
+        ctx.fillText(`${percentage.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`, point.x, point.y);
+      });
+      ctx.restore();
+    },
+  };
   const solidTooltip = ({ chart, tooltip }) => {
     const host = chart.canvas.parentElement;
     let element = host.querySelector('.monitoring-donut-tooltip');
@@ -188,6 +221,7 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
       layout: { padding: 11 },
       cutout: '60%',
       plugins: {
+        doughnutPercentages: { display: hasMonitoringExpenseData },
         legend: { display: false },
         tooltip: {
           enabled: false,
@@ -195,6 +229,7 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
         },
       },
     },
+    plugins: [doughnutPercentages],
   });
 })();
 </script>
@@ -210,14 +245,18 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
     if (Math.abs(amount) >= 1000000) return `Rp ${(amount / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 0 })} Jt`;
     return `Rp ${amount.toLocaleString('id-ID')}`;
   };
+  const trendAnimation = {
+    duration: 1000,
+    easing: 'easeOutQuart',
+  };
   window.expenseTrendChart = new Chart(canvas, {
     type: 'line',
     data: { labels: trend.labels, datasets: [
-      { label: 'Beban Karyawan', data: trend.employee || [], borderColor: '#1F06AC', backgroundColor: '#1F06AC', fill: false, tension: 0, borderWidth: 2.5, pointRadius: 2.25, pointHoverRadius: 3.5, pointBackgroundColor: '#1F06AC', pointBorderColor: '#1F06AC', pointBorderWidth: 2, spanGaps: true },
-      { label: 'Beban Administrasi & Umum', data: trend.administration || [], borderColor: '#08CB00', backgroundColor: '#08CB00', fill: false, tension: 0, borderWidth: 2.5, pointRadius: 2.25, pointHoverRadius: 3.5, pointBackgroundColor: '#08CB00', pointBorderColor: '#08CB00', pointBorderWidth: 2, spanGaps: true },
-      { label: 'Beban Penyusutan & Amortisasi', data: trend.depreciation || [], borderColor: '#06B6D4', backgroundColor: '#06B6D4', fill: false, tension: 0, borderWidth: 2.5, pointRadius: 2.25, pointHoverRadius: 3.5, pointBackgroundColor: '#06B6D4', pointBorderColor: '#06B6D4', pointBorderWidth: 2, spanGaps: true },
+      { label: 'Beban Karyawan', data: trend.employee || [], borderColor: '#1F06AC', backgroundColor: '#1F06AC', fill: false, tension: .34, cubicInterpolationMode: 'monotone', borderWidth: 2.8, pointRadius: 3, pointHoverRadius: 4.5, pointBackgroundColor: '#1F06AC', pointBorderColor: '#1F06AC', pointBorderWidth: 0, spanGaps: true },
+      { label: 'Beban Administrasi & Umum', data: trend.administration || [], borderColor: '#08CB00', backgroundColor: '#08CB00', fill: false, tension: .34, cubicInterpolationMode: 'monotone', borderWidth: 2.8, pointRadius: 3, pointHoverRadius: 4.5, pointBackgroundColor: '#08CB00', pointBorderColor: '#08CB00', pointBorderWidth: 0, spanGaps: true },
+      { label: 'Beban Penyusutan & Amortisasi', data: trend.depreciation || [], borderColor: '#06B6D4', backgroundColor: '#06B6D4', fill: false, tension: .34, cubicInterpolationMode: 'monotone', borderWidth: 2.8, pointRadius: 3, pointHoverRadius: 4.5, pointBackgroundColor: '#06B6D4', pointBorderColor: '#06B6D4', pointBorderWidth: 0, spanGaps: true },
     ] },
-    options: { responsive: true, maintainAspectRatio: false, animation: { duration: 850, easing: 'easeOutCubic' }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 6, boxHeight: 6, padding: 10, color: '#456989', font: { size: 7, weight: '700' } } }, tooltip: { backgroundColor: '#082f66', padding: 9, cornerRadius: 8, callbacks: { label: (context) => `${context.dataset.label}: ${shortRupiah(context.raw)}` } } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { color: '#7893ad', font: { size: 8, weight: '700' } } }, y: { grid: { color: 'rgba(76,134,180,.13)' }, border: { display: false }, ticks: { color: '#7893ad', font: { size: 8 }, maxTicksLimit: 4, callback: shortRupiah } } } },
+    options: { responsive: true, maintainAspectRatio: false, animation: trendAnimation, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 6, boxHeight: 6, padding: 10, color: '#456989', font: { size: 7, weight: '700' } } }, tooltip: { backgroundColor: '#082f66', padding: 9, cornerRadius: 8, callbacks: { label: (context) => `${context.dataset.label}: ${shortRupiah(context.raw)}` } } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { color: '#7893ad', font: { size: 8, weight: '700' } } }, y: { beginAtZero: true, grid: { color: 'rgba(78,115,223,.15)', borderDash: [3, 3] }, border: { display: false }, ticks: { color: '#7893ad', font: { size: 8 }, maxTicksLimit: 4, callback: shortRupiah } } } },
   });
 })();
 </script>
@@ -246,6 +285,7 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
       chart.data.datasets[0].data = Array.isArray(data.employee) ? data.employee : [];
       chart.data.datasets[1].data = Array.isArray(data.administration) ? data.administration : [];
       chart.data.datasets[2].data = Array.isArray(data.depreciation) ? data.depreciation : [];
+      chart.reset();
       chart.update();
       if (titleUnit) titleUnit.textContent = `- ${unit.options[unit.selectedIndex]?.text || unit.value}`;
       const historyUrl = new URL(window.location.href);
@@ -285,6 +325,16 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
     if (text !== undefined) element.textContent = text;
     return element;
   };
+  const compactPercentage = (value) => {
+    const match = String(value || '').match(/[\d.,]+%/);
+    return match ? match[0] : String(value || '');
+  };
+  const normalizeStaticLegend = () => {
+    legend.querySelectorAll('.monitoring-donut-item .monitoring-donut-meta').forEach((item) => {
+      item.textContent = compactPercentage(item.textContent);
+    });
+  };
+  normalizeStaticLegend();
   const renderLegend = (items, hasData, totalValue) => {
     legend.querySelectorAll('.monitoring-donut-item, .monitoring-donut-empty-state').forEach((item) => item.remove());
     if (!hasData) {
@@ -301,11 +351,14 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
       const dot = make('i', 'monitoring-donut-dot');
       dot.style.setProperty('--tone', colors[index] || '#FF0052');
       const copy = make('div');
+      const percentage = ((value / totalValue) * 100).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
       copy.append(make('span', 'monitoring-donut-name', item.label || '-'));
-      copy.append(make('span', 'monitoring-donut-meta', `${((value / totalValue) * 100).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}% dari total`));
       const amount = make('strong', 'monitoring-donut-value', compactMoney(value));
       amount.title = money(value);
-      row.append(dot, copy, amount);
+      copy.append(amount);
+      const share = make('span', 'monitoring-donut-meta', `${percentage}%`);
+      share.title = `${percentage}% dari total`;
+      row.append(dot, copy, share);
       legend.append(row);
     });
   };
@@ -339,6 +392,7 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
         chart.data.datasets[0].backgroundColor = hasData ? colors : ['#FF0052'];
         chart.data.datasets[0].hoverOffset = hasData ? 7 : 0;
         chart.options.events = hasData ? undefined : [];
+        chart.options.plugins.doughnutPercentages.display = hasData;
         chart.update();
       }
       const historyUrl = new URL(form.action, window.location.origin);
@@ -432,4 +486,5 @@ foreach ($monitoringExpenseDonut as $index => $expense) {
   }
 })();
 </script>
+<?php endif ?>
 <?= $this->endSection() ?>

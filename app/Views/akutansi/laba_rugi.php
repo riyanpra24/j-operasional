@@ -70,7 +70,7 @@ $bopoAchievement = static fn(?string $value): string => $value === null ? '—' 
         </div>
         <div class="form-group lr-filter-month">
             <label class="lr-upload-label" for="lrFilterMonth">Bulan</label>
-            <div class="lr-rka-filter-control"><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg></span><select class="lr-upload-select" id="lrFilterMonth" name="bulan" required>
+            <div class="lr-rka-filter-control"><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg></span><select class="lr-upload-select" id="lrFilterMonth" name="bulan" data-select-menu-max-height="200" required>
                 <?php foreach ($lrMonths as $monthNumber => $monthName): ?>
                     <option value="<?= $monthNumber ?>" <?= $monthNumber === $selectedMonth ? 'selected' : '' ?>><?= $monthName ?></option>
                 <?php endforeach ?>

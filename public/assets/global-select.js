@@ -29,7 +29,11 @@
         menu.style.left = '0px';
         menu.style.top = '0px';
         menu.style.width = '100px';
-        menu.style.maxHeight = '';
+        const configuredMaxHeight = Number.parseInt(menu.dataset.maxHeight || '', 10);
+        const maxMenuHeight = Number.isFinite(configuredMaxHeight) && configuredMaxHeight > 0
+            ? configuredMaxHeight
+            : 260;
+        menu.style.maxHeight = `${maxMenuHeight}px`;
         const origin = menu.getBoundingClientRect();
         const scaleX = origin.width / 100 || 1;
         const scaleY = origin.height / menu.offsetHeight || 1;
@@ -41,7 +45,7 @@
         const naturalHeight = menu.getBoundingClientRect().height;
         const opensAbove = naturalHeight > below && above > 0;
         const available = opensAbove ? above : below;
-        menu.style.maxHeight = `${Math.max(0, Math.min(260, available) / scaleY)}px`;
+        menu.style.maxHeight = `${Math.max(0, Math.min(maxMenuHeight, available) / scaleY)}px`;
         menu.style.overflowY = 'auto';
         const height = menu.getBoundingClientRect().height;
         const top = opensAbove ? anchor.top - height - 5 : anchor.bottom + 5;
@@ -129,6 +133,9 @@
 
         const menu = document.createElement('div');
         menu.className = 'global-select-menu';
+        if (select.dataset.selectMenuMaxHeight) {
+            menu.dataset.maxHeight = select.dataset.selectMenuMaxHeight;
+        }
         menu.id = `global-select-options-${++nextId}`;
         menu.setAttribute('role', 'listbox');
         menu.hidden = true;

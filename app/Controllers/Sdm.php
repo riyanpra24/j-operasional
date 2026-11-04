@@ -1124,7 +1124,7 @@ class Sdm extends BaseController
                 'Kepala Bagian Bisnis', 'Kepala Bagian Operasional',
             ],
             str_starts_with($workUnit, 'Kantor Unit Pelayanan ') => [
-                'Kepala Kantor Unit Pelayanan', 'Manajer Klaim & Subro', 'Manajer Bisnis I',
+                'Pemimpin Cabang', 'Manajer Klaim & Subro', 'Manajer Bisnis I',
                 'Manajer Bisnis II', 'Manajer Operasional',
             ],
             str_starts_with($workUnit, 'Kantor Cabang ') => [

@@ -24,6 +24,9 @@ use Throwable;
 
 class Akutansi extends BaseController
 {
+    /** Dashboard yang sudah dibuat tetap tersimpan dan dapat diaktifkan kembali. */
+    private const DASHBOARD_COMING_SOON = true;
+
     public function monitoringAnggaran(): string
     {
         $units = ['Konsolidasi', ...RkaCalculator::SOURCE_UNITS];
@@ -811,15 +814,20 @@ class Akutansi extends BaseController
         return view('akutansi/rka_kanwil_surabaya', $data);
     }
 
-    public function index(): string
+    public function index(): RedirectResponse
     {
-        return view('akutansi/index', [
-            'title' => 'Akutansi',
-        ]);
+        return redirect()->to(site_url('akutansi/dashboard'));
     }
 
     public function dashboard(): string|ResponseInterface
     {
+        if (self::DASHBOARD_COMING_SOON) {
+            return view('akutansi/dashboard', [
+                'title' => 'Dashboard Akuntansi',
+                'showComingSoon' => true,
+            ]);
+        }
+
         $rkaRecords = (new AccountingRkaBudgetModel())
             ->orderBy('budget_year', 'DESC')
             ->orderBy('updated_at', 'DESC')

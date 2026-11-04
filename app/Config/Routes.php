@@ -21,6 +21,8 @@ $routes->group('', static function (RouteCollection $routes): void {
 $routes->get('/', 'Landing::index', ['as' => 'landing']);
 $routes->get('welcome', 'Welcome::index', ['as' => 'welcome']);
 $routes->get('dashboard', 'Dashboard::index', ['as' => 'dashboard']);
+$routes->get('manager-operasional/rekap-pks-barang-jasa', 'ManagerOperasional::rekapPks', ['as' => 'manager_operasional.rekap_pks']);
+$routes->get('dashboard/coming-soon-preview', 'Dashboard::comingSoonPreview', ['as' => 'dashboard.coming_soon_preview']);
 
 // Halaman awal modul SDM & Teller dan Akutansi
 $routes->get('sdm', 'Sdm::index', ['as' => 'sdm.index']);
@@ -137,6 +139,7 @@ $routes->get(
     'PengadaanBarangJasa::index',
     ['as' => 'pengadaan_barang_jasa.index'],
 );
+$routes->get('bagian-umum-2/pks-barang-jasa', 'PksBarangJasa::index', ['as' => 'pks_umum_2.index']);
 
 $routes->group('bagian-umum-1/dokumen-spk', static function (RouteCollection $routes): void {
     $routes->get('/', 'DokumenSpk::index', ['as' => 'dokumen_spk.index']);

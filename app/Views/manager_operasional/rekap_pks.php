@@ -1,0 +1,5 @@
+<?= $this->extend('layouts/main') ?>
+<?= $this->section('content') ?>
+<section class="page-heading"><div><p class="eyebrow">MANAGER OPERASIONAL</p><h1>Rekap PKS Barang dan Jasa</h1><p>Rekap seluruh PKS dari Bagian Umum 1 dan Bagian Umum 2.</p></div></section>
+<section class="panel register-panel"><div class="table-wrap"><table><thead><tr><th>No. PKS</th><th>Nama Kerja Sama</th><th>Unit Pengelola</th><th>Mitra</th><th>Berakhir</th><th>Nilai</th></tr></thead><tbody><?php if ($records === []): ?><tr><td colspan="6"><div class="empty-state"><strong>Belum ada data PKS</strong></div></td></tr><?php else: ?><?php foreach ($records as $record): ?><tr><td><strong><?= esc($record['kode_internal']) ?></strong></td><td><?= esc($record['nama_kerjasama']) ?></td><td><?= esc($record['unit_pengelola']) ?></td><td><?= esc($record['nama_mitra']) ?></td><td><?= esc($record['periode_selesai'] ?: '-') ?></td><td><?= $record['nilai'] === null ? '-' : 'Rp '.number_format((float) $record['nilai'], 0, ',', '.') ?></td></tr><?php endforeach ?><?php endif ?></tbody></table></div></section>
+<?= $this->endSection() ?>

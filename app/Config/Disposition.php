@@ -27,5 +27,18 @@ final class Disposition
         'Agil Halis Kesawa',
     ];
 
+    /** @return list<string> */
+    public static function atkPickupRecipients(): array
+    {
+        return [
+            ...self::RECIPIENTS,
+            'Kemal Rismandaru',
+            'Riyan Pradana',
+            'Gandes Novia Wulansari',
+            'Irgun Wahju Drijanto',
+            'Joni Slamet Edi S',
+        ];
+    }
+
     public const STATUSES = ['Menunggu', 'Diterima', 'Diproses', 'Diteruskan', 'Selesai'];
 }

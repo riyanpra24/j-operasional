@@ -49,7 +49,7 @@ class AtkKantor extends BaseController
             'pickupRecords' => $this->pickupRecords(),
             'pickupYears' => $this->pickupYears(),
             'pickupAtks' => (new AtkKantorModel())->where('stok_barang >', 0)->orderBy('nama_barang', 'ASC')->findAll(),
-            'pickupRecipients' => Disposition::RECIPIENTS,
+            'pickupRecipients' => $this->pickupRecipients(),
             'pickupState' => session()->getFlashdata('atk_pickup_popup'),
             'pickupListOpen' => session()->getFlashdata('atk_pickup_list_open') === true,
         ]);
@@ -65,7 +65,7 @@ class AtkKantor extends BaseController
         $items = $this->pickupItems();
         $errors = [];
         if ($name === '' || mb_strlen($name) > 150) $errors[] = 'Nama pengambil wajib diisi dan maksimal 150 karakter.';
-        elseif (! in_array($name, Disposition::RECIPIENTS, true)) $errors[] = 'Nama pengambil harus dipilih dari daftar disposisi Agendaris.';
+        elseif (! in_array($name, $this->pickupRecipients(), true)) $errors[] = 'Nama pengambil harus dipilih dari daftar yang tersedia.';
         if ($date === null) $errors[] = 'Tanggal pengambilan wajib diisi.';
         if ($items === []) $errors[] = 'Pilih minimal satu barang dan isi jumlah pengambilan.';
         $values = ['nama_pengambil' => $name, 'tanggal_pengambilan' => (string) $this->request->getPost('tanggal_pengambilan'), 'pickup_items' => $this->submittedPickupItems()];
@@ -312,6 +312,12 @@ class AtkKantor extends BaseController
             ->join('agendaris_atk_pengambilan as pengambilan', 'pengambilan.id = item.pengambilan_id')
             ->where('pengambilan.deleted_at', null)
             ->groupBy('item.atk_id');
+    }
+
+    /** @return list<string> */
+    private function pickupRecipients(): array
+    {
+        return Disposition::atkPickupRecipients();
     }
 
     private function pickupPopupError(array $values, array $errors): RedirectResponse

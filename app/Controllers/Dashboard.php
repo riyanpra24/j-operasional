@@ -7,6 +7,18 @@ use Config\UserRoles;
 
 class Dashboard extends BaseController
 {
+    public function comingSoonPreview(): string|RedirectResponse
+    {
+        $role = (string) session()->get('auth_role');
+        if ($role !== 'admin') {
+            return redirect()->to(site_url(UserRoles::defaultRoute($role)));
+        }
+
+        return view('dashboard/coming_soon_preview', [
+            'title' => 'Pratinjau Template Coming Soon',
+        ]);
+    }
+
     public function index(): string|RedirectResponse
     {
         $role = (string) session()->get('auth_role');

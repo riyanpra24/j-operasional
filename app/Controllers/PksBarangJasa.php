@@ -268,7 +268,7 @@ class PksBarangJasa extends BaseController
 
     private function baseListQuery(): PksKerjasamaModel
     {
-        return $this->kerjasama
+        $query = $this->kerjasama
             ->select("pks_kerjasama.*, pks_mitra.nama_mitra, pks_mitra.alamat, pks_mitra.nama_kontak, pks_mitra.jabatan_kontak, pks_mitra.telepon, pks_mitra.email,
                 (SELECT d.id FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS dokumen_induk_id,
                 (SELECT d.nomor_dokumen FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL AND d.jenis_dokumen = 'PKS' LIMIT 1) AS nomor_dokumen,
@@ -285,6 +285,8 @@ class PksBarangJasa extends BaseController
                 (SELECT COUNT(*) FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL) AS jumlah_dokumen", false)
             ->join('pks_mitra', 'pks_mitra.id = pks_kerjasama.mitra_id')
             ->where('pks_mitra.deleted_at', null);
+        if ($unit = $this->managedUnit()) $query->where('pks_kerjasama.unit_pengelola', $unit);
+        return $query;
     }
 
     private function detailPageData(int $id, bool $isEditMode): array
@@ -411,6 +413,7 @@ class PksBarangJasa extends BaseController
         foreach ($fields as $field) {
             $data[$field] = trim((string) $this->request->getPost($field));
         }
+        if ($unit = $this->managedUnit()) $data['unit_pengelola'] = $unit;
         $data['pic_internal'] = match ($data['unit_pengelola']) {
             'Bagian Umum 1' => 'Angger Wicaksono',
             'Bagian Umum 2' => 'Agil Halis Kesawa',
@@ -603,14 +606,35 @@ class PksBarangJasa extends BaseController
 
     private function findRecord(int $id): array
     {
-        $record = $this->kerjasama->select('pks_kerjasama.*, pks_mitra.nama_mitra, pks_mitra.alamat, pks_mitra.nama_kontak, pks_mitra.jabatan_kontak, pks_mitra.telepon, pks_mitra.email')
+        $query = $this->kerjasama->select('pks_kerjasama.*, pks_mitra.nama_mitra, pks_mitra.alamat, pks_mitra.nama_kontak, pks_mitra.jabatan_kontak, pks_mitra.telepon, pks_mitra.email')
             ->join('pks_mitra', 'pks_mitra.id = pks_kerjasama.mitra_id')
-            ->where('pks_mitra.deleted_at', null)
-            ->find($id);
+            ->where('pks_mitra.deleted_at', null)->where('pks_kerjasama.id', $id);
+        if ($unit = $this->managedUnit()) $query->where('pks_kerjasama.unit_pengelola', $unit);
+        $record = $query->first();
         if ($record === null) {
             throw PageNotFoundException::forPageNotFound('Data PKS tidak ditemukan.');
         }
         return $record;
+    }
+
+    private function managedUnit(): ?string
+    {
+        $roleUnit = match ((string) session()->get('auth_role')) {
+            'umum_1' => 'Bagian Umum 1',
+            'umum_2' => 'Bagian Umum 2',
+            default => null,
+        };
+        if ($roleUnit !== null) return $roleUnit;
+
+        if ($this->currentRoleIsAdmin()) {
+            return match (service('uri')->getSegment(1)) {
+                'bagian-umum-1' => 'Bagian Umum 1',
+                'bagian-umum-2' => 'Bagian Umum 2',
+                default => null,
+            };
+        }
+
+        return null;
     }
 
     private function findOwnedDocument(int $id, int $documentId): array

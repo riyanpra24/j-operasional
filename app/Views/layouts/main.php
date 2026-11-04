@@ -292,12 +292,19 @@ if ($currentRole === 'security') {
                             <span aria-hidden="true">●</span>
                             Dokumen Keluar
                         </a>
+                        <a href="<?= site_url('bagian-umum-2/pks-barang-jasa') ?>" class="nav-sublink <?= $generalSectionTwoActive && $uri->getSegment(2) === 'pks-barang-jasa' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            PKS Barang dan Jasa
+                        </a>
                         <a href="<?= site_url('bagian-umum-2/monitoring-kendaraan/data-kendaraan') ?>" class="nav-sublink <?= $generalSectionTwoActive && $uri->getSegment(2) === 'monitoring-kendaraan' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Monitoring Kendaraan
                         </a>
                     </div>
                 </div>
+                <?php endif ?>
+                <?php if ($currentRole === 'admin'): ?>
+                <div class="nav-group" data-nav-group><button type="button" class="nav-link nav-parent" data-nav-toggle aria-expanded="false" aria-controls="managerOperasionalSubmenu"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-link-text">Manager Operasional</span><span class="nav-chevron" aria-hidden="true">›</span></button><div class="nav-submenu" id="managerOperasionalSubmenu" data-nav-submenu hidden><a href="<?= site_url('manager-operasional/rekap-pks-barang-jasa') ?>" class="nav-sublink"><span aria-hidden="true">●</span>Rekap PKS Barang dan Jasa</a></div></div>
                 <?php endif ?>
                 <?php if ($canAccessSdm): ?>
                 <div class="nav-group <?= $sdmActive ? 'open' : '' ?>" data-nav-group>
