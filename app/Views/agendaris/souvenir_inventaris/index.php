@@ -47,8 +47,9 @@
     .souvenir-pickup-item-list { display: grid; gap: 8px; }
     .souvenir-pickup-item-row { display: flex; align-items: center; gap: 8px; }
     .souvenir-pickup-item-row select { flex: 1; min-width: 0; }
+    .souvenir-pickup-item-row > .global-select { flex: 1 1 auto; min-width: 0; }
     .souvenir-pickup-quantity { display: flex; flex: 0 0 158px; min-width: 158px; }
-    .souvenir-pickup-item-row input { flex: 1; width: auto; border-radius: 8px 0 0 8px; }
+    .souvenir-pickup-quantity input { flex: 1; width: auto; border-radius: 8px 0 0 8px; }
     .souvenir-pickup-unit { display: flex; align-items: center; min-width: 42px; padding: 0 9px; color: var(--system-electric-blue, #0878e8); border: 1px solid #c9ddeb; border-left: 0; border-radius: 0 8px 8px 0; background: #eef8ff; font-size: 9px; font-weight: 800; white-space: nowrap; }
     .souvenir-pickup-remove-item { display: inline-grid !important; flex: 0 0 auto; width: var(--system-table-action-size) !important; min-width: var(--system-table-action-size) !important; height: var(--system-table-action-size) !important; min-height: var(--system-table-action-size) !important; margin: 0 !important; padding: 0 !important; place-items: center !important; color: var(--system-table-action-color) !important; border: 1px solid var(--system-table-action-border) !important; border-radius: 7px !important; background: #fff !important; box-shadow: 0 2px 6px rgba(28, 98, 151, .06) !important; line-height: 1 !important; }
     .souvenir-pickup-remove-item svg { width: 15px !important; height: 15px !important; fill: none !important; stroke: currentColor !important; }
@@ -60,8 +61,9 @@
     .souvenir-return-item-list { display: grid; gap: 8px; }
     .souvenir-return-item-row { display: flex; align-items: center; gap: 8px; }
     .souvenir-return-item-row select { flex: 1; min-width: 0; }
+    .souvenir-return-item-row > .global-select { flex: 1 1 auto; min-width: 0; }
     .souvenir-return-quantity { display: flex; flex: 0 0 158px; min-width: 158px; }
-    .souvenir-return-item-row input { flex: 1; width: auto; border-radius: 8px 0 0 8px; }
+    .souvenir-return-quantity input { flex: 1; width: auto; border-radius: 8px 0 0 8px; }
     .souvenir-return-unit { display: flex; align-items: center; min-width: 42px; padding: 0 9px; color: var(--system-electric-blue, #0878e8); border: 1px solid #c9ddeb; border-left: 0; border-radius: 0 8px 8px 0; background: #eef8ff; font-size: 9px; font-weight: 800; white-space: nowrap; }
     .souvenir-return-remove-item { display: inline-grid !important; flex: 0 0 auto; width: var(--system-table-action-size) !important; min-width: var(--system-table-action-size) !important; height: var(--system-table-action-size) !important; min-height: var(--system-table-action-size) !important; margin: 0 !important; padding: 0 !important; place-items: center !important; }
     @media (max-width: 760px) { .souvenir-pickup-form-grid, .souvenir-return-form-grid { grid-template-columns: 1fr; } .souvenir-pickup-form-grid .modal-span-2, .souvenir-return-form-grid .modal-span-2 { grid-column: auto; } }
@@ -298,6 +300,11 @@ $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_
 
 <script>
 (() => {
+    // Dropdown search global untuk seluruh pilihan item souvenir dan inventaris.
+    document.querySelectorAll('[data-souvenir-pickup-item], [data-souvenir-return-item], [data-inventory-loan-item], [data-inventory-return-item]').forEach((itemSelect) => {
+        itemSelect.setAttribute('data-select-searchable', '');
+        itemSelect.dataset.selectMenuMaxHeight = '200';
+    });
     const records = <?= json_encode($popupRecords, $jsonFlags) ?>;
     const popupState = <?= json_encode($popupState, $jsonFlags) ?>;
     const baseUrl = <?= json_encode(site_url('agendaris/souvenir-inventaris'), $jsonFlags) ?>;

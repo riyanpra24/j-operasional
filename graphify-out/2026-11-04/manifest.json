@@ -84,10 +84,10 @@
     "semantic_hash": "403f4f8da5d9e36e0a9c46d46d517911"
   },
   "app/Config/Disposition.php": {
-    "mtime": 1788763444.6151576,
-    "seen": 1791336831.4746323,
-    "ast_hash": "203926655d5b03fde341446136f7d553",
-    "semantic_hash": "203926655d5b03fde341446136f7d553"
+    "mtime": 1793761032.3975465,
+    "seen": 1793761139.1470091,
+    "ast_hash": "f904db112f68d56e23166b4f70221b34",
+    "semantic_hash": ""
   },
   "app/Config/DocTypes.php": {
     "mtime": 1783416215.0,
@@ -7308,9 +7308,9 @@
     "semantic_hash": ""
   },
   "app/Controllers/AtkKantor.php": {
-    "mtime": 1793072448.0641806,
-    "seen": 1793072744.4913337,
-    "ast_hash": "a7916dcb683c56b344139bb925681638",
+    "mtime": 1793761032.8960397,
+    "seen": 1793761139.1653328,
+    "ast_hash": "f8a432424ac763a4fea0211a26eacfdc",
     "semantic_hash": ""
   },
   "app/Database/Migrations/2026-10-26-120000_CreateAgendarisAtkKantor.php": {
@@ -7326,9 +7326,9 @@
     "semantic_hash": ""
   },
   "app/Views/agendaris/atk_kantor/index.php": {
-    "mtime": 1793072516.148448,
-    "seen": 1793072744.5853357,
-    "ast_hash": "2d3b1c7dc45fd70356c08845ae680423",
+    "mtime": 1793765717.0283456,
+    "seen": 1793765803.5900319,
+    "ast_hash": "81c010e102b780e72bdaafb8b32463a4",
     "semantic_hash": ""
   },
   "tests/agendaris/atk_kantor.php": {

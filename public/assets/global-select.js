@@ -65,9 +65,15 @@
     const position = (control, ensureSpace = false) => positionMenu(control.trigger, control.menu, control.trigger.closest('dialog[open], [role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]'), ensureSpace);
 
     const sync = (control) => {
-        const { select, trigger, text, menu } = control;
+        const { select, trigger, text, menu, searchable } = control;
         const selected = select.selectedOptions[0];
-        text.textContent = selected ? selected.textContent.trim() : '';
+        const selectedText = selected ? selected.textContent.trim() : '';
+        if (searchable) {
+            trigger.placeholder = select.options[0]?.textContent.trim() || '';
+            if (document.activeElement !== trigger) trigger.value = selected?.value ? selectedText : '';
+        } else {
+            text.textContent = selectedText;
+        }
         trigger.disabled = select.matches(':disabled');
         trigger.setAttribute('aria-required', select.required ? 'true' : 'false');
         const label = select.getAttribute('aria-label') || Array.from(select.labels || []).map((item) => item.textContent.trim()).join(' ');
@@ -88,6 +94,7 @@
             button.className = 'global-select-option';
             button.setAttribute('role', 'option');
             button.dataset.selectIndex = String(option.index);
+            button.dataset.selectSearch = option.textContent.trim().toLocaleLowerCase('id-ID');
             button.textContent = option.textContent.trim();
             button.disabled = option.disabled || Boolean(option.closest('optgroup:disabled'));
             button.setAttribute('aria-selected', option.selected ? 'true' : 'false');
@@ -107,28 +114,37 @@
 
     const setup = (select) => {
         if (controls.has(select) || select.multiple || select.size > 1 || select.closest('.bukti-category-select, .bukti-date-range-popover') || select.closest('[data-native-select]') || select.hidden) return;
+        const searchable = select.hasAttribute('data-select-searchable')
+            || select.matches('[data-souvenir-pickup-item], [data-souvenir-return-item], [data-inventory-loan-item], [data-inventory-return-item]');
         const wrapper = document.createElement('span');
-        wrapper.className = 'global-select';
+        wrapper.className = `global-select${searchable ? ' global-select--searchable' : ''}`;
         select.before(wrapper);
         wrapper.append(select);
         select.classList.add('global-select-native');
         select.tabIndex = -1;
         select.setAttribute('aria-hidden', 'true');
 
-        const trigger = document.createElement('button');
-        trigger.type = 'button';
-        trigger.className = 'global-select-trigger';
+        const trigger = document.createElement(searchable ? 'input' : 'button');
+        if (searchable) {
+            trigger.type = 'search';
+            trigger.autocomplete = 'off';
+        } else {
+            trigger.type = 'button';
+        }
+        trigger.className = `global-select-trigger${searchable ? ' global-select-search-trigger' : ''}`;
         trigger.setAttribute('role', 'combobox');
         trigger.setAttribute('aria-haspopup', 'listbox');
         trigger.setAttribute('aria-expanded', 'false');
-        const text = document.createElement('span');
-        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        icon.setAttribute('viewBox', '0 0 24 24');
-        icon.setAttribute('aria-hidden', 'true');
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', 'm6 9 6 6 6-6');
-        icon.append(path);
-        trigger.append(text, icon);
+        const text = searchable ? null : document.createElement('span');
+        if (!searchable) {
+            const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            icon.setAttribute('viewBox', '0 0 24 24');
+            icon.setAttribute('aria-hidden', 'true');
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'm6 9 6 6 6-6');
+            icon.append(path);
+            trigger.append(text, icon);
+        }
         wrapper.append(trigger);
 
         const menu = document.createElement('div');
@@ -140,13 +156,11 @@
         menu.setAttribute('role', 'listbox');
         menu.hidden = true;
         trigger.setAttribute('aria-controls', menu.id);
-        const control = { select, wrapper, trigger, text, menu };
+        const control = { select, wrapper, trigger, text, menu, searchable, ignoreNextFocus: false };
         controls.set(select, control);
 
-        trigger.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            if (openControl === control) { close(); return; }
+        const openMenu = () => {
+            if (openControl === control) return;
             close();
             sync(control);
             buildOptions(control);
@@ -157,7 +171,49 @@
             openControl = control;
             trigger.setAttribute('aria-expanded', 'true');
             position(control, true);
-        });
+        };
+        const filterOptions = () => {
+            const query = trigger.value.trim().toLocaleLowerCase('id-ID');
+            let visibleOptions = 0;
+            menu.querySelectorAll('[data-select-index]').forEach((item) => {
+                const matches = query === '' || (item.dataset.selectSearch || '').includes(query);
+                item.hidden = !matches;
+                if (matches) visibleOptions += 1;
+            });
+            const emptyState = menu.querySelector('[data-select-empty]');
+            if (query !== '' && visibleOptions === 0) {
+                if (!emptyState) {
+                    const empty = document.createElement('div');
+                    empty.className = 'global-select-empty';
+                    empty.dataset.selectEmpty = '';
+                    empty.textContent = 'No Data';
+                    menu.append(empty);
+                }
+            } else {
+                emptyState?.remove();
+            }
+            position(control);
+        };
+        if (searchable) {
+            trigger.addEventListener('focus', () => {
+                if (control.ignoreNextFocus) { control.ignoreNextFocus = false; return; }
+                openMenu();
+            });
+            trigger.addEventListener('input', () => { openMenu(); filterOptions(); });
+            trigger.addEventListener('keydown', (event) => {
+                if (event.key === 'ArrowDown' && openControl === control) {
+                    event.preventDefault();
+                    menu.querySelector('[data-select-index]:not([hidden]):not(:disabled)')?.focus();
+                }
+            });
+        } else {
+            trigger.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (openControl === control) { close(); return; }
+                openMenu();
+            });
+        }
         trigger.addEventListener('keydown', (event) => {
             if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 event.preventDefault();
@@ -175,6 +231,7 @@
             select.dispatchEvent(new Event('input', { bubbles: true }));
             select.dispatchEvent(new Event('change', { bubbles: true }));
             sync(control);
+            if (searchable) control.ignoreNextFocus = true;
             close(true);
         });
         menu.addEventListener('keydown', (event) => {

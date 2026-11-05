@@ -1,42 +1,42 @@
-# Graph Report - operasional  (2026-11-04)
+# Graph Report - operasional  (2026-11-05)
 
 ## Corpus Check
-- 1144 files · ~2,811,506 words
+- 1144 files · ~2,811,788 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 64 file(s) not represented in the graph (top: (none) 19, .css 13, .xml 11)
 
 ## Summary
-- 9545 nodes · 19993 edges · 602 communities (160 shown, 442 thin omitted)
+- 9546 nodes · 19995 edges · 604 communities (155 shown, 449 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 1299 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b458a575`
+- Built from commit: `87317371`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - tn
-- GeneratorTrait
+- BaseCommand
 - BaseContext
 - chart.umd.min.js
 - Parser
 - PksBarangJasa
 - service
-- BaseController
+- AccountSessionManager
 - Builder
-- CIUnitTestCase
+- stdClass
 - Kint
 - BaseConnection
 - Email
-- ResponseInterface
+- Cors
 - BaseModel
 - CLI
 - re
 - Router
 - OracleLrSalaryParser
-- LocalizationFinder
-- ClosureValue
+- Utils
+- FeatureTestTrait
 - Sdm
 - updateElements
 - MethodValue
@@ -50,7 +50,7 @@
 - BaseBuilder
 - DatabaseException
 - RouteCollection
-- BaseCommand
+- Commands
 - ro
 - RouteCollectionInterface
 - form_helper.php
@@ -67,10 +67,10 @@
 - View
 - IncomingRequest
 - URI
-- ContextInterface
+- SimpleXMLElementPlugin
 - CITestStreamFilter
 - AtkKantor
-- RedirectResponse
+- Magang
 - .getParsed
 - xt
 - Paths
@@ -78,23 +78,23 @@
 - ContentSecurityPolicy
 - CodeIgniter
 - Cookie
-- Sdm.php
+- Factories
 - OCI8/Builder.php
 - selection.cjs
-- Factories
-- csrf_hash
-- InstanceValue
+- FactoriesCache
+- ProgresDokumen
+- ContextInterface
 - Filters
 - BaseCast
 - import_transaction.php
 - Migration
-- helper
+- ExceptionInterface
 - HTTPException
-- CookieException
+- Sppd
 - ResponseTrait
 - o
-- Toolbar
-- RequestInterface
+- helper
+- ResponseInterface
 - ValidationInterface
 - CURLRequest
 - sn
@@ -115,7 +115,7 @@
 - RequestTrait
 - upload.cjs
 - Modules
-- Rules
+- SplFileInfo
 - config
 - TimeTrait
 - Security
@@ -126,14 +126,14 @@
 - Connection
 - text_helper.php
 - Pager
-- ArrayHelper
+- Rules
 - attendance_action_menu.cjs
 - BaseHandler
 - DateTimeImmutable
-- Request
+- CodeIgniter.php
 - SecurityException
 - FrameworkException
-- MicrotimeRepresentation
+- MicrotimePlugin
 - ResponseTrait
 - BaseResult
 - Connection
@@ -142,6 +142,7 @@
 - landing_navigation.js
 - LrFormulaService
 - RkaCalculator
+- Exceptions
 - MockCache
 - monitoring_period.php
 - preview.cjs
@@ -156,33 +157,35 @@
 - Entity
 - html_helper.php
 - Session
-- TableName
+- ShowTableInfo
 - UploadedFile
 - ApcuHandler
-- PageNotFoundException
+- AutoRouterImproved
 - Connection
 - Header
-- MemcachedHandler
-- DokumenMasukModel
+- BuktiBayar
+- ResourcePresenter
 - Escaper.php
 - MemcachedHandler
 - FileCollection
-- Agendaris
+- csrf_hash
 - RkaWorkbookParser
+- UnitEnum
 - Stringable
 - run.php
 - Fabricator
 - File
-- log_message
+- FilterCollector
 - Rules
+- LocalizationFinder
 - Table
 - AbstractValue
 - Mimes
 - Language
-- FilterCollector
+- ControllerFinder
 - CastException
 - Builder
-- RuntimeException
+- ZipArchive
 - system/Config/Services.php
 - DatabaseTestTrait
 - delete.cjs
@@ -213,8 +216,8 @@
 - SessionInterface
 - Images
 - FileLocatorInterface
-- DataAset
-- SouvenirInventaris
+- .view
+- PageNotFoundException
 - MockConnection
 - CacheInterface
 - EssAttendanceReportParser
@@ -230,9 +233,9 @@
 - IncomingControlSheetPdf
 - .summary
 - BaseService
-- DokumenMasuk
+- RouterException
 - QueryInterface
-- SdmEmployeeWorkbookParser
+- Result
 - analyze_rka_relationship.mjs
 - lr_lob_filter.cjs
 - oracle_lr_delete.cjs
@@ -240,19 +243,19 @@
 - ViewException
 - bulk.php
 - HandlerInterface
-- ValidationException
-- .getEnv
-- DefinedRouteCollector
+- View
+- GenerateKey
+- Utilities/Routes.php
 - pagination.php
 - oracle_lr_upload.cjs
-- BaseHandler
+- MySQLi/Connection.php
 - CloneableCookieInterface
 - ResourceController
-- RendererInterface
+- Result
 - Test/Fabricator.php
 - LoggerTrait
 - SouvenirPickupProofPdf
-- DatabaseTestTrait.php
+- MockResult
 - TextRenderer
 - Timer
 - BaseTransformer
@@ -262,23 +265,24 @@
 - AbstractLogger
 - CriticalError
 - Validation
-- FormatException
+- ControllerMethodReader
+- CastException
 - Throwable
 - FileLocator
-- .create
+- ApiException
 - RedisHandler
 - LogException
 - UploadedFileInterface
 - StringValue
 - Cell
 - inflector_helper.php
-- TableRepresentation
 - require-dev
+- CastInterface
 - import_access.php
 - TwoVehicleMonitoringDummyData
-- SQLite3/Connection.php
-- TestGenerator
-- Postgre/Connection.php
+- Result
+- current_url
+- Result
 - ExampleDatabaseTest.php
 - export_document.php
 - AddSatuanJumlahToDokumenMasuk
@@ -286,12 +290,12 @@
 - period.js
 - AddDispositionTrackingToAgendaris
 - RedisHandler
-- ClassDeclaredContext
+- Parser/Parser.php
 - CreateDataAset
 - CreateAgendarisSouvenirPengambilanItems
 - .summary
-- filesystem_helper.php
-- Running Application Tests
+- FilterTestTrait
+- PreparedQuery
 - Config/Events.php
 - ClassifyOnDutyRequestAttendance
 - ShowOnDutyRequestOnHolidays
@@ -300,7 +304,7 @@
 - require
 - AddCompositionMappingToSdmEmployeeProfiles
 - LogicException
-- ReflectionClass
+- Cells/Cell.php
 - CreateAgendarisAtkKantor
 - History
 - CreateUserSessions
@@ -319,14 +323,14 @@
 - SplitUmumUserRole
 - AddSoftDeleteToOracleLrImports
 - CreateDokumenMasuk
-- View/Parser.php
+- TestLogger
 - OracleLrImportService
 - RemoveNomorAgendaFromDokumenMasuk
 - CreateAgendaris
 - MakeAgendarisIndependent
 - AddBerkasToAgendaris
 - AddPerihalPenerimaToDokumenMasuk
-- Response
+- import.php
 - AddWorkflowToDokumenKeluar
 - CreateDistribusiDokumen
 - AddJumlahDanEkspedisiToDokumenKeluar
@@ -397,7 +401,7 @@
 - CreateAgendarisSouvenirInventaris
 - akutansi/monitoring_anggaran.php
 - RKA template checks
-- ZipArchive
+- DOMElement
 - CreateAccountingBuktiBayar
 - AGENTS.md
 - AddTanggalSecurityToDokumenMasuk
@@ -407,7 +411,7 @@
 - AddVehicleCustomName
 - AddSoftDeleteToAccountingRkaBudgets
 - CreateAgendarisSouvenirPengembalian
-- MySQLi/Connection.php
+- Result
 - CreateAccountingLrRecapOverrides
 - EnableSoftDeletesAcrossApplication
 - CreateAgendarisSouvenirPengembalianItems
@@ -426,18 +430,16 @@
 - AddRolesAndOperationalUsers
 - AddPenyerahanAtToDokumenMasuk
 - AddNomorTanggalAgendarisToAgendaris
-- VehicleMonitoringDummyData
 - NormalizeVehicleServiceBudget
 - NormalizeSdmManagerTitles
 - CreateMonitoringAnggaranNotes
-- SampleURIGenerator
 - CreateAgendarisInventarisPeminjaman
 - EscaperInterface
 - CreateAgendarisInventarisPeminjamanItems
 - AddKeteranganToAgendarisSouvenirPengambilan
 - CreateAgendarisInventarisPengembalian
 - AddSatuanToAgendarisAtkKantor
-- site_url
+- RedirectResponse
 
 ## God Nodes (most connected - your core abstractions)
 1. `Migration` - 257 edges
@@ -466,87 +468,75 @@
 ## Import Cycles
 - None detected.
 
-## Communities (602 total, 442 thin omitted)
+## Communities (604 total, 449 thin omitted)
 
 ### Community 0 - "tn"
 Cohesion: 0.04
 Nodes (22): addBox(), beforeUpdate(), configure(), d(), es(), f(), generateLabels(), Ie() (+14 more)
 
-### Community 1 - "GeneratorTrait"
-Cohesion: 0.06
-Nodes (12): Generators, GeneratorTrait, CellGenerator, ConfigGenerator, ControllerGenerator, EntityGenerator, FilterGenerator, ModelGenerator (+4 more)
+### Community 1 - "BaseCommand"
+Cohesion: 0.04
+Nodes (23): SetupDataAset, Generators, BaseCommand, GeneratorTrait, ClearCache, MigrateStatus, CellGenerator, CommandGenerator (+15 more)
 
 ### Community 2 - "BaseContext"
 Cohesion: 0.03
-Nodes (20): ArrayLimitPlugin, Base64Plugin, ClosurePlugin, DateTimePlugin, EnumPlugin, HtmlPlugin, IteratorPlugin, JsonPlugin (+12 more)
+Nodes (19): AbstractPlugin, ArrayLimitPlugin, Base64Plugin, ClosurePlugin, EnumPlugin, HtmlPlugin, IteratorPlugin, JsonPlugin (+11 more)
 
 ### Community 3 - "chart.umd.min.js"
 Cohesion: 0.03
 Nodes (73): ai(), at(), average(), beforeDatasetDraw(), beforeDatasetsDraw(), beforeDraw(), buildLookupTable(), ca (+65 more)
 
 ### Community 4 - "Parser"
-Cohesion: 0.07
-Nodes (6): AbstractPlugin, ClassStringsPlugin, ConstructablePluginInterface, Parser, PluginInterface, ProxyPlugin
+Cohesion: 0.05
+Nodes (8): ClassStringsPlugin, ConstructablePluginInterface, Parser, PluginInterface, ProxyPlugin, ClosedResourceValue, ResourceValue, UnknownValue
 
 ### Community 5 - "PksBarangJasa"
-Cohesion: 0.10
+Cohesion: 0.11
 Nodes (5): PksBarangJasa, PksDokumenModel, PksItemModel, PksKerjasamaModel, PksMitraModel
 
 ### Community 6 - "service"
 Cohesion: 0.05
-Nodes (42): {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), cache(), class_uses_recursive(), command() (+34 more)
+Nodes (40): {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), TestGenerator, cache(), class_uses_recursive() (+32 more)
 
-### Community 7 - "BaseController"
+### Community 7 - "AccountSessionManager"
 Cohesion: 0.05
-Nodes (11): UserRoles, BagianUmum2, BaseController, {closure#3}(), KelolaAkun, Landing, ManagerOperasional, NonBelanjaModal (+3 more)
+Nodes (8): UserRoles, Auth, {closure#3}(), KelolaAkun, AccountSessionManager, UserModel, Throttler, ThrottlerInterface
 
 ### Community 8 - "Builder"
 Cohesion: 0.09
 Nodes (4): Builder, {closure#2}(), {closure#3}(), {closure#9}()
 
-### Community 9 - "CIUnitTestCase"
-Cohesion: 0.08
-Nodes (6): CIUnitTestCase, MockCodeIgniter, ReflectionHelper, ExampleSessionTest, ConfigReader, HealthTest
-
 ### Community 10 - "Kint"
-Cohesion: 0.04
-Nodes (10): dd(), trace(), CallFinder, FacadeInterface, d(), s(), Kint, AbstractRenderer (+2 more)
+Cohesion: 0.05
+Nodes (9): dd(), trace(), FacadeInterface, d(), s(), Kint, AbstractRenderer, ConstructableRendererInterface (+1 more)
 
 ### Community 12 - "Email"
-Cohesion: 0.07
-Nodes (3): function_usable(), Email, word_wrap()
-
-### Community 13 - "ResponseInterface"
-Cohesion: 0.05
-Nodes (6): Cors, ResponseInterface, ChromeLoggerHandler, Filter, Restrict, RouteAttributeInterface
+Cohesion: 0.06
+Nodes (12): function_usable(), Email, Creating Tests, Database Tests, Generating Code Coverage, PHPUnit XML Configuration, Requirements, Resources (+4 more)
 
 ### Community 15 - "CLI"
 Cohesion: 0.04
-Nodes (12): CLI, {closure#1}(), Migrate, {closure#1}(), MigrateRollback, ListCommands, LocalizationSync, {closure#1}() (+4 more)
+Nodes (11): CLI, {closure#1}(), Migrate, {closure#1}(), MigrateRollback, ListCommands, {closure#1}(), FilterCheck (+3 more)
 
 ### Community 16 - "re"
 Cohesion: 0.07
 Nodes (14): evaluate(), number(), normalized(), normalize(), normalize_formula(), shift_formula(), clean(), main() (+6 more)
 
-### Community 17 - "Router"
-Cohesion: 0.04
-Nodes (9): Feature, HTTPExceptionInterface, base_url(), BadRequestException, RedirectException, ResponsableInterface, ExceptionInterface, RouterException (+1 more)
-
 ### Community 18 - "OracleLrSalaryParser"
 Cohesion: 0.04
 Nodes (33): {closure#1}(), {closure#10}(), {closure#12}(), {closure#3}(), LrReportRows, LrSignRules, OracleLrSalaryParser, {closure#3}() (+25 more)
 
-### Community 19 - "LocalizationFinder"
-Cohesion: 0.06
-Nodes (6): LocalizationFinder, ComposerScripts, FsPathPlugin, SplFileInfoPlugin, SplFileInfoRepresentation, SplFileInfoValue
+### Community 19 - "Utils"
+Cohesion: 0.03
+Nodes (9): CallFinder, FsPathPlugin, SplFileInfoPlugin, Utils, ClosureValue, ParameterBag, ParameterHoldingTrait, SplFileInfoRepresentation (+1 more)
 
-### Community 20 - "ClosureValue"
-Cohesion: 0.16
-Nodes (3): ClosureValue, ParameterBag, ParameterHoldingTrait
+### Community 20 - "FeatureTestTrait"
+Cohesion: 0.11
+Nodes (3): ControllerTestTrait, FeatureTestTrait, service()
 
 ### Community 21 - "Sdm"
-Cohesion: 0.07
-Nodes (4): Sdm, SdmAttendanceImportModel, SdmAttendanceRecordModel, SdmEmployeeProfileModel
+Cohesion: 0.05
+Nodes (7): {closure#11}(), {closure#13}(), {closure#19}(), Sdm, SdmAttendanceImportModel, SdmAttendanceRecordModel, SdmEmployeeProfileModel
 
 ### Community 22 - "updateElements"
 Cohesion: 0.13
@@ -557,12 +547,8 @@ Cohesion: 0.07
 Nodes (7): ClassHooksPlugin, ClassMethodsPlugin, MethodContext, DeclaredCallableBag, FunctionValue, MethodValue, CallableDefinitionRepresentation
 
 ### Community 24 - "BadMethodCallException"
-Cohesion: 0.03
-Nodes (9): WincacheHandler, BasePreparedQuery, PreparedQuery, PreparedQuery, PreparedQuery, PreparedQueryInterface, PreparedQuery, PreparedQuery (+1 more)
-
-### Community 25 - "CLIRequest"
-Cohesion: 0.09
-Nodes (3): Kint, ResponseCache, CLIRequest
+Cohesion: 0.05
+Nodes (6): BasePreparedQuery, PreparedQuery, PreparedQueryInterface, PreparedQuery, PreparedQuery, BadMethodCallException
 
 ### Community 26 - ".update"
 Cohesion: 0.09
@@ -573,8 +559,8 @@ Cohesion: 0.06
 Nodes (26): afterDatasetsUpdate(), Be(), bo, fn(), gn(), H(), l(), ii() (+18 more)
 
 ### Community 28 - "Time"
-Cohesion: 0.11
-Nodes (4): {closure#1}(), now(), Time, Cache
+Cohesion: 0.07
+Nodes (6): WincacheHandler, {closure#1}(), DatetimeCast, now(), Time, ReflectionHelper
 
 ### Community 29 - "Forge"
 Cohesion: 0.05
@@ -585,12 +571,8 @@ Cohesion: 0.06
 Nodes (9): BaseUtils, DatabaseException, Utils, Builder, Utils, Utils, Builder, Utils (+1 more)
 
 ### Community 34 - "RouteCollection"
-Cohesion: 0.08
-Nodes (20): {closure#1}(), {closure#10}(), {closure#11}(), {closure#12}(), {closure#13}(), {closure#14}(), {closure#15}(), {closure#16}() (+12 more)
-
-### Community 35 - "BaseCommand"
 Cohesion: 0.06
-Nodes (13): SetupDataAset, BaseCommand, ClearCache, InfoCache, MigrateStatus, CommandGenerator, SeederGenerator, Help (+5 more)
+Nodes (20): {closure#1}(), {closure#10}(), {closure#11}(), {closure#12}(), {closure#13}(), {closure#14}(), {closure#15}(), {closure#16}() (+12 more)
 
 ### Community 36 - "ro"
 Cohesion: 0.09
@@ -601,20 +583,20 @@ Cohesion: 0.13
 Nodes (23): stringify_attributes(), form_button(), form_checkbox(), form_datalist(), form_dropdown(), form_fieldset(), form_hidden(), form_input() (+15 more)
 
 ### Community 40 - "MonitoringKendaraan"
-Cohesion: 0.15
+Cohesion: 0.14
 Nodes (6): {closure#2}(), MonitoringKendaraan, VehicleActivityLogModel, VehicleDocumentModel, VehicleMaintenanceModel, VehicleModel
 
 ### Community 41 - "Model"
-Cohesion: 0.05
-Nodes (9): AccountingLrRecapOverrideModel, AgendarisInventarisPeminjamanItemModel, AgendarisInventarisPengembalianItemModel, AgendarisSouvenirPengambilanItemModel, AgendarisSouvenirPengembalianItemModel, SdmAttendanceCalendarModel, SdmOvertimeImportModel, SdmOvertimeRecordModel (+1 more)
+Cohesion: 0.04
+Nodes (14): SecurityPersonnel, DistribusiDokumen, AccountingLrRecapOverrideModel, AgendarisInventarisPeminjamanItemModel, AgendarisInventarisPengembalianItemModel, AgendarisModel, AgendarisSouvenirPengambilanItemModel, AgendarisSouvenirPengembalianItemModel (+6 more)
 
 ### Community 42 - "EncryptionException"
-Cohesion: 0.08
+Cohesion: 0.07
 Nodes (6): EncrypterInterface, EncryptionException, BaseHandler, OpenSSLHandler, SodiumHandler, KeyRotationDecorator
 
 ### Community 43 - "Events"
-Cohesion: 0.07
-Nodes (5): Commands, Events, FabricatorModel, MockEmail, MockEvents
+Cohesion: 0.06
+Nodes (6): Events, CIUnitTestCase, MockCodeIgniter, MockEmail, MockEvents, ExampleSessionTest
 
 ### Community 44 - "ho"
 Cohesion: 0.07
@@ -622,35 +604,31 @@ Nodes (9): _generate(), _getTimestampsForTable(), ho(), io(), lt(), no(), nt(), 
 
 ### Community 45 - "ArrayValue"
 Cohesion: 0.04
-Nodes (8): ThrowablePlugin, TracePlugin, TracePlugin, ArrayValue, SourceRepresentation, ThrowableValue, TraceFrameValue, TraceValue
+Nodes (9): TablePlugin, ThrowablePlugin, TracePlugin, ArrayValue, SourceRepresentation, TableRepresentation, ThrowableValue, TraceFrameValue (+1 more)
 
 ### Community 46 - "Seeder"
-Cohesion: 0.10
-Nodes (9): AgendarisSouvenirInventarisDummyData, AtkKantorDummyData, DataAsetSeptember2026, DokumenSpkSpreadsheetData, DummyOperationalData, PksWorkflowDummyData, SdmTellerDummyData, ThreeDummyWorkflowData (+1 more)
+Cohesion: 0.09
+Nodes (10): AgendarisSouvenirInventarisDummyData, AtkKantorDummyData, DataAsetSeptember2026, DokumenSpkSpreadsheetData, DummyOperationalData, PksWorkflowDummyData, SdmTellerDummyData, ThreeDummyWorkflowData (+2 more)
 
 ### Community 48 - "RuntimeException"
-Cohesion: 0.05
-Nodes (13): CacheFactory, CacheException, CLIException, ConfigException, DebugTraceableTrait, RuntimeException, ExceptionInterface, FileException (+5 more)
+Cohesion: 0.07
+Nodes (11): CLIException, ConfigException, DebugTraceableTrait, RuntimeException, ExceptionInterface, FileException, FileNotFoundException, set_realpath() (+3 more)
 
 ### Community 50 - "IncomingRequest"
-Cohesion: 0.08
+Cohesion: 0.07
 Nodes (4): FileCollection, {closure#1}(), IncomingRequest, MockIncomingRequest
 
-### Community 52 - "ContextInterface"
-Cohesion: 0.04
-Nodes (14): ArrayObjectPlugin, BlacklistPlugin, PluginBeginInterface, SimpleXMLElementPlugin, StreamPlugin, ClosedResourceValue, ArrayContext, ClassOwnedContext (+6 more)
+### Community 52 - "SimpleXMLElementPlugin"
+Cohesion: 0.11
+Nodes (3): SimpleXMLElementPlugin, StreamPlugin, ArrayContext
 
 ### Community 53 - "CITestStreamFilter"
 Cohesion: 0.06
 Nodes (5): InputOutput, CITestStreamFilter, MockInputOutput, PhpStreamWrapper, StreamFilterTrait
 
 ### Community 54 - "AtkKantor"
-Cohesion: 0.13
-Nodes (4): AtkKantor, AtkKantorModel, AtkPengambilanItemModel, AtkPengambilanModel
-
-### Community 55 - "RedirectResponse"
-Cohesion: 0.08
-Nodes (5): Magang, Sppd, MagangModel, SppdModel, RedirectResponse
+Cohesion: 0.11
+Nodes (5): Disposition, AtkKantor, AtkKantorModel, AtkPengambilanItemModel, AtkPengambilanModel
 
 ### Community 56 - ".getParsed"
 Cohesion: 0.08
@@ -665,16 +643,16 @@ Cohesion: 0.06
 Nodes (8): Optimize, Paths, preload, Boot, Console, Environment, {closure#1}(), DotEnv
 
 ### Community 59 - "Entity.php"
-Cohesion: 0.05
-Nodes (14): EnumCast, ArrayCast, BaseCast, BooleanCast, CSVCast, DatetimeCast, EnumCast, FloatCast (+6 more)
+Cohesion: 0.07
+Nodes (10): ArrayCast, BaseCast, BooleanCast, CSVCast, FloatCast, IntBoolCast, IntegerCast, ObjectCast (+2 more)
 
 ### Community 61 - "CodeIgniter"
-Cohesion: 0.05
-Nodes (5): Cache, Services, CodeIgniter, single_service(), ControllerTestTrait
+Cohesion: 0.08
+Nodes (4): Cache, Services, CodeIgniter, single_service()
 
-### Community 63 - "Sdm.php"
-Cohesion: 0.07
-Nodes (5): Disposition, {closure#11}(), {closure#13}(), {closure#19}(), AgendarisModel
+### Community 62 - "Cookie"
+Cohesion: 0.06
+Nodes (3): cookie(), Cookie, CookieException
 
 ### Community 64 - "OCI8/Builder.php"
 Cohesion: 0.04
@@ -684,25 +662,17 @@ Nodes (10): {closure#4}(), {closure#7}(), Builder, {closure#1}(), {closure#10}()
 Cohesion: 0.05
 Nodes (33): assert, back, confirmation, editExisting, editTrigger, element(), existingAlert, existingMessage (+25 more)
 
-### Community 66 - "Factories"
-Cohesion: 0.06
-Nodes (5): FactoriesCache, FileVarExportHandler, CreateDatabase, ConfigCheck, Factories
+### Community 66 - "FactoriesCache"
+Cohesion: 0.14
+Nodes (3): FactoriesCache, FileVarExportHandler, ConfigCheck
 
-### Community 67 - "csrf_hash"
-Cohesion: 0.13
-Nodes (5): DokumenKeluar, ProgresDokumen, DokumenKeluarModel, csrf_hash(), csrf_token()
-
-### Community 68 - "InstanceValue"
-Cohesion: 0.06
-Nodes (4): DomPlugin, DomNodeListValue, DomNodeValue, InstanceValue
-
-### Community 69 - "Filters"
-Cohesion: 0.08
-Nodes (3): FilterException, Filters, FilterTestTrait
+### Community 68 - "ContextInterface"
+Cohesion: 0.03
+Nodes (13): ArrayObjectPlugin, BlacklistPlugin, DateTimePlugin, DomPlugin, PluginBeginInterface, ContextInterface, DateTimeValue, DomNodeListValue (+5 more)
 
 ### Community 70 - "BaseCast"
-Cohesion: 0.06
-Nodes (10): ArrayCast, BaseCast, BooleanCast, CastInterface, CSVCast, FloatCast, IntBoolCast, IntegerCast (+2 more)
+Cohesion: 0.07
+Nodes (9): BaseCast, BooleanCast, CSVCast, FloatCast, IntBoolCast, IntegerCast, TimestampCast, URICast (+1 more)
 
 ### Community 71 - "import_transaction.php"
 Cohesion: 0.07
@@ -712,21 +682,21 @@ Nodes (8): AssetWorkbookParser, BaseController, DataAsetModel, ImportDatabase, I
 Cohesion: 0.06
 Nodes (11): AddPengambilanToDokumenMasuk, SyncPickedDocumentsToAgendaris, RemovePenerimaanFromDokumenKeluar, AddProgresToDokumenKeluar, AddOutgoingWorkflowTimestamps, CreatePksBarangJasaModule, CreateAccountingRkaBudgets, AddReportBasisToOracleLrImports (+3 more)
 
-### Community 73 - "helper"
-Cohesion: 0.07
-Nodes (12): helper(), is_really_writable(), BadFunctionCallException, ExceptionInterface, format_number(), number_to_amount(), number_to_currency(), number_to_size() (+4 more)
-
-### Community 76 - "ResponseTrait"
-Cohesion: 0.09
-Nodes (3): ResponseTrait, ResourcePresenter, MockResourcePresenter
+### Community 73 - "ExceptionInterface"
+Cohesion: 0.17
+Nodes (7): Iterator, BadFunctionCallException, ExceptionInterface, format_number(), number_to_amount(), number_to_currency(), number_to_size()
 
 ### Community 77 - "o"
 Cohesion: 0.12
 Nodes (13): a(), determineDataLimits(), Di(), g(), g(), m(), o(), p() (+5 more)
 
-### Community 79 - "RequestInterface"
-Cohesion: 0.06
-Nodes (16): Filters, AuthFilter, FriendlyCsrfFilter, PreserveListFiltersFilter, RoleAccessFilter, Filters, Cors, CSRF (+8 more)
+### Community 78 - "helper"
+Cohesion: 0.08
+Nodes (4): helper(), Toolbar, sanitize_filename(), Filters
+
+### Community 79 - "ResponseInterface"
+Cohesion: 0.04
+Nodes (20): Filters, AuthFilter, FriendlyCsrfFilter, PreserveListFiltersFilter, RoleAccessFilter, Filters, CSRF, DebugToolbar (+12 more)
 
 ### Community 82 - "sn"
 Cohesion: 0.10
@@ -749,20 +719,20 @@ Cohesion: 0.08
 Nodes (20): create, deleteForm, detail, detailEdit, detailModal, document, edit, errors (+12 more)
 
 ### Community 91 - "Connection"
-Cohesion: 0.07
+Cohesion: 0.08
 Nodes (4): clean_path(), remove_invisible_characters(), render_backtrace(), Connection
 
 ### Community 92 - "Publisher"
 Cohesion: 0.08
-Nodes (5): Publisher, Publish, Publisher, PublisherException, Publisher
+Nodes (7): Publisher, Publish, Publisher, same_file(), write_file(), PublisherException, Publisher
 
 ### Community 93 - "InvalidArgumentException"
-Cohesion: 0.12
-Nodes (3): DatetimeCast, InvalidArgumentException, Message
+Cohesion: 0.07
+Nodes (8): DatetimeCast, InvalidArgumentException, directory_mirror(), get_dir_file_info(), get_file_info(), _from_random(), random_string(), Message
 
 ### Community 95 - "Database"
-Cohesion: 0.13
-Nodes (3): Database, Seed, Config
+Cohesion: 0.09
+Nodes (5): Database, CreateDatabase, Seed, MigrationGenerator, Config
 
 ### Community 98 - "upload.cjs"
 Cohesion: 0.07
@@ -773,28 +743,32 @@ Cohesion: 0.06
 Nodes (7): Autoload, Modules, Autoloader, Namespaces, AutoloadConfig, Modules, MockAutoload
 
 ### Community 101 - "config"
-Cohesion: 0.06
-Nodes (14): App, Hostnames, MigrationGenerator, app_timezone(), config(), Services, Config, anchor() (+6 more)
+Cohesion: 0.05
+Nodes (17): App, Hostnames, app_timezone(), config(), Services, Config, anchor(), anchor_popup() (+9 more)
+
+### Community 103 - "Security"
+Cohesion: 0.11
+Nodes (3): Security, Security, MockSecurity
 
 ### Community 106 - "DokumenSpk"
 Cohesion: 0.15
 Nodes (3): {closure#2}(), DokumenSpk, DokumenSpkModel
 
 ### Community 109 - "text_helper.php"
-Cohesion: 0.10
-Nodes (8): ForeignCharacters, ForeignCharacters, convert_accented_characters(), _from_random(), random_string(), strip_slashes(), mb_url_title(), url_title()
+Cohesion: 0.09
+Nodes (10): ForeignCharacters, ForeignCharacters, character_limiter(), convert_accented_characters(), highlight_phrase(), strip_slashes(), word_limiter(), word_wrap() (+2 more)
 
-### Community 111 - "ArrayHelper"
-Cohesion: 0.08
-Nodes (4): ArrayHelper, array_deep_search(), array_group_by(), dot_array_search()
+### Community 111 - "Rules"
+Cohesion: 0.06
+Nodes (5): ArrayHelper, array_deep_search(), array_group_by(), dot_array_search(), Rules
 
 ### Community 112 - "attendance_action_menu.cjs"
 Cohesion: 0.20
 Nodes (10): assert, attendance, buttonFor(), { chromium }, fs, path, reference, root (+2 more)
 
-### Community 115 - "Request"
-Cohesion: 0.08
-Nodes (5): Method, Request, RouterInterface, FeatureTestTrait, service()
+### Community 115 - "CodeIgniter.php"
+Cohesion: 0.07
+Nodes (8): HTTPExceptionInterface, BadRequestException, ExceptionInterface, RedirectException, Method, Request, ResponsableInterface, RouterInterface
 
 ### Community 116 - "SecurityException"
 Cohesion: 0.11
@@ -804,20 +778,12 @@ Nodes (3): InvalidChars, SecurityException, SecurityInterface
 Cohesion: 0.11
 Nodes (3): DownloadException, FrameworkException, ModelException
 
-### Community 118 - "MicrotimeRepresentation"
-Cohesion: 0.08
-Nodes (3): MicrotimePlugin, MicrotimeValue, MicrotimeRepresentation
-
-### Community 120 - "BaseResult"
-Cohesion: 0.05
-Nodes (4): BaseResult, Result, Result, MockResult
-
 ### Community 124 - "landing_navigation.js"
 Cohesion: 0.12
 Nodes (16): about, card, classes(), css, document, element(), flow, fs (+8 more)
 
 ### Community 125 - "LrFormulaService"
-Cohesion: 0.09
+Cohesion: 0.10
 Nodes (3): CreateAccountingLrFormulaRules, {closure#6}(), LrFormulaService
 
 ### Community 126 - "RkaCalculator"
@@ -845,20 +811,20 @@ Cohesion: 0.09
 Nodes (23): suggest, ext-apcu, ext-curl, ext-dom, ext-exif, ext-fileinfo, ext-gd, ext-imagick (+15 more)
 
 ### Community 140 - "html_helper.php"
-Cohesion: 0.19
-Nodes (20): DocTypes, slash_item(), _solidus(), audio(), doctype(), embed(), _has_protocol(), img() (+12 more)
+Cohesion: 0.13
+Nodes (21): DocTypes, slash_item(), _solidus(), audio(), doctype(), embed(), _has_protocol(), img() (+13 more)
 
 ### Community 141 - "Session"
+Cohesion: 0.05
+Nodes (7): Session, SessionException, BaseHandler, FileHandler, MemcachedHandler, PersistsConnection, LoggerAwareTrait
+
+### Community 152 - "FileCollection"
+Cohesion: 0.11
+Nodes (3): {closure#1}(), FileCollection, directory_map()
+
+### Community 153 - "csrf_hash"
 Cohesion: 0.10
-Nodes (3): Session, SessionException, FileHandler
-
-### Community 145 - "PageNotFoundException"
-Cohesion: 0.08
-Nodes (5): BuktiBayar, BuktiBayarModel, PageNotFoundException, AutoRouterImproved, MethodNotFoundException
-
-### Community 149 - "DokumenMasukModel"
-Cohesion: 0.16
-Nodes (3): SecurityPersonnel, DistribusiDokumen, DokumenMasukModel
+Nodes (6): Agendaris, DokumenKeluar, DokumenMasuk, csrf_field(), csrf_hash(), csrf_token()
 
 ### Community 157 - "run.php"
 Cohesion: 0.16
@@ -868,33 +834,29 @@ Nodes (8): check(), {closure#10}(), {closure#13}(), {closure#14}(), {closure#5}(
 Cohesion: 0.18
 Nodes (7): File, FileSizeUnit, B, GB, KB, MB, TB
 
-### Community 160 - "log_message"
-Cohesion: 0.11
-Nodes (5): Auth, AccountSessionManager, log_message(), Throttler, ThrottlerInterface
-
 ### Community 164 - "AbstractValue"
 Cohesion: 0.04
-Nodes (20): AbstractPlugin, BinaryPlugin, CallableDefinitionPlugin, CallablePlugin, ColorPlugin, LockPlugin, MicrotimePlugin, PluginInterface (+12 more)
+Nodes (23): Kint, AbstractPlugin, BinaryPlugin, CallableDefinitionPlugin, CallablePlugin, ColorPlugin, LockPlugin, MicrotimePlugin (+15 more)
 
 ### Community 165 - "Mimes"
 Cohesion: 0.13
 Nodes (3): Mimes, FileRules, FileRules
 
-### Community 167 - "FilterCollector"
-Cohesion: 0.10
-Nodes (6): AutoRouteCollector, AutoRouteCollector, ControllerFinder, FilterCollector, FilterFinder, Routes
+### Community 167 - "ControllerFinder"
+Cohesion: 0.18
+Nodes (3): AutoRouteCollector, AutoRouteCollector, ControllerFinder
 
 ### Community 168 - "CastException"
-Cohesion: 0.08
-Nodes (6): JsonCast, CastException, JsonCast, TimestampCast, CastException, HasExitCodeInterface
-
-### Community 170 - "RuntimeException"
 Cohesion: 0.10
-Nodes (7): AssetWorkbookParser, {closure#1}(), MagangWorkbookParser, {closure#1}(), assetRow(), cell(), workbook()
+Nodes (4): JsonCast, TimestampCast, CastException, HasExitCodeInterface
+
+### Community 170 - "ZipArchive"
+Cohesion: 0.10
+Nodes (5): AssetWorkbookParser, {closure#1}(), MagangWorkbookParser, {closure#1}(), SdmEmployeeWorkbookParser
 
 ### Community 171 - "system/Config/Services.php"
 Cohesion: 0.04
-Nodes (19): ContentSecurityPolicy, Cors, CURLRequest, Email, Encryption, Honeypot, Logger, Migrations (+11 more)
+Nodes (21): ContentSecurityPolicy, Cors, CURLRequest, Email, Encryption, Feature, Format, Honeypot (+13 more)
 
 ### Community 173 - "delete.cjs"
 Cohesion: 0.11
@@ -908,45 +870,57 @@ Nodes (3): {closure#2}(), {closure#3}(), Escaper
 Cohesion: 0.08
 Nodes (5): LrMoney, LrRealizationCalculator, {closure#2}(), MonitoringAnggaran, MonitoringAnggaranExport
 
-### Community 185 - "DataException"
+### Community 181 - "FileHandler"
 Cohesion: 0.09
-Nodes (4): {closure#1}(), DataException, ExceptionInterface, CastInterface
+Nodes (5): CacheFactory, CacheException, FileHandler, InfoCache, is_really_writable()
+
+### Community 185 - "DataException"
+Cohesion: 0.12
+Nodes (3): {closure#1}(), DataException, ExceptionInterface
 
 ### Community 191 - "de"
 Cohesion: 0.21
 Nodes (4): ce(), de, dt(), he()
 
 ### Community 193 - "DateTimeInterface"
-Cohesion: 0.16
-Nodes (3): IndonesianHolidayCalendar, DateTimeValue, IndonesianHolidayCalendarTest
+Cohesion: 0.10
+Nodes (3): IndonesianHolidayCalendar, MicrotimeRepresentation, IndonesianHolidayCalendarTest
 
 ### Community 195 - "DataConverter"
-Cohesion: 0.20
-Nodes (3): DataCaster, DataConverter, {closure#1}()
+Cohesion: 0.17
+Nodes (4): DataCaster, DataConverter, {closure#1}(), {closure#2}()
 
 ### Community 200 - "FileLocatorInterface"
-Cohesion: 0.08
-Nodes (9): Routing, View, FileLocatorInterface, Routing, View, {closure#1}(), {closure#1}(), {closure#2}() (+1 more)
+Cohesion: 0.12
+Nodes (4): Routing, FileLocatorInterface, Routing, {closure#1}()
 
-### Community 201 - "DataAset"
-Cohesion: 0.16
-Nodes (3): DataAset, AssetPeriod, DataAsetModel
+### Community 201 - ".view"
+Cohesion: 0.06
+Nodes (9): BagianUmum2, BaseController, DataAset, ManagerOperasional, NonBelanjaModal, PengadaanBarangJasa, LrRealizationService, AccountingLrImportModel (+1 more)
 
-### Community 202 - "SouvenirInventaris"
+### Community 202 - "PageNotFoundException"
 Cohesion: 0.05
-Nodes (7): SouvenirInventaris, InventoryLoanProofPdf, AgendarisInventarisPeminjamanModel, AgendarisInventarisPengembalianModel, AgendarisSouvenirInventarisModel, AgendarisSouvenirPengambilanModel, AgendarisSouvenirPengembalianModel
+Nodes (8): SouvenirInventaris, AgendarisInventarisPeminjamanModel, AgendarisInventarisPengembalianModel, AgendarisSouvenirInventarisModel, AgendarisSouvenirPengambilanModel, AgendarisSouvenirPengembalianModel, db_connect(), PageNotFoundException
 
 ### Community 206 - "optimize-assets.cjs"
 Cohesion: 0.22
 Nodes (10): fs, gzip, gzipAsset(), main(), path, { promisify }, resizeWebp(), root (+2 more)
 
 ### Community 207 - "LoggerInterface"
-Cohesion: 0.13
+Cohesion: 0.12
 Nodes (4): model(), Controller, BaseResource, LoggerInterface
+
+### Community 209 - "CookieStore"
+Cohesion: 0.09
+Nodes (4): Cookie, CookieStore, Response, MockResponse
 
 ### Community 213 - "summarize_laba_rugi.mjs"
 Cohesion: 0.15
 Nodes (12): checks, computed, detailRanges, details, formulaCells, formulaKinds, reported, sections (+4 more)
+
+### Community 217 - "BaseService"
+Cohesion: 0.11
+Nodes (3): WorkerMode, BaseService, MockServices
 
 ### Community 221 - "analyze_rka_relationship.mjs"
 Cohesion: 0.27
@@ -964,9 +938,17 @@ Nodes (10): assert, button, close, dialog, form, fs, open, snippet (+2 more)
 Cohesion: 0.19
 Nodes (11): assertBulk(), {closure#1}(), {closure#10}(), {closure#11}(), {closure#2}(), {closure#3}(), {closure#8}(), {closure#9}() (+3 more)
 
-### Community 229 - ".getEnv"
-Cohesion: 0.17
-Nodes (3): GenerateKey, env(), is_windows()
+### Community 227 - "HandlerInterface"
+Cohesion: 0.16
+Nodes (4): Logger, BaseHandler, HandlerInterface, MockLogger
+
+### Community 228 - "View"
+Cohesion: 0.24
+Nodes (3): View, View, ViewDecoratorInterface
+
+### Community 230 - "Utilities/Routes.php"
+Cohesion: 0.13
+Nodes (4): Routes, SampleURIGenerator, Routes, DefinedRouteCollector
 
 ### Community 232 - "pagination.php"
 Cohesion: 0.14
@@ -977,16 +959,12 @@ Cohesion: 0.15
 Nodes (11): assert, button, close, dialog, file, form, fs, open (+3 more)
 
 ### Community 240 - "SouvenirPickupProofPdf"
-Cohesion: 0.13
-Nodes (3): InventoryReturnProofPdf, SouvenirPickupProofPdf, SouvenirReturnProofPdf
+Cohesion: 0.09
+Nodes (4): InventoryLoanProofPdf, InventoryReturnProofPdf, SouvenirPickupProofPdf, SouvenirReturnProofPdf
 
 ### Community 242 - "TextRenderer"
-Cohesion: 0.08
-Nodes (5): CliRenderer, AbstractPlugin, MicrotimePlugin, PluginInterface, TextRenderer
-
-### Community 244 - "BaseTransformer"
-Cohesion: 0.13
-Nodes (3): ApiException, BaseTransformer, TransformerInterface
+Cohesion: 0.09
+Nodes (3): CliRenderer, PluginInterface, TextRenderer
 
 ### Community 245 - "monitoring_expand.js"
 Cohesion: 0.11
@@ -1000,13 +978,17 @@ Nodes (4): sheets, [inputPath, outputDir], summary, targets
 Cohesion: 0.18
 Nodes (5): result, mixed, reversals, grouped, result
 
-### Community 252 - "FormatException"
-Cohesion: 0.14
-Nodes (6): Format, FormatException, Format, FormatterInterface, JSONFormatter, XMLFormatter
+### Community 250 - "Validation"
+Cohesion: 0.10
+Nodes (3): array_flatten_with_dots(), ValidationException, Validation
+
+### Community 253 - "CastException"
+Cohesion: 0.31
+Nodes (3): EnumCast, JsonCast, CastException
 
 ### Community 254 - "Throwable"
-Cohesion: 0.09
-Nodes (7): Exceptions, BaseExceptionHandler, {closure#1}(), ExceptionHandler, ExceptionHandlerInterface, Exceptions, LogLevel
+Cohesion: 0.12
+Nodes (6): Exceptions, BaseExceptionHandler, {closure#1}(), ExceptionHandler, ExceptionHandlerInterface, LogLevel
 
 ### Community 255 - "FileLocator"
 Cohesion: 0.10
@@ -1016,9 +998,13 @@ Nodes (4): FileLocator, FileLocatorCached, Optimize, get_filenames()
 Cohesion: 0.04
 Nodes (9): BinaryPlugin, ColorPlugin, TimestampPlugin, ColorValue, AbstractRepresentation, BinaryRepresentation, ColorRepresentation, StringRepresentation (+1 more)
 
+### Community 261 - "Cell"
+Cohesion: 0.16
+Nodes (4): class_basename(), decamelize(), Cell, Cell
+
 ### Community 262 - "inflector_helper.php"
-Cohesion: 0.18
-Nodes (10): class_basename(), camelize(), counted(), decamelize(), is_pluralizable(), ordinal(), ordinalize(), pascalize() (+2 more)
+Cohesion: 0.26
+Nodes (8): camelize(), counted(), is_pluralizable(), ordinal(), ordinalize(), pascalize(), plural(), singular()
 
 ### Community 265 - "require-dev"
 Cohesion: 0.22
@@ -1044,17 +1030,9 @@ Nodes (7): description, homepage, license, name, scripts, test, type
 Cohesion: 0.17
 Nodes (9): badge, code, document, fields, form, fs, path, vm (+1 more)
 
-### Community 281 - "ClassDeclaredContext"
-Cohesion: 0.07
-Nodes (6): ClassStaticsPlugin, ClassConstContext, ClassDeclaredContext, DoubleAccessMemberContext, PropertyContext, StaticPropertyContext
-
-### Community 286 - "filesystem_helper.php"
-Cohesion: 0.29
-Nodes (4): directory_mirror(), get_dir_file_info(), get_file_info(), same_file()
-
-### Community 287 - "Running Application Tests"
-Cohesion: 0.18
-Nodes (10): Creating Tests, Database Tests, Generating Code Coverage, PHPUnit XML Configuration, Requirements, Resources, Running Application Tests, Running the tests (+2 more)
+### Community 281 - "Parser/Parser.php"
+Cohesion: 0.05
+Nodes (9): ControllerMethodReader, ClassStaticsPlugin, ClassConstContext, ClassDeclaredContext, ClassOwnedContext, DoubleAccessMemberContext, PropertyContext, StaticPropertyContext (+1 more)
 
 ### Community 291 - "CodeIgniter 4 Framework"
 Cohesion: 0.29
@@ -1068,9 +1046,13 @@ Nodes (4): getFirstChildWithTagName(), getHash(), init(), showTab()
 Cohesion: 0.33
 Nodes (6): require, ext-intl, ext-mbstring, laminas/laminas-escaper, php, psr/log
 
-### Community 297 - "ReflectionClass"
-Cohesion: 0.07
-Nodes (6): ControllerMethodReader, ControllerMethodReader, getProperties(), PropertiesTrait, Cell, {closure#2}()
+### Community 297 - "Cells/Cell.php"
+Cohesion: 0.24
+Nodes (3): getProperties(), PropertiesTrait, {closure#2}()
+
+### Community 326 - "import.php"
+Cohesion: 0.83
+Nodes (3): assetRow(), cell(), workbook()
 
 ### Community 354 - "BaseCollector"
 Cohesion: 0.05
@@ -1104,29 +1086,29 @@ Nodes (9): assert, { chromium }, assert, assertPosition(), box(), { chromium }, 
 Cohesion: 0.16
 Nodes (5): ExceptionInterface, InvalidArgumentException, RuntimeException, InvalidArgumentException, LoggerAwareInterface
 
-### Community 610 - "site_url"
+### Community 610 - "RedirectResponse"
 Cohesion: 0.05
-Nodes (10): Akutansi, Dashboard, DeletedData, LrRealizationService, RkaBudgetService, AccountingLrImportModel, AccountingRkaBudgetModel, {closure#2}() (+2 more)
+Nodes (11): Akutansi, Dashboard, DeletedData, Landing, Welcome, RkaBudgetService, AccountingRkaBudgetModel, {closure#2}() (+3 more)
 
 ## Knowledge Gaps
 - **287 isolated node(s):** `monitoringDialog`, `monitoringExportDialog`, `toggle`, `password`, `name` (+282 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 3223 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **442 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 3224 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **449 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Migration` connect `Migration` to `CreateAccountingBuktiBayar`, `AddTanggalSecurityToDokumenMasuk`, `RebasePksDocumentSequence`, `NormalizeVehicleMaintenanceSchedule`, `NormalizeVehicleManagementUnit`, `AddVehicleCustomName`, `AddSoftDeleteToAccountingRkaBudgets`, `CreateAgendarisSouvenirPengembalian`, `CreateAccountingLrRecapOverrides`, `EnableSoftDeletesAcrossApplication`, `CreateAgendarisSouvenirPengembalianItems`, `AddBerkasToAccountingBuktiBayar`, `AddWorkUnitToSdmEmployeeProfiles`, `AddJenisToAgendarisSouvenirInventaris`, `CreateSdmAttendanceRecap`, `ExampleMigration`, `CreateDokumenKeluar`, `CreateSdmOvertimeRecap`, `AddKeperluanKegiatanToAgendarisSouvenirPengambilan`, `CreateAgendarisInventarisPengembalianItems`, `CreateSdmSppd`, `AddRolesAndOperationalUsers`, `AddPenyerahanAtToDokumenMasuk`, `AddNomorTanggalAgendarisToAgendaris`, `NormalizeVehicleServiceBudget`, `NormalizeSdmManagerTitles`, `CreateMonitoringAnggaranNotes`, `CreateAgendarisInventarisPeminjaman`, `CreateAgendarisInventarisPeminjamanItems`, `AddKeteranganToAgendarisSouvenirPengambilan`, `CreateAgendarisInventarisPengembalian`, `AddSatuanToAgendarisAtkKantor`, `Database`, `LrFormulaService`, `AddSatuanJumlahToDokumenMasuk`, `AddDispositionTrackingToAgendaris`, `CreateDataAset`, `CreateAgendarisSouvenirPengambilanItems`, `ClassifyOnDutyRequestAttendance`, `ShowOnDutyRequestOnHolidays`, `AddCompositionMappingToSdmEmployeeProfiles`, `CreateAgendarisAtkKantor`, `CreateUserSessions`, `SeparateAttendanceIncompleteCodes`, `NormalizeMissingAttendanceAsTa`, `SwapAttendanceIncompleteCodes`, `NormalizeAttendanceHolidayAndLeaveCodes`, `AddLateCheckoutMissingCode`, `CreateUserSessionUsageLogs`, `NormalizeCbLeaveCodes`, `NormalizePlainCbLeaveCode`, `NormalizeAdditionalEssLeaveCodes`, `RenameAgendarisSouvenirNamaToNamaItem`, `SplitUmumUserRole`, `AddSoftDeleteToOracleLrImports`, `CreateDokumenMasuk`, `RemoveNomorAgendaFromDokumenMasuk`, `CreateAgendaris`, `MakeAgendarisIndependent`, `AddBerkasToAgendaris`, `AddPerihalPenerimaToDokumenMasuk`, `AddWorkflowToDokumenKeluar`, `CreateDistribusiDokumen`, `AddJumlahDanEkspedisiToDokumenKeluar`, `CreateSecurityHandoverHistory`, `AddTanggalSecurityToDokumenKeluar`, `ChangeJumlahDokumenToVarchar`, `RenameWaitingProgressDokumenKeluar`, `CreateUsers`, `AddKeperluanKegiatanToAgendarisSouvenirPengembalian`, `AddDokumenLinkToDokumenKeluar`, `AddPengambilanAtToDokumenMasuk`, `CreateSdmAttendanceCalendar`, `AddProgresToAgendaris`, `AddAgendarisCompletionToDokumenKeluar`, `RestrictDokumenSpkToSpkOnly`, `SimplifyPksItemToKeterangan`, `AddShiftHandoverToDokumenMasuk`, `CreateVehicleMonitoring`, `AlignSecurityHandoverWithRecipient`, `AddBerkasUrlToAccountingBuktiBayar`, `AddSoftDeleteActorMetadata`, `AddAdminLoginPin`, `CreateAgendarisSouvenirPengambilan`, `SetVehicleMaintenanceToThreeMonths`, `AddJangkaWaktuToPksDokumen`, `RemoveVehicleNextServiceKilometer`, `CreateDokumenSpk`, `RemoveCatatanFromDokumenSpk`, `AddAttendanceWorkUnitAndReportingPeriod`, `FixVehicleActivityLogForeignKey`, `AddVehicleCustomStatus`, `AddNomorAgendaToDokumenMasuk`, `NormalizeVehicleStatusOptions`, `CreateSdmMagang`, `AddSecurityToDokumenKeluar`, `AddDisposisiToAgendaris`, `AddVehicleInternalPic`, `SyncVehicleKilometerFromMaintenance`, `AddVehicleServiceBudget`, `AddVehicleCustomDriver`, `AddSoftDeleteToSdmAttendanceImports`, `AddSdmProcessingLockToAgendaris`, `AddFotoAsetLink`, `CreateOutgoingSecurityHandoverHistory`, `AddVehicleOwnershipStatus`, `ExtendAgendarisDispositionToFiveSteps`, `CreateOracleLrImports`, `AddJumlahToAgendarisSouvenirPengambilanItems`, `CreateAgendarisAtkPengambilan`, `CorrectCabangSurabayaAttendanceWorkUnit`, `ClearDeletedAccountingLrImportCache`, `AddWorkUnitToDokumenKeluar`, `ClassifyLateAttendance`, `ReplaceAgendarisFileWithLink`, `AddColumnScopeToAccountingLrFormulaRules`, `CreateAgendarisSouvenirInventaris`?**
-  _High betweenness centrality (0.080) - this node is a cross-community bridge._
+  _High betweenness centrality (0.079) - this node is a cross-community bridge._
 - **Are the 180 inferred relationships involving `service()` (e.g. with `.run()` and `{closure#1}()`) actually correct?**
   _`service()` has 180 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `monitoringDialog`, `monitoringExportDialog`, `toggle` to the rest of the system?**
   _287 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `tn` be split into smaller, more focused modules?**
   _Cohesion score 0.03749531308586427 - nodes in this community are weakly interconnected._
-- **Why does `InvalidArgumentException` connect `InvalidArgumentException` to `UploadedFileInterface`, `service`, `Builder`, `.whereHaving`, `BaseModel`, `CLI`, `TableName`, `SQLite3/Connection.php`, `Connection`, `Router`, `FileCollection`, `Time`, `Forge`, `filesystem_helper.php`, `File`, `DatabaseException`, `.compileSelect`, `RouteCollection`, `RouteCollectionInterface`, `Mimes`, `TestResponse`, `Model`, `system/Config/Services.php`, `Seeder`, `DateTime`, `RuntimeException`, `IncomingRequest`, `CITestStreamFilter`, `DataException`, `MessageTrait`, `ContentSecurityPolicy`, `CodeIgniter`, `Cookie`, `OCI8/Builder.php`, `Factories`, `DataConverter`, `OutgoingRequest`, `ConnectionInterface`, `BaseCast`, `Images`, `FileLocatorInterface`, `helper`, `HTTPException`, `CookieException`, `InstanceValue`, `Filters`, `CookieStore`, `CURLRequest`, `Closure`, `Superglobals`, `BaseService`, `Database`, `Modules`, `Rules`, `ValidationException`, `Security`, `text_helper.php`, `Test/Fabricator.php`, `ArrayHelper`, `BaseHandler`, `CriticalError`, `Validation`, `.update`?**
-  _High betweenness centrality (0.074) - this node is a cross-community bridge._
-- **Should `GeneratorTrait` be split into smaller, more focused modules?**
-  _Cohesion score 0.05957767722473605 - nodes in this community are weakly interconnected._
-- **Why does `ResponseInterface` connect `ResponseInterface` to `service`, `BaseController`, `MessageInterface`, `PageNotFoundException`, `OracleLrSalaryParser`, `Header`, `Router`, `DokumenMasukModel`, `Sdm`, `Agendaris`, `CLIRequest`, `Time`, `RouteCollectionInterface`, `TestResponse`, `system/Config/Services.php`, `Events`, `DateTime`, `URI`, `AutoRouter`, `AtkKantor`, `RedirectResponse`, `ContentSecurityPolicy`, `CodeIgniter`, `Sdm.php`, `PagerInterface`, `csrf_hash`, `Filters`, `Response`, `FileLocatorInterface`, `SouvenirInventaris`, `ResponseTrait`, `Toolbar`, `LoggerInterface`, `RequestInterface`, `CURLRequest`, `DokumenMasuk`, `site_url`, `ValidationException`, `config`, `DokumenSpk`, `ResourceController`, `Request`, `SecurityException`, `Throwable`?**
-  _High betweenness centrality (0.073) - this node is a cross-community bridge._
+- **Why does `InvalidArgumentException` connect `InvalidArgumentException` to `UploadedFileInterface`, `service`, `.trigger`, `Builder`, `stdClass`, `ShowTableInfo`, `CLI`, `DOMElement`, `Connection`, `FeatureTestTrait`, `FileCollection`, `Forge`, `.insert`, `File`, `BaseBuilder`, `DatabaseException`, `RouteCollection`, `FilterTestTrait`, `RouteCollectionInterface`, `Mimes`, `TestResponse`, `Model`, `system/Config/Services.php`, `Seeder`, `DateTime`, `RuntimeException`, `IncomingRequest`, `CITestStreamFilter`, `DataException`, `MessageTrait`, `ContentSecurityPolicy`, `Cookie`, `Factories`, `OCI8/Builder.php`, `ConnectionInterface`, `DataConverter`, `OutgoingRequest`, `.transformDataToArray`, `BaseCast`, `Images`, `FileLocatorInterface`, `ExceptionInterface`, `HTTPException`, `Filters`, `ResponseInterface`, `CURLRequest`, `Closure`, `Superglobals`, `BaseService`, `Database`, `Modules`, `Security`, `text_helper.php`, `Test/Fabricator.php`, `Rules`, `BaseHandler`, `DateTimeImmutable`, `CodeIgniter.php`, `CriticalError`, `Validation`?**
+  _High betweenness centrality (0.071) - this node is a cross-community bridge._
+- **Should `BaseCommand` be split into smaller, more focused modules?**
+  _Cohesion score 0.03568977350720659 - nodes in this community are weakly interconnected._
+- **Why does `ResponseInterface` connect `ResponseInterface` to `service`, `AccountSessionManager`, `MessageInterface`, `Cors`, `current_url`, `Router`, `OracleLrSalaryParser`, `BuktiBayar`, `Sdm`, `ResourcePresenter`, `FeatureTestTrait`, `csrf_hash`, `CLIRequest`, `TestResponse`, `Model`, `system/Config/Services.php`, `DateTime`, `URI`, `AutoRouter`, `AtkKantor`, `Magang`, `ContentSecurityPolicy`, `CodeIgniter`, `PagerInterface`, `ProgresDokumen`, `Filters`, `FileLocatorInterface`, `PageNotFoundException`, `ResponseTrait`, `helper`, `LoggerInterface`, `CURLRequest`, `CookieStore`, `Closure`, `RedirectResponse`, `config`, `DokumenSpk`, `ResourceController`, `DateTimeImmutable`, `CodeIgniter.php`, `SecurityException`, `Validation`, `Throwable`, `Exceptions`?**
+  _High betweenness centrality (0.066) - this node is a cross-community bridge._
