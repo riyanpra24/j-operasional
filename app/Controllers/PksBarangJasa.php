@@ -67,6 +67,7 @@ class PksBarangJasa extends BaseController
 
         return view('pks/index', [
             'title' => 'PKS Barang dan Jasa',
+            'pksBaseUrl' => $this->pksBaseUrl(),
             'records' => $this->decorateRows($query->paginate($perPage, 'pks')),
             'pager' => $this->kerjasama->pager,
             'filters' => compact('keyword', 'status', 'perPage', 'order'),
@@ -78,7 +79,7 @@ class PksBarangJasa extends BaseController
 
     public function create(): RedirectResponse
     {
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))
+        return redirect()->to($this->pksBaseUrl())
             ->with('pks_modal', 'create')
             ->with('pks_form_data', []);
     }
@@ -105,7 +106,7 @@ class PksBarangJasa extends BaseController
             return $this->mainFormError('create', $formData, ['pks' => 'Data PKS dan dokumen induk gagal disimpan. Silakan coba kembali.']);
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $kerjasamaId . '/ubah'))
+        return redirect()->to($this->pksBaseUrl() . '/' . $kerjasamaId . '/ubah')
             ->with('success', 'PKS beserta dokumen induknya berhasil dibuat. Anda dapat menambahkan addendum dan item pekerjaan pada halaman ini.');
     }
 
@@ -129,7 +130,7 @@ class PksBarangJasa extends BaseController
             $record = array_merge($record, $this->documentFormData($initialDocument));
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))
+        return redirect()->to($this->pksBaseUrl())
             ->with('pks_modal', 'edit')
             ->with('pks_form_data', $record)
             ->with('pks_edit_id', $id);
@@ -165,18 +166,18 @@ class PksBarangJasa extends BaseController
             return $this->mainFormError('edit', $formData, ['pks' => 'Perubahan data PKS dan dokumen induk gagal disimpan.'], $id);
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah'))->with('success', 'Data utama dan dokumen induk PKS berhasil diperbarui.');
+        return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah')->with('success', 'Data utama dan dokumen induk PKS berhasil diperbarui.');
     }
 
     public function destroy(int $id): RedirectResponse
     {
         $record = $this->findRecord($id);
         if (! $this->deleteRecord($this->kerjasama, 'pks_kerjasama', $id)) {
-            return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))->with('error', 'Data PKS gagal dihapus.');
+            return redirect()->to($this->pksBaseUrl())->with('error', 'Data PKS gagal dihapus.');
         }
 
         $message = 'PKS ' . $record['kode_internal'] . ' beserta riwayatnya berhasil dihapus';
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))->with('success', $message . ($this->currentRoleIsAdmin() ? ' permanen.' : '.'));
+        return redirect()->to($this->pksBaseUrl())->with('success', $message . ($this->currentRoleIsAdmin() ? ' permanen.' : '.'));
     }
 
     public function storeDocument(int $id): RedirectResponse
@@ -193,11 +194,12 @@ class PksBarangJasa extends BaseController
             return $this->detailError($id, $this->dokumen->errors() ?: ['dokumen' => 'Dokumen gagal disimpan.'], 'dokumen');
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('success', 'Riwayat dokumen berhasil ditambahkan.');
+        return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#riwayat-dokumen')->with('success', 'Riwayat dokumen berhasil ditambahkan.');
     }
 
     public function updateDocument(int $id, int $documentId): RedirectResponse
     {
+        $this->findRecord($id);
         $document = $this->findOwnedDocument($id, $documentId);
         $data = $this->documentPayload($id);
         $data['jenis_dokumen'] = $document['jenis_dokumen'];
@@ -213,22 +215,23 @@ class PksBarangJasa extends BaseController
             return $this->detailError($id, $this->dokumen->errors() ?: ['dokumen' => 'Dokumen gagal diperbarui.'], 'dokumen');
         }
 
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('success', 'Riwayat dokumen berhasil diperbarui.');
+        return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#riwayat-dokumen')->with('success', 'Riwayat dokumen berhasil diperbarui.');
     }
 
     public function destroyDocument(int $id, int $documentId): RedirectResponse
     {
+        $this->findRecord($id);
         $document = $this->findOwnedDocument($id, $documentId);
         if ($document['jenis_dokumen'] === 'PKS') {
-            return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')
+            return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#riwayat-dokumen')
                 ->with('error', 'Dokumen PKS induk tidak dapat dihapus. Hapus data PKS secara keseluruhan jika memang diperlukan.');
         }
         if (! $this->deleteRecord($this->dokumen, 'pks_dokumen_kerjasama', $documentId)) {
-            return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('error', 'Dokumen belum dapat dihapus.');
+            return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#riwayat-dokumen')->with('error', 'Dokumen belum dapat dihapus.');
         }
 
         $message = $document['jenis_dokumen'] . ' nomor ' . $document['nomor_dokumen'] . ' berhasil dihapus';
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#riwayat-dokumen')->with('success', $message . ($this->currentRoleIsAdmin() ? ' permanen.' : '.'));
+        return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#riwayat-dokumen')->with('success', $message . ($this->currentRoleIsAdmin() ? ' permanen.' : '.'));
     }
 
     public function storeItem(int $id): RedirectResponse
@@ -241,11 +244,12 @@ class PksBarangJasa extends BaseController
         }
 
         $this->item->insert($data);
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', 'Item pekerjaan berhasil ditambahkan.');
+        return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#item-pekerjaan')->with('success', 'Item pekerjaan berhasil ditambahkan.');
     }
 
     public function updateItem(int $id, int $itemId): RedirectResponse
     {
+        $this->findRecord($id);
         $this->findOwnedItem($id, $itemId);
         $data = $this->itemPayload($id);
         $errors = $this->validateItem($data);
@@ -254,16 +258,17 @@ class PksBarangJasa extends BaseController
         }
 
         $this->item->update($itemId, $data);
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', 'Item pekerjaan berhasil diperbarui.');
+        return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#item-pekerjaan')->with('success', 'Item pekerjaan berhasil diperbarui.');
     }
 
     public function destroyItem(int $id, int $itemId): RedirectResponse
     {
+        $this->findRecord($id);
         $this->findOwnedItem($id, $itemId);
         if (! $this->deleteRecord($this->item, 'pks_item_kerjasama', $itemId)) {
-            return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('error', 'Item pekerjaan belum dapat dihapus.');
+            return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#item-pekerjaan')->with('error', 'Item pekerjaan belum dapat dihapus.');
         }
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#item-pekerjaan')->with('success', $this->currentRoleIsAdmin() ? 'Item pekerjaan berhasil dihapus permanen.' : 'Item pekerjaan berhasil dihapus.');
+        return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#item-pekerjaan')->with('success', $this->currentRoleIsAdmin() ? 'Item pekerjaan berhasil dihapus permanen.' : 'Item pekerjaan berhasil dihapus.');
     }
 
     private function baseListQuery(): PksKerjasamaModel
@@ -285,7 +290,6 @@ class PksBarangJasa extends BaseController
                 (SELECT COUNT(*) FROM pks_dokumen_kerjasama d WHERE d.kerjasama_id = pks_kerjasama.id AND d.deleted_at IS NULL) AS jumlah_dokumen", false)
             ->join('pks_mitra', 'pks_mitra.id = pks_kerjasama.mitra_id')
             ->where('pks_mitra.deleted_at', null);
-        if ($unit = $this->managedUnit()) $query->where('pks_kerjasama.unit_pengelola', $unit);
         return $query;
     }
 
@@ -303,6 +307,7 @@ class PksBarangJasa extends BaseController
 
         return [
             'title' => $isEditMode ? 'Kelola PKS Barang dan Jasa' : 'Detail PKS Barang dan Jasa',
+            'pksBaseUrl' => $this->pksBaseUrl(),
             'record' => $record,
             'documents' => $documents,
             'items' => $items,
@@ -413,12 +418,6 @@ class PksBarangJasa extends BaseController
         foreach ($fields as $field) {
             $data[$field] = trim((string) $this->request->getPost($field));
         }
-        if ($unit = $this->managedUnit()) $data['unit_pengelola'] = $unit;
-        $data['pic_internal'] = match ($data['unit_pengelola']) {
-            'Bagian Umum 1' => 'Angger Wicaksono',
-            'Bagian Umum 2' => 'Agil Halis Kesawa',
-            default => '',
-        };
         return $data;
     }
 
@@ -429,7 +428,7 @@ class PksBarangJasa extends BaseController
             'kode_internal' => 'required|max_length[80]',
             'nama_kerjasama' => 'required|max_length[250]',
             'unit_pengelola' => 'permit_empty|in_list[Bagian Umum 1,Bagian Umum 2]',
-            'pic_internal' => 'permit_empty|in_list[Angger Wicaksono,Agil Halis Kesawa]',
+            'pic_internal' => 'permit_empty|max_length[150]',
             'nama_mitra' => 'required|max_length[200]',
             'nama_kontak' => 'permit_empty|max_length[150]',
             'jabatan_kontak' => 'permit_empty|max_length[150]',
@@ -591,13 +590,13 @@ class PksBarangJasa extends BaseController
 
     private function detailError(int $id, array $errors, string $section): RedirectResponse
     {
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa/' . $id . '/ubah') . '#' . ($section === 'item' ? 'item-pekerjaan' : 'riwayat-dokumen'))
+        return redirect()->to($this->pksBaseUrl() . '/' . $id . '/ubah#' . ($section === 'item' ? 'item-pekerjaan' : 'riwayat-dokumen'))
             ->withInput()->with('errors', $errors)->with('pks_error_section', $section);
     }
 
     private function mainFormError(string $mode, array $data, array $errors, ?int $id = null): RedirectResponse
     {
-        return redirect()->to(site_url('bagian-umum-1/pks-barang-jasa'))
+        return redirect()->to($this->pksBaseUrl())
             ->with('errors', $errors)
             ->with('pks_modal', $mode)
             ->with('pks_form_data', $data)
@@ -609,7 +608,6 @@ class PksBarangJasa extends BaseController
         $query = $this->kerjasama->select('pks_kerjasama.*, pks_mitra.nama_mitra, pks_mitra.alamat, pks_mitra.nama_kontak, pks_mitra.jabatan_kontak, pks_mitra.telepon, pks_mitra.email')
             ->join('pks_mitra', 'pks_mitra.id = pks_kerjasama.mitra_id')
             ->where('pks_mitra.deleted_at', null)->where('pks_kerjasama.id', $id);
-        if ($unit = $this->managedUnit()) $query->where('pks_kerjasama.unit_pengelola', $unit);
         $record = $query->first();
         if ($record === null) {
             throw PageNotFoundException::forPageNotFound('Data PKS tidak ditemukan.');
@@ -617,24 +615,11 @@ class PksBarangJasa extends BaseController
         return $record;
     }
 
-    private function managedUnit(): ?string
+    private function pksBaseUrl(): string
     {
-        $roleUnit = match ((string) session()->get('auth_role')) {
-            'umum_1' => 'Bagian Umum 1',
-            'umum_2' => 'Bagian Umum 2',
-            default => null,
-        };
-        if ($roleUnit !== null) return $roleUnit;
-
-        if ($this->currentRoleIsAdmin()) {
-            return match (service('uri')->getSegment(1)) {
-                'bagian-umum-1' => 'Bagian Umum 1',
-                'bagian-umum-2' => 'Bagian Umum 2',
-                default => null,
-            };
-        }
-
-        return null;
+        return site_url(service('uri')->getSegment(1) === 'bagian-umum-2'
+            ? 'bagian-umum-2/pks-barang-jasa'
+            : 'bagian-umum-1/pks-barang-jasa');
     }
 
     private function findOwnedDocument(int $id, int $documentId): array

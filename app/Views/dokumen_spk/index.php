@@ -29,15 +29,6 @@ foreach ($records as $record) {
 }
 ?>
 
-<section class="page-heading heading-actions spk-page-heading">
-    <div>
-        <p class="eyebrow">BAGIAN UMUM 1</p>
-        <h1>Dokumen SPK</h1>
-        <p>Register Surat Perintah Kerja beserta tautan dokumennya.</p>
-    </div>
-    <button class="btn btn-primary" type="button" data-spk-create data-spk-create-year="<?= (int) ($filters['year'] ?: date('Y')) ?>">＋ Tambah Dokumen</button>
-</section>
-
 <section class="panel filter-panel spk-filter-panel">
     <form action="<?= $baseUrl ?>" method="get" class="spk-filter-form">
         <div class="form-group search-group">
@@ -61,19 +52,29 @@ foreach ($records as $record) {
         </div>
         <?= view('components/list_order_filter', ['id' => 'spkUrutan', 'value' => $filters['order']]) ?>
         <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
-        <div class="filter-actions"><button class="btn btn-secondary" type="submit">Terapkan</button><a class="btn btn-ghost" href="<?= $baseUrl ?>">Reset</a></div>
+        <div class="filter-actions"><button class="btn btn-secondary" type="submit">Terapkan</button><a class="btn btn-ghost" href="<?= $baseUrl ?>">Reset</a>
+            <details class="lr-action-menu lr-filter-menu">
+                <summary class="lr-filter-menu-trigger" aria-label="Menu tindakan Dokumen SPK" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                        <rect x="3" y="3" width="7" height="7" rx="1.4"></rect>
+                        <rect x="14" y="3" width="7" height="7" rx="1.4"></rect>
+                        <rect x="3" y="14" width="7" height="7" rx="1.4"></rect>
+                        <rect x="14" y="14" width="7" height="7" rx="1.4"></rect>
+                    </svg></summary>
+                <div class="lr-action-menu-popover" role="menu" aria-label="Menu Dokumen SPK"><button type="button" role="menuitem" class="lr-action-menu-item" data-spk-create data-spk-create-year="<?= (int) ($filters['year'] ?: date('Y')) ?>">＋ Tambah Dokumen</button></div>
+            </details>
+        </div>
     </form>
 </section>
 
-<section class="panel register-panel spk-table-panel">
-    <div class="panel-header spk-register-header">
+<section class="panel register-panel spk-table-panel table-title-flat">
+    <header class="panel-header spk-register-header table-title-flat__header">
         <div>
-            <h2>Register Dokumen<?= $filters['year'] ? ' Tahun ' . $filters['year'] : '' ?></h2>
-            <p>Dokumen dengan tanggal atau link kosong otomatis ditandai belum lengkap.</p>
+            <h2>Dokumen SPK</h2>
+            <p>Daftar Surat Perintah Kerja</p>
         </div>
         <span><?= number_format($total, 0, ',', '.') ?> dokumen</span>
-    </div>
-    <div class="table-wrap">
+    </header>
+    <div class="table-wrap table-title-flat__table">
         <table class="spk-register-table">
             <thead>
                 <tr>
@@ -98,7 +99,7 @@ foreach ($records as $record) {
                 <?php else: ?>
                     <?php foreach ($records as $index => $record): ?>
                         <tr>
-                            <td><strong><?= (($pager->getCurrentPage('dokumen_spk') - 1) * $filters['perPage']) + $index + 1 ?></strong><small class="spk-sequence">Register <?= (int) $record['nomor_urut'] ?></small></td>
+                            <td><strong><?= (($pager->getCurrentPage('dokumen_spk') - 1) * $filters['perPage']) + $index + 1 ?></strong></td>
                             <td>
                                 <div class="spk-number-cell"><button type="button" class="spk-number-trigger" data-spk-view="<?= (int) $record['id'] ?>"><?= esc($record['nomor_dokumen']) ?></button><small>Tahun <?= (int) $record['tahun'] ?></small></div>
                             </td>
@@ -151,7 +152,7 @@ foreach ($records as $record) {
                     <div class="form-group"><label for="spkEditYear">Tahun Register <span class="required">*</span></label><input id="spkEditYear" name="tahun" type="number" min="2000" max="2100" required></div>
                     <div class="form-group"><label for="spkEditType">Jenis Dokumen</label><input id="spkEditType" value="SPK · Surat Perintah Kerja" readonly tabindex="-1"><input type="hidden" name="jenis_dokumen" value="SPK"></div>
                     <div class="form-group modal-span-2"><label for="spkEditNumber">Nomor SPK <span class="required">*</span></label>
-                        <div class="spk-number-generator"><input id="spkEditNumber" name="nomor_dokumen" readonly required><button class="btn btn-secondary" type="button" data-spk-edit-generate>Generate Nomor SPK</button></div><small data-spk-edit-number-hint>Nomor urut dan bulan pembuatan nomor dikelola otomatis oleh sistem.</small>
+                        <div class="spk-number-generator"><input id="spkEditNumber" name="nomor_dokumen" type="text" inputmode="numeric" autocomplete="off" placeholder="Ketik nomor urut, contoh: 001" required><button class="btn btn-secondary" type="button" data-spk-edit-generate>Generate Nomor SPK</button></div><small data-spk-edit-number-hint>Ketik nomor urut saja atau gunakan Generate Nomor SPK. Sistem akan melengkapi format nomor sesuai template.</small>
                     </div>
                     <div class="form-group"><label for="spkEditDate">Tanggal Dokumen</label><input id="spkEditDate" name="tanggal_dokumen" type="date"></div>
                     <div class="form-group"><label for="spkEditLink">Link Berkas</label><input id="spkEditLink" name="link_berkas" type="url" maxlength="2048" placeholder="https://..."></div>
@@ -330,7 +331,7 @@ foreach ($records as $record) {
             fields.date.value = record.tanggal_dokumen;
             fields.link.value = record.link_berkas;
             fields.subject.value = record.perihal;
-            numberHint.textContent = 'Nomor SPK tersimpan tidak berubah ketika Tanggal Dokumen diisi atau diperbarui.';
+            numberHint.textContent = 'Ketik nomor urut saja atau gunakan Generate Nomor SPK. Sistem akan melengkapi format nomor sesuai template.';
             numberHint.classList.remove('is-warning');
             showModal(trigger);
         };
@@ -346,20 +347,13 @@ foreach ($records as $record) {
             fields.date.value = '';
             fields.link.value = '';
             fields.subject.value = '';
-            numberHint.textContent = 'Klik Generate Nomor SPK setelah Tahun Register sesuai.';
+            numberHint.textContent = 'Ketik nomor urut saja atau gunakan Generate Nomor SPK. Sistem akan melengkapi format nomor sesuai template.';
             numberHint.classList.remove('is-warning');
             showModal(trigger);
-        };
-        const requireRegeneration = () => {
-            if (modal.hidden || !fields.number.value) return;
-            fields.number.value = '';
-            numberHint.textContent = 'Tahun berubah. Generate ulang nomor SPK sebelum menyimpan.';
-            numberHint.classList.add('is-warning');
         };
         const generateNumber = async () => {
             const year = Number.parseInt(fields.year.value, 10);
             if (!Number.isInteger(year) || year < 2000 || year > 2100) {
-                fields.number.value = '';
                 numberHint.textContent = 'Isi Tahun Register dengan benar terlebih dahulu.';
                 numberHint.classList.add('is-warning');
                 return;
@@ -379,10 +373,9 @@ foreach ($records as $record) {
                 const result = await response.json();
                 if (!response.ok || !result.success) throw new Error(result.message || 'Nomor SPK gagal dibuat.');
                 fields.number.value = result.number;
-                numberHint.textContent = 'Nomor urut ' + result.sequence + ' berhasil disesuaikan otomatis.';
+                numberHint.textContent = 'Nomor SPK berhasil dibuat sesuai template. Nomor urut: ' + result.sequence + '.';
                 numberHint.classList.remove('is-warning');
             } catch (error) {
-                fields.number.value = '';
                 numberHint.textContent = error.message || 'Nomor SPK gagal dibuat.';
                 numberHint.classList.add('is-warning');
             } finally {
@@ -391,11 +384,22 @@ foreach ($records as $record) {
             }
         };
 
-        document.querySelectorAll('[data-spk-create]').forEach((trigger) => trigger.addEventListener('click', () => openCreateModal(trigger)));
+        document.querySelectorAll('[data-spk-create]').forEach((trigger) => trigger.addEventListener('click', () => {
+            trigger.closest('details')?.removeAttribute('open');
+            openCreateModal(trigger);
+        }));
         document.querySelectorAll('[data-spk-edit]').forEach((trigger) => trigger.addEventListener('click', () => openEditModal(trigger)));
         modal.querySelectorAll('[data-spk-edit-close]').forEach((button) => button.addEventListener('click', closeModal));
-        fields.year.addEventListener('input', requireRegeneration);
+        const formatTypedSequence = () => {
+            const sequence = fields.number.value.trim();
+            if (!/^\d+$/.test(sequence)) return;
+            const year = Number.parseInt(fields.year.value, 10);
+            if (!Number.isInteger(year) || year < 2000 || year > 2100) return;
+            const romanMonths = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+            fields.number.value = sequence.padStart(3, '0') + '/SPK/W.6/' + romanMonths[new Date().getMonth()] + '/' + year;
+        };
         generateButton.addEventListener('click', generateNumber);
+        fields.number.addEventListener('blur', formatTypedSequence);
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!form.reportValidity()) return;

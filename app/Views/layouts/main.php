@@ -218,6 +218,10 @@ if ($currentRole === 'security') {
                         <span class="nav-chevron" aria-hidden="true">›</span>
                     </button>
                     <div class="nav-submenu" id="agendarisSubmenu" data-nav-submenu <?= $agendarisActive ? '' : 'hidden' ?>>
+                        <a href="<?= site_url('agendaris/dashboard') ?>" class="nav-sublink <?= $agendarisActive && $agendarisPage === 'dashboard' ? 'active' : '' ?>">
+                            <span aria-hidden="true">●</span>
+                            Dashboard
+                        </a>
                         <a href="<?= site_url('agendaris/surat-masuk') ?>" class="nav-sublink <?= $agendarisActive && $agendarisPage === 'surat-masuk' ? 'active' : '' ?>">
                             <span aria-hidden="true">●</span>
                             Dokumen Masuk

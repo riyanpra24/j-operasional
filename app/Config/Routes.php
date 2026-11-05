@@ -139,7 +139,21 @@ $routes->get(
     'PengadaanBarangJasa::index',
     ['as' => 'pengadaan_barang_jasa.index'],
 );
-$routes->get('bagian-umum-2/pks-barang-jasa', 'PksBarangJasa::index', ['as' => 'pks_umum_2.index']);
+$routes->group('bagian-umum-2/pks-barang-jasa', static function (RouteCollection $routes): void {
+    $routes->get('/', 'PksBarangJasa::index', ['as' => 'pks_umum_2.index']);
+    $routes->get('tambah', 'PksBarangJasa::create', ['as' => 'pks_umum_2.create']);
+    $routes->post('/', 'PksBarangJasa::store', ['as' => 'pks_umum_2.store']);
+    $routes->get('(:num)', 'PksBarangJasa::show/$1', ['as' => 'pks_umum_2.show']);
+    $routes->get('(:num)/ubah', 'PksBarangJasa::edit/$1', ['as' => 'pks_umum_2.edit']);
+    $routes->post('(:num)', 'PksBarangJasa::update/$1', ['as' => 'pks_umum_2.update']);
+    $routes->post('(:num)/hapus', 'PksBarangJasa::destroy/$1', ['as' => 'pks_umum_2.destroy']);
+    $routes->post('(:num)/dokumen', 'PksBarangJasa::storeDocument/$1', ['as' => 'pks_umum_2.document.store']);
+    $routes->post('(:num)/dokumen/(:num)', 'PksBarangJasa::updateDocument/$1/$2', ['as' => 'pks_umum_2.document.update']);
+    $routes->post('(:num)/dokumen/(:num)/hapus', 'PksBarangJasa::destroyDocument/$1/$2', ['as' => 'pks_umum_2.document.destroy']);
+    $routes->post('(:num)/item', 'PksBarangJasa::storeItem/$1', ['as' => 'pks_umum_2.item.store']);
+    $routes->post('(:num)/item/(:num)', 'PksBarangJasa::updateItem/$1/$2', ['as' => 'pks_umum_2.item.update']);
+    $routes->post('(:num)/item/(:num)/hapus', 'PksBarangJasa::destroyItem/$1/$2', ['as' => 'pks_umum_2.item.destroy']);
+});
 
 $routes->group('bagian-umum-1/dokumen-spk', static function (RouteCollection $routes): void {
     $routes->get('/', 'DokumenSpk::index', ['as' => 'dokumen_spk.index']);
@@ -243,6 +257,7 @@ $routes->group('distribusi-dokumen', static function (RouteCollection $routes): 
 // Agendaris
 $routes->group('agendaris', static function (RouteCollection $routes): void {
     $routes->get('/', 'Agendaris::index', ['as' => 'agendaris.index']);
+    $routes->get('dashboard', 'Agendaris::dashboard', ['as' => 'agendaris.dashboard']);
 
     $routes->group('surat-masuk', static function (RouteCollection $routes): void {
         $routes->get('/', 'Agendaris::suratMasuk', ['as' => 'agendaris.surat_masuk']);

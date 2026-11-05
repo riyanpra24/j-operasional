@@ -217,15 +217,13 @@ class DokumenSpk extends BaseController
     {
         $documentDate = $this->nullIfEmpty($this->request->getPost('tanggal_dokumen'));
         $year = trim((string) $this->request->getPost('tahun'));
-        $sequence = $this->resolveSequence((int) $year, $existing);
         $submittedNumber = $this->cleanText($this->request->getPost('nomor_dokumen'));
-        if ($existing !== null && (int) $existing['tahun'] === (int) $year) {
-            $number = (string) $existing['nomor_dokumen'];
-        } elseif ($this->isGeneratedNumberValid($submittedNumber, $sequence, (int) $year)) {
-            $number = $submittedNumber;
-        } else {
-            $number = $this->generateDocumentNumber((string) $sequence, $year);
-        }
+        $sequence = $this->extractSequence($submittedNumber);
+        $number = $existing !== null
+            && (int) $existing['tahun'] === (int) $year
+            && $submittedNumber === (string) $existing['nomor_dokumen']
+            ? (string) $existing['nomor_dokumen']
+            : $this->generateDocumentNumber((string) $sequence, $year);
 
         return [
             'nomor_urut' => $sequence,
@@ -323,13 +321,11 @@ class DokumenSpk extends BaseController
         return $paddedSequence . '/SPK/W.6/' . $romanMonths[$month] . '/' . (int) $year;
     }
 
-    private function isGeneratedNumberValid(string $number, int $sequence, int $year): bool
+    private function extractSequence(string $number): int
     {
-        $paddedSequence = str_pad((string) max(0, $sequence), 3, '0', STR_PAD_LEFT);
-        $romanMonth = '(?:I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)';
-        $pattern = '#^' . preg_quote($paddedSequence, '#') . '/SPK/W\.6/' . $romanMonth . '/' . $year . '$#';
+        $sequence = explode('/', trim($number), 2)[0] ?? '';
 
-        return preg_match($pattern, $number) === 1;
+        return ctype_digit($sequence) ? (int) $sequence : 0;
     }
 
     private function decorate(array $records): array

@@ -20,7 +20,7 @@ class UserRoles extends BaseConfig
         'security'  => ['dokumen-masuk', 'dokumen-keluar', 'distribusi-dokumen'],
         'agendaris' => ['agendaris'],
         'umum_1'    => ['bagian-umum-1'],
-        'umum_2'    => ['bagian-umum-2', 'bagian-umum-1/pks-barang-jasa'],
+        'umum_2'    => ['bagian-umum-2'],
         'akutansi'  => ['akutansi'],
         'sdm'       => ['sdm'],
     ];

@@ -19,7 +19,8 @@ $formatNumber = static function ($value): string {
     if ($value === null || $value === '') return '-';
     return rtrim(rtrim(number_format((float) $value, 2, ',', '.'), '0'), ',');
 };
-$baseUrl = site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']);
+$pksBaseUrl = $pksBaseUrl ?? site_url('bagian-umum-1/pks-barang-jasa');
+$baseUrl = $pksBaseUrl . '/' . $record['id'];
 $isEditMode = $isEditMode ?? false;
 ?>
 
@@ -35,15 +36,15 @@ $isEditMode = $isEditMode ?? false;
 </nav>
 <div class="pks-popup-step-panel" data-pks-detail-step-panel="1">
 <section class="pks-popup-record-heading">
-    <p class="eyebrow">BAGIAN UMUM 1 / DETAIL PKS</p>
+    <p class="eyebrow">BAGIAN UMUM / DETAIL PKS</p>
     <h2><?= esc($record['nama_kerjasama']) ?></h2>
     <p><?= esc($record['kode_internal']) ?> · <?= esc($record['nama_mitra']) ?></p>
 </section>
 <?php else: ?>
 <section class="page-heading heading-actions pks-detail-heading">
     <div>
-        <a href="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="back-link">← Kembali ke daftar</a>
-        <p class="eyebrow">BAGIAN UMUM 1 / <?= $isEditMode ? 'KELOLA PKS' : 'DETAIL PKS' ?></p>
+        <a href="<?= esc($pksBaseUrl) ?>" class="back-link">← Kembali ke daftar</a>
+        <p class="eyebrow">BAGIAN UMUM / <?= $isEditMode ? 'KELOLA PKS' : 'DETAIL PKS' ?></p>
         <h1><?= esc($record['nama_kerjasama']) ?></h1>
         <p><?= esc($record['kode_internal']) ?> · <?= esc($record['nama_mitra']) ?></p>
     </div>

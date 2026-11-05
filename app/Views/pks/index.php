@@ -16,6 +16,7 @@ $popupMode = session()->getFlashdata('pks_modal');
 $popupData = session()->getFlashdata('pks_form_data') ?? [];
 $popupEditId = session()->getFlashdata('pks_edit_id');
 $popupErrors = session()->getFlashdata('errors') ?? [];
+$pksBaseUrl = $pksBaseUrl ?? site_url('bagian-umum-1/pks-barang-jasa');
 $summaryCards = [
     '' => ['label' => 'Total PKS', 'icon' => '▤', 'class' => 'total', 'count' => $summary['total']],
     'aktif' => ['label' => 'Aktif', 'icon' => '✓', 'class' => 'active', 'count' => $summary['aktif']],
@@ -33,7 +34,7 @@ $summaryCards = [
             'per_page' => $filters['perPage'],
             'urutan' => $filters['order'],
         ], static fn($value): bool => $value !== '');
-        $cardUrl = site_url('bagian-umum-1/pks-barang-jasa') . ($cardQuery === [] ? '' : '?' . http_build_query($cardQuery));
+        $cardUrl = $pksBaseUrl . ($cardQuery === [] ? '' : '?' . http_build_query($cardQuery));
         $isActiveCard = $filters['status'] === $statusKey;
         ?>
         <a class="pks-summary-card pks-summary-card-<?= esc($card['class'], 'attr') ?> <?= $isActiveCard ? 'is-active' : '' ?>" href="<?= esc($cardUrl) ?>" <?= $isActiveCard ? 'aria-current="page"' : '' ?>>
@@ -44,7 +45,7 @@ $summaryCards = [
 </section>
 
 <section class="panel filter-panel">
-    <form action="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" method="get" class="pks-filter-form">
+    <form action="<?= esc($pksBaseUrl) ?>" method="get" class="pks-filter-form">
         <?php if ($filters['status'] !== ''): ?><input type="hidden" name="status" value="<?= esc($filters['status']) ?>"><?php endif ?>
         <div class="form-group">
             <label for="pksSearch">Cari PKS</label>
@@ -53,7 +54,7 @@ $summaryCards = [
         <?= view('components/list_order_filter', ['id' => 'pksOrder', 'value' => $filters['order']]) ?>
         <div class="filter-actions">
             <button type="submit" class="btn btn-secondary">Terapkan</button>
-            <a href="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="btn btn-ghost">Reset</a>
+            <a href="<?= esc($pksBaseUrl) ?>" class="btn btn-ghost">Reset</a>
             <details class="lr-action-menu lr-filter-menu">
                 <summary class="lr-filter-menu-trigger" aria-label="Menu tindakan PKS" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
                         <rect x="3" y="3" width="7" height="7" rx="1.4"></rect>
@@ -67,18 +68,21 @@ $summaryCards = [
     </form>
 </section>
 
-<section class="panel register-panel pks-table-panel">
-    <div class="pks-table-realtime" aria-label="Waktu acuan perhitungan masa berlaku">
-        <span aria-hidden="true"></span>
-        <p>Dihitung otomatis per <strong data-pks-current-date><?= esc($calculationDate) ?></strong> WIB</p>
-    </div>
-    <div class="table-wrap">
+<section class="panel register-panel pks-table-panel table-title-flat">
+    <header class="table-title-flat__header">
+        <div class="pks-table-realtime" aria-label="Waktu acuan perhitungan masa berlaku">
+            <span aria-hidden="true"></span>
+            <p>Dihitung otomatis per <strong data-pks-current-date><?= esc($calculationDate) ?></strong> WIB</p>
+        </div>
+    </header>
+    <div class="table-wrap table-title-flat__table">
         <table>
             <thead>
                 <tr>
                     <th>No.</th>
                     <th>Nomor PKS</th>
                     <th>Nama Kerja Sama</th>
+                    <th>Unit Pengelola</th>
                     <th>Mitra</th>
                     <th>Dokumen Terakhir</th>
                     <th>Masa Berlaku</th>
@@ -90,7 +94,7 @@ $summaryCards = [
             <tbody>
                 <?php if ($records === []): ?>
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             <div class="empty-state"><span>▤</span><strong>Belum ada data PKS</strong>
                                 <p>Tambahkan PKS pertama melalui menu tindakan atau ubah kata kunci pencarian.</p>
                             </div>
@@ -100,9 +104,12 @@ $summaryCards = [
                     <?php foreach ($records as $index => $record): ?>
                         <tr>
                             <td><strong><?= (($pager->getCurrentPage('pks') - 1) * $filters['perPage']) + $index + 1 ?></strong></td>
-                            <td><a class="pks-code-link" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']) ?>"><?= esc($record['kode_internal']) ?></a></td>
+                            <td><a class="pks-code-link" href="<?= esc($pksBaseUrl . '/' . $record['id']) ?>"><?= esc($record['kode_internal']) ?></a></td>
                             <td>
-                                <div class="pks-name-cell"><strong><?= esc($record['nama_kerjasama']) ?></strong><span><?= esc($record['unit_pengelola'] ?: 'Unit belum diisi') ?></span></div>
+                                <div class="pks-name-cell"><strong><?= esc($record['nama_kerjasama']) ?></strong></div>
+                            </td>
+                            <td>
+                                <div class="pks-name-cell"><strong><?= esc($record['unit_pengelola'] ?: 'Unit belum diisi') ?></strong><span class="pks-pic-name"><?= esc($record['pic_internal'] ?: 'PIC internal belum diisi') ?></span></div>
                             </td>
                             <td><?= esc($record['nama_mitra']) ?></td>
                             <td>
@@ -115,8 +122,8 @@ $summaryCards = [
                             <td><span class="pks-status <?= esc($record['status_class']) ?>"><?= esc($record['status_label']) ?></span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id']) ?>" data-pks-view data-pks-popup-url="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id'] . '?popup=1') ?>" title="Lihat detail" aria-label="Lihat detail"><?= view('components/table_action_icon', ['icon' => 'view']) ?></a>
-                                    <a class="icon-btn" href="<?= site_url('bagian-umum-1/pks-barang-jasa/' . $record['id'] . '/ubah') ?>" title="Edit dan kelola" aria-label="Edit dan kelola PKS"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></a>
+                                    <a class="icon-btn" href="<?= esc($pksBaseUrl . '/' . $record['id']) ?>" data-pks-view data-pks-popup-url="<?= esc($pksBaseUrl . '/' . $record['id'] . '?popup=1') ?>" title="Lihat detail" aria-label="Lihat detail"><?= view('components/table_action_icon', ['icon' => 'view']) ?></a>
+                                    <a class="icon-btn" href="<?= esc($pksBaseUrl . '/' . $record['id'] . '/ubah') ?>" title="Edit dan kelola" aria-label="Edit dan kelola PKS"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></a>
                                 </div>
                             </td>
                         </tr>
@@ -126,7 +133,7 @@ $summaryCards = [
         </table>
     </div>
     <div class="table-list-footer">
-        <form method="get" action="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" class="table-length-form">
+        <form method="get" action="<?= esc($pksBaseUrl) ?>" class="table-length-form">
             <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>">
             <?php if ($filters['status'] !== ''): ?><input type="hidden" name="status" value="<?= esc($filters['status']) ?>"><?php endif ?>
             <input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">
@@ -144,13 +151,13 @@ $summaryCards = [
         <header class="modal-header">
             <div class="modal-title-group"><span class="modal-title-icon pks-modal-icon" data-pks-modal-icon>＋</span>
                 <div>
-                    <p>BAGIAN UMUM 1</p>
+                    <p>BAGIAN UMUM</p>
                     <h2 id="pksMainModalTitle" data-pks-modal-title>Tambah PKS Barang dan Jasa</h2>
                 </div>
             </div>
             <button type="button" class="modal-close" data-pks-modal-close aria-label="Tutup">×</button>
         </header>
-        <form action="<?= site_url('bagian-umum-1/pks-barang-jasa') ?>" method="post" data-pks-main-form>
+        <form action="<?= esc($pksBaseUrl) ?>" method="post" data-pks-main-form>
             <?= csrf_field() ?>
             <div class="modal-body">
                 <?php if ($popupErrors !== []): ?><div class="modal-alert pks-popup-errors" role="alert"><strong>Periksa data berikut:</strong>
@@ -186,7 +193,7 @@ $summaryCards = [
                                 <option value="Bagian Umum 2">Bagian Umum 2</option>
                             </select></div>
                         <div class="form-group modal-span-2"><label for="popupNamaKerjasama">Nama Kerja Sama <span class="required">*</span></label><input id="popupNamaKerjasama" name="nama_kerjasama" maxlength="250" placeholder="Contoh: Pengadaan Jasa Kebersihan Kantor" required></div>
-                        <div class="form-group"><label for="popupPicInternal">PIC Internal</label><input id="popupPicInternal" name="pic_internal" readonly aria-readonly="true" placeholder="Terisi otomatis sesuai unit"><small>Ditentukan otomatis berdasarkan Unit Pengelola.</small></div>
+                        <div class="form-group"><label for="popupPicInternal">PIC Internal</label><input id="popupPicInternal" name="pic_internal" maxlength="150" placeholder="Nama PIC internal"><small>Opsional untuk kebutuhan informasi PKS.</small></div>
                     </div>
                 </section>
 
@@ -260,7 +267,7 @@ $summaryCards = [
         <header class="modal-header">
             <div class="modal-title-group"><span class="modal-title-icon pks-modal-icon">▤</span>
                 <div>
-                    <p>BAGIAN UMUM 1</p>
+                    <p>BAGIAN UMUM</p>
                     <h2 id="pksDetailPopupTitle">Detail PKS Barang dan Jasa</h2>
                 </div>
             </div>
@@ -337,21 +344,12 @@ $summaryCards = [
         const backButton = modal.querySelector('[data-pks-step-back]');
         const nextButton = modal.querySelector('[data-pks-step-next]');
         const submitButton = modal.querySelector('[data-pks-modal-submit]');
-        const baseUrl = <?= json_encode(site_url('bagian-umum-1/pks-barang-jasa')) ?>;
+        const baseUrl = <?= json_encode($pksBaseUrl) ?>;
         const fieldNames = ['kode_internal', 'nama_kerjasama', 'unit_pengelola', 'pic_internal', 'nama_mitra', 'alamat', 'nama_kontak', 'jabatan_kontak', 'telepon', 'email', 'nomor_dokumen', 'tanggal_dokumen', 'jangka_waktu_bulan', 'periode_mulai', 'periode_selesai', 'nilai', 'link_berkas'];
-        const unitField = form.elements.unit_pengelola;
-        const picField = form.elements.pic_internal;
         const documentDateField = form.elements.tanggal_dokumen;
         const durationField = form.elements.jangka_waktu_bulan;
         const periodStartField = form.elements.periode_mulai;
         const periodEndField = form.elements.periode_selesai;
-        const picByUnit = {
-            'Bagian Umum 1': 'Angger Wicaksono',
-            'Bagian Umum 2': 'Agil Halis Kesawa'
-        };
-        const syncPicInternal = () => {
-            picField.value = picByUnit[unitField.value] ?? '';
-        };
         const addMonthsClamped = (dateValue, monthsValue) => {
             const match = String(dateValue || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
             const months = Number.parseInt(monthsValue, 10);
@@ -446,7 +444,6 @@ $summaryCards = [
             fieldNames.forEach(name => {
                 form.elements[name].value = data[name] ?? '';
             });
-            syncPicInternal();
             syncDocumentPeriod();
             modal.querySelector('[data-pks-modal-title]').textContent = id ? 'Ubah PKS Barang dan Jasa' : 'Tambah PKS Barang dan Jasa';
             modal.querySelector('[data-pks-modal-icon]').textContent = id ? '✎' : '＋';
@@ -459,7 +456,6 @@ $summaryCards = [
             const data = JSON.parse(button.dataset.pksEdit);
             prepare(data, data.id);
         }));
-        unitField.addEventListener('change', syncPicInternal);
         documentDateField.addEventListener('change', syncDocumentPeriod);
         documentDateField.addEventListener('input', syncDocumentPeriod);
         durationField.addEventListener('input', syncDocumentPeriod);

@@ -25,6 +25,60 @@ class Agendaris extends BaseController
         return redirect()->to(site_url('agendaris/surat-masuk'));
     }
 
+    public function dashboard(): string
+    {
+        $db = db_connect();
+
+        $dokumenMasukTotal = $db->table('agendaris')->where('deleted_at', null)->countAllResults();
+        $dokumenMasukSelesai = $db->table('agendaris')->where('deleted_at', null)->where('progres', 'Selesai')->countAllResults();
+        $dokumenMasukMenunggu = max(0, $dokumenMasukTotal - $dokumenMasukSelesai);
+        $dokumenKeluarTotal = $db->table('dokumen_keluar')->where('deleted_at', null)->countAllResults();
+        $dokumenKeluarSelesai = $db->table('dokumen_keluar')->where('deleted_at', null)->where('status_agendaris', 'Selesai')->countAllResults();
+
+        $atkTotal = $db->table('agendaris_atk_kantor')->where('deleted_at', null)->countAllResults();
+        $atkTersedia = $db->table('agendaris_atk_kantor')->where('deleted_at', null)->where('stok_barang >', 5)->countAllResults();
+        $atkMenipis = $db->table('agendaris_atk_kantor')->where('deleted_at', null)->where('stok_barang >', 0)->where('stok_barang <=', 5)->countAllResults();
+        $atkHabis = $db->table('agendaris_atk_kantor')->where('deleted_at', null)->where('stok_barang <=', 0)->countAllResults();
+
+        $souvenirTotal = $db->table('agendaris_souvenir_inventaris')->where('deleted_at', null)->where('jenis', 'Souvenir')->countAllResults();
+        $souvenirTersedia = $db->table('agendaris_souvenir_inventaris')->where('deleted_at', null)->where('jenis', 'Souvenir')->where('persediaan_akhir >', 5)->countAllResults();
+        $souvenirMenipis = $db->table('agendaris_souvenir_inventaris')->where('deleted_at', null)->where('jenis', 'Souvenir')->where('persediaan_akhir >', 0)->where('persediaan_akhir <=', 5)->countAllResults();
+        $souvenirHabis = $db->table('agendaris_souvenir_inventaris')->where('deleted_at', null)->where('jenis', 'Souvenir')->where('persediaan_akhir <=', 0)->countAllResults();
+        $inventarisTotal = $db->table('agendaris_souvenir_inventaris')->where('deleted_at', null)->where('jenis', 'Inventaris')->countAllResults();
+        $dokumenPersentase = $dokumenMasukTotal > 0 ? (int) round(($dokumenMasukSelesai / $dokumenMasukTotal) * 100) : 0;
+
+        $dokumenTerbaru = $db->table('agendaris')
+            ->select('nomor_surat, nomor_agendaris, perihal_surat, progres, tanggal_diterima')
+            ->where('deleted_at', null)
+            ->orderBy('updated_at', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->limit(5)
+            ->get()
+            ->getResultArray();
+
+        return view('agendaris/dashboard', [
+            'title' => 'Dashboard Agendaris',
+            'summary' => [
+                'dokumen_masuk_total' => $dokumenMasukTotal,
+                'dokumen_masuk_selesai' => $dokumenMasukSelesai,
+                'dokumen_masuk_menunggu' => $dokumenMasukMenunggu,
+                'dokumen_keluar_total' => $dokumenKeluarTotal,
+                'dokumen_keluar_selesai' => $dokumenKeluarSelesai,
+                'atk_total' => $atkTotal,
+                'atk_tersedia' => $atkTersedia,
+                'atk_menipis' => $atkMenipis,
+                'atk_habis' => $atkHabis,
+                'souvenir_total' => $souvenirTotal,
+                'souvenir_tersedia' => $souvenirTersedia,
+                'souvenir_menipis' => $souvenirMenipis,
+                'souvenir_habis' => $souvenirHabis,
+                'inventaris_total' => $inventarisTotal,
+                'dokumen_persentase' => $dokumenPersentase,
+            ],
+            'dokumenTerbaru' => $dokumenTerbaru,
+        ]);
+    }
+
     public function suratMasuk(): string
     {
         $generalSectionView = service('uri')->getSegment(1) === 'bagian-umum-1';
