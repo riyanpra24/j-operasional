@@ -40,10 +40,15 @@ namespace {
     require __DIR__ . '/../../app/Modules/Akuntansi/Controllers/Akutansi.php';
     $GLOBALS['db'] = new NoteDatabase();
     $controller = new \App\Modules\Akuntansi\Controllers\Akutansi();
-    $GLOBALS['post'] = ['unit' => 'Surabaya', 'tahun' => '2026', 'bulan' => '9', 'uraian' => '', 'deviasi' => 'all', 'notes' => ['row_29' => 'Catatan September', 'row_30' => ''], 'original' => ['row_29' => '', 'row_30' => '']];
+    // Filter deviasi hanya menentukan baris yang ditampilkan, bukan identitas catatan.
+    $GLOBALS['post'] = ['unit' => 'Surabaya', 'tahun' => '2026', 'bulan' => '9', 'uraian' => '', 'deviasi' => 'negative', 'notes' => ['row_29' => 'Catatan September', 'row_30' => ''], 'original' => ['row_29' => '', 'row_30' => '']];
     $response = $controller->saveMonitoringExplanations();
     if (!isset($response->flash['success']) || count($GLOBALS['db']->rows) !== 1 || $GLOBALS['db']->rows['Surabaya:2026:9:row_29']['explanation'] !== 'Catatan September') throw new \RuntimeException('Unable to save a note or unchanged rows were written.');
-    $GLOBALS['post']['bulan'] = '10'; $GLOBALS['post']['notes']['row_29'] = 'Catatan Oktober';
+    $GLOBALS['post']['deviasi'] = 'all';
+    $GLOBALS['post']['original']['row_29'] = 'Catatan September';
+    $response = $controller->saveMonitoringExplanations();
+    if (!isset($response->flash['success']) || count($GLOBALS['db']->rows) !== 1 || $GLOBALS['db']->rows['Surabaya:2026:9:row_29']['explanation'] !== 'Catatan September') throw new \RuntimeException('Notes saved from a deviation filter must remain available in Semua Deviasi.');
+    $GLOBALS['post']['bulan'] = '10'; $GLOBALS['post']['notes']['row_29'] = 'Catatan Oktober'; $GLOBALS['post']['original']['row_29'] = '';
     $controller->saveMonitoringExplanations();
     if (count($GLOBALS['db']->rows) !== 2 || $GLOBALS['db']->rows['Surabaya:2026:9:row_29']['explanation'] !== 'Catatan September') throw new \RuntimeException('Notes must be isolated by period.');
     $GLOBALS['post']['bulan'] = '9'; $GLOBALS['post']['notes']['row_29'] = 'Usang';

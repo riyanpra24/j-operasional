@@ -267,11 +267,52 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
         });
     });
     const monitoringDialog = document.getElementById('monitoringEditDialog');
-    document.querySelector('[data-monitoring-edit-open]')?.addEventListener('click', (event) => {
-        event.currentTarget.closest('details')?.removeAttribute('open');
-        monitoringDialog?.showModal();
+    const syncMonitoringNoteStyles = (scope = document) => {
+        scope.querySelectorAll('[data-monitoring-note]').forEach((noteField) => {
+            const originalField = noteField.parentElement?.querySelector('[data-monitoring-original]');
+            const updateNoteStyle = () => {
+                const unchangedExistingNote = originalField && originalField.value !== '' && noteField.value === originalField.value;
+                noteField.classList.toggle('is-original-note', unchangedExistingNote);
+                noteField.classList.toggle('is-edited-note', noteField.value !== (originalField?.value || ''));
+            };
+            noteField.addEventListener('input', updateNoteStyle);
+            updateNoteStyle();
+        });
+    };
+    const refreshMonitoringEditor = async () => {
+        if (!(monitoringDialog instanceof HTMLDialogElement)) return;
+        const response = await fetch(window.location.href, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        if (!response.ok) throw new Error('Data edit tidak dapat dimuat.');
+        const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const refreshedDialog = page.getElementById('monitoringEditDialog');
+        if (!(refreshedDialog instanceof HTMLDialogElement)) throw new Error('Form Edit Anggaran tidak ditemukan.');
+        monitoringDialog.innerHTML = refreshedDialog.innerHTML;
+        syncMonitoringNoteStyles(monitoringDialog);
+    };
+    document.addEventListener('click', async (event) => {
+        if (!(event.target instanceof Element)) return;
+        const openButton = event.target.closest('[data-monitoring-edit-open]');
+        if (openButton) {
+            event.preventDefault();
+            openButton.closest('details')?.removeAttribute('open');
+            openButton.disabled = true;
+            try {
+                await refreshMonitoringEditor();
+                monitoringDialog?.showModal();
+            } catch (_) {
+                // Muat ulang penuh hanya sebagai cadangan bila data dialog gagal diambil.
+                window.location.assign(window.location.href);
+            } finally {
+                openButton.disabled = false;
+            }
+            return;
+        }
+        if (event.target.closest('#monitoringEditDialog [data-monitoring-edit-close]')) monitoringDialog?.close();
     });
-    monitoringDialog?.querySelectorAll('[data-monitoring-edit-close]').forEach((button) => button.addEventListener('click', () => monitoringDialog.close()));
     if (monitoringDialog?.dataset.autoOpen === 'true') monitoringDialog.showModal();
     const monitoringExportDialog = document.getElementById('monitoringExportDialog');
     document.querySelector('[data-monitoring-export-open]')?.addEventListener('click', (event) => {
@@ -280,16 +321,7 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
     });
     monitoringExportDialog?.querySelectorAll('[data-monitoring-export-close]').forEach((button) => button.addEventListener('click', () => monitoringExportDialog.close()));
     monitoringExportDialog?.querySelector('[data-monitoring-export-form]')?.addEventListener('submit', () => monitoringExportDialog.close());
-    document.querySelectorAll('[data-monitoring-note]').forEach((noteField) => {
-        const originalField = noteField.parentElement?.querySelector('[data-monitoring-original]');
-        const updateNoteStyle = () => {
-            const unchangedExistingNote = originalField && originalField.value !== '' && noteField.value === originalField.value;
-            noteField.classList.toggle('is-original-note', unchangedExistingNote);
-            noteField.classList.toggle('is-edited-note', noteField.value !== (originalField?.value || ''));
-        };
-        noteField.addEventListener('input', updateNoteStyle);
-        updateNoteStyle();
-    });
+    syncMonitoringNoteStyles();
 </script>
 
 <?= $this->endSection() ?>
