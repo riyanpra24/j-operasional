@@ -61,7 +61,9 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
     .monitoring-edit-table thead { position: sticky; top: 0; z-index: 8; }
     body .content-shell .main-content .monitoring-edit-table thead th:first-child { z-index: 9; background: #22396f !important; }
     .monitoring-edit-table th, .monitoring-edit-table td { padding: 5px 6px; }
-    .monitoring-edit-table textarea { box-sizing: border-box; min-width: 0; width: 100%; min-height: 36px; padding: 6px 8px; border: 1px solid #a9cae7; border-radius: 7px; color: #163c66; background: #fff; font: inherit; resize: vertical; }
+    .monitoring-edit-table textarea { box-sizing: border-box; min-width: 0; width: 100%; min-height: 36px; padding: 6px 8px; border: 1px solid #a9cae7; border-radius: 7px; color: #111827; background: #fff; font: inherit; resize: vertical; }
+    .monitoring-edit-table textarea.is-original-note { color: #8a94a3; background: #f8fafc; }
+    .monitoring-edit-table textarea.is-edited-note { color: #111827; background: #fff; }
     .monitoring-edit-table textarea:focus { outline: 2px solid #45afe5; outline-offset: 1px; }
 </style>
 
@@ -105,7 +107,7 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
             <label class="lr-upload-label" for="budgetDeviation">Filter Deviasi</label>
             <div class="lr-rka-filter-control"><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4h10M7 20h10M9 4 15 20M15 4 9 20"></path></svg></span>
                 <select class="lr-upload-select" id="budgetDeviation" name="deviasi">
-                    <option value="all" <?= $selectedDeviationFilter === 'all' ? 'selected' : '' ?>>Semua Deviasi</option>
+                    <option value="" disabled hidden <?= $selectedDeviationFilter === 'all' ? 'selected' : '' ?>>Pilih filter deviasi</option>
                     <option value="normal" <?= $selectedDeviationFilter === 'normal' ? 'selected' : '' ?>>Deviasi Normal</option>
                     <option value="negative" <?= $selectedDeviationFilter === 'negative' ? 'selected' : '' ?>>Deviasi Mines</option>
                 </select>
@@ -236,7 +238,8 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
                             <?php else: ?>
                             <td colspan="6" aria-label="Nilai kelompok tersedia pada Konsolidasi saja"></td>
                             <?php endif ?>
-                            <td><textarea name="notes[<?= esc($key, 'attr') ?>]" rows="1" maxlength="2000" aria-label="Penjelasan <?= esc($editRow['label'], 'attr') ?>"><?= esc($editNotes[$key] ?? $note) ?></textarea><textarea name="original[<?= esc($key, 'attr') ?>]" hidden><?= esc($note) ?></textarea></td>
+                            <?php $editNote = $editNotes[$key] ?? $note; ?>
+                            <td><textarea class="<?= $editNote === $note && $note !== '' ? 'is-original-note' : ($editNote !== $note ? 'is-edited-note' : '') ?>" name="notes[<?= esc($key, 'attr') ?>]" rows="1" maxlength="2000" aria-label="Penjelasan <?= esc($editRow['label'], 'attr') ?>" data-monitoring-note><?= esc($editNote) ?></textarea><textarea name="original[<?= esc($key, 'attr') ?>]" hidden data-monitoring-original><?= esc($note) ?></textarea></td>
                         </tr>
                     <?php endforeach ?>
                     <?php endforeach ?>
@@ -275,6 +278,16 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
     });
     monitoringExportDialog?.querySelectorAll('[data-monitoring-export-close]').forEach((button) => button.addEventListener('click', () => monitoringExportDialog.close()));
     monitoringExportDialog?.querySelector('[data-monitoring-export-form]')?.addEventListener('submit', () => monitoringExportDialog.close());
+    document.querySelectorAll('[data-monitoring-note]').forEach((noteField) => {
+        const originalField = noteField.parentElement?.querySelector('[data-monitoring-original]');
+        const updateNoteStyle = () => {
+            const unchangedExistingNote = originalField && originalField.value !== '' && noteField.value === originalField.value;
+            noteField.classList.toggle('is-original-note', unchangedExistingNote);
+            noteField.classList.toggle('is-edited-note', noteField.value !== (originalField?.value || ''));
+        };
+        noteField.addEventListener('input', updateNoteStyle);
+        updateNoteStyle();
+    });
 </script>
 
 <?= $this->endSection() ?>

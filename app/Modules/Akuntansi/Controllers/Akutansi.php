@@ -43,7 +43,7 @@ class Akutansi extends BaseController
         $search = $this->request->getGet('uraian');
         $search = is_string($search) ? mb_substr(trim($search), 0, 150) : '';
         $deviationFilter = $this->request->getGet('deviasi');
-        $deviationFilter = is_string($deviationFilter) && in_array($deviationFilter, ['all', 'normal', 'negative'], true)
+        $deviationFilter = is_string($deviationFilter) && in_array($deviationFilter, ['normal', 'negative'], true)
             ? $deviationFilter : 'all';
         $record = (new RkaBudgetService())->find($unit === 'Konsolidasi' ? 'Korporat Kanwil' : $unit, $year);
         $values = $record === null ? null : json_decode((string) $record['calculated_json'], true, 512, JSON_THROW_ON_ERROR);

@@ -19,7 +19,7 @@ namespace App\Controllers {
 namespace {
     class NoteRequest { public function getPost($key) { return $GLOBALS['post'][$key] ?? null; } }
     class NoteDatabase {
-        public array $rows = []; public array $snapshot = []; public array $condition = []; public bool $inTransaction = false;
+        public array $rows = []; public array $snapshot = []; public array $condition = []; public string $queryKey = ''; public bool $inTransaction = false;
         public function transBegin() { $this->snapshot = $this->rows; $this->inTransaction = true; return true; }
         public function transRollback() { if ($this->inTransaction) $this->rows = $this->snapshot; $this->inTransaction = false; return true; }
         public function transCommit() { $this->inTransaction = false; return true; }
@@ -37,10 +37,10 @@ namespace {
     function redirect() { return new \CodeIgniter\HTTP\RedirectResponse(); }
     function site_url($path) { return '/' . $path; }
     function log_message($level, $message, $context = []) {}
-    require __DIR__ . '/../../app/Controllers/Akutansi.php';
+    require __DIR__ . '/../../app/Modules/Akuntansi/Controllers/Akutansi.php';
     $GLOBALS['db'] = new NoteDatabase();
-    $controller = new \App\Controllers\Akutansi();
-    $GLOBALS['post'] = ['unit' => 'Surabaya', 'tahun' => '2026', 'bulan' => '9', 'uraian' => '', 'notes' => ['row_29' => 'Catatan September', 'row_30' => ''], 'original' => ['row_29' => '', 'row_30' => '']];
+    $controller = new \App\Modules\Akuntansi\Controllers\Akutansi();
+    $GLOBALS['post'] = ['unit' => 'Surabaya', 'tahun' => '2026', 'bulan' => '9', 'uraian' => '', 'deviasi' => 'all', 'notes' => ['row_29' => 'Catatan September', 'row_30' => ''], 'original' => ['row_29' => '', 'row_30' => '']];
     $response = $controller->saveMonitoringExplanations();
     if (!isset($response->flash['success']) || count($GLOBALS['db']->rows) !== 1 || $GLOBALS['db']->rows['Surabaya:2026:9:row_29']['explanation'] !== 'Catatan September') throw new \RuntimeException('Unable to save a note or unchanged rows were written.');
     $GLOBALS['post']['bulan'] = '10'; $GLOBALS['post']['notes']['row_29'] = 'Catatan Oktober';
