@@ -252,16 +252,18 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
 </dialog>
 
 <script>
-    document.querySelectorAll('.monitoring-budget-table [data-monitoring-group]').forEach((row) => {
+    // Tabel dapat diperbarui sebagian saat filter digunakan. Delegasi klik
+    // membuat tombol buka/tutup kelompok tetap bekerja pada baris pengganti.
+    document.addEventListener('click', (event) => {
+        const row = event.target.closest('.monitoring-budget-table [data-monitoring-group]');
+        if (!row || event.target.closest('textarea, input, select, a')) return;
         const button = row.querySelector('[data-monitoring-toggle]');
-        row.addEventListener('click', (event) => {
-            if (event.target.closest('textarea, input, select, a')) return;
-            const expanded = button.getAttribute('aria-expanded') !== 'true';
-            button.setAttribute('aria-expanded', String(expanded));
-            button.getAttribute('aria-controls').split(' ').forEach((id) => {
-                const detail = document.getElementById(id);
-                if (detail) detail.hidden = !expanded;
-            });
+        if (!button) return;
+        const expanded = button.getAttribute('aria-expanded') !== 'true';
+        button.setAttribute('aria-expanded', String(expanded));
+        button.getAttribute('aria-controls').split(' ').filter(Boolean).forEach((id) => {
+            const detail = document.getElementById(id);
+            if (detail) detail.hidden = !expanded;
         });
     });
     const monitoringDialog = document.getElementById('monitoringEditDialog');

@@ -1,7 +1,7 @@
 # Graph Report - operasional  (2026-11-18)
 
 ## Corpus Check
-- 1158 files · ~2,857,867 words
+- 1158 files · ~2,858,006 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 64 file(s) not represented in the graph (top: (none) 19, .css 13, .xml 11)
 

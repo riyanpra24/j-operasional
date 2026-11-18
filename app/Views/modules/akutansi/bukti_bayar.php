@@ -596,7 +596,7 @@ $rangeLabel = $filters['tanggal_dari'] !== '' || $filters['tanggal_sampai'] !== 
         document.querySelectorAll('[data-bukti-view-close]').forEach((button) => button.addEventListener('click', () => toggle(viewModal, false)));
         document.querySelectorAll('[data-bukti-delete-close]').forEach((button) => button.addEventListener('click', () => toggle(deleteModal, false)));
 
-        document.querySelectorAll('[data-bukti-edit]').forEach((button) => button.addEventListener('click', () => {
+        const openEdit = (button) => {
             const record = parseRecord(button);
             form.action = form.dataset.updateUrl.replace('__id__', record.id);
             form.nomor_memo.value = record.nomor_memo || '';
@@ -610,14 +610,14 @@ $rangeLabel = $filters['tanggal_dari'] !== '' || $filters['tanggal_sampai'] !== 
             document.querySelector('#buktiBayarFormTitle').textContent = 'Edit Bukti Bayar';
             document.querySelector('[data-bukti-form-submit]').textContent = 'Simpan Perubahan';
             toggle(formModal, true);
-        }));
-        document.querySelectorAll('[data-bukti-delete]').forEach((button) => button.addEventListener('click', () => {
+        };
+        const openDelete = (button) => {
             const record = parseRecord(button);
             deleteForm.action = deleteForm.dataset.deleteUrl.replace('__id__', record.id);
             document.querySelector('[data-bukti-delete-label]').textContent = record.nomor_voucher || record.nomor_memo || 'ini';
             toggle(deleteModal, true);
-        }));
-        document.querySelectorAll('[data-bukti-view]').forEach((button) => button.addEventListener('click', async () => {
+        };
+        const openView = async (button) => {
             try {
                 const response = await fetch(button.dataset.url, {
                     headers: {
@@ -648,7 +648,24 @@ $rangeLabel = $filters['tanggal_dari'] !== '' || $filters['tanggal_sampai'] !== 
             } catch (error) {
                 window.alert(error.message || 'Detail bukti bayar belum dapat ditampilkan.');
             }
-        }));
+        };
+        // Baris Bukti Bayar dapat diganti saat filter atau pagination dipakai.
+        // Delegasi event memastikan aksi Lihat, Edit, dan Hapus tetap aktif.
+        document.addEventListener('click', async (event) => {
+            if (!(event.target instanceof Element)) return;
+            const button = event.target.closest('[data-bukti-edit], [data-bukti-delete], [data-bukti-view]');
+            if (!button) return;
+            event.preventDefault();
+            if (button.hasAttribute('data-bukti-edit')) {
+                openEdit(button);
+                return;
+            }
+            if (button.hasAttribute('data-bukti-delete')) {
+                openDelete(button);
+                return;
+            }
+            await openView(button);
+        });
     })();
 </script>
 

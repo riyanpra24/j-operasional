@@ -2500,50 +2500,57 @@
         panel.classList.toggle('lr-details-expanded', hasExpandedDetail);
     };
 
-    document.querySelectorAll('.lr-report-table [data-lr-expandable]').forEach((row) => {
+    // Laporan dapat diperbarui sebagian setelah filter digunakan. Delegasi klik
+    // menjaga kelompok Laba/Rugi baru tetap dapat dibuka dan ditutup.
+    document.addEventListener('click', (event) => {
+        if (!(event.target instanceof Element)) return;
+        const row = event.target.closest('.lr-report-table [data-lr-expandable]');
+        if (!row || event.target.closest('[data-lr-percent-toggle], input, select, textarea, a')) return;
         const toggle = row.querySelector('[data-lr-toggle]');
-        if (!toggle) return;
-        row.addEventListener('click', () => {
-            const expanded = toggle.getAttribute('aria-expanded') !== 'true';
-            toggle.setAttribute('aria-expanded', String(expanded));
-            row.querySelectorAll('[data-rka-group-output], [data-lr-group-output]').forEach((output) => {
-                if (output.hasAttribute('data-rka-group-output')) output.dataset.rkaExpanded = String(expanded);
-                if (output.hasAttribute('data-lr-group-output')) output.dataset.lrExpanded = String(expanded);
-                output.setAttribute('aria-hidden', String(expanded));
-            });
-            row.querySelectorAll('[data-lr-percent-toggle]').forEach((percentageToggle) => {
-                const detailId = percentageToggle.getAttribute('aria-controls');
-                const percentageDetail = detailId ? document.getElementById(detailId) : null;
-                percentageToggle.setAttribute('aria-expanded', 'false');
-                if (percentageDetail) percentageDetail.hidden = true;
-            });
-            row.closest('table').querySelectorAll('[data-lr-detail]').forEach((detail) => {
-                if (detail.dataset.lrDetail !== toggle.dataset.lrToggle) return;
-                const percentageDetail = detail.hasAttribute('data-lr-percent-detail');
-                detail.hidden = !expanded || percentageDetail;
-                if (percentageDetail) {
-                    const percentageToggle = row.closest('table').querySelector(`[data-lr-percent-toggle][aria-controls="${detail.id}"]`);
-                    percentageToggle?.setAttribute('aria-expanded', 'false');
-                }
-            });
-            synchronizeProfitLossScroll(row.closest('table'));
+        const table = row.closest('table');
+        if (!toggle || !table) return;
+
+        const expanded = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(expanded));
+        row.querySelectorAll('[data-rka-group-output], [data-lr-group-output]').forEach((output) => {
+            if (output.hasAttribute('data-rka-group-output')) output.dataset.rkaExpanded = String(expanded);
+            if (output.hasAttribute('data-lr-group-output')) output.dataset.lrExpanded = String(expanded);
+            output.setAttribute('aria-hidden', String(expanded));
         });
+        row.querySelectorAll('[data-lr-percent-toggle]').forEach((percentageToggle) => {
+            const detailId = percentageToggle.getAttribute('aria-controls');
+            const percentageDetail = detailId ? document.getElementById(detailId) : null;
+            percentageToggle.setAttribute('aria-expanded', 'false');
+            if (percentageDetail) percentageDetail.hidden = true;
+        });
+        table.querySelectorAll('[data-lr-detail]').forEach((detail) => {
+            if (detail.dataset.lrDetail !== toggle.dataset.lrToggle) return;
+            const percentageDetail = detail.hasAttribute('data-lr-percent-detail');
+            detail.hidden = !expanded || percentageDetail;
+            if (percentageDetail) {
+                const percentageToggle = table.querySelector(`[data-lr-percent-toggle][aria-controls="${detail.id}"]`);
+                percentageToggle?.setAttribute('aria-expanded', 'false');
+            }
+        });
+        synchronizeProfitLossScroll(table);
     });
     document.querySelectorAll('.lr-profitloss-table').forEach(synchronizeProfitLossScroll);
 })();
 
 // Laba & Rugi: tampilkan rincian % Pencapaian per LOB untuk Korporat Kanwil.
 (() => {
-    document.querySelectorAll('[data-lr-percent-toggle]').forEach((toggle) => {
-        toggle.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const targetId = toggle.getAttribute('aria-controls');
-            const detail = targetId ? document.getElementById(targetId) : null;
-            if (!detail) return;
-            const expanded = toggle.getAttribute('aria-expanded') !== 'true';
-            toggle.setAttribute('aria-expanded', String(expanded));
-            detail.hidden = !expanded;
-        });
+    document.addEventListener('click', (event) => {
+        if (!(event.target instanceof Element)) return;
+        const toggle = event.target.closest('[data-lr-percent-toggle]');
+        if (!toggle) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const targetId = toggle.getAttribute('aria-controls');
+        const detail = targetId ? document.getElementById(targetId) : null;
+        if (!detail) return;
+        const expanded = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(expanded));
+        detail.hidden = !expanded;
     });
 })();
 
