@@ -107,7 +107,7 @@ $monitoringEditOpen = $monitoringEditOpen ?? false;
             <label class="lr-upload-label" for="budgetDeviation">Filter Deviasi</label>
             <div class="lr-rka-filter-control"><span class="lr-rka-filter-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4h10M7 20h10M9 4 15 20M15 4 9 20"></path></svg></span>
                 <select class="lr-upload-select" id="budgetDeviation" name="deviasi">
-                    <option value="" disabled hidden <?= $selectedDeviationFilter === 'all' ? 'selected' : '' ?>>Pilih filter deviasi</option>
+                    <option value="all" <?= $selectedDeviationFilter === 'all' ? 'selected' : '' ?>>Semua Deviasi</option>
                     <option value="normal" <?= $selectedDeviationFilter === 'normal' ? 'selected' : '' ?>>Deviasi Normal</option>
                     <option value="negative" <?= $selectedDeviationFilter === 'negative' ? 'selected' : '' ?>>Deviasi Mines</option>
                 </select>
