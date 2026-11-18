@@ -314,8 +314,23 @@
         openModal(editModal);
     };
 
-    document.querySelectorAll('[data-sdm-document-view]').forEach((button) => button.addEventListener('click', () => openView(parseData(button, 'data-sdm-document-view'))));
-    document.querySelectorAll('[data-sdm-document-edit]').forEach((button) => button.addEventListener('click', () => openEdit(parseData(button, 'data-sdm-document-edit'))));
+    // Tombol aksi berada di dalam tabel yang dapat diperbarui secara parsial.
+    // Delegasi event menjaga tombol Lihat dan Edit tetap berfungsi sesudah filter,
+    // pagination, atau jumlah baris tabel diubah.
+    document.addEventListener('click', (event) => {
+        const viewButton = event.target.closest('[data-sdm-document-view]');
+        if (viewButton) {
+            event.preventDefault();
+            openView(parseData(viewButton, 'data-sdm-document-view'));
+            return;
+        }
+
+        const editButton = event.target.closest('[data-sdm-document-edit]');
+        if (editButton) {
+            event.preventDefault();
+            openEdit(parseData(editButton, 'data-sdm-document-edit'));
+        }
+    });
     detailEdit?.addEventListener('click', () => {
         if (!currentDocument) return;
         closeModal(viewModal, false);
@@ -356,7 +371,10 @@
                 if (csrfField) csrfField.value = result.csrf.hash;
             }
             if (!response.ok || !result.success) throw result;
-            window.location.assign(result.redirect_url || currentDocumentListUrl());
+            const targetUrl = result.redirect_url || currentDocumentListUrl();
+            closeModal(editModal);
+            if (window.OperationalTable?.refreshActive?.(targetUrl)) return;
+            window.location.assign(targetUrl);
         } catch (error) {
             const errors = Array.isArray(error.errors) ? error.errors : [error.message || 'Perubahan disposisi belum berhasil disimpan.'];
             errorBox.replaceChildren();
