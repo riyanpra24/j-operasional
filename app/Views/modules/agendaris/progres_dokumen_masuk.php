@@ -1,0 +1,112 @@
+<?php
+/** @var list<array<string, mixed>> $agenda */
+/** @var array<string, mixed> $filters */
+/** @var list<string> $jenisOptions */
+/** @var \CodeIgniter\Pager\PagerInterface $pager */
+?>
+<?= $this->extend('layouts/main') ?>
+<?= $this->section('content') ?>
+
+<section class="page-heading heading-actions distribution-heading security-page-heading">
+    <div>
+        <p class="eyebrow">AGENDARIS</p>
+        <h1>Progres Dokumen</h1>
+    </div>
+    <?= view('modules/agendaris/progres_tabs', ['activeTab' => 'masuk', 'counts' => $tabCounts]) ?>
+</section>
+
+<form id="incomingProgressSyncForm" method="post" action="<?= site_url('agendaris/progres-dokumen-masuk/sinkronkan') ?>" hidden>
+    <?= csrf_field() ?>
+</form>
+
+<section class="panel filter-panel security-filter-panel">
+    <form method="get" action="<?= site_url('agendaris/progres-dokumen') ?>" class="agendaris-filter-form">
+        <div class="form-group search-group"><label for="incoming_progress_q">Cari dokumen</label>
+            <div class="input-with-icon"><span>⌕</span><input id="incoming_progress_q" type="search" name="q" value="<?= esc($filters['keyword']) ?>" placeholder="Nomor Agendaris, pengirim, perihal, penerima..."></div>
+        </div>
+        <div class="form-group"><label for="incoming_progress_jenis">Jenis</label><select id="incoming_progress_jenis" name="jenis">
+                <option value="">Semua jenis</option><?php foreach ($jenisOptions as $option): ?><option value="<?= esc($option) ?>" <?= $filters['jenis'] === $option ? 'selected' : '' ?>><?= esc($option) ?></option><?php endforeach ?>
+            </select></div>
+        <div class="form-group"><label for="incoming_progress_dari">Dari tanggal diterima</label><input id="incoming_progress_dari" type="date" name="dari" value="<?= esc($filters['from']) ?>"></div>
+        <div class="form-group"><label for="incoming_progress_sampai">Sampai tanggal diterima</label><input id="incoming_progress_sampai" type="date" name="sampai" value="<?= esc($filters['to']) ?>"></div>
+        <?= view('components/list_order_filter', ['id' => 'incoming_progress_urutan', 'value' => $filters['order']]) ?>
+        <input type="hidden" name="per_page" value="<?= $filters['perPage'] ?>">
+        <div class="filter-actions"><button type="submit" class="btn btn-secondary">Terapkan</button><a href="<?= site_url('agendaris/progres-dokumen') ?>" class="btn btn-ghost">Reset</a><details class="lr-action-menu lr-filter-menu"><summary class="lr-filter-menu-trigger" aria-label="Menu tindakan Progres Dokumen Masuk" title="Menu tindakan"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><rect x="14" y="14" width="7" height="7" rx="1.4"></rect></svg></summary><div class="lr-action-menu-popover" role="menu" aria-label="Menu Progres Dokumen Masuk"><button type="button" role="menuitem" class="lr-action-menu-item" data-agendaris-add>Tambah Dokumen Masuk</button><span class="lr-action-menu-divider" aria-hidden="true"></span><button type="submit" form="incomingProgressSyncForm" role="menuitem" class="lr-action-menu-item">Sinkronkan Dokumen</button></div></details></div>
+    </form>
+</section>
+
+<section class="panel register-panel agendaris-table-panel agenda-document-table-card progress-document-panel security-register-panel">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Sumber</th>
+                    <th>Nomor Agendaris</th>
+                    <th>Nomor Surat</th>
+                    <th>Perihal Surat</th>
+                    <th>Pengirim</th>
+                    <th>Tracking Disposisi</th>
+                    <th>Progres</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($agenda === []): ?>
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state"><span>▦</span><strong>Belum ada Dokumen Masuk</strong>
+                                <p>Tambahkan Dokumen Masuk baru atau sinkronkan dari data Security.</p>
+                            </div>
+                        </td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($agenda as $row): ?><tr>
+                            <td><span class="agenda-source <?= $row['dokumen_masuk_id'] !== null ? 'security' : 'manual' ?>"><?= $row['dokumen_masuk_id'] !== null ? 'Security' : 'Input Manual' ?></span></td>
+                            <td><strong><?= $row['nomor_agendaris'] ? esc($row['nomor_agendaris']) : '<span class="agenda-incomplete">Belum dibuat</span>' ?></strong></td>
+                            <td><strong><?= $row['nomor_surat'] ? esc($row['nomor_surat']) : '<span class="agenda-incomplete">Belum diisi</span>' ?></strong></td>
+                            <td class="cell-wrap"><?= esc($row['perihal_surat']) ?></td>
+                            <td><?= esc($row['pengirim']) ?></td>
+                            <?php
+                            $activeDisposition = 0;
+                            for ($step = 1; $step <= \Config\Disposition::MAX_STEPS; $step++) {
+                                if (trim((string) ($row["disposisi_{$step}"] ?? '')) !== '') $activeDisposition = $step;
+                            }
+                            $trackingStatus = $activeDisposition > 0 ? ($row["disposisi_{$activeDisposition}_status"] ?? 'Menunggu') : 'Belum ditentukan';
+                            $trackingClass = ['Menunggu' => 'pending', 'Diterima' => 'received', 'Diproses' => 'active', 'Diteruskan' => 'forwarded', 'Selesai' => 'completed'][$trackingStatus] ?? 'empty';
+                            ?>
+                            <td>
+                                <div class="disposition-table-tracking"><strong><?= $activeDisposition > 0 ? esc($row["disposisi_{$activeDisposition}"]) : 'Belum ada disposisi' ?></strong><span><?= $activeDisposition > 0 ? 'Tahap ' . $activeDisposition . ' · maksimal ' . \Config\Disposition::MAX_STEPS : 'Tracking belum dimulai' ?></span><em class="disposition-status-badge <?= $trackingClass ?>"><?= esc($trackingStatus) ?></em></div>
+                            </td>
+                            <?php $completed = ($row['progres'] ?? '') === 'Selesai'; ?>
+                            <td><span class="pickup-status <?= $completed ? 'completed' : 'pending' ?>"><?= esc($row['progres'] ?? 'Menunggu Penyelesaian') ?></span></td>
+                            <td>
+                                <div class="table-actions">
+                                    <button type="button" class="icon-btn" title="Detail" data-agendaris-view data-agendaris-url="<?= site_url('agendaris/progres-dokumen-masuk/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'view']) ?></button>
+                                    <button type="button" class="icon-btn" title="Ubah" data-agendaris-edit data-agendaris-url="<?= site_url('agendaris/progres-dokumen-masuk/' . $row['id']) ?>"><?= view('components/table_action_icon', ['icon' => 'edit']) ?></button>
+                                    <button type="button" class="icon-btn icon-btn-delete" title="Hapus" data-agendaris-delete data-delete-url="<?= site_url('agendaris/progres-dokumen-masuk/' . $row['id'] . '/hapus') ?>" data-delete-label="<?= esc($row['nomor_surat'] ?: 'Belum diisi', 'attr') ?>"><?= view('components/table_action_icon', ['icon' => 'delete']) ?></button>
+                                </div>
+                            </td>
+                        </tr><?php endforeach ?>
+                <?php endif ?>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-list-footer">
+        <form method="get" action="<?= site_url('agendaris/progres-dokumen') ?>" class="table-length-form">
+            <input type="hidden" name="q" value="<?= esc($filters['keyword']) ?>">
+            <input type="hidden" name="jenis" value="<?= esc($filters['jenis']) ?>">
+            <input type="hidden" name="dari" value="<?= esc($filters['from']) ?>">
+            <input type="hidden" name="sampai" value="<?= esc($filters['to']) ?>">
+            <input type="hidden" name="urutan" value="<?= esc($filters['order']) ?>">
+            <label for="incoming_progress_per_page">Tampilkan</label>
+            <select id="incoming_progress_per_page" name="per_page" aria-label="Jumlah baris per halaman" data-table-length><?php foreach ([10, 20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['perPage'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach ?></select>
+            <span>data</span>
+        </form>
+        <?php if ($agenda !== []): ?><div class="pagination-wrap"><?= $pager->links('progres_dokumen_masuk', 'default_full') ?></div><?php endif ?>
+    </div>
+</section>
+
+<?= view('modules/agendaris/form_modal') ?>
+<?= view('modules/agendaris/detail_modal', ['readOnly' => false]) ?>
+<?= view('modules/agendaris/delete_modal') ?>
+<?= $this->endSection() ?>

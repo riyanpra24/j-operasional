@@ -876,19 +876,6 @@ body.jaksa-bg .pks-summary-card {
     border-radius: 13px !important;
     box-shadow: 0 8px 20px rgba(17,66,117,.08) !important;
 }
-body.jaksa-bg .pks-summary-card::after {
-    position: absolute;
-    top: -78px;
-    right: -47px;
-    width: 155px;
-    height: 155px;
-    border: 24px solid rgba(58,163,234,.13);
-    border-radius: 50%;
-    box-shadow: -31px 33px 0 -15px rgba(84,208,195,.12);
-    content: "";
-    pointer-events: none;
-}
-body.jaksa-bg .pks-summary-card > * { position: relative; z-index: 1; }
 body.jaksa-bg .pks-summary-card:hover {
     border-color: #68c6e4 !important;
     box-shadow: 0 12px 24px rgba(17,104,158,.14) !important;
@@ -912,11 +899,8 @@ body.jaksa-bg .pks-summary-icon.active { background: linear-gradient(135deg, #07
 body.jaksa-bg .pks-summary-icon.warning { background: linear-gradient(135deg, #ce7a00, #ffb415) !important; box-shadow: 0 8px 16px rgba(195,119,0,.20) !important; }
 body.jaksa-bg .pks-summary-icon.expired { background: linear-gradient(135deg, #be264a, #ec4c6a) !important; box-shadow: 0 8px 16px rgba(175,35,65,.20) !important; }
 body.jaksa-bg .pks-summary-card-active { background: linear-gradient(105deg, #fff 0%, #fbfffe 62%, #e8fbf5 100%) !important; }
-body.jaksa-bg .pks-summary-card-active::after { border-color: rgba(56,198,174,.13); box-shadow: -31px 33px 0 -15px rgba(96,216,206,.14); }
 body.jaksa-bg .pks-summary-card-warning { background: linear-gradient(105deg, #fff 0%, #fffefa 62%, #fff4d7 100%) !important; }
-body.jaksa-bg .pks-summary-card-warning::after { border-color: rgba(250,190,63,.15); box-shadow: -31px 33px 0 -15px rgba(255,210,109,.15); }
 body.jaksa-bg .pks-summary-card-expired { background: linear-gradient(105deg, #fff 0%, #fffdfd 62%, #fff0f3 100%) !important; }
-body.jaksa-bg .pks-summary-card-expired::after { border-color: rgba(233,95,120,.12); box-shadow: -31px 33px 0 -15px rgba(249,171,186,.14); }
 body.jaksa-bg .pks-summary-grid small { color: #7385a3 !important; font-size: 9px !important; }
 body.jaksa-bg .pks-summary-grid strong { margin-top: 4px !important; color: #0b3d7b !important; font-size: 23px !important; }
 

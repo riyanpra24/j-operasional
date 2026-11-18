@@ -1,0 +1,342 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JAKSA — Pengujian Lokal</title>
+<link rel="stylesheet" href="../../public/assets/app.css">
+<link rel="stylesheet" href="../../public/assets/flowui-theme.css">
+<link rel="stylesheet" href="../../public/assets/jaksa-background.css">
+<link rel="stylesheet" href="../../public/assets/global-select.css">
+<link rel="stylesheet" href="../../public/assets/readable-ui.css">
+</head><body class="jaksa-bg ui-readable"><div class="app-shell">
+<aside class="sidebar" id="sidebar"><a class="brand brand-jaksa" href="#dashboard"><img class="brand-jaksa-wordmark" src="../../public/assets/images/jaksa-sidebar-logo-selected.png" alt="JAKSA"></a><nav class="main-nav"><p class="nav-label">MENU UTAMA</p><a class="nav-link active" href="#dashboard"><span class="nav-icon">⌂</span><span class="nav-link-text">Dashboard</span></a><div class="nav-group" data-nav-group><button class="nav-link nav-parent" data-nav-toggle aria-expanded="false"><span class="nav-icon">▤</span><span class="nav-link-text">Security</span></button><div class="nav-submenu" data-nav-submenu hidden><a class="nav-sublink" href="#tabel">Dokumen Masuk</a></div></div></nav></aside><button class="sidebar-backdrop" data-sidebar-close aria-label="Tutup menu"></button>
+<div class="content-shell"><header class="topbar"><button class="menu-toggle" data-sidebar-toggle aria-label="Buka menu">☰</button><div class="topbar-title"><strong>JAKSA Operasional</strong><span>Pengujian lokal · data contoh</span></div></header><main class="main-content" id="dashboard">
+
+<section class="admin-dashboard-hero">
+    <div class="admin-dashboard-welcome">
+        <span class="admin-dashboard-avatar" aria-hidden="true">AD</span>
+        <div>
+            <span class="admin-dashboard-kicker">DASHBOARD ADMINISTRATOR</span>
+            <h1>Selamat datang, Administrator Uji</h1>
+            <p>Ringkasan terpusat seluruh aktivitas operasional JAKSA per 09 November 2026.</p>
+        </div>
+    </div>
+    <div class="admin-dashboard-hero-actions">
+        <a class="admin-dashboard-account-link" href="#kelola-akun">
+            <span aria-hidden="true">◎</span>
+            <span><strong>12 akun</strong><small>Kelola pengguna</small></span>
+        </a>
+        <button type="button" class="admin-dashboard-print" data-print><span aria-hidden="true">⇩</span> Cetak ringkasan</button>
+    </div>
+</section>
+
+<section class="admin-dashboard-overview" aria-label="Ringkasan utama">
+    <article class="admin-overview-card blue">
+        <span class="admin-overview-icon" aria-hidden="true">▤</span>
+        <div><small>Total Data Terkelola</small><strong>12.580</strong>
+            <p>Akumulasi seluruh modul aktif</p>
+        </div>
+    </article>
+    <article class="admin-overview-card red">
+        <span class="admin-overview-icon" aria-hidden="true">!</span>
+        <div><small>Perlu Perhatian</small><strong>24</strong>
+            <p>Antrean dan tenggat yang perlu ditindaklanjuti</p>
+        </div>
+    </article>
+    <article class="admin-overview-card teal">
+        <span class="admin-overview-icon" aria-hidden="true">+</span>
+        <div><small>Aktivitas Hari Ini</small><strong>36</strong>
+            <p>Pencatatan baru pada modul utama</p>
+        </div>
+    </article>
+    <article class="admin-overview-card purple">
+        <span class="admin-overview-icon" aria-hidden="true">●</span>
+        <div><small>Sesi Aktif</small><strong>5</strong>
+            <p>Akun yang sedang terhubung</p>
+        </div>
+    </article>
+</section>
+
+<section class="admin-dashboard-lower-grid">
+    <article class="admin-dashboard-panel admin-attention-panel">
+        <header>
+            <div><span>PRIORITAS</span>
+                <h2>Perlu Perhatian</h2>
+                <p>Daftar pekerjaan yang belum selesai atau mendekati tenggat.</p>
+            </div><strong>24</strong>
+        </header>
+        <div class="admin-attention-list">
+                            <a href="tabel" class="admin-attention-item orange">
+                    <span class="admin-attention-count">18</span>
+                    <span><strong>Dokumen menunggu distribusi</strong><small>Security</small></span>
+                    <i aria-hidden="true">→</i>
+                </a>
+                            <a href="tabel" class="admin-attention-item red">
+                    <span class="admin-attention-count">6</span>
+                    <span><strong>Perjanjian mendekati tenggat</strong><small>Bagian Umum</small></span>
+                    <i aria-hidden="true">→</i>
+                </a>
+                    </div>
+    </article>
+
+    <article class="admin-dashboard-panel admin-activity-panel">
+        <header>
+            <div><span>TERBARU</span>
+                <h2>Aktivitas Aplikasi</h2>
+                <p>Data terbaru lintas unit dalam satu rangkuman.</p>
+            </div>
+        </header>
+        <div class="admin-activity-list">
+                                                <a href="tabel" class="admin-activity-item blue">
+                        <span class="admin-activity-dot" aria-hidden="true"></span>
+                        <span class="admin-activity-copy">
+                            <small>SECURITY</small>
+                            <strong>Dokumen masuk untuk proses pemeriksaan</strong>
+                            <p>Data contoh pengujian lokal</p>
+                        </span>
+                        <time datetime="2026-11-09 09:15:00">09-11-2026<small>09:15 WIB</small></time>
+                    </a>
+                                    </div>
+    </article>
+</section>
+
+<section class="admin-visual-grid" aria-label="Visualisasi ringkasan aplikasi">
+    <article class="admin-dashboard-panel admin-trend-panel">
+        <header>
+            <div><span>DIAGRAM AKTIVITAS</span>
+                <h2>Tren Enam Bulan</h2>
+                <p>Jumlah pencatatan baru dari modul utama setiap bulan.</p>
+            </div>
+            <span class="admin-chart-summary"><strong>835</strong><small>Total aktivitas</small></span>
+        </header>
+        <div class="admin-line-chart">
+            <div class="admin-chart-y-axis" aria-hidden="true">
+                <span>210</span>
+                <span>158</span>
+                <span>105</span>
+                <span>53</span>
+                <span>0</span>
+            </div>
+            <div class="admin-chart-canvas">
+                <svg viewBox="0 0 720 180" preserveAspectRatio="none" role="img" aria-label="Diagram aktivitas enam bulan">
+                    <defs>
+                        <linearGradient id="adminTrendArea" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stop-color="#008baa" stop-opacity=".3" />
+                            <stop offset="100%" stop-color="#00a49d" stop-opacity=".03" />
+                        </linearGradient>
+                    </defs>
+                                            <line x1="0" y1="40" x2="720" y2="40" class="admin-chart-grid-line" />                        <line x1="0" y1="66" x2="720" y2="66" class="admin-chart-grid-line" />                        <line x1="0" y1="92" x2="720" y2="92" class="admin-chart-grid-line" />                        <line x1="0" y1="118" x2="720" y2="118" class="admin-chart-grid-line" />                        <line x1="0" y1="145" x2="720" y2="145" class="admin-chart-grid-line" />                                            <path d="M 0 102.5 L 144 82.5 L 288 100 L 432 55 L 576 72.5 L 720 40 L 720 180 L 0 180 Z" fill="url(#adminTrendArea)" />                    <polyline points="0,102.5 144,82.5 288,100 432,55 576,72.5 720,40" class="admin-chart-line" />
+                                            <circle cx="0" cy="102.5" r="5" class="admin-chart-point" />
+                        <text x="0" y="89.5" text-anchor="middle" class="admin-chart-value">85</text>
+                                            <circle cx="144" cy="82.5" r="5" class="admin-chart-point" />
+                        <text x="144" y="69.5" text-anchor="middle" class="admin-chart-value">125</text>
+                                            <circle cx="288" cy="100" r="5" class="admin-chart-point" />
+                        <text x="288" y="87" text-anchor="middle" class="admin-chart-value">90</text>
+                                            <circle cx="432" cy="55" r="5" class="admin-chart-point" />
+                        <text x="432" y="42" text-anchor="middle" class="admin-chart-value">180</text>
+                                            <circle cx="576" cy="72.5" r="5" class="admin-chart-point" />
+                        <text x="576" y="59.5" text-anchor="middle" class="admin-chart-value">145</text>
+                                            <circle cx="720" cy="40" r="5" class="admin-chart-point" />
+                        <text x="720" y="27" text-anchor="middle" class="admin-chart-value">210</text>
+                                    </svg>
+                <div class="admin-chart-x-axis"><span><strong>Juni</strong><small>2026</small></span><span><strong>Juli</strong><small>2026</small></span><span><strong>Agustus</strong><small>2026</small></span><span><strong>September</strong><small>2026</small></span><span><strong>Oktober</strong><small>2026</small></span><span><strong>November</strong><small>2026</small></span></div>
+            </div>
+        </div>
+        <footer><span><i></i>Aktivitas tercatat</span><small>Sumber: Security, Agendaris, PKS, SPK, dan Monitoring Kendaraan</small></footer>
+    </article>
+
+    <article class="admin-dashboard-panel admin-donut-panel">
+        <header>
+            <div><span>DONUT RINGKAS</span>
+                <h2>Komposisi Data</h2>
+                <p>Perbandingan jumlah data pada setiap unit.</p>
+            </div>
+        </header>
+        <div class="admin-donut-content">
+            <div class="admin-donut-chart" style="background:conic-gradient(#087bb8 0deg 176.33deg,#7152c2 176.33deg 293.88deg,#009e91 293.88deg 360deg)" role="img" aria-label="Komposisi 245 data">
+                <div><strong>245</strong><small>Total data</small></div>
+            </div>
+            <div class="admin-donut-legend">
+                                                        <div class="blue">
+                        <i aria-hidden="true"></i>
+                        <span><strong>Security</strong><small>120 data</small></span>
+                        <b>49%</b>
+                    </div>
+                                                        <div class="purple">
+                        <i aria-hidden="true"></i>
+                        <span><strong>Agendaris</strong><small>80 data</small></span>
+                        <b>33%</b>
+                    </div>
+                                                        <div class="teal">
+                        <i aria-hidden="true"></i>
+                        <span><strong>PKS</strong><small>45 data</small></span>
+                        <b>18%</b>
+                    </div>
+                            </div>
+        </div>
+    </article>
+</section>
+
+<section class="admin-dashboard-section">
+    <header class="admin-dashboard-section-heading">
+        <div><span>SELURUH UNIT</span>
+            <h2>Ringkasan Modul</h2>
+            <p>Pantau jumlah data dan status utama dari setiap bagian.</p>
+        </div>
+    </header>
+
+    <div class="admin-module-grid">
+                    <article class="admin-module-card blue">
+                <header>
+                    <div class="admin-module-heading">
+                        <span class="admin-module-icon" aria-hidden="true">▤</span>
+                        <div><span>SECURITY</span>
+                            <h3>Security</h3>
+                            <p>Ringkasan operasional unit</p>
+                        </div>
+                    </div>
+                    <a href="#tabel">Buka modul <span aria-hidden="true">→</span></a>
+                </header>
+                <div class="admin-module-metrics">
+                                            <a class="admin-module-metric" href="#tabel">
+                            <span>Dokumen tercatat</span>
+                            <strong>120</strong>
+                            <small>Seluruh periode</small>
+                        </a>
+                                            <a class="admin-module-metric" href="#tabel">
+                            <span>Menunggu proses</span>
+                            <strong>18</strong>
+                            <small>Perlu ditindaklanjuti</small>
+                        </a>
+                                    </div>
+            </article>
+                    <article class="admin-module-card blue">
+                <header>
+                    <div class="admin-module-heading">
+                        <span class="admin-module-icon" aria-hidden="true">▤</span>
+                        <div><span>AGENDARIS</span>
+                            <h3>Agendaris</h3>
+                            <p>Ringkasan operasional unit</p>
+                        </div>
+                    </div>
+                    <a href="#tabel">Buka modul <span aria-hidden="true">→</span></a>
+                </header>
+                <div class="admin-module-metrics">
+                                            <a class="admin-module-metric" href="#tabel">
+                            <span>Dokumen tercatat</span>
+                            <strong>120</strong>
+                            <small>Seluruh periode</small>
+                        </a>
+                                            <a class="admin-module-metric" href="#tabel">
+                            <span>Menunggu proses</span>
+                            <strong>18</strong>
+                            <small>Perlu ditindaklanjuti</small>
+                        </a>
+                                    </div>
+            </article>
+            </div>
+</section>
+
+<section class="register-panel" id="tabel"><header class="panel-header"><h2>Dokumen Masuk — Data Uji</h2><button class="btn btn-primary" data-open-input-modal>Tambah Dokumen</button></header><div class="table-wrap"><table><thead><tr><th>No.</th><th>Pengirim</th><th>Perihal</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+<tr><td>1</td><td>Unit Operasional 1</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>2</td><td>Unit Operasional 2</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>3</td><td>Unit Operasional 3</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>4</td><td>Unit Operasional 4</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>5</td><td>Unit Operasional 5</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>6</td><td>Unit Operasional 6</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>7</td><td>Unit Operasional 7</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>8</td><td>Unit Operasional 8</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>9</td><td>Unit Operasional 9</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>10</td><td>Unit Operasional 10</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>11</td><td>Unit Operasional 11</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr><tr><td>12</td><td>Unit Operasional 12</td><td>Dokumen pengujian keterbacaan tabel dengan keterangan panjang</td><td>09-11-2026</td><td><span class="status-chip status-success">Selesai</span></td><td><button class="btn btn-secondary" data-open-input-modal>Input</button></td></tr></tbody></table></div></section></main></div></div>
+<div class="input-modal" id="inputDokumenModal" hidden aria-hidden="true">
+    <button type="button" class="modal-backdrop" data-modal-close aria-label="Tutup popup"></button>
+    <section class="modal-dialog modal-dialog-compact" role="dialog" aria-modal="true" aria-labelledby="inputModalTitle">
+        <header class="modal-header">
+            <div class="modal-title-group">
+                <span class="modal-title-icon">＋</span>
+                <div><p>REGISTER DIGITAL</p><h2 id="inputModalTitle">Input Dokumen Masuk</h2></div>
+            </div>
+            <button type="button" class="modal-close" data-modal-close aria-label="Tutup popup">×</button>
+        </header>
+
+        <form action="#distribusi-dokumen/dokumen-masuk" method="post" id="modalDokumenForm">
+            <input type="hidden" name="csrf_test" value="fixture">            <div class="modal-alert" data-modal-errors hidden role="alert"></div>
+            <div class="modal-body input-modal-body">
+                <div class="modal-section-heading"><span>01</span><div><strong>Data dokumen</strong><small>Lengkapi informasi dokumen yang diterima</small></div></div>
+                <div class="modal-form-grid input-form-grid">
+                    <div class="form-group">
+                        <label for="modal_pengirim">Pengirim <span class="required">*</span></label>
+                        <input id="modal_pengirim" name="pengirim" maxlength="255" placeholder="Nama orang, unit, atau instansi pengirim" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_perihal_pilihan">Perihal <span class="required">*</span></label>
+                        <select id="modal_perihal_pilihan" name="perihal_pilihan" data-perihal-select required>
+                            <option value="">Pilih perihal</option>
+                            <option value="Confidential Documents">Confidential Documents</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group modal-span-2" data-perihal-custom hidden>
+                        <label for="modal_perihal_lainnya">Perihal lainnya <span class="required">*</span></label>
+                        <input id="modal_perihal_lainnya" name="perihal_lainnya" data-perihal-custom-input maxlength="255" placeholder="Ketik perihal dokumen">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_penerima">Penerima <span class="required">*</span></label>
+                        <select id="modal_penerima" name="penerima" required>
+                            <option value="">Pilih penerima</option>
+                            <option value="Yanto Pujoyuwono">Yanto Pujoyuwono</option>
+                            <option value="M. Aziz Dwi Pratomo">M. Aziz Dwi Pratomo</option>
+                            <option value="Ach. Fathur Rozi">Ach. Fathur Rozi</option>
+                            <option value="Yayak Andriyani">Yayak Andriyani</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_tanggal">Tanggal Diterima <span class="required">*</span></label>
+                        <input id="modal_tanggal" type="date" name="tanggal" value="2026-11-09" data-date-input required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_hari">Hari</label>
+                        <input id="modal_hari" value="" data-day-output readonly tabindex="-1">
+                        <small>Dihitung otomatis dari tanggal</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_jenis">Jenis <span class="required">*</span></label>
+                        <select id="modal_jenis" name="jenis" data-jenis-select required>
+                            <option value="">Pilih jenis</option>
+                            <option value="Surat">Surat</option>
+                            <option value="Dokumen">Dokumen</option>
+                            <option value="Paket">Paket</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group modal-span-2" data-jenis-custom hidden>
+                        <label for="modal_jenis_lainnya">Jenis lainnya <span class="required">*</span></label>
+                        <input id="modal_jenis_lainnya" name="jenis_lainnya" data-jenis-custom-input maxlength="100" placeholder="Ketik jenis dokumen">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_jumlah">Jumlah <span class="required">*</span></label>
+                        <input id="modal_jumlah" type="number" min="1" name="jumlah" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_satuan_jumlah">Satuan Jumlah</label>
+                        <input id="modal_satuan_jumlah" name="satuan_jumlah" maxlength="50" placeholder="Contoh: lembar, berkas, amplop">
+                        <small>Isi satuan jumlah yang diterima jika diperlukan.</small>
+                    </div>
+                    <div class="form-group ">
+    <label for="modal_ekspedisi_pilihan">Ekspedisi</label>
+    <select id="modal_ekspedisi_pilihan" name="ekspedisi_pilihan" data-ekspedisi-select >
+        <option value="">Pilih ekspedisi</option>
+                    <option value="J&amp;T Express" >J&amp;T Express</option>
+                    <option value="JNE" >JNE</option>
+                    <option value="Pos Indonesia" >Pos Indonesia</option>
+                    <option value="TIKI" >TIKI</option>
+                    <option value="GoSend" >GoSend</option>
+                    <option value="GrabExpress" >GrabExpress</option>
+                    <option value="Paxel" >Paxel</option>
+                    <option value="KAI Logistik" >KAI Logistik</option>
+                    <option value="KGP" >KGP</option>
+                <option value="Lainnya" >Lainnya</option>
+    </select>
+</div>
+<div class="form-group " data-ekspedisi-custom hidden>
+    <label for="modal_ekspedisi_lainnya">Ekspedisi lainnya <span class="required">*</span></label>
+    <input id="modal_ekspedisi_lainnya" name="ekspedisi_lainnya" data-ekspedisi-custom-input maxlength="150" value="" placeholder="Ketik nama ekspedisi" disabled>
+</div>
+                </div>
+            </div>
+            <footer class="modal-footer">
+                <span class="modal-submit-status" data-modal-status></span>
+                <button type="button" class="btn btn-ghost" data-modal-close>Batal</button>
+                <button type="submit" class="btn btn-primary" data-modal-submit>Simpan dokumen</button>
+            </footer>
+        </form>
+    </section>
+</div>
+<script src="../../public/assets/app.js"></script><script src="../../public/assets/global-select.js"></script></body></html>

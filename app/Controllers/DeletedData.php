@@ -2,23 +2,23 @@
 
 namespace App\Controllers;
 
-use App\Models\AgendarisModel;
-use App\Models\AccountingRkaBudgetModel;
+use App\Modules\Agendaris\Models\AgendarisModel;
+use App\Modules\Akuntansi\Models\AccountingRkaBudgetModel;
 use App\Libraries\RkaBudgetService;
 use App\Libraries\LrWorkpaperImportParser;
-use App\Models\DokumenKeluarModel;
-use App\Models\DokumenMasukModel;
-use App\Models\DokumenSpkModel;
-use App\Models\DataAsetModel;
-use App\Models\MagangModel;
-use App\Models\PksDokumenModel;
-use App\Models\PksItemModel;
-use App\Models\PksKerjasamaModel;
-use App\Models\SdmAttendanceImportModel;
+use App\Modules\Shared\Documents\Models\DokumenKeluarModel;
+use App\Modules\Shared\Documents\Models\DokumenMasukModel;
+use App\Modules\BagianUmum\Models\DokumenSpkModel;
+use App\Modules\BagianUmum\Models\DataAsetModel;
+use App\Modules\Sdm\Models\MagangModel;
+use App\Modules\Shared\Pks\Models\PksDokumenModel;
+use App\Modules\Shared\Pks\Models\PksItemModel;
+use App\Modules\Shared\Pks\Models\PksKerjasamaModel;
+use App\Modules\Sdm\Models\SdmAttendanceImportModel;
 use App\Models\UserModel;
-use App\Models\VehicleDocumentModel;
-use App\Models\VehicleMaintenanceModel;
-use App\Models\VehicleModel;
+use App\Modules\BagianUmum\Models\VehicleDocumentModel;
+use App\Modules\BagianUmum\Models\VehicleMaintenanceModel;
+use App\Modules\BagianUmum\Models\VehicleModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\Model;
@@ -27,7 +27,7 @@ class DeletedData extends BaseController
 {
     /** @var array<string, array{label:string, table:string, model:class-string<Model>, fields:list<string>}> */
     private const RESOURCES = [
-        'laporan-laba-rugi' => ['label' => 'Laporan Laba / Rugi', 'table' => 'accounting_lr_imports', 'model' => \App\Models\AccountingLrImportModel::class, 'fields' => ['report_basis', 'unit_name', 'report_month', 'report_year', 'source_name']],
+        'laporan-laba-rugi' => ['label' => 'Laporan Laba / Rugi', 'table' => 'accounting_lr_imports', 'model' => \App\Modules\Akuntansi\Models\AccountingLrImportModel::class, 'fields' => ['report_basis', 'unit_name', 'report_month', 'report_year', 'source_name']],
         'rka-kanwil-surabaya' => ['label' => 'RKA Kanwil Surabaya', 'table' => 'accounting_rka_budgets', 'model' => AccountingRkaBudgetModel::class, 'fields' => ['unit_name', 'budget_year']],
         'dokumen-masuk' => ['label' => 'Dokumen Masuk', 'table' => 'dokumen_masuk', 'model' => DokumenMasukModel::class, 'fields' => ['nomor_surat', 'pengirim', 'perihal']],
         'agendaris' => ['label' => 'Agendaris', 'table' => 'agendaris', 'model' => AgendarisModel::class, 'fields' => ['nomor_surat', 'pengirim', 'perihal_surat']],

@@ -1,0 +1,1299 @@
+{
+    "lob": [
+        {
+            "source_lob": "KUR",
+            "description_lob_contains": null,
+            "target_column": "KUR",
+            "priority": 10,
+            "is_active": 1
+        },
+        {
+            "source_lob": "NON KUR",
+            "description_lob_contains": null,
+            "target_column": "NON KUR",
+            "priority": 10,
+            "is_active": 1
+        },
+        {
+            "source_lob": "PEN",
+            "description_lob_contains": null,
+            "target_column": "PEN",
+            "priority": 10,
+            "is_active": 1
+        }
+    ],
+    "accounts": [
+        {
+            "unit_scope": "all",
+            "source_description": "Beban gaji karyawan",
+            "source_description_normalized": "beban gaji karyawan",
+            "report_label": "Beban gaji karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban lembur karyawan",
+            "source_description_normalized": "beban lembur karyawan",
+            "report_label": "Beban lembur karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban asuransi kesehatan karyawan",
+            "source_description_normalized": "beban asuransi kesehatan karyawan",
+            "report_label": "Beban asuransi kesehatan karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban asuransi jiwa karyawan",
+            "source_description_normalized": "beban asuransi jiwa karyawan",
+            "report_label": "Beban asuransi jiwa karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban dana pensiun",
+            "source_description_normalized": "beban dana pensiun",
+            "report_label": "Beban dana pensiun",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban kompensasi kinerja karyawan",
+            "source_description_normalized": "beban kompensasi kinerja karyawan",
+            "report_label": "Beban kompensasi kinerja karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Biaya jasa kini karyawan",
+            "source_description_normalized": "biaya jasa kini karyawan",
+            "report_label": "Biaya jasa kini karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Biaya jasa lalu karyawan",
+            "source_description_normalized": "biaya jasa lalu karyawan",
+            "report_label": "Biaya jasa lalu karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Bunga atas imbalan pasca kerja karyawan",
+            "source_description_normalized": "bunga atas imbalan pasca kerja karyawan",
+            "report_label": "Bunga atas imbalan pasca kerja karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban BPJS kesehatan karyawan",
+            "source_description_normalized": "beban bpjs kesehatan karyawan",
+            "report_label": "Beban BPJS kesehatan karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban BPJS jaminan hari tua karyawan",
+            "source_description_normalized": "beban bpjs jaminan hari tua karyawan",
+            "report_label": "Beban BPJS jaminan hari tua karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban BPJS jaminan kecelakaan kerja dan jaminan kematian karyawan",
+            "source_description_normalized": "beban bpjs jaminan kecelakaan kerja dan jaminan kematian karyawan",
+            "report_label": "Beban BPJS jaminan kecelakaan kerja dan jaminan kematian karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban BPJS jaminan pensiun karyawan",
+            "source_description_normalized": "beban bpjs jaminan pensiun karyawan",
+            "report_label": "Beban BPJS jaminan pensiun karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban tunjangan hari raya karyawan",
+            "source_description_normalized": "beban tunjangan hari raya karyawan",
+            "report_label": "Beban tunjangan hari raya karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban tunjangan PPh 21 karyawan",
+            "source_description_normalized": "beban tunjangan pph 21 karyawan",
+            "report_label": "Beban tunjangan PPh 21 karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban tunjangan transportasi karyawan",
+            "source_description_normalized": "beban tunjangan transportasi karyawan",
+            "report_label": "Beban tunjangan transportasi karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban tunjangan jabatan",
+            "source_description_normalized": "beban tunjangan jabatan",
+            "report_label": "Beban tunjangan jabatan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban tunjangan cuti besar",
+            "source_description_normalized": "beban tunjangan cuti besar",
+            "report_label": "Beban tunjangan cuti besar",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban tunjangan cuti tahunan",
+            "source_description_normalized": "beban tunjangan cuti tahunan",
+            "report_label": "Beban tunjangan cuti tahunan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban tunjangan makan",
+            "source_description_normalized": "beban tunjangan makan",
+            "report_label": "Beban tunjangan makan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban Tunjangan Pakaian Kerja",
+            "source_description_normalized": "beban tunjangan pakaian kerja",
+            "report_label": "Beban Tunjangan Pakaian Kerja",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban kompensasi PKWT/PKWTT",
+            "source_description_normalized": "beban kompensasi pkwt/pkwtt",
+            "report_label": "Beban kompensasi PKWT/PKWTT",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban tunjangan lainnya",
+            "source_description_normalized": "beban tunjangan lainnya",
+            "report_label": "Beban tunjangan lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Imbal jasa profesional - akuntan publik",
+            "source_description_normalized": "imbal jasa profesional - akuntan publik",
+            "report_label": "Imbal jasa profesional - akuntan publik",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Imbal jasa profesional - konsultan hukum",
+            "source_description_normalized": "imbal jasa profesional - konsultan hukum",
+            "report_label": "Imbal jasa profesional - konsultan hukum",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Imbal jasa profesional - konsultan manajemen",
+            "source_description_normalized": "imbal jasa profesional - konsultan manajemen",
+            "report_label": "Imbal jasa profesional - konsultan manajemen",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban imbal jasa profesional IT",
+            "source_description_normalized": "beban imbal jasa profesional it",
+            "report_label": "Beban imbal jasa profesional IT",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Imbal jasa profesional - lainnya",
+            "source_description_normalized": "imbal jasa profesional - lainnya",
+            "report_label": "Imbal jasa profesional - lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Air, listrik dan utilitas - gedung",
+            "source_description_normalized": "air, listrik dan utilitas - gedung",
+            "report_label": "Air, listrik dan utilitas - gedung",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Air, listrik dan utilitas - rumah dinas",
+            "source_description_normalized": "air, listrik dan utilitas - rumah dinas",
+            "report_label": "Air, listrik dan utilitas - rumah dinas",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Pemasaran",
+            "source_description_normalized": "pemasaran",
+            "report_label": "Pemasaran",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pelatihan manajemen",
+            "source_description_normalized": "beban pelatihan manajemen",
+            "report_label": "Beban pelatihan manajemen",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pelatihan karyawan - insidentil",
+            "source_description_normalized": "beban pelatihan karyawan - insidentil",
+            "report_label": "Beban pelatihan karyawan - insidentil",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pelatihan karyawan - leadership",
+            "source_description_normalized": "beban pelatihan karyawan - leadership",
+            "report_label": "Beban pelatihan karyawan - leadership",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pelatihan karyawan - TNA",
+            "source_description_normalized": "beban pelatihan karyawan - tna",
+            "report_label": "Beban pelatihan karyawan - TNA",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban sertifikasi",
+            "source_description_normalized": "beban sertifikasi",
+            "report_label": "Beban sertifikasi",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban perekrutan karyawan",
+            "source_description_normalized": "beban perekrutan karyawan",
+            "report_label": "Beban perekrutan karyawan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban uang saku magang",
+            "source_description_normalized": "beban uang saku magang",
+            "report_label": "Beban uang saku magang",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Akomodasi dinas dalam negeri",
+            "source_description_normalized": "akomodasi dinas dalam negeri",
+            "report_label": "Akomodasi dinas dalam negeri",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Transportasi dinas dalam negeri",
+            "source_description_normalized": "transportasi dinas dalam negeri",
+            "report_label": "Transportasi dinas dalam negeri",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Tunjangan perjalanan dinas dalam negeri",
+            "source_description_normalized": "tunjangan perjalanan dinas dalam negeri",
+            "report_label": "Tunjangan perjalanan dinas dalam negeri",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Akomodasi dinas luar negeri",
+            "source_description_normalized": "akomodasi dinas luar negeri",
+            "report_label": "Akomodasi dinas luar negeri",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Transportasi dinas luar negeri",
+            "source_description_normalized": "transportasi dinas luar negeri",
+            "report_label": "Transportasi dinas luar negeri",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Tunjangan perjalanan dinas luar negeri",
+            "source_description_normalized": "tunjangan perjalanan dinas luar negeri",
+            "report_label": "Tunjangan perjalanan dinas luar negeri",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Percetakan dan inventaris kantor",
+            "source_description_normalized": "percetakan dan inventaris kantor",
+            "report_label": "Percetakan dan inventaris kantor",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Telepon, fax dan komunikasi - gedung",
+            "source_description_normalized": "telepon, fax dan komunikasi - gedung",
+            "report_label": "Telepon, fax dan komunikasi - gedung",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Telepon, fax dan komunikasi - rumah dinas",
+            "source_description_normalized": "telepon, fax dan komunikasi - rumah dinas",
+            "report_label": "Telepon, fax dan komunikasi - rumah dinas",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Bensin dan parkir",
+            "source_description_normalized": "bensin dan parkir",
+            "report_label": "Bensin dan parkir",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan kendaraan",
+            "source_description_normalized": "beban pemeliharaan kendaraan",
+            "report_label": "Beban pemeliharaan kendaraan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penggunaan Data Center",
+            "source_description_normalized": "beban penggunaan data center",
+            "report_label": "Beban penggunaan Data Center",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban jaringan dan konektivitas",
+            "source_description_normalized": "beban jaringan dan konektivitas",
+            "report_label": "Beban jaringan dan konektivitas",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyewaan peralatan IT",
+            "source_description_normalized": "beban penyewaan peralatan it",
+            "report_label": "Beban penyewaan peralatan IT",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan peralatan IT",
+            "source_description_normalized": "beban pemeliharaan peralatan it",
+            "report_label": "Beban pemeliharaan peralatan IT",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan perangkat lunak IT",
+            "source_description_normalized": "beban pemeliharaan perangkat lunak it",
+            "report_label": "Beban pemeliharaan perangkat lunak IT",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan gedung",
+            "source_description_normalized": "beban pemeliharaan gedung",
+            "report_label": "Beban pemeliharaan gedung",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan rumah dinas",
+            "source_description_normalized": "beban pemeliharaan rumah dinas",
+            "report_label": "Beban pemeliharaan rumah dinas",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan mesin dan peralatan",
+            "source_description_normalized": "beban pemeliharaan mesin dan peralatan",
+            "report_label": "Beban pemeliharaan mesin dan peralatan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan renovasi dan instalasi",
+            "source_description_normalized": "beban pemeliharaan renovasi dan instalasi",
+            "report_label": "Beban pemeliharaan renovasi dan instalasi",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban aset bernilai rendah",
+            "source_description_normalized": "beban aset bernilai rendah",
+            "report_label": "Beban aset bernilai rendah",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan lainnya",
+            "source_description_normalized": "beban pemeliharaan lainnya",
+            "report_label": "Beban pemeliharaan lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan gedung sewa",
+            "source_description_normalized": "beban pemeliharaan gedung sewa",
+            "report_label": "Beban pemeliharaan gedung sewa",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan gudang sewa",
+            "source_description_normalized": "beban pemeliharaan gudang sewa",
+            "report_label": "Beban pemeliharaan gudang sewa",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan rumah dinas sewa",
+            "source_description_normalized": "beban pemeliharaan rumah dinas sewa",
+            "report_label": "Beban pemeliharaan rumah dinas sewa",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan peralatan sewa",
+            "source_description_normalized": "beban pemeliharaan peralatan sewa",
+            "report_label": "Beban pemeliharaan peralatan sewa",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan aset sewa lainnya",
+            "source_description_normalized": "beban pemeliharaan aset sewa lainnya",
+            "report_label": "Beban pemeliharaan aset sewa lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Sewa kantor",
+            "source_description_normalized": "sewa kantor",
+            "report_label": "Sewa kantor",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Sewa gudang",
+            "source_description_normalized": "sewa gudang",
+            "report_label": "Sewa gudang",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Sewa kendaraan",
+            "source_description_normalized": "sewa kendaraan",
+            "report_label": "Sewa kendaraan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pemeliharaan kendaraan sewa",
+            "source_description_normalized": "beban pemeliharaan kendaraan sewa",
+            "report_label": "Beban pemeliharaan kendaraan sewa",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Sewa peralatan",
+            "source_description_normalized": "sewa peralatan",
+            "report_label": "Sewa peralatan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Sewa rumah dinas",
+            "source_description_normalized": "sewa rumah dinas",
+            "report_label": "Sewa rumah dinas",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Biaya service charge",
+            "source_description_normalized": "biaya service charge",
+            "report_label": "Biaya service charge",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Sewa lainnya",
+            "source_description_normalized": "sewa lainnya",
+            "report_label": "Sewa lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban CKPN",
+            "source_description_normalized": "beban ckpn",
+            "report_label": "Beban CKPN",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pengumpulan informasi dan pengelolaan data",
+            "source_description_normalized": "beban pengumpulan informasi dan pengelolaan data",
+            "report_label": "Beban pengumpulan informasi dan pengelolaan data",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pengelolaan dana dan investasi",
+            "source_description_normalized": "beban pengelolaan dana dan investasi",
+            "report_label": "Beban pengelolaan dana dan investasi",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penelitian dan pengembangan",
+            "source_description_normalized": "beban penelitian dan pengembangan",
+            "report_label": "Beban penelitian dan pengembangan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban sosialisasi dan rekonsiliasi",
+            "source_description_normalized": "beban sosialisasi dan rekonsiliasi",
+            "report_label": "Beban sosialisasi dan rekonsiliasi",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban eksploitasi",
+            "source_description_normalized": "beban eksploitasi",
+            "report_label": "Beban eksploitasi",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban asuransi",
+            "source_description_normalized": "beban asuransi",
+            "report_label": "Beban asuransi",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban iuran keanggotaan",
+            "source_description_normalized": "beban iuran keanggotaan",
+            "report_label": "Beban iuran keanggotaan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pajak lainnya",
+            "source_description_normalized": "beban pajak lainnya",
+            "report_label": "Beban pajak lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Denda pajak",
+            "source_description_normalized": "denda pajak",
+            "report_label": "Denda pajak",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "PPN Masukan yang dibebankan",
+            "source_description_normalized": "ppn masukan yang dibebankan",
+            "report_label": "PPN Masukan yang dibebankan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Pungutan OJK",
+            "source_description_normalized": "pungutan ojk",
+            "report_label": "Pungutan OJK",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Pajak bumi dan bangunan",
+            "source_description_normalized": "pajak bumi dan bangunan",
+            "report_label": "Pajak bumi dan bangunan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban TJSL - Pilar Sosial",
+            "source_description_normalized": "beban tjsl - pilar sosial",
+            "report_label": "Beban TJSL - Pilar Sosial",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban TJSL - Pilar Lingkungan",
+            "source_description_normalized": "beban tjsl - pilar lingkungan",
+            "report_label": "Beban TJSL - Pilar Lingkungan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban TJSL - Pilar Ekonomi",
+            "source_description_normalized": "beban tjsl - pilar ekonomi",
+            "report_label": "Beban TJSL - Pilar Ekonomi",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban TJSL - Pilar Hukum dan Tata Kelola",
+            "source_description_normalized": "beban tjsl - pilar hukum dan tata kelola",
+            "report_label": "Beban TJSL - Pilar Hukum dan Tata Kelola",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban sponsorship event",
+            "source_description_normalized": "beban sponsorship event",
+            "report_label": "Beban sponsorship event",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban sumbangan",
+            "source_description_normalized": "beban sumbangan",
+            "report_label": "Beban sumbangan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban akomodasi rapat",
+            "source_description_normalized": "beban akomodasi rapat",
+            "report_label": "Beban akomodasi rapat",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban konsumsi rapat",
+            "source_description_normalized": "beban konsumsi rapat",
+            "report_label": "Beban konsumsi rapat",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban honorarium peserta rapat",
+            "source_description_normalized": "beban honorarium peserta rapat",
+            "report_label": "Beban honorarium peserta rapat",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban jasa pelaksanaan rapat",
+            "source_description_normalized": "beban jasa pelaksanaan rapat",
+            "report_label": "Beban jasa pelaksanaan rapat",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban representasi manajemen",
+            "source_description_normalized": "beban representasi manajemen",
+            "report_label": "Beban representasi manajemen",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban representasi perusahaan lainnya",
+            "source_description_normalized": "beban representasi perusahaan lainnya",
+            "report_label": "Beban representasi perusahaan lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Biaya admin bank",
+            "source_description_normalized": "biaya admin bank",
+            "report_label": "Biaya admin bank",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Biaya transfer",
+            "source_description_normalized": "biaya transfer",
+            "report_label": "Biaya transfer",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Retribusi keamanan",
+            "source_description_normalized": "retribusi keamanan",
+            "report_label": "Retribusi keamanan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Retribusi kebersihan",
+            "source_description_normalized": "retribusi kebersihan",
+            "report_label": "Retribusi kebersihan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban pajak dan retribusi daerah",
+            "source_description_normalized": "beban pajak dan retribusi daerah",
+            "report_label": "Beban pajak dan retribusi daerah",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban umum dan administrasi lainnya",
+            "source_description_normalized": "beban umum dan administrasi lainnya",
+            "report_label": "Beban umum dan administrasi lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban lainnya",
+            "source_description_normalized": "beban lainnya",
+            "report_label": "Beban lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Biaya kegiatan internal",
+            "source_description_normalized": "biaya kegiatan internal",
+            "report_label": "Biaya kegiatan internal",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Biaya komunitas",
+            "source_description_normalized": "biaya komunitas",
+            "report_label": "Biaya komunitas",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Biaya komunikasi dan kampanye",
+            "source_description_normalized": "biaya komunikasi dan kampanye",
+            "report_label": "Biaya komunikasi dan kampanye",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Selisih biaya invoice",
+            "source_description_normalized": "selisih biaya invoice",
+            "report_label": "Selisih biaya invoice",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban retribusi dan kontribusi lainnya",
+            "source_description_normalized": "beban retribusi dan kontribusi lainnya",
+            "report_label": "Beban retribusi dan kontribusi lainnya",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan aset tetap - gedung",
+            "source_description_normalized": "beban penyusutan aset tetap - gedung",
+            "report_label": "Beban penyusutan aset tetap - gedung",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan aset tetap - rumah dinas",
+            "source_description_normalized": "beban penyusutan aset tetap - rumah dinas",
+            "report_label": "Beban penyusutan aset tetap - rumah dinas",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan aset tetap - kendaraan",
+            "source_description_normalized": "beban penyusutan aset tetap - kendaraan",
+            "report_label": "Beban penyusutan aset tetap - kendaraan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan aset tetap - mesin dan peralatan",
+            "source_description_normalized": "beban penyusutan aset tetap - mesin dan peralatan",
+            "report_label": "Beban penyusutan aset tetap - mesin dan peralatan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan aset tetap - renovasi dan instalasi",
+            "source_description_normalized": "beban penyusutan aset tetap - renovasi dan instalasi",
+            "report_label": "Beban penyusutan aset tetap - renovasi dan instalasi",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban bunga liabilitas sewa - gedung",
+            "source_description_normalized": "beban bunga liabilitas sewa - gedung",
+            "report_label": "Beban bunga liabilitas sewa - gedung",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban bunga liabilitas sewa - rumah dinas",
+            "source_description_normalized": "beban bunga liabilitas sewa - rumah dinas",
+            "report_label": "Beban bunga liabilitas sewa - rumah dinas",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban bunga liabilitas sewa - kendaraan",
+            "source_description_normalized": "beban bunga liabilitas sewa - kendaraan",
+            "report_label": "Beban bunga liabilitas sewa - kendaraan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban bunga liabilitas sewa - peralatan",
+            "source_description_normalized": "beban bunga liabilitas sewa - peralatan",
+            "report_label": "Beban bunga liabilitas sewa - peralatan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan hak guna sewa - gedung",
+            "source_description_normalized": "beban penyusutan hak guna sewa - gedung",
+            "report_label": "Beban penyusutan hak guna sewa - gedung",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan hak guna sewa - rumah dinas",
+            "source_description_normalized": "beban penyusutan hak guna sewa - rumah dinas",
+            "report_label": "Beban penyusutan hak guna sewa - rumah dinas",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan hak guna sewa - kendaraan",
+            "source_description_normalized": "beban penyusutan hak guna sewa - kendaraan",
+            "report_label": "Beban penyusutan hak guna sewa - kendaraan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan hak guna sewa - peralatan",
+            "source_description_normalized": "beban penyusutan hak guna sewa - peralatan",
+            "report_label": "Beban penyusutan hak guna sewa - peralatan",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban penyusutan hak guna sewa - gudang",
+            "source_description_normalized": "beban penyusutan hak guna sewa - gudang",
+            "report_label": "Beban penyusutan hak guna sewa - gudang",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Beban amortisasi aset tidak berwujud - perangkat lunak",
+            "source_description_normalized": "beban amortisasi aset tidak berwujud - perangkat lunak",
+            "report_label": "Beban amortisasi aset tidak berwujud - perangkat lunak",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Pendapatan jasa giro",
+            "source_description_normalized": "pendapatan jasa giro",
+            "report_label": "Pendapatan jasa giro",
+            "sign_mode": "invert",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "Pendapatan lainnya",
+            "source_description_normalized": "pendapatan lainnya",
+            "report_label": "Pendapatan lainnya",
+            "sign_mode": "invert",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "tranportasi dinas dalam negeri",
+            "source_description_normalized": "tranportasi dinas dalam negeri",
+            "report_label": "Transportasi dinas dalam negeri",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "all",
+            "source_description": "tranportasi dinas luar negeri",
+            "source_description_normalized": "tranportasi dinas luar negeri",
+            "report_label": "Transportasi dinas luar negeri",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "kanwil",
+            "source_description": "Beban Klaim",
+            "source_description_normalized": "beban klaim",
+            "report_label": "Beban Klaim",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "kanwil",
+            "source_description": "Kenaikan (Penurunan) Cadangan Klaim",
+            "source_description_normalized": "kenaikan (penurunan) cadangan klaim",
+            "report_label": "Kenaikan (Penurunan) Cadangan Klaim",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "kanwil",
+            "source_description": "Pendapatan Subrogasi",
+            "source_description_normalized": "pendapatan subrogasi",
+            "report_label": "Pendapatan Subrogasi",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "kanwil",
+            "source_description": "Beban Komisi Netto",
+            "source_description_normalized": "beban komisi netto",
+            "report_label": "Beban Komisi Netto",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Pendapatan premi penjaminan kredit",
+            "source_description_normalized": "pendapatan premi penjaminan kredit",
+            "report_label": "Imbal Jasa Penjaminan Bruto",
+            "sign_mode": "invert",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Beban Pajak PPh 21 Non Karywan",
+            "source_description_normalized": "beban pajak pph 21 non karywan",
+            "report_label": "Pendapatan Subrogasi",
+            "sign_mode": "invert",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Restitusi penjaminan kredit",
+            "source_description_normalized": "restitusi penjaminan kredit",
+            "report_label": "Restitusi penjaminan kredit",
+            "sign_mode": "invert",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Pembayaran premi penjaminan ulang keluar",
+            "source_description_normalized": "pembayaran premi penjaminan ulang keluar",
+            "report_label": "Premi Penjaminan Ulang",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Beban klaim penjaminan kredit bruto",
+            "source_description_normalized": "beban klaim penjaminan kredit bruto",
+            "report_label": "Beban Klaim",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Penerimaan klaim penjaminan ulang",
+            "source_description_normalized": "penerimaan klaim penjaminan ulang",
+            "report_label": "Beban Klaim",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Kenaikan/penurunan estimasi liabilitas klaim - penjaminan",
+            "source_description_normalized": "kenaikan/penurunan estimasi liabilitas klaim - penjaminan",
+            "report_label": "Kenaikan (Penurunan) Cadangan Klaim",
+            "sign_mode": "keep",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Hak subrogasi penjaminan kredit - bruto",
+            "source_description_normalized": "hak subrogasi penjaminan kredit - bruto",
+            "report_label": "Pendapatan Subrogasi",
+            "sign_mode": "invert",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Beban penagihan subrogasi",
+            "source_description_normalized": "beban penagihan subrogasi",
+            "report_label": "Pendapatan Subrogasi",
+            "sign_mode": "invert",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Pendapatan komisi penjaminan ulang diterima",
+            "source_description_normalized": "pendapatan komisi penjaminan ulang diterima",
+            "report_label": "Beban Komisi Netto",
+            "sign_mode": "invert",
+            "is_active": 1
+        },
+        {
+            "unit_scope": "branch",
+            "source_description": "Komisi penjaminan kredit dibayar",
+            "source_description_normalized": "komisi penjaminan kredit dibayar",
+            "report_label": "Beban Komisi Netto",
+            "sign_mode": "invert",
+            "is_active": 1
+        }
+    ],
+    "branch_formula": [
+        {
+            "source_description": "Pendapatan premi penjaminan kredit",
+            "report_label": "Imbal Jasa Penjaminan Bruto",
+            "sign_mode": "invert",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_sign_mode": "invert"
+        },
+        {
+            "source_description": "Beban Pajak PPh 21 Non Karywan",
+            "report_label": "Pendapatan Subrogasi",
+            "sign_mode": "invert",
+            "segments": [
+                "NON KUR"
+            ]
+        },
+        {
+            "source_description": "Restitusi penjaminan kredit",
+            "report_label": "Restitusi penjaminan kredit",
+            "sign_mode": "invert",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_sign_mode": "invert"
+        },
+        {
+            "source_description": "Pembayaran premi penjaminan ulang keluar",
+            "report_label": "Premi Penjaminan Ulang",
+            "sign_mode": "keep",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_sign_mode": "keep"
+        },
+        {
+            "source_description": "Beban klaim penjaminan kredit bruto",
+            "report_label": "Beban Klaim",
+            "sign_mode": "keep",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_sign_mode": "keep"
+        },
+        {
+            "source_description": "Penerimaan klaim penjaminan ulang",
+            "report_label": "Beban Klaim",
+            "sign_mode": "keep",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_sign_mode": "keep"
+        },
+        {
+            "source_description": "Kenaikan/penurunan estimasi liabilitas klaim - penjaminan",
+            "report_label": "Kenaikan (Penurunan) Cadangan Klaim",
+            "sign_mode": "keep",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_zero": true
+        },
+        {
+            "source_description": "Hak subrogasi penjaminan kredit - bruto",
+            "report_label": "Pendapatan Subrogasi",
+            "sign_mode": "invert",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_sign_mode": "invert"
+        },
+        {
+            "source_description": "Beban penagihan subrogasi",
+            "report_label": "Pendapatan Subrogasi",
+            "sign_mode": "invert",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_sign_mode": "keep"
+        },
+        {
+            "source_description": "Pendapatan komisi penjaminan ulang diterima",
+            "report_label": "Beban Komisi Netto",
+            "sign_mode": "invert",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_sign_mode": "invert"
+        },
+        {
+            "source_description": "Komisi penjaminan kredit dibayar",
+            "report_label": "Beban Komisi Netto",
+            "sign_mode": "invert",
+            "segments": [
+                "KUR",
+                "NON KUR",
+                "PEN"
+            ],
+            "product_sign_mode": "invert"
+        }
+    ]
+}

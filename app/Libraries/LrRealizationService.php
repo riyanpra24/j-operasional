@@ -2,7 +2,7 @@
 
 namespace App\Libraries;
 
-use App\Models\AccountingLrImportModel;
+use App\Modules\Akuntansi\Models\AccountingLrImportModel;
 
 /** Loads the latest source per unit and report basis, then calculates one consistent report view. */
 final class LrRealizationService

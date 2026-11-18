@@ -258,6 +258,11 @@
     restorePageScroll();
 
     const reloadOperationalPage = () => {
+        const targetUrl = typeof window.__operationalRouteUrl === 'string' && window.__operationalRouteUrl !== ''
+            ? window.__operationalRouteUrl
+            : window.location.href;
+        if (window.OperationalTable?.refreshActive?.(targetUrl)) return;
+
         rememberPageScroll();
         if (typeof window.__operationalRouteUrl === 'string' && window.__operationalRouteUrl !== '') {
             window.location.replace(window.__operationalRouteUrl);
@@ -3651,4 +3656,205 @@
     } else {
         applyGlobalFilterLabel();
     }
+})();
+
+/* Pembaruan parsial untuk tabel daftar: filter, pagination, dan jumlah baris. */
+(() => {
+    const requests = new Map();
+
+    const findCard = (target) => {
+        if (!target) return null;
+        try {
+            return document.querySelector(target);
+        } catch (error) {
+            return null;
+        }
+    };
+
+    const tableSections = (root = document) => [...root.querySelectorAll('section')]
+        .filter((section) => section.querySelector('table') !== null);
+
+    const descriptorFor = (card) => {
+        if (!card) return null;
+        if (card.id) {
+            const id = window.CSS?.escape ? window.CSS.escape(card.id) : card.id;
+            return { key: `id:${card.id}`, selector: `#${id}` };
+        }
+
+        const position = tableSections().indexOf(card);
+        return position >= 0 ? { key: `table:${position}`, position } : null;
+    };
+
+    const cardFromDescriptor = (root, descriptor) => {
+        if (!descriptor) return null;
+        return descriptor.selector
+            ? root.querySelector(descriptor.selector)
+            : (tableSections(root)[descriptor.position] || null);
+    };
+
+    const firstTableAfter = (element) => tableSections().find((section) => (
+        element.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING
+    )) || null;
+
+    const genericCardFor = (element) => {
+        const currentSection = element.closest('section');
+        if (currentSection?.querySelector('table')) return currentSection;
+
+        const filterPanel = element.closest('.filter-panel');
+        return filterPanel ? firstTableAfter(filterPanel) : null;
+    };
+
+    const configuredCardFor = (element) => {
+        if (!(element instanceof Element)) return null;
+
+        const explicitTarget = element.closest('[data-partial-table-target]')?.dataset.partialTableTarget || '';
+        const explicitCard = findCard(explicitTarget);
+        if (explicitCard) return explicitCard;
+
+        const nestedCard = element.closest('[data-partial-table]');
+        if (nestedCard) return nestedCard;
+
+        for (const config of document.querySelectorAll('[data-partial-table-config]')) {
+            const configuredCard = findCard(config.dataset.partialTableTarget || '');
+            if (configuredCard?.contains(element)) return configuredCard;
+
+            const filterSelector = config.dataset.partialTableFilter || '';
+            if (filterSelector === '') continue;
+            try {
+                if (element.matches(filterSelector)) return configuredCard;
+            } catch (error) {
+                // Konfigurasi yang tidak valid tidak boleh mengganggu interaksi tabel lain.
+            }
+        }
+
+        return genericCardFor(element);
+    };
+
+    const urlFromForm = (form) => {
+        const url = new URL(form.action || window.location.href, window.location.href);
+        const query = new URLSearchParams(new FormData(form));
+        query.delete('page');
+        [...query.keys()].filter((key) => key.startsWith('page_')).forEach((key) => query.delete(key));
+        url.search = query.toString();
+        return url.toString();
+    };
+
+    const refresh = async (card, url, { updateHistory = true } = {}) => {
+        const descriptor = descriptorFor(card);
+        if (!descriptor) {
+            window.location.assign(url);
+            return;
+        }
+
+        requests.get(descriptor.key)?.abort();
+        const request = new AbortController();
+        requests.set(descriptor.key, request);
+        card.classList.add('is-loading', 'partial-table-loading');
+        card.setAttribute('aria-busy', 'true');
+
+        try {
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                cache: 'no-store',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                signal: request.signal,
+            });
+            if (!response.ok) throw new Error('Table request failed.');
+
+            const responseDocument = new DOMParser().parseFromString(await response.text(), 'text/html');
+            const nextCard = cardFromDescriptor(responseDocument, descriptor);
+            if (!nextCard || requests.get(descriptor.key) !== request) return;
+
+            card.replaceWith(nextCard);
+            if (updateHistory && window.location.href !== url) history.pushState({ partialTable: descriptor.key }, '', url);
+            document.dispatchEvent(new CustomEvent('operasional:table-refreshed', {
+                detail: { selector: descriptor.key, table: nextCard, url },
+            }));
+        } catch (error) {
+            if (error.name !== 'AbortError') window.location.assign(url);
+        } finally {
+            if (requests.get(descriptor.key) === request) requests.delete(descriptor.key);
+            if (card.isConnected) {
+                card.classList.remove('is-loading', 'partial-table-loading');
+                card.removeAttribute('aria-busy');
+            }
+        }
+    };
+
+    const refreshFromLink = (link, card) => {
+        if (link.target || link.hasAttribute('download')) return;
+        const url = new URL(link.href, window.location.href);
+        if (url.origin !== window.location.origin) return;
+        refresh(card, url.toString());
+    };
+
+    window.OperationalTable = Object.assign(window.OperationalTable || {}, {
+        refresh: (target, url = window.location.href) => {
+            const card = typeof target === 'string' ? findCard(target) : target;
+            if (!card) return Promise.reject(new Error('Tabel tidak ditemukan.'));
+            return refresh(card, new URL(url, window.location.href).toString());
+        },
+        refreshActive: (url = window.location.href) => {
+            const card = tableSections().find((section) => section.querySelector('.pagination, .table-length-form') !== null);
+            if (!card) return false;
+            refresh(card, new URL(url, window.location.href).toString(), { updateHistory: false });
+            return true;
+        },
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!(event.target instanceof Element) || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+        const directLink = event.target.closest('a[data-partial-table-target]');
+        const paginationLink = event.target.closest('.pagination a');
+        const resetLink = event.target.closest('.filter-panel a.btn-ghost[href]');
+        const tableLink = directLink || paginationLink || resetLink;
+        if (!tableLink) return;
+
+        const card = configuredCardFor(tableLink);
+        if (!card) return;
+        event.preventDefault();
+        refreshFromLink(tableLink, card);
+    });
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target instanceof HTMLFormElement ? event.target : null;
+        if (!form || event.defaultPrevented || (form.method || 'get').toLowerCase() !== 'get') return;
+
+        const isTableFilter = form.matches('.table-length-form') || form.closest('.filter-panel') !== null || form.hasAttribute('data-partial-table-target');
+        if (!isTableFilter) return;
+
+        const card = configuredCardFor(form);
+        if (!card) return;
+        event.preventDefault();
+        refresh(card, urlFromForm(form));
+    });
+
+    document.addEventListener('change', (event) => {
+        const select = event.target instanceof HTMLSelectElement ? event.target : null;
+        const isTableLength = select?.matches('[data-partial-table-length], [data-async-table-length], .table-length-form select[name="per_page"]');
+        if (!isTableLength || !select.form) return;
+
+        const card = configuredCardFor(select);
+        if (!card) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        refresh(card, urlFromForm(select.form));
+    }, true);
+
+    window.addEventListener('popstate', () => {
+        const cards = new Map();
+        document.querySelectorAll('[data-partial-table], [data-partial-table-config]').forEach((element) => {
+            const card = element.matches('[data-partial-table]')
+                ? element
+                : findCard(element.dataset.partialTableTarget || '');
+            const descriptor = descriptorFor(card);
+            if (card && descriptor) cards.set(descriptor.key, card);
+        });
+        tableSections().filter((card) => card.querySelector('.pagination, .table-length-form') !== null).forEach((card) => {
+            const descriptor = descriptorFor(card);
+            if (descriptor) cards.set(descriptor.key, card);
+        });
+        cards.forEach((card) => refresh(card, window.location.href, { updateHistory: false }));
+    });
 })();

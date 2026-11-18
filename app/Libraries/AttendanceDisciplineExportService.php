@@ -2,8 +2,8 @@
 
 namespace App\Libraries;
 
-use App\Models\SdmAttendanceCalendarModel;
-use App\Models\SdmAttendanceRecordModel;
+use App\Modules\Sdm\Models\SdmAttendanceCalendarModel;
+use App\Modules\Sdm\Models\SdmAttendanceRecordModel;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;

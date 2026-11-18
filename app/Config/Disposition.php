@@ -41,4 +41,12 @@ final class Disposition
     }
 
     public const STATUSES = ['Menunggu', 'Diterima', 'Diproses', 'Diteruskan', 'Selesai'];
+
+    public const RETURN_TO_AGENDARIS_STATUS = 'Kembalikan ke Agendaris';
+
+    /** @return list<string> */
+    public static function sdmStatusOptions(): array
+    {
+        return [...self::STATUSES, self::RETURN_TO_AGENDARIS_STATUS];
+    }
 }

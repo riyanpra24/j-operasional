@@ -2,7 +2,7 @@
 
 namespace App\Libraries;
 
-use App\Models\AccountingRkaBudgetModel;
+use App\Modules\Akuntansi\Models\AccountingRkaBudgetModel;
 use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
