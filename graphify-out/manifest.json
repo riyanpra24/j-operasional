@@ -1302,9 +1302,9 @@
     "semantic_hash": "78e2a3cada5052f148c4865bac51d6ea"
   },
   "public/assets/app.js": {
-    "mtime": 1794986752.111238,
-    "seen": 1794986801.1940737,
-    "ast_hash": "f806a81a42fdea9a84d9708a80858509",
+    "mtime": 1795053778.1505396,
+    "seen": 1795053934.4344459,
+    "ast_hash": "bc4c3323c9eeb92f81583885fd2f3061",
     "semantic_hash": ""
   },
   "public/assets/lr-volume-editor-popup.js": {

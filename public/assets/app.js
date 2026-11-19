@@ -1695,7 +1695,8 @@
                 return;
             }
             agendaStatus.textContent = 'Berhasil disimpan';
-            window.setTimeout(reloadOperationalPage, 500);
+            closeAgendaForm();
+            window.setTimeout(reloadOperationalPage, 180);
         } catch (error) {
             showAgendaErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {
@@ -2208,7 +2209,8 @@
             updateCsrf(result.csrf);
             if (!response.ok || !result.success) { showProgressErrors(result.message || 'Data belum dapat disimpan.', result.errors || []); return; }
             progressStatus.textContent = 'Berhasil disimpan';
-            window.setTimeout(reloadOperationalPage, 500);
+            closeProgressForm();
+            window.setTimeout(reloadOperationalPage, 180);
         } catch (error) {
             showProgressErrors('Koneksi ke aplikasi bermasalah. Silakan coba kembali.');
         } finally {

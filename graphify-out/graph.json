@@ -331256,7 +331256,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "public/assets/app.js",
-      "source_location": "L2482",
+      "source_location": "L2484",
       "weight": 1.0
     },
     {
@@ -331268,7 +331268,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "public/assets/app.js",
-      "source_location": "L3089",
+      "source_location": "L3091",
       "weight": 1.0
     },
     {
